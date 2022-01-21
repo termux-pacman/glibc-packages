@@ -1,0 +1,76 @@
+# Maintainer: Anatol Pomozov
+# Maintainer: Eli Schwartz <eschwartz@archlinux.org>
+# Contributor: Christer Solskogen <christer.solskogen@gmail.com>
+# Build order: aarch64-binutils -> aarch64-linux-api-headers -> aarch64-gcc-bootstrap -> aarch64-glibc -> aarch64-gcc -> aarch64-glibc (again)
+
+_arch=aarch64
+_target=$_arch-unknown-linux-gnu
+pkgname=$_arch-glibc
+pkgver=2.34
+pkgrel=1
+_commit=be176490b818b65b5162c332eb6b581690b16e5c
+pkgdesc="GNU C Library ARM64 target"
+arch=('aarch64')
+url='https://www.gnu.org/software/libc/'
+license=('GPL' 'LGPL')
+depends=()
+makedepends=($_arch-gcc $_arch-linux-api-headers)
+options=(!strip staticlibs)
+source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz{,.sig}
+	'_Fork.c.patch'
+	'dl-tls_init_tp.c.patch'
+	'pthread_create.c.patch')
+sha256sums=('44d26a1fe20b8853a48f470ead01e4279e869ac149b195dda4e44a195d981ab2'
+            'SKIP'
+            'SKIP'
+            'SKIP'
+            'SKIP')
+validpgpkeys=(7273542B39962DF7B299931416792B4EA25340F8  # "Carlos O'Donell <carlos@systemhalted.org>"
+              BC7C7372637EC10C57D7AA6579C43DFBF1CF2187) # Siddhesh Poyarekar
+
+prepare() {
+  for i in *.patch; do
+    /data/data/com.termux/files/usr/bin/patch -Np1 -i ${srcdir}/$i
+  done
+  mkdir -p glibc-build
+}
+
+build() {
+  sed -i 's|/tmp|/data/data/com.termux/files/usr/tmp|g' $(grep -R /tmp/ glibc-${pkgver} | grep -v /var/ | awk -F'[:=]' '{printf $1 "\n"}')
+  sed -i 's|/var/tmp|/data/data/com.termux/files/usr/tmp|g' $(grep -R /var/tmp glibc-${pkgver} | awk -F'[:=]' '{printf $1 "\n"}')
+
+  cd glibc-build
+  echo "build-programs=yes" > configparms
+  echo "slibdir=/data/data/com.termux/files/usr/glibc/lib" >> configparms
+  echo "rtlddir=/data/data/com.termux/files/usr/glibc/lib" >> configparms
+
+  unset CFLAGS
+  ../glibc-$pkgver/configure \
+      --prefix=/data/data/com.termux/files/usr/glibc \
+      --sysconfdir=/data/data/com.termux/files/usr/glibc/etc \
+      --host=$_target \
+      --libdir=/data/data/com.termux/files/usr/glibc/lib \
+      --with-bugurl=https://bugs.archlinux.org \
+      --enable-kernel=4.4 \
+      --enable-bind-now \
+      --enable-stack-protector=strong \
+      --enable-stackguard-randomization \
+      --disable-timezone-tools \
+      --enable-multi-arch CFLAGS="-O2 -pipe"
+
+  make
+}
+
+package() {
+  cd glibc-build
+  make DESTDIR="$pkgdir" install 
+
+  #we don't want static libraries. Only keep the one that we really need.
+  find "$pkgdir"  -name '*.a' -and -not -name libc_nonshared.a -delete
+  
+  #strip manually
+  find "$pkgdir" -name '*.so' -and ! -name 'libc.so' -print0 | xargs -0 strip --strip-all
+
+  #fix missing symlink
+  ln -s libpthread.so.0 "$pkgdir"/data/data/com.termux/files/usr/glibc/lib/libpthread.so
+}
