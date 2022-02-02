@@ -1,0 +1,55 @@
+# Maintainer: Pierre Schmitz <pierre@archlinux.de>
+
+pkgbase=zlib-glibc
+pkgname=(zlib-glibc minizip-glibc)
+epoch=1
+pkgver=1.2.11
+pkgrel=5
+arch=(any)
+license=('custom')
+url="https://www.zlib.net/"
+depends=()
+options=('staticlibs')  # needed by binutils testsuite
+source=("https://zlib.net/zlib-${pkgver}.tar.gz"{,.asc})
+sha256sums=('c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1'
+            'SKIP')
+validpgpkeys=('5ED46A6721D365587791E2AA783FCD8E58BCAFBA')
+
+prepare() {
+	cd "${srcdir}/zlib-$pkgver"
+	grep -A 24 '^  Copyright' zlib.h > LICENSE
+}
+
+build() {
+	cd "${srcdir}/zlib-$pkgver"
+
+	CFLAGS+=" -ffat-lto-objects"
+	./configure --prefix=/data/data/com.termux/files/usr/glibc
+	make
+
+	cd contrib/minizip
+	cp Makefile Makefile.orig
+	cp ../README.contrib readme.txt
+	autoreconf --install
+	./configure --prefix=/data/data/com.termux/files/usr/glibc --enable-static=no
+	make
+}
+
+package_zlib() {
+	pkgdesc='Compression library implementing the deflate compression method found in gzip and PKZIP'
+
+	cd "${srcdir}/zlib-$pkgver"
+	make install DESTDIR="${pkgdir}"
+	install -D -m644 LICENSE "${pkgdir}/data/data/com.termux/files/usr/glibc/share/licenses/zlib/LICENSE"
+}
+
+package_minizip() {
+	pkgdesc='Mini zip and unzip based on zlib'
+
+	cd "${srcdir}/zlib-$pkgver/contrib/minizip"
+	make install DESTDIR="${pkgdir}"
+	install -D -m644 "${srcdir}/zlib-$pkgver/LICENSE" "${pkgdir}/data/data/com.termux/files/usr/glibc/share/licenses/minizip/LICENSE"
+
+	# https://github.com/madler/zlib/pull/229
+	rm "${pkgdir}/data/data/com.termux/files/usr/glibc/include/minizip/crypt.h"
+}

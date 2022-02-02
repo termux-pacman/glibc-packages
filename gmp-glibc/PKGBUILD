@@ -1,0 +1,30 @@
+# Maintainer: Allan McRae <allan@archlinux.org>
+# Contributer: Jan de Groot <jgc@archlinux.org>
+
+pkgname=gmp-glibc
+pkgver=6.2.1
+pkgrel=1
+pkgdesc='A free library for arbitrary precision arithmetic'
+arch=(any)
+url='https://gmplib.org/'
+depends=()
+license=(LGPL3 GPL)
+source=(https://gmplib.org/download/gmp/gmp-$pkgver.tar.lz{,.sig})
+md5sums=('03a31d8cbaf29d136252f8f38875ed82'
+         'SKIP')
+validpgpkeys=('343C2FF0FBEE5EC2EDBEF399F3599FF828C67298')   # Niels Möller
+
+build() {
+  cd gmp-$pkgver
+
+  ./configure --build=${CHOST} \
+    --prefix=/data/data/com.termux/files/usr/glibc \
+    --enable-cxx \
+    --enable-fat
+  make
+}
+
+package() {
+  cd gmp-$pkgver
+  make DESTDIR="${pkgdir}" install
+}
