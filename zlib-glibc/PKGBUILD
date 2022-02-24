@@ -35,7 +35,7 @@ build() {
 	make
 }
 
-package_zlib() {
+package_zlib-glibc() {
 	pkgdesc='Compression library implementing the deflate compression method found in gzip and PKZIP'
 
 	cd "${srcdir}/zlib-$pkgver"
@@ -43,7 +43,7 @@ package_zlib() {
 	install -D -m644 LICENSE "${pkgdir}/data/data/com.termux/files/usr/glibc/share/licenses/zlib/LICENSE"
 }
 
-package_minizip() {
+package_minizip-glibc() {
 	pkgdesc='Mini zip and unzip based on zlib'
 
 	cd "${srcdir}/zlib-$pkgver/contrib/minizip"

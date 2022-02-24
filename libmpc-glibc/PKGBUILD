@@ -23,4 +23,5 @@ package() {
   cd "${srcdir}/mpc-${pkgver}"
   make DESTDIR="${pkgdir}" install
   mv "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/info/{mpc,libmpc}.info
+  rm "$pkgdir"/data/data/com.termux/files/usr/glibc/share/info/dir
 }

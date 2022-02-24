@@ -27,4 +27,5 @@ build() {
 package() {
   cd gmp-$pkgver
   make DESTDIR="${pkgdir}" install
+  rm "$pkgdir"/data/data/com.termux/files/usr/glibc/share/info/dir
 }
