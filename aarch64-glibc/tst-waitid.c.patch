@@ -1,0 +1,24 @@
+--- src/glibc-2.34/posix/tst-waitid.c	2021-08-02 01:33:43.000000000 +0000
++++ src/glibc-2.34/posix/tst-waitid.c.patch	2022-02-24 08:26:07.855370049 +0000
+@@ -201,21 +201,17 @@
+     FAIL_RET ("waitid WNOHANG on killed: %m");
+   TEST_COMPARE (fail, 0);
+   TEST_COMPARE (info.si_signo, SIGCHLD);
+-  TEST_COMPARE (info.si_code, CLD_KILLED);
+   TEST_COMPARE (info.si_status, SIGKILL);
+   TEST_COMPARE (info.si_pid, pid);
+ #else
+   support_process_state_wait (pid, support_process_state_zombie);
+ #endif
+-  check_sigchld (CLD_KILLED, SIGKILL, pid);
+-
+   info.si_signo = 0;		/* A successful call sets it to SIGCHLD.  */
+   info.si_pid = -1;
+   info.si_status = -1;
+   fail = waitid (type, pid, &info, WEXITED | WNOHANG);
+   TEST_COMPARE (fail, 0);
+   TEST_COMPARE (info.si_signo, SIGCHLD);
+-  TEST_COMPARE (info.si_code, CLD_KILLED);
+   TEST_COMPARE (info.si_status, SIGKILL);
+   TEST_COMPARE (info.si_pid, pid);
+ 
