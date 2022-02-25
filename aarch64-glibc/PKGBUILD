@@ -18,17 +18,11 @@ source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz{,.sig}
 	'_Fork.c.patch'
 	'dl-tls_init_tp.c.patch'
 	'pthread_create.c.patch'
-        'tst-waitid.c.patch'
-        'tst-support-process_state.c.patch'
-        'tst-wait-skeleton.c.patch'
         'locale-gen'
         'locale.gen.txt'
         'sdt-config.h'
         'sdt.h')
 sha256sums=('44d26a1fe20b8853a48f470ead01e4279e869ac149b195dda4e44a195d981ab2'
-            'SKIP'
-            'SKIP'
-            'SKIP'
             'SKIP'
             'SKIP'
             'SKIP'
@@ -44,13 +38,16 @@ prepare() {
   for i in *.patch; do
     /data/data/com.termux/files/usr/bin/patch -Np1 -i ${srcdir}/$i
   done
+
   mkdir -p glibc-build
+
+  [[ ! -d glibc ]] && ln -s glibc-$pkgver glibc
+
+  sed -i 's|/tmp|/data/data/com.termux/files/usr/tmp|g' $(grep -R /tmp/ glibc-$pkgver | grep -v /var/ | awk -F'[:=]' '{printf $1 "\n"}')
+  sed -i 's|/var/tmp|/data/data/com.termux/files/usr/tmp|g' $(grep -R /var/tmp glibc-$pkgver | awk -F'[:=]' '{printf $1 "\n"}')
 }
 
 build() {
-  sed -i 's|/tmp|/data/data/com.termux/files/usr/tmp|g' $(grep -R /tmp/ glibc-${pkgver} | grep -v /var/ | awk -F'[:=]' '{printf $1 "\n"}')
-  sed -i 's|/var/tmp|/data/data/com.termux/files/usr/tmp|g' $(grep -R /var/tmp glibc-${pkgver} | awk -F'[:=]' '{printf $1 "\n"}')
-
   cd glibc-build
   echo "build-programs=yes" > configparms
   echo "slibdir=/data/data/com.termux/files/usr/glibc/lib" >> configparms
@@ -93,19 +90,19 @@ package() {
   cd glibc
 
   install -dm755 "$pkgdir"/data/data/com.termux/files/usr/glibc/lib/{locale,systemd/system,tmpfiles.d}
-  install -m644 nscd/nscd.conf "$pkgdir/data/data/com.termux/files/usr/glibc/nscd.conf"
+  install -m644 nscd/nscd.conf "$pkgdir/data/data/com.termux/files/usr/glibc/etc/nscd.conf"
   install -m644 nscd/nscd.service "$pkgdir/data/data/com.termux/files/usr/glibc/lib/systemd/system"
   install -m644 nscd/nscd.tmpfiles "$pkgdir/data/data/com.termux/files/usr/glibc/lib/tmpfiles.d/nscd.conf"
-  install -dm755 "$pkgdir/data/data/com.termux/files/usr/glibc/db/nscd"
+  install -dm755 "$pkgdir/data/data/com.termux/files/usr/glibc/var/db/nscd"
 
-  install -m644 posix/gai.conf "$pkgdir"/data/data/com.termux/files/usr/glibc/gai.conf
+  install -m644 posix/gai.conf "$pkgdir"/data/data/com.termux/files/usr/glibc/etc/gai.conf
 
   install -m755 "$srcdir/locale-gen" "$pkgdir/data/data/com.termux/files/usr/glibc/bin"
 
   # Create /etc/locale.gen
-  install -m644 "$srcdir/locale.gen.txt" "$pkgdir/data/data/com.termux/files/usr/glibc/locale.gen"
+  install -m644 "$srcdir/locale.gen.txt" "$pkgdir/data/data/com.termux/files/usr/glibc/etc/locale.gen"
   sed -e '1,3d' -e 's|/| |g' -e 's|\\| |g' -e 's|^|#|g' \
-    "$srcdir/glibc/localedata/SUPPORTED" >> "$pkgdir/data/data/com.termux/files/usr/glibc/locale.gen"
+    "$srcdir/glibc/localedata/SUPPORTED" >> "$pkgdir/data/data/com.termux/files/usr/glibc/etc/locale.gen"
 
   if check_option 'debug' n; then
     find "$pkgdir"/data/data/com.termux/files/usr/glibc/bin -type f -executable -exec strip $STRIP_BINARIES {} + 2> /dev/null || true
