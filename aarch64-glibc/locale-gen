@@ -36,7 +36,7 @@ while read locale charset; do \
 	echo -n '...'; \
         if [ -f $LOCALES/$locale ]; then input=$locale; else \
         input=`echo $locale | sed 's/\([^.]*\)[^@]*\(.*\)/\1\2/'`; fi; \
-	localedef -i $input -c -f $charset -A /data/data/com.termux/files/usr/glibc/share/locale/locale.alias $locale; \
+	localedef --no-archive -i $input -c -f $charset -A /data/data/com.termux/files/usr/glibc/share/locale/locale.alias $locale; \
 	echo ' done'; \
 done < $LOCALEGEN
 echo "Generation complete."
