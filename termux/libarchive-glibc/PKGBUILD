@@ -1,0 +1,32 @@
+# Maintainer: Bartłomiej Piotrowski <bpiotrowski@archlinux.org>
+# Maintainer: Dan McGee <dan@archlinux.org>
+
+pkgname=libarchive-glibc
+pkgver=3.6.1
+pkgrel=1
+pkgdesc='Multi-format archive and compression library'
+arch=('aarch64' 'arm' 'x86_64' 'i686')
+url='https://libarchive.org/'
+license=('BSD')
+validpgpkeys=('A5A45B12AD92D964B89EEE2DEC560C81CEC2276E') # Martin Matuska <mm@FreeBSD.org>
+source=("https://github.com/libarchive/libarchive/releases/download/v${pkgver}/libarchive-${pkgver}.tar.xz"{,.asc})
+sha256sums=('5a411aceb978f43e626f0c2d1812ddd8807b645ed892453acabd532376c148e6'
+            'SKIP')
+
+build() {
+  cd "libarchive-${pkgver}"
+
+  ./configure \
+      --prefix=$prefix/glibc \
+      --without-xml2 \
+      --without-nettle \
+      --disable-static
+  make
+}
+
+package() {
+  cd "libarchive-${pkgver}"
+
+  make DESTDIR="$pkgdir" install
+  install -Dm0644 COPYING "$terdir/usr/glibc/share/licenses/libarchive/COPYING"
+}
