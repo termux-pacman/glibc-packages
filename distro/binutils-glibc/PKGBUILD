@@ -73,7 +73,6 @@ build() {
     --disable-readline \
     --disable-sim \
     --disable-werror \
-    --disable-gas \
     --with-debuginfod \
     --with-pic \
     --with-system-zlib

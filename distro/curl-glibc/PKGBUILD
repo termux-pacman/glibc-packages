@@ -1,0 +1,86 @@
+# Maintainer: Dave Reisner <dreisner@archlinux.org>
+# Contributor: Angel Velasquez <angvp@archlinux.org>
+# Contributor: Eric Belanger <eric@archlinux.org>
+# Contributor: Lucien Immink <l.immink@student.fnt.hvu.nl>
+# Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
+
+pkgbase=curl
+pkgname=(curl-glibc libcurl-compat-glibc)
+pkgver=7.82.0
+pkgrel=0
+pkgdesc='An URL retrieval utility and library'
+arch=(any)
+url='https://curl.haxx.se'
+license=('MIT')
+source=("https://curl.haxx.se/download/curl-${pkgver}.tar.gz"{,.asc})
+sha512sums=('d4c4a785876e0d1ba1c1adbe65528d56a8b81fc03ff724e87819cfe51aca60f8a7bf2ac9384f30c3a6bbd28669b2bd3e9a6794737243c836c4902d085a72c474'
+            'SKIP')
+validpgpkeys=('27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2') # Daniel Stenberg
+
+_configure_options=(
+  --prefix='/data/data/com.termux/files/usr/glibc'
+  --mandir='/data/data/com.termux/files/usr/glibc/share/man'
+  --disable-ldap
+  --disable-ldaps
+  --disable-manual
+  --enable-ipv6
+  --enable-threaded-resolver
+  --with-libssh2
+  --with-openssl
+  --with-random='/dev/urandom'
+  --with-ca-bundle='/data/data/com.termux/files/usr/glibc/etc/ssl/certs/ca-certificates.crt'
+)
+
+build() {
+  mkdir build-curl{,-compat} || true
+
+  # build curl
+  cd "${srcdir}"/build-curl
+
+  CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
+  CXXFLAGS="${CFLAGS}"
+
+  "${srcdir}/${pkgbase}-${pkgver}"/configure \
+    "${_configure_options[@]}" \
+    --enable-versioned-symbols
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
+  make
+
+  # build libcurl-compat
+  cd "${srcdir}"/build-curl-compat
+
+  "${srcdir}/${pkgbase}-${pkgver}"/configure \
+    "${_configure_options[@]}" \
+    --disable-versioned-symbols
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
+  make -C lib
+}
+
+package_curl-glibc() {
+  cd build-curl
+
+  make DESTDIR="${pkgdir}" install
+  make DESTDIR="${pkgdir}" install -C scripts
+
+  cd "${srcdir}/curl-${pkgver}"
+
+  # license
+  install -Dt "${pkgdir}/data/data/com.termux/files/usr/glibc/share/licenses/curl" -m0644 COPYING
+}
+
+package_libcurl-compat-glibc() {
+  pkgdesc='An URL retrieval library (without versioned symbols)'
+
+  cd "${srcdir}"/build-curl-compat
+
+  make -C lib DESTDIR="${pkgdir}" install
+
+  mv "${pkgdir}"/data/data/com.termux/files/usr/glibc/lib/libcurl{,-compat}.so.4.7.0
+  rm "${pkgdir}"/data/data/com.termux/files/usr/glibc/lib/libcurl.{a,so}*
+  for version in 3 4.0.0 4.1.0 4.2.0 4.3.0 4.4.0 4.5.0 4.6.0; do
+    ln -s libcurl-compat.so.4.7.0 "${pkgdir}"/data/data/com.termux/files/usr/glibc/lib/libcurl.so.${version}
+  done
+
+  install -dm 0755 "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/licenses
+  ln -s curl "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/licenses/libcurl-compat
+}

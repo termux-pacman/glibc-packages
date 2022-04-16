@@ -1,0 +1,9 @@
+[Unit]
+Description=Kerberos 5 KDC
+
+[Service]
+ExecStart=/data/data/com.termux/files/usr/glibc/bin/krb5kdc -n
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
