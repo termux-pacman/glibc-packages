@@ -2,7 +2,7 @@
 
 pkgname=libmpc-glibc
 pkgver=1.2.1
-pkgrel=1
+pkgrel=0
 pkgdesc="Library for the arithmetic of complex numbers with arbitrarily high precision"
 arch=('any')
 url="http://www.multiprecision.org/"

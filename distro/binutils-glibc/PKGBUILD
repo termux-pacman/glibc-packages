@@ -7,7 +7,7 @@
 
 pkgname=binutils-glibc
 pkgver=2.38
-pkgrel=3
+pkgrel=0
 pkgdesc='A set of programs to assemble and manipulate binary and object files'
 arch=(any)
 url='https://www.gnu.org/software/binutils/'
@@ -99,4 +99,6 @@ package() {
 
   # install FSF All Permissive License
   install -Dm644 -t "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/licenses/${pkgname}/ FSFAP
+
+  rm -f "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/info/dir
 }

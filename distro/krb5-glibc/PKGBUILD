@@ -3,7 +3,7 @@
 pkgname=krb5-glibc
 _pkgvermajor=1.19
 pkgver=1.19.3
-pkgrel=1
+pkgrel=0
 pkgdesc='The Kerberos network authentication system'
 url='https://web.mit.edu/kerberos/'
 arch=(any)

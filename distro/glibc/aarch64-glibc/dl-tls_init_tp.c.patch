@@ -1,6 +1,6 @@
-diff -uNr src/glibc-2.34/sysdeps/nptl/dl-tls_init_tp.c src/glibc-2.34/sysdeps/nptl/dl-tls_init_tp.c.path
---- src/glibc-2.34/sysdeps/nptl/dl-tls_init_tp.c	2021-08-02 01:33:43.000000000 +0000
-+++ src/glibc-2.34/sysdeps/nptl/dl-tls_init_tp.c.path	2022-01-20 08:42:04.148400381 +0000
+diff -uNr src/glibc-2.35/sysdeps/nptl/dl-tls_init_tp.c src/glibc-2.35/sysdeps/nptl/dl-tls_init_tp.c.path
+--- src/glibc-2.35/sysdeps/nptl/dl-tls_init_tp.c	2021-08-02 01:33:43.000000000 +0000
++++ src/glibc-2.35/sysdeps/nptl/dl-tls_init_tp.c.path	2022-01-20 08:42:04.148400381 +0000
 @@ -80,14 +80,9 @@
      pd->robust_head.futex_offset = (offsetof (pthread_mutex_t, __data.__lock)
                                      - offsetof (pthread_mutex_t,

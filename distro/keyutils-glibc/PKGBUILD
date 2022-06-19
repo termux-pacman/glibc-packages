@@ -4,7 +4,7 @@
 pkgname=keyutils-glibc
 _tag='5678a1aae8834b5c16b5ed7dc72ef8836a29e122' # git rev-parse v${pkgver}
 pkgver=1.6.3
-pkgrel=1
+pkgrel=0
 pkgdesc='Linux Key Management Utilities'
 arch=(any)
 url='https://www.kernel.org/'

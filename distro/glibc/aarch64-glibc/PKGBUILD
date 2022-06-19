@@ -6,8 +6,8 @@
 _arch=aarch64
 _target=$_arch-unknown-linux-gnu
 pkgname=$_arch-glibc
-pkgver=2.34
-pkgrel=1
+pkgver=2.35
+pkgrel=0
 _commit=be176490b818b65b5162c332eb6b581690b16e5c
 pkgdesc="GNU C Library ARM64 target"
 arch=(any)
@@ -19,20 +19,28 @@ source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz{,.sig}
 	'dl-tls_init_tp.c.patch'
 	'pthread_create.c.patch'
         'faccessat.c.patch'
+        'tst-rseq-disable.c.patch'
+        'tst-rseq.h.patch'
+        'rseq-internal.h.patch'
         'locale-gen'
         'locale.gen.txt'
         'sdt-config.h'
-        'sdt.h')
-sha256sums=('44d26a1fe20b8853a48f470ead01e4279e869ac149b195dda4e44a195d981ab2'
+        'sdt.h'
+	'grun')
+sha256sums=('5123732f6b67ccd319305efd399971d58592122bcc2a6518a1bd2510dd0cf52e'
             'SKIP'
-            'SKIP'
-            'SKIP'
-            'SKIP'
-            'SKIP'
-            'SKIP'
-            'SKIP'
-            'SKIP'
-            'SKIP')
+            '0a25d0358ba67c9cad1d94707615d9a6249b5234a9de601a10f281a5c604cc83'
+            '0cc8d30b73368bfb92f7ea8298e4a791bb8d641c97ec86ef1c1be6052920fe32'
+            '69a74af5419df4b914190b29cedee762413716fdc397eee22d7dcb5a5efdb092'
+            '55871505df12af8eea2e6d9d50d1337437d12f082f6fd2c673f9911cb9747938'
+            '55365e5bf9d758ded46e82fd6165b6a1c7828ab96d9de18346653553fce3018d'
+            '47a5eed52a0c91e86b7f26e5e716ce24b8eb545eee21dc17f98cafc1f4a2dbb4'
+            'e4eb6b3a3b42b28e15010c7a062141f8fd262c85185a746639f4432594fe9a1d'
+            'cdd916c0dc29e5d958ddef5c3530947244fd740ce7645601bfabae53512323b8'
+            'd42648cea552ba5353a32e264686e992263289d5cc86207314dffc54ab514981'
+            'cdc234959c6fdb43f000d3bb7d1080b0103f4080f5e67bcfe8ae1aaf477812f0'
+            '774061aff612a377714a509918a9e0e0aafce708b87d2d7e06b1bd1f6542fe70'
+            '8094c9c64280710a31ad8d66c9d691a2de6756f4b0ae7051d9a4f5f3b8a9dc30')
 validpgpkeys=(7273542B39962DF7B299931416792B4EA25340F8  # "Carlos O'Donell <carlos@systemhalted.org>"
               BC7C7372637EC10C57D7AA6579C43DFBF1CF2187) # Siddhesh Poyarekar
 
@@ -129,5 +137,5 @@ package() {
 
   sed -i 's|!/bin/bash|!/data/data/com.termux/files/usr/bin/bash|' "$pkgdir"/data/data/com.termux/files/usr/glibc/bin/*
   mkdir -p "$pkgdir"/data/data/com.termux/files/usr/bin
-  ln -s /data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1 "$pkgdir"/data/data/com.termux/files/usr/bin/glibc
+  install -m755 "$srcdir/grun" "$pkgdir/data/data/com.termux/files/usr/bin"
 }

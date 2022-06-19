@@ -3,7 +3,7 @@
 
 pkgname=gmp-glibc
 pkgver=6.2.1
-pkgrel=1
+pkgrel=0
 pkgdesc='A free library for arbitrary precision arithmetic'
 arch=(any)
 url='https://gmplib.org/'

@@ -6,7 +6,7 @@
 _arch=aarch64
 _target=$_arch-unknown-linux-gnu
 pkgname=(gcc-glibc gcc-libs)
-pkgver=11.2.0
+pkgver=12.1.0
 _islver=0.24
 pkgrel=0
 #_snapshot=8-20190111
@@ -25,7 +25,7 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-$pkgver/gcc-$pkgver.tar.xz{,.sig}
 )
 _libdir=data/data/com.termux/files/usr/glibc/lib/gcc/$CHOST/${pkgver%%+*}
 
-sha256sums=('d08edc536b54c372a1010ff6619dd274c0f1603aa49212ba20f7aa2cda36fa8b'
+sha256sums=('62fd634889f31c02b64af2c468f064b47ad1ca78411c45abe6ac4b5f8dd19c7b'
             'SKIP'
             '043105cc544f416b48736fff8caf077fb0663a717d06b1113f16e391ac99ebad'
             'd87254ee2c816aee66b00dd5002966cf3fe9aca4969eaf160c47150583357790'
@@ -115,6 +115,8 @@ package_gcc-libs() {
   # Install Runtime Library Exception
   install -Dm644 "$srcdir/gcc-${pkgver}/COPYING.RUNTIME" \
     "$pkgdir/data/data/com.termux/files/usr/glibc/share/licenses/gcc-libs/RUNTIME.LIBRARY.EXCEPTION"
+
+  rm -f "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/info/dir
 }
 
 package_gcc-glibc() {
@@ -181,4 +183,6 @@ package_gcc-glibc() {
   install -d "$pkgdir/data/data/com.termux/files/usr/glibc/share/licenses/$pkgname/"
   ln -s /data/data/com.termux/files/usr/glibc/share/licenses/gcc-libs/RUNTIME.LIBRARY.EXCEPTION \
     "$pkgdir/data/data/com.termux/files/usr/glibc/share/licenses/$pkgname/"
+
+  rm -f "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/info/dir
 }

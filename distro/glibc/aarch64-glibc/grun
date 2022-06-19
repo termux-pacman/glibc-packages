@@ -1,0 +1,25 @@
+#!/data/data/com.termux/files/usr/bin/bash
+
+# version: 1.0
+# this command allows you to run commands that depend on glibc
+# or run a shell with access to commands from a configured glibc.
+
+if [[ -z "$1" ]]; then
+	echo "This command allows you to run commands that depend on glibc"
+	echo "or run a shell with access to commands from a configured glibc."
+	echo ""
+	echo "  --shell - launching a customized shell"
+	echo ""
+	exit 0
+fi
+
+unset LD_PRELOAD
+export PATH=$PREFIX/glibc/bin:$PATH
+
+if [ "$1" = "--shell" ]; then
+	exec $SHELL
+else
+	exec $PREFIX/glibc/lib/ld.so $@
+fi
+
+exit $?

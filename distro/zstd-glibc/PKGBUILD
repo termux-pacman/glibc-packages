@@ -5,7 +5,7 @@
 
 pkgname=zstd-glibc
 pkgver=1.5.2
-pkgrel=2
+pkgrel=0
 pkgdesc='Zstandard - Fast real-time compression algorithm'
 url='https://facebook.github.io/zstd/'
 arch=(any)

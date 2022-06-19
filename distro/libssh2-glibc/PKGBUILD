@@ -6,7 +6,7 @@
 
 pkgname=libssh2-glibc
 pkgver=1.10.0
-pkgrel=1
+pkgrel=0
 pkgdesc="A library implementing the SSH2 protocol as defined by Internet Drafts"
 url="https://www.libssh2.org/"
 arch=(any)
