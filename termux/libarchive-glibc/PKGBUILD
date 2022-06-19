@@ -3,7 +3,7 @@
 
 pkgname=libarchive-glibc
 pkgver=3.6.1
-pkgrel=1
+pkgrel=0
 pkgdesc='Multi-format archive and compression library'
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url='https://libarchive.org/'

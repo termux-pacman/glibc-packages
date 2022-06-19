@@ -1,0 +1,48 @@
+# Maintainer: Pierre Schmitz <pierre@archlinux.de>
+
+pkgname=openssl-glibc
+_ver=1.1.1o
+# use a pacman compatible version scheme
+pkgver=${_ver/[a-z]/.${_ver//[0-9.]/}}
+pkgrel=0
+pkgdesc='The Open Source toolkit for Secure Sockets Layer and Transport Layer Security'
+arch=('aarch64' 'arm' 'x86_64' 'i686')
+url='https://www.openssl.org'
+license=('custom:BSD')
+makedepends=('perl')
+backup=('data/data/com.termux/files/usr/glibc/etc/ssl/openssl.cnf')
+source=("https://www.openssl.org/source/openssl-${_ver}.tar.gz"{,.asc}
+	'ca-dir.patch')
+sha256sums=('9384a2b0570dd80358841464677115df785edb941c71211f75076d72fe6b438f'
+            'SKIP'
+            '9ffaf3fb5443fe1b7a18dc407f04a4a781834bcbc52187ff97f4c1fa1e2f8cdf')
+validpgpkeys=('8657ABB260F056B1E5190839D9C4D26D0E604491'
+	'7953AC1FBC3DC8B3B292393ED5E9E43F7DF9EE8C')
+
+prepare() {
+	cd "$srcdir/openssl-$_ver"
+
+	# set ca dir to /etc/ssl by default
+	patch -p0 -i "$srcdir/ca-dir.patch"
+	sed -i 's|#! /usr/bin|#! /data/data/com.termux/files/usr/bin|g' Configure
+}
+
+build() {
+	cd "$srcdir/openssl-$_ver"
+
+	# mark stack as non-executable: http://bugs.archlinux.org/task/12434
+	./Configure --prefix=${prefix}/glibc --openssldir=${prefix}/glibc/etc/ssl --libdir=lib \
+		shared no-ssl3-method enable-ec_nistp_64_gcc_128 linux-aarch64\
+		"-Wa,--noexecstack ${CPPFLAGS} ${CFLAGS} ${LDFLAGS}"
+
+	make depend
+	make
+}
+
+package() {
+	cd "$srcdir/openssl-$_ver"
+
+	make DESTDIR="$pkgdir" MANDIR=${prefix}/glibc/share/man MANSUFFIX=ssl install_sw install_ssldirs install_man_docs
+
+	install -D -m644 LICENSE "${terdir}/usr/glibc/share/licenses/$pkgname/LICENSE"
+}

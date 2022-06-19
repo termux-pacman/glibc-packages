@@ -1,0 +1,32 @@
+# Maintainer: Dave Reisner <dreisner@archlinux.org>
+# Contributor: Angel Velasquez <angvp@archlinux.org>
+# Contributor: Sergej Pupykin <pupykin.s+arch@gmail.com>
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+# Contributor: ice-man <icemanf@gmail.com>
+
+pkgname=libssh2-glibc
+pkgver=1.10.0
+pkgrel=0
+pkgdesc="A library implementing the SSH2 protocol as defined by Internet Drafts"
+url="https://www.libssh2.org/"
+arch=('aarch64' 'arm' 'x86_64' 'i686')
+license=('BSD')
+validpgpkeys=('27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2'   # Daniel Stenberg
+              '914C533DF9B2ADA2204F586D78E11C6B279D5C91')  # Daniel Stenberg (old key)
+source=("https://www.libssh2.org/download/libssh2-$pkgver.tar.gz"{,.asc})
+sha256sums=('2d64e90f3ded394b91d3a2e774ca203a4179f69aebee03003e5a6fa621e41d51'
+            'SKIP')
+
+build() {
+  cd "libssh2-$pkgver"
+
+  ./configure --prefix=${prefix}/glibc
+  make
+}
+
+package() {
+  cd "libssh2-$pkgver"
+
+  make DESTDIR="$pkgdir" install
+  install -Dm644 COPYING "$terdir/usr/glibc/share/licenses/$pkgname/LICENSE"
+}
