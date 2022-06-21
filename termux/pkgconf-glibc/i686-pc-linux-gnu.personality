@@ -1,0 +1,5 @@
+Triplet: i686-pc-linux-gnu
+SysrootDir: /
+DefaultSearchPaths: /data/data/com.termux/files/usr/glibc/lib/pkgconfig:/data/data/com.termux/files/usr/glibc/share/pkgconfig
+SystemIncludePaths: /data/data/com.termux/files/usr/glibc/include
+SystemLibraryPaths: /data/data/com.termux/files/usr/glibc/lib

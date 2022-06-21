@@ -1,0 +1,54 @@
+# Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
+# Contributor: Johannes Löthberg <johannes@kyriasis.com>
+# Contributor: Piotr Gorski <lucjan.lucjanov@gmail.com>
+# Contributor: Lucy <lucy@luz.lu>
+# Contributor: Bartlomiej Piotrowski <nospam@bpiotrowski.pl>
+
+pkgname=pkgconf-glibc
+pkgver=1.8.0
+pkgrel=0
+pkgdesc="Package compiler and linker metadata toolkit"
+url="https://github.com/pkgconf/pkgconf"
+license=(custom:ISC)
+arch=('aarch64' 'arm' 'x86_64' 'i686')
+makedepends=(git)
+provides=(pkgconfig libpkgconf.so)
+_commit=cef30268e1a3f79efd607c26abcf556aa314c9c4  # tags/pkgconf-1.8.0
+source=("git+$url#commit=$_commit"
+        i686-pc-linux-gnu.personality
+        x86_64-pc-linux-gnu.personality)
+sha256sums=('SKIP'
+            'ed3364b73d5e2361c87d7a71c61e055dd1b01dfbc5b037fd5c172fa4d2b1592e'
+            '517fdd67206aa7ff196acfec4ce91f1efa0c9e50b2fee76dbf908c861c000565')
+
+pkgver() {
+  cd pkgconf
+  git describe --tags | sed 's/^pkgconf-//;s/-/+/g'
+}
+
+prepare() {
+  cd pkgconf
+}
+
+build() {
+  meson pkgconf build -D tests=false -D prefix="${prefix}/glibc"
+  meson compile -C build
+}
+
+package() {
+  meson install -C build --destdir "$pkgdir"
+
+  install -Dt "$terdir/usr/glibc/share/pkgconfig/personality.d" -m644 \
+    i686-pc-linux-gnu.personality \
+    x86_64-pc-linux-gnu.personality
+
+  ln -s pkgconf "$terdir/usr/glibc/bin/i686-pc-linux-gnu-pkg-config"
+  ln -s pkgconf "$terdir/usr/glibc/bin/x86_64-pc-linux-gnu-pkg-config"
+  ln -s pkgconf "$terdir/usr/glibc/bin/pkg-config"
+
+  ln -s pkgconf.1 "$terdir/usr/glibc/share/man/man1/pkg-config.1"
+
+  install -Dt "$terdir/usr/glibc/share/licenses/$pkgname" -m644 pkgconf/COPYING
+}
+
+# vim:set sw=2 et:
