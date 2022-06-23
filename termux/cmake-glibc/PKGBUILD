@@ -1,0 +1,36 @@
+# Maintainer: Felix Yan <felixonmars@archlinux.org>
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+# Contributor: Pierre Schmitz <pierre@archlinux.de>
+
+pkgname=cmake-glibc
+pkgver=3.23.2
+pkgrel=0
+pkgdesc='A cross-platform open-source make system'
+arch=('aarch64' 'arm' 'x86_64' 'i686')
+url="https://www.cmake.org/"
+license=('custom')
+makedepends=('emacs')
+source=("https://www.cmake.org/files/v${pkgver%.*}/cmake-${pkgver}.tar.gz")
+sha512sums=('0925adf973d642fd76d4089b61b3882babb0a85050c4c57d5f5f3bd6b17564a9feb0beed236cd636e25f69072fa30b67ea3f80932380b6b6576f2dd78b8e6931')
+
+build() {
+  cd cmake-${pkgver}
+  ./bootstrap --prefix=${prefix}/glibc \
+    --mandir=/share/man \
+    --docdir=/share/doc/cmake \
+    --datadir=/share/cmake \
+    --sphinx-man \
+    --sphinx-html \
+    --system-libs \
+    --parallel=$(${prefix}/glibc/bin/getconf _NPROCESSORS_ONLN)
+  make
+}
+
+package() {
+  cd cmake-${pkgver}
+  make DESTDIR="${pkgdir}" install
+
+  rm -r "$terdir"/usr/glibc/share/doc/cmake/html/_sources
+  emacs -batch -f batch-byte-compile "${terdir}"/usr/glibc/share/emacs/site-lisp/cmake-mode.el
+  install -Dm644 Copyright.txt "${terdir}"/usr/glibc/share/licenses/cmake/LICENSE
+}

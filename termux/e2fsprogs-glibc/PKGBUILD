@@ -4,7 +4,7 @@
 pkgbase=e2fsprogs
 pkgname=('e2fsprogs-glibc' 'fuse2fs-glibc')
 pkgver=1.46.5
-pkgrel=4
+pkgrel=0
 pkgdesc='Ext2/3/4 filesystem utilities'
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 license=('GPL' 'LGPL' 'MIT')
