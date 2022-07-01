@@ -1,0 +1,69 @@
+# Maintainer: Giancarlo Razzolini <grazzolini@archlinux.org>
+# Maintainer: Frederik Schwan <freswa at archlinux dot org>
+# Contributor: Bartłomiej Piotrowski <bpiotrowski@archlinux.org>
+# Contributor: Allan McRae <allan@archlinux.org>
+# Contributor: judd <jvinet@zeroflux.org>
+
+# NOTE: requires rebuilt with each new gcc version
+
+pkgname=libtool-glibc
+pkgver=2.4.7
+pkgrel=0
+_gccver=12.1.0
+pkgdesc='A generic library support script'
+arch=('aarch64' 'arm' 'x86_64' 'i686')
+url='https://www.gnu.org/software/libtool'
+license=(GPL)
+groups=(base-devel)
+checkdepends=(gcc-fortran)
+options=(debug)
+_commit=6d7ce133ce54898cf28abd89d167cccfbc3c9b2b
+source=(git+https://git.savannah.gnu.org/git/libtool.git#commit=$_commit
+        git+https://git.savannah.gnu.org/git/gnulib.git
+        gnulib-bootstrap::git+https://github.com/gnulib-modules/bootstrap.git
+        no_hostname.patch
+        disable-lto-link-order2.patch)
+sha256sums=('SKIP'
+            'SKIP'
+            'SKIP'
+            '693aabb24a6e7ce21fe0b5d14394e19edcb8476663b5afa4463f9fa0df24d946'
+            'b6dce6681f223b18a90614edbcdeb00f228abd1216e22c4bd07285321cd2ceb7')
+
+pkgver() {
+  cd libtool
+  git describe --tags | sed 's/-/+/g;s/^v//'
+}
+
+prepare() {
+  cd libtool
+
+  patch -Np1 -i ${srcdir}/no_hostname.patch
+
+  # test 67 is broken with lto
+  # this patch removes the -flto flag for this very test
+  # adapt when -ffat-lto-objects is enabled by Arch
+  patch -Np1 -i ${srcdir}/disable-lto-link-order2.patch
+
+  git submodule init
+  git config --local submodule.gnulib.url "$srcdir/gnulib"
+  git config --local submodule.gl-mod/bootstrap.url "$srcdir/gnulib-bootstrap"
+  git submodule update
+
+  ./bootstrap
+}
+
+build() {
+  cd libtool
+  ./configure --prefix=${prefix}/glibc lt_cv_sys_lib_dlsearch_path_spec="${prefix}/glibc/lib"
+  sed -i 's|! /bin|! /data/data/com.termux/files/usr/bin|' $(ls -p | grep -v /)
+  sed -i 's|! /usr/bin|! /data/data/com.termux/files/usr/bin|' $(ls -p | grep -v /)
+  make
+}
+
+package() {
+  cd libtool
+  make DESTDIR="$pkgdir" install
+  sed -i 's|! /bin|! /data/data/com.termux/files/usr/bin|' "$terdir"/usr/glibc/bin/*
+  sed -i 's|! /usr/bin|! /data/data/com.termux/files/usr/bin|' "$terdir"/usr/glibc/bin/*
+  sed -i 's|SHELL="/bin/sh"|SHELL="/data/data/com.termux/files/usr/bin/sh"|' "$terdir"/usr/glibc/bin/libtool
+}

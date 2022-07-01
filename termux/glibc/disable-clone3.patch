@@ -1,0 +1,21 @@
+diff -uNr src/glibc-2.35/sysdeps/unix/sysv/linux/clone-internal.c src/glibc-2.35/sysdeps/unix/sysv/linux/clone-internal.c.patch
+--- src/glibc-2.35/sysdeps/unix/sysv/linux/clone-internal.c
++++ src/glibc-2.35/sysdeps/unix/sysv/linux/clone-internal.c.patch
+@@ -48,17 +48,6 @@ __clone_internal (struct clone_args *cl_args,
+ 		  int (*func) (void *arg), void *arg)
+ {
+   int ret;
+-#ifdef HAVE_CLONE3_WRAPPER
+-  /* Try clone3 first.  */
+-  int saved_errno = errno;
+-  ret = __clone3 (cl_args, sizeof (*cl_args), func, arg);
+-  if (ret != -1 || errno != ENOSYS)
+-    return ret;
+-
+-  /* NB: Restore errno since errno may be checked against non-zero
+-     return value.  */
+-  __set_errno (saved_errno);
+-#endif
+ 
+   /* Map clone3 arguments to clone arguments.  NB: No need to check
+      invalid clone3 specific bits in flags nor exit_signal since this
