@@ -7,7 +7,7 @@ _arch=aarch64
 _target=$_arch-unknown-linux-gnu
 pkgname=$_arch-glibc
 pkgver=2.35
-pkgrel=0
+pkgrel=1
 _commit=be176490b818b65b5162c332eb6b581690b16e5c
 pkgdesc="GNU C Library ARM64 target"
 arch=(any)
@@ -22,6 +22,7 @@ source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz{,.sig}
         'tst-rseq-disable.c.patch'
         'tst-rseq.h.patch'
         'rseq-internal.h.patch'
+        'disable-clone3.patch'
         'locale-gen'
         'locale.gen.txt'
         'sdt-config.h'
@@ -36,6 +37,7 @@ sha256sums=('5123732f6b67ccd319305efd399971d58592122bcc2a6518a1bd2510dd0cf52e'
             '55365e5bf9d758ded46e82fd6165b6a1c7828ab96d9de18346653553fce3018d'
             '47a5eed52a0c91e86b7f26e5e716ce24b8eb545eee21dc17f98cafc1f4a2dbb4'
             'e4eb6b3a3b42b28e15010c7a062141f8fd262c85185a746639f4432594fe9a1d'
+            'f35852b69cd3fc78f7e77b566075b24e7a641dd60484e05abfcb838294225d1a'
             'cdd916c0dc29e5d958ddef5c3530947244fd740ce7645601bfabae53512323b8'
             'd42648cea552ba5353a32e264686e992263289d5cc86207314dffc54ab514981'
             'cdc234959c6fdb43f000d3bb7d1080b0103f4080f5e67bcfe8ae1aaf477812f0'
@@ -69,9 +71,10 @@ build() {
   ../glibc-$pkgver/configure \
       --prefix=/data/data/com.termux/files/usr/glibc \
       --sysconfdir=/data/data/com.termux/files/usr/glibc/etc \
+      --with-headers=${prefix}/glibc/include \
       --host=$_target \
       --libdir=/data/data/com.termux/files/usr/glibc/lib \
-      --with-bugurl=https://bugs.archlinux.org \
+      --with-bugurl=https://github.com/Maxython/glibc-for-termux/issues \
       --enable-kernel=4.4 \
       --enable-bind-now \
       --enable-stack-protector=strong \
