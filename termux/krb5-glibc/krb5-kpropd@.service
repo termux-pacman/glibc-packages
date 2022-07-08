@@ -1,0 +1,8 @@
+[Unit]
+Description=Kerberos 5 propagation server
+Conflicts=krb5-kpropd.service
+
+[Service]
+ExecStart=/data/data/com.termux/files/usr/glibc/bin/kpropd
+StandardInput=socket
+StandardError=syslog

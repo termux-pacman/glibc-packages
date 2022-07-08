@@ -1,0 +1,12 @@
+diff -uNr src/gcc-12.1.0/fixincludes/fixinc.in src/gcc-12.1.0/fixincludes/fixinc.in.patch
+--- src/gcc-12.1.0/fixincludes/fixinc.in	2022-05-06 10:30:56.000000000 +0300
++++ src/gcc-12.1.0/fixincludes/fixinc.in.patch	2022-07-05 21:01:58.553461747 +0300
+@@ -173,7 +173,7 @@
+ #
+ if test $# -eq 0
+ then
+-    INPUTLIST="/usr/include"
++    INPUTLIST="/data/data/com.termux/files/usr/glibc/include"
+ else
+     INPUTLIST="$@"
+ fi

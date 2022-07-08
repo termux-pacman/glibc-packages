@@ -71,7 +71,7 @@ build() {
   ../glibc-$pkgver/configure \
       --prefix=/data/data/com.termux/files/usr/glibc \
       --sysconfdir=/data/data/com.termux/files/usr/glibc/etc \
-      --with-headers=${prefix}/glibc/include \
+      --with-headers=/data/data/com.termux/files/usr/glibc/include \
       --host=$_target \
       --libdir=/data/data/com.termux/files/usr/glibc/lib \
       --with-bugurl=https://github.com/Maxython/glibc-for-termux/issues \

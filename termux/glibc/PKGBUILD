@@ -60,28 +60,40 @@ prepare() {
 
 build() {
   cd glibc-build
-  echo "build-programs=yes" > configparms
-  echo "slibdir=${prefix}/glibc/lib" >> configparms
+  echo "slibdir=${prefix}/glibc/lib" > configparms
   echo "rtlddir=${prefix}/glibc/lib" >> configparms
   echo "sbindir=${prefix}/glibc/bin" >> configparms
   echo "rootsbindir=${prefix}/glibc/bin" >> configparms
 
-  unset CFLAGS
+  #CFLAGS=${CFLAGS/-Wp,-D_FORTIFY_SOURCE=2 -O/}
+  CFLAGS="-O2 -pipe"
+
   ../glibc-$pkgver/configure \
       --prefix=${prefix}/glibc \
       --sysconfdir=${prefix}/glibc/etc \
       --with-headers=${prefix}/glibc/include \
       --host=$_target \
       --libdir=${prefix}/glibc/lib \
+      --libexecdir=${prefix}/glibc/lib \
       --with-bugurl=https://github.com/Maxython/glibc-for-termux/issues \
-      --enable-kernel=4.4 \
       --enable-bind-now \
+      --enable-cet \
+      --enable-kernel=4.4 \
+      --enable-multi-arch \
       --enable-stack-protector=strong \
-      --enable-stackguard-randomization \
-      --disable-timezone-tools \
-      --enable-multi-arch CFLAGS="-O2 -pipe"
+      --enable-systemtap \
+      --disable-profile \
+      --disable-crypt \
+      --disable-werror
 
-  make
+  echo "build-programs=no" >> configparms
+  make -O
+
+  sed -i "/build-programs=/s#no#yes#" configparms
+  echo "CFLAGS=-O2 -pipe" >> configparms
+  make -O
+
+  locale/localedef -c -f ../glibc/localedata/charmaps/UTF-8 -i ../glibc/localedata/locales/C ../C.UTF-8/
 }
 
 package() {
@@ -90,11 +102,8 @@ package() {
           data/data/com.termux/files/usr/glibc/etc/locale.gen
           data/data/com.termux/files/usr/glibc/etc/nscd.conf)
 
-  install -dm755 "$terdir/usr/glibc/etc"
-  touch "$terdir/usr/glibc/etc/ld.so.conf"
-
   make -C glibc-build install_root="$pkgdir" install
-  rm -f "$terdir"/usr/glibc/etc/ld.so.{cache,conf}
+  rm -f "$terdir"/usr/glibc/etc/ld.so.cache
 
   # Shipped in tzdata
   rm -f "$pkgdir"/usr/bin/{tzselect,zdump,zic}
@@ -116,26 +125,15 @@ package() {
   sed -e '1,3d' -e 's|/| |g' -e 's|\\| |g' -e 's|^|#|g' \
     "$srcdir/glibc/localedata/SUPPORTED" >> "$terdir/usr/glibc/etc/locale.gen"
 
-  if check_option 'debug' n; then
-    find "$terdir"/usr/glibc/bin -type f -executable -exec strip $STRIP_BINARIES {} + 2> /dev/null || true
-    find "$terdir"/usr/glibc/lib -name '*.a' -type f -exec strip $STRIP_STATIC {} + 2> /dev/null || true
-
-    # Do not strip these for gdb and valgrind functionality, but strip the rest
-    find "$terdir"/usr/glibc/lib \
-      -not -name 'ld-*.so*' \
-      -not -name 'libc.so*' \
-      -not -name 'libpthread.so*' \
-      -not -name 'libthread_db.so*' \
-      -name '*.so*' -type f -exec strip $STRIP_SHARED {} + 2> /dev/null || true
-  fi
+  # install C.UTF-8 so that it is always available
+  install -dm755 "$terdir/usr/glibc/lib/locale"
+  cp -r "$srcdir/C.UTF-8" -t "$terdir/usr/glibc/lib/locale"
+  sed -i '/#C\.UTF-8 /d' "$terdir/usr/glibc/etc/locale.gen"
 
   # Provide tracing probes to libstdc++ for exceptions, possibly for other
   # libraries too. Useful for gdb's catch command.
   install -Dm644 "$srcdir/sdt.h" "$terdir/usr/glibc/include/sys/sdt.h"
   install -Dm644 "$srcdir/sdt-config.h" "$terdir/usr/glibc/include/sys/sdt-config.h"
-
-  # Provided by libxcrypt; keep the old shared library for backwards compatibility
-  rm -f "$terdir"/usr/glibc/include/crypt.h "$terdir"/usr/glibc/lib/libcrypt.{a,so}
 
   sed -i 's|!/bin/bash|!/data/data/com.termux/files/usr/bin/bash|' "$terdir"/usr/glibc/bin/*
   mkdir -p "$terdir"/usr/bin

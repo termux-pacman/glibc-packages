@@ -1,0 +1,8 @@
+[Unit]
+Description=Kerberos 5 administration server
+
+[Service]
+ExecStart=/data/data/com.termux/files/usr/glibc/bin/kadmind -nofork
+
+[Install]
+WantedBy=multi-user.target
