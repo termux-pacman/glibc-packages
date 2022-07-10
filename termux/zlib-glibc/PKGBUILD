@@ -1,0 +1,36 @@
+# Maintainer: Pierre Schmitz <pierre@archlinux.de>
+
+pkgname=zlib-glibc
+epoch=1
+pkgver=1.2.12
+pkgrel=0
+arch=('aarch64' 'arm' 'x86_64' 'i686')
+license=('custom')
+url="https://www.zlib.net/"
+depends=()
+options=('staticlibs')  # needed by binutils testsuite
+source=("https://zlib.net/zlib-${pkgver}.tar.gz"{,.asc})
+sha256sums=('91844808532e5ce316b3c010929493c0244f3d37593afd6de04f71821d5136d9'
+            'SKIP')
+validpgpkeys=('5ED46A6721D365587791E2AA783FCD8E58BCAFBA')
+
+prepare() {
+	cd "${srcdir}/zlib-$pkgver"
+	grep -A 24 '^  Copyright' zlib.h > LICENSE
+}
+
+build() {
+	cd "${srcdir}/zlib-$pkgver"
+
+	#CFLAGS+=" -ffat-lto-objects"
+	./configure --prefix=${prefix}/glibc
+	make
+}
+
+package() {
+	pkgdesc='Compression library implementing the deflate compression method found in gzip and PKZIP'
+
+	cd "${srcdir}/zlib-$pkgver"
+	make install DESTDIR="${pkgdir}"
+	install -D -m644 LICENSE "${terdir}/usr/glibc/share/licenses/zlib/LICENSE"
+}
