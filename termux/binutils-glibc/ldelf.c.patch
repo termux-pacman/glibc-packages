@@ -1,0 +1,38 @@
+diff -uNr src/binutils-2.38/ld/ldelf.c src/binutils-2.38/ld/ldelf.c.patch
+--- src/binutils-2.38/ld/ldelf.c	2022-01-22 15:14:09.000000000 +0300
++++ src/binutils-2.38/ld/ldelf.c.patch	2022-07-10 23:24:40.326945641 +0300
+@@ -131,7 +131,7 @@
+ /* On Linux, it's possible to have different versions of the same
+    shared library linked against different versions of libc.  The
+    dynamic linker somehow tags which libc version to use in
+-   /etc/ld.so.cache, and, based on the libc that it sees in the
++   /data/data/com.termux/files/usr/glibc/etc/ld.so.cache, and, based on the libc that it sees in the
+    executable, chooses which version of the shared library to use.
+ 
+    We try to do a similar check here by checking whether this shared
+@@ -756,8 +756,8 @@
+   return ldelf_search_needed (ld_elf_hints, &needed, force, false, elfsize);
+ }
+ 
+-/* For a native linker, check the file /etc/ld.so.conf for directories
+-   in which we may find shared libraries.  /etc/ld.so.conf is really
++/* For a native linker, check the file /data/data/com.termux/files/usr/glibc/etc/ld.so.conf for directories
++   in which we may find shared libraries.  /data/data/com.termux/files/usr/glibc/etc/ld.so.conf is really
+    only meaningful on Linux.  */
+ 
+ struct ldelf_ld_so_conf
+@@ -930,12 +930,12 @@
+ 
+       info.path = NULL;
+       info.len = info.alloc = 0;
+-      tmppath = concat (ld_sysroot, prefix, "/etc/ld.so.conf",
++      tmppath = concat (ld_sysroot, prefix, "/data/data/com.termux/files/usr/glibc/etc/ld.so.conf",
+ 			(const char *) NULL);
+       if (!ldelf_parse_ld_so_conf (&info, tmppath))
+ 	{
+ 	  free (tmppath);
+-	  tmppath = concat (ld_sysroot, "/etc/ld.so.conf",
++	  tmppath = concat (ld_sysroot, "/data/data/com.termux/files/usr/glibc/etc/ld.so.conf",
+ 			    (const char *) NULL);
+ 	  ldelf_parse_ld_so_conf (&info, tmppath);
+ 	}

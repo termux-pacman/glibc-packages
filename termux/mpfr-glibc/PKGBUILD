@@ -13,7 +13,7 @@ arch=('aarch64' 'arm' 'x86_64' 'i686')
 url='https://www.mpfr.org/'
 license=('GPL3' 'LGPL3')
 depends=()
-makedepends=('autoconf-archive')
+#makedepends=('autoconf-archive')
 source=("https://ftp.gnu.org/gnu/mpfr/mpfr-${_pkgver}.tar.xz"{,.sig}
          patches.diff) # wget https://www.mpfr.org/mpfr-4.1.0/allpatches -O patches.diff
 sha512sums=('1bd1c349741a6529dfa53af4f0da8d49254b164ece8a46928cdb13a99460285622d57fe6f68cef19c6727b3f9daa25ddb3d7d65c201c8f387e421c7f7bee6273'
@@ -29,7 +29,7 @@ prepare() {
   cd mpfr-${_pkgver}
 
   patch -p1 < "$srcdir"/patches.diff
-  autoreconf -fiv
+  #autoreconf -fiv
 }
 
 build() {

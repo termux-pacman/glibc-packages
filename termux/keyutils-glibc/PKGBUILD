@@ -4,7 +4,7 @@
 pkgname=keyutils-glibc
 _tag='5678a1aae8834b5c16b5ed7dc72ef8836a29e122' # git rev-parse v${pkgver}
 pkgver=1.6.3
-pkgrel=0
+pkgrel=1
 pkgdesc='Linux Key Management Utilities'
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url='https://www.kernel.org/'
@@ -35,7 +35,7 @@ build() {
 package() {
   cd keyutils
   mkdir -p "${terdir}/usr/glibc"
-  make DESTDIR="${terdir}/usr/glibc" SBINDIR='/bin' BINDIR='/bin' LIBDIR='/lib' USRLIBDIR="/lib" install
+  make DESTDIR="${terdir}/usr/glibc" SBINDIR='/bin' BINDIR='/bin' LIBDIR='/lib' USRLIBDIR="/lib" INCLUDEDIR="/include" SHAREDIR="/share/keyutils" MANDIR="/share/man" install
   rm "${terdir}"/usr/glibc/lib/libkeyutils.so
   ln -s libkeyutils.so.1 "${terdir}"/usr/glibc/lib/libkeyutils.so
 }

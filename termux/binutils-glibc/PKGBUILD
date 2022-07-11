@@ -7,25 +7,29 @@
 
 pkgname=binutils-glibc
 pkgver=2.38
-pkgrel=0
+pkgrel=1
 pkgdesc='A set of programs to assemble and manipulate binary and object files'
-arch=(any)
+arch=('aarch64' 'arm' 'x86_64' 'i686')
 url='https://www.gnu.org/software/binutils/'
 license=('GPL3' 'GPL' 'FDL1.3' 'custom:FSFAP')
 #_commit=cb5f6a3e146cc70bc2d864989386df80acec5d3e
 #source=(git+https://sourceware.org/git/binutils-gdb.git#commit=$_commit)
 source=(https://ftp.gnu.org/gnu/binutils/binutils-$pkgver.tar.xz{,.sig}
         gold-warn-unsupported.patch
-        fix-incorrect-undefined-symbol.patch)
+        fix-incorrect-undefined-symbol.patch
+        ldelf.c.patch)
 sha256sums=('e316477a914f567eccc34d5d29785b8b0f5a10208d36bbacedcc39048ecfe024'
             'SKIP'
             '2d430b66f84a19c154725ec535280c493be1d34f1a90f95208dce02fecd0e4e4'
-            'fd33b2f8cac7561cecf3fdbb5a50fd2f2dfa6420516cbe57c47784a06fa16bf6')
+            'fd33b2f8cac7561cecf3fdbb5a50fd2f2dfa6420516cbe57c47784a06fa16bf6'
+            '1e9a96e2529986f352dc379b3ee18d62d86c436cda40941cad30e6f7e7e2d5e8')
 validpgpkeys=(3A24BC1E8FB409FA9F14371813FCEF89DD9E3C4F)
 
 prepare() {
   [[ ! -d binutils-gdb ]] && ln -s binutils-$pkgver binutils-gdb
   mkdir -p binutils-build
+
+  patch -Np1 -i "${srcdir}"/ldelf.c.patch
 
   cd binutils-gdb
 
@@ -39,22 +43,19 @@ prepare() {
   # Change the gold configuration script to only warn about
   # unsupported targets.  This allows the binutils to be built with
   # BPF support enabled.
-  /data/data/com.termux/files/usr/bin/patch -Np1 -i "${srcdir}"/gold-warn-unsupported.patch
+  patch -Np1 -i "${srcdir}"/gold-warn-unsupported.patch
 
   # fix incorrect "undefined reference" errors
   # https://sourceware.org/bugzilla/show_bug.cgi?id=28879
-  /data/data/com.termux/files/usr/bin/patch -Np1 -i "${srcdir}"/fix-incorrect-undefined-symbol.patch
+  patch -Np1 -i "${srcdir}"/fix-incorrect-undefined-symbol.patch
 }
 
 build() {
   cd binutils-build
 
-  CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-  CXXFLAGS="${CFLAGS}"
-
   "$srcdir/binutils-gdb/configure" \
-    --prefix=/data/data/com.termux/files/usr/glibc \
-    --with-lib-path=/data/data/com.termux/files/usr/glibc/lib:/data/data/com.termux/files/usr/glibc/local/lib \
+    --prefix=${prefix}/glibc \
+    --with-lib-path=${prefix}/glibc/lib:${prefix}/glibc/local/lib \
     --with-bugurl=https://bugs.archlinux.org/ \
     --enable-cet \
     --enable-deterministic-archives \
@@ -77,7 +78,7 @@ build() {
     --with-pic \
     --with-system-zlib
 
-  make -O tooldir=/data/data/com.termux/files/usr/glibc
+  make -O tooldir=${prefix}/glibc
 
   # Extract the FSF All Permissive License
   # <https://www.gnu.org/prep/maintain/html_node/License-Notices-for-Other-Files.html>
@@ -87,18 +88,18 @@ build() {
 
 package() {
   cd binutils-build
-  make prefix="$pkgdir/data/data/com.termux/files/usr/glibc" tooldir="$pkgdir/data/data/com.termux/files/usr/glibc" install
+  make prefix="$terdir/usr/glibc" tooldir="$terdir/usr/glibc" install
 
   # Remove unwanted files
-  rm -f "$pkgdir"/data/data/com.termux/files/usr/glibc/share/man/man1/{dlltool,nlmconv,windres,windmc}*
+  rm -f "$terdir"/usr/glibc/share/man/man1/{dlltool,nlmconv,windres,windmc}*
 
   # No shared linking to these files outside binutils
-  rm -f "$pkgdir"/data/data/com.termux/files/usr/glibc/lib/lib{bfd,opcodes}.so
-  echo 'INPUT( /data/data/com.termux/files/usr/glibc/lib/libbfd.a -liberty -lz -ldl )' > "$pkgdir/data/data/com.termux/files/usr/glibc/lib/libbfd.so"
-  echo 'INPUT( /data/data/com.termux/files/usr/glibc/lib/libopcodes.a -lbfd )' > "$pkgdir/data/data/com.termux/files/usr/glibc/lib/libopcodes.so"
+  rm -f "$terdir"/usr/glibc/lib/lib{bfd,opcodes}.so
+  echo "INPUT( ${prefix}/glibc/lib/libbfd.a -liberty -lz -ldl )" > "$terdir/usr/glibc/lib/libbfd.so"
+  echo "INPUT( ${prefix}/glibc/lib/libopcodes.a -lbfd )" > "$terdir/usr/glibc/lib/libopcodes.so"
 
   # install FSF All Permissive License
-  install -Dm644 -t "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/licenses/${pkgname}/ FSFAP
+  install -Dm644 -t "${terdir}"/usr/glibc/share/licenses/${pkgname}/ FSFAP
 
-  rm -f "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/info/dir
+  rm -f "${terdir}"/usr/glibc/share/info/dir
 }

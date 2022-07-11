@@ -78,6 +78,10 @@ package() {
    # systemd stuff
    install -Dm 644 "${srcdir}"/krb5-{kadmind.service,kdc.service,kpropd.service,kpropd@.service,kpropd.socket} \
       -t "${terdir}/usr/glibc/lib/systemd/system"
+
+  for i in bin/compile_et include/com_err.h lib/libcom_err.so share/et/et_c.awk share/et/et_h.awk share/man/man1/compile_et.1; do
+    rm "${terdir}"/usr/glibc/${i}
+  done
 }
 
 # vim: ts=2 sw=2 et:
