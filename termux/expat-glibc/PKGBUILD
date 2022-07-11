@@ -10,7 +10,7 @@ pkgdesc="An XML parser library"
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url="https://libexpat.github.io/"
 license=(MIT)
-makedepends=(cmake)
+makedepends=(cmake-glibc)
 provides=(libexpat.so)
 options=(debug)
 source=("https://github.com/libexpat/libexpat/releases/download/R_${pkgver//./_}/expat-${pkgver}.tar.bz2"{,.asc})
@@ -22,6 +22,7 @@ validpgpkeys=(3176EF7DB2367F1FCA4F306B1F9B0E909AF37285) # Sebastian Pipping
 
 build() {
   cmake -DCMAKE_INSTALL_PREFIX=${prefix}/glibc \
+        -DCMAKE_INSTALL_LIBDIR=lib \
         -DCMAKE_BUILD_TYPE=None \
         -W no-dev \
         -B build \
