@@ -7,6 +7,7 @@ pkgdesc="Library for the arithmetic of complex numbers with arbitrarily high pre
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url="http://www.multiprecision.org/"
 license=('LGPL')
+depends=('mpfr-glibc')
 source=(https://ftp.gnu.org/gnu/mpc/mpc-${pkgver/_/-}.tar.gz{,.sig})
 md5sums=('9f16c976c25bb0f76b50be749cd7a3a8'
          'SKIP')

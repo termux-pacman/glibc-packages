@@ -9,6 +9,7 @@ pkgdesc='Linux Key Management Utilities'
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url='https://www.kernel.org/'
 license=('GPL2' 'LGPL2.1')
+depends=('glibc' 'bash')
 makedepends=('git')
 backup=('data/data/com.termux/files/usr/glibc/etc/request-key.conf')
 validpgpkeys=('A86E54B0D5E1B4E0AB7C640FFBB7576BA7CB0B6B') # David Howells <dhowells@redhat.com>

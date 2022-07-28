@@ -43,8 +43,7 @@ build() {
 }
 
 package_util-linux-glibc() {
-  optdepends=('python: python bindings to libmount'
-              'words: default dictionary for look')
+  depends=('coreutils-glibc' 'libcap-glibc' 'libxcrypt-glibc' 'util-linux-libs' 'ncurses-glibc')
   cd "${pkgbase}-${_realver}"
 
   make DESTDIR="${pkgdir}" install
@@ -64,6 +63,7 @@ package_util-linux-glibc() {
 
 package_util-linux-libs-glibc() {
   pkgdesc="util-linux runtime libraries"
+  depends=('glibc')
   provides=('libutil-linux' 'libblkid.so' 'libfdisk.so' 'libmount.so' 'libsmartcols.so' 'libuuid.so')
 
   make -C "${pkgbase}-${_realver}" DESTDIR="${pkgdir}" install-usrlib_execLTLIBRARIES

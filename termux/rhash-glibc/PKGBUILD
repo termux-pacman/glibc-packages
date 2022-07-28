@@ -13,6 +13,8 @@ url='https://github.com/rhash/RHash'
 license=('BSD')
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 
+depends=('glibc')
+
 backup=('data/data/com.termux/files/usr/glibc/etc/rhashrc')
 
 source=(rhash-$pkgver.tar.gz::https://github.com/rhash/RHash/archive/v$pkgver.tar.gz

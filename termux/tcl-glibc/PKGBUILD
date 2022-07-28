@@ -7,8 +7,7 @@ pkgdesc="Powerful, easy-to-learn dynamic programming language"
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url="http://tcl.sourceforge.net/"
 license=('custom')
-#depends=('zlib')
-options=('staticlibs' '!lto')
+depends=('zlib-glibc')
 source=(https://downloads.sourceforge.net/sourceforge/tcl/tcl${pkgver}-src.tar.gz)
 sha256sums=('26c995dd0f167e48b11961d891ee555f680c175f7173ff8cb829f4ebcde4c1a6')
 

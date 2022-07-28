@@ -7,8 +7,7 @@ pkgrel=0
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 license=('custom')
 url="https://www.zlib.net/"
-depends=()
-options=('staticlibs')  # needed by binutils testsuite
+depends=('glibc')
 source=("https://zlib.net/zlib-${pkgver}.tar.gz"{,.asc})
 sha256sums=('91844808532e5ce316b3c010929493c0244f3d37593afd6de04f71821d5136d9'
             'SKIP')

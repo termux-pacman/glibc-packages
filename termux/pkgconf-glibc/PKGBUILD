@@ -11,6 +11,8 @@ pkgdesc="Package compiler and linker metadata toolkit"
 url="https://github.com/pkgconf/pkgconf"
 license=(custom:ISC)
 arch=('aarch64' 'arm' 'x86_64' 'i686')
+depends=(glibc bash)
+# meson
 makedepends=(git)
 provides=(pkgconfig libpkgconf.so)
 _commit=cef30268e1a3f79efd607c26abcf556aa314c9c4  # tags/pkgconf-1.8.0

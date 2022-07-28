@@ -7,6 +7,7 @@ pkgrel=0
 pkgdesc='A free library for arbitrary precision arithmetic'
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url='https://gmplib.org/'
+depends=(gcc-libs bash)
 license=(LGPL3 GPL)
 source=(https://gmplib.org/download/gmp/gmp-$pkgver.tar.lz{,.sig})
 md5sums=('03a31d8cbaf29d136252f8f38875ed82'

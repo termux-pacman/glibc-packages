@@ -12,6 +12,9 @@ pkgdesc='An URL retrieval utility and library'
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url='https://curl.haxx.se'
 license=('MIT')
+depends=('brotli-glibc' 'krb5-glibc' 'libidn2-glibc'
+         'libnghttp2-glibc' 'libpsl-glibc' 'libssh2-glibc'
+         'openssl-glibc' 'zlib-glibc' 'zstd-glibc')
 source=("https://curl.haxx.se/download/curl-${pkgver}.tar.gz"{,.asc})
 sha512sums=('0b909b7ed55f9a9789584fd9d2033d5838dcf29e33adf6657258e97ebe7c91b26282007687a729c8385594fd8220bd718fd008154926b87b8da254d586fab3c7'
             'SKIP')
@@ -67,6 +70,7 @@ package_curl-glibc() {
 
 package_libcurl-compat-glibc() {
   pkgdesc='An URL retrieval library (without versioned symbols)'
+  depends=('curl-glibc' 'openssl-glibc')
 
   cd "${srcdir}"/build-curl-compat
 

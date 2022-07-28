@@ -11,6 +11,8 @@ pkgdesc="A library implementing the SSH2 protocol as defined by Internet Drafts"
 url="https://www.libssh2.org/"
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 license=('BSD')
+depends=('openssl-glibc' 'zlib-glibc')
+provides=('libssh2.so')
 validpgpkeys=('27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2'   # Daniel Stenberg
               '914C533DF9B2ADA2204F586D78E11C6B279D5C91')  # Daniel Stenberg (old key)
 source=("https://www.libssh2.org/download/libssh2-$pkgver.tar.gz"{,.asc})

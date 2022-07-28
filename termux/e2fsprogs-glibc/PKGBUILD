@@ -10,7 +10,7 @@ arch=('aarch64' 'arm' 'x86_64' 'i686')
 license=('GPL' 'LGPL' 'MIT')
 url='http://e2fsprogs.sourceforge.net'
 options=('debug')
-makedepends=('util-linux' 'fuse2-glibc')
+makedepends=('util-linux-glibc' 'fuse2-glibc')
 validpgpkeys=('3AB057B7E78D945C8C5591FBD36F769BC11804F0') # Theodore Ts'o <tytso@mit.edu>
 source=("https://www.kernel.org/pub/linux/kernel/people/tytso/${pkgbase}/v${pkgver}/${pkgbase}-${pkgver}.tar."{xz,sign}
         'MIT-LICENSE')
@@ -47,9 +47,7 @@ build() {
 }
 
 package_e2fsprogs-glibc() {
-  optdepends=('lvm2: for e2scrub'
-              'util-linux: for e2scrub'
-              'smtp-forwarder: for e2scrub_fail script')
+  depends=('bash' 'util-linux-libs-glibc')
   provides=('libcom_err.so'
             'libe2p.so'
             'libext2fs.so'
@@ -83,6 +81,7 @@ package_e2fsprogs-glibc() {
 }
 
 package_fuse2fs-glibc() {
+  depends=('fuse2-glibc' 'e2fsprogs-glibc')
   pkgdesc='Ext2/3/4 filesystem driver for FUSE'
 
   cd "${srcdir}/${pkgbase}-${pkgver}"

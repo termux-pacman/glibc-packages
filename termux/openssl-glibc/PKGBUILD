@@ -9,6 +9,7 @@ pkgdesc='The Open Source toolkit for Secure Sockets Layer and Transport Layer Se
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url='https://www.openssl.org'
 license=('custom:BSD')
+depends=('glibc')
 makedepends=('perl')
 backup=('data/data/com.termux/files/usr/glibc/etc/ssl/openssl.cnf')
 source=("https://www.openssl.org/source/openssl-${_ver}.tar.gz"{,.asc}

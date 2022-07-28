@@ -9,7 +9,7 @@ pkgname=$_arch-glibc
 pkgver=2.35
 pkgrel=1
 _commit=be176490b818b65b5162c332eb6b581690b16e5c
-pkgdesc="GNU C Library ARM64 target"
+pkgdesc="GNU C Library"
 arch=(any)
 url='https://www.gnu.org/software/libc/'
 license=('GPL' 'LGPL')
@@ -42,7 +42,7 @@ sha256sums=('5123732f6b67ccd319305efd399971d58592122bcc2a6518a1bd2510dd0cf52e'
             'd42648cea552ba5353a32e264686e992263289d5cc86207314dffc54ab514981'
             'cdc234959c6fdb43f000d3bb7d1080b0103f4080f5e67bcfe8ae1aaf477812f0'
             '774061aff612a377714a509918a9e0e0aafce708b87d2d7e06b1bd1f6542fe70'
-            '8094c9c64280710a31ad8d66c9d691a2de6756f4b0ae7051d9a4f5f3b8a9dc30')
+            'ecb37a575c55dadcf70e9ca6fc7bc6e8694b6693f65a59a5264f264422f61bc0')
 validpgpkeys=(7273542B39962DF7B299931416792B4EA25340F8  # "Carlos O'Donell <carlos@systemhalted.org>"
               BC7C7372637EC10C57D7AA6579C43DFBF1CF2187) # Siddhesh Poyarekar
 
@@ -61,38 +61,43 @@ prepare() {
 
 build() {
   cd glibc-build
-  echo "build-programs=yes" > configparms
-  echo "slibdir=/data/data/com.termux/files/usr/glibc/lib" >> configparms
+  echo "slibdir=/data/data/com.termux/files/usr/glibc/lib" > configparms
   echo "rtlddir=/data/data/com.termux/files/usr/glibc/lib" >> configparms
   echo "sbindir=/data/data/com.termux/files/usr/glibc/bin" >> configparms
   echo "rootsbindir=/data/data/com.termux/files/usr/glibc/bin" >> configparms
 
-  unset CFLAGS
+  CFLAGS=${CFLAGS/-Wp,-D_FORTIFY_SOURCE=2 -O2 -pipe/}
+
   ../glibc-$pkgver/configure \
       --prefix=/data/data/com.termux/files/usr/glibc \
-      --sysconfdir=/data/data/com.termux/files/usr/glibc/etc \
-      --with-headers=/data/data/com.termux/files/usr/glibc/include \
-      --host=$_target \
       --libdir=/data/data/com.termux/files/usr/glibc/lib \
+      --libexecdir=/data/data/com.termux/files/usr/glibc/lib \
       --with-bugurl=https://github.com/Maxython/glibc-for-termux/issues \
-      --enable-kernel=4.4 \
       --enable-bind-now \
+      --enable-cet \
+      --enable-kernel=4.4 \
+      --enable-multi-arch \
       --enable-stack-protector=strong \
-      --enable-stackguard-randomization \
-      --disable-timezone-tools \
-      --enable-multi-arch CFLAGS="-O2 -pipe"
+      --enable-systemtap \
+      --disable-profile \
+      --disable-crypt \
+      --disable-werror
 
-  make
+  echo "build-programs=no" >> configparms
+  make -O
+
+  sed -i "/build-programs=/s#no#yes#" configparms
+  echo "CFLAGS=-Wp,-D_FORTIFY_SOURCE=2 -O2 -pipe" >> configparms
+  make -O
+  make info
+
+  locale/localedef -c -f ../glibc/localedata/charmaps/UTF-8 -i ../glibc/localedata/locales/C ../C.UTF-8/
 }
 
 package() {
-  pkgdesc='GNU C Library'
   backup=(data/data/com.termux/files/usr/glibc/etc/gai.conf
           data/data/com.termux/files/usr/glibc/etc/locale.gen
           data/data/com.termux/files/usr/glibc/etc/nscd.conf)
-
-  install -dm755 "$pkgdir/data/data/com.termux/files/usr/glibc/etc"
-  touch "$pkgdir/data/data/com.termux/files/usr/glibc/etc/ld.so.conf"
 
   make -C glibc-build install_root="$pkgdir" install
   rm -f "$pkgdir"/data/data/com.termux/files/usr/glibc/etc/ld.so.{cache,conf}
@@ -117,26 +122,15 @@ package() {
   sed -e '1,3d' -e 's|/| |g' -e 's|\\| |g' -e 's|^|#|g' \
     "$srcdir/glibc/localedata/SUPPORTED" >> "$pkgdir/data/data/com.termux/files/usr/glibc/etc/locale.gen"
 
-  if check_option 'debug' n; then
-    find "$pkgdir"/data/data/com.termux/files/usr/glibc/bin -type f -executable -exec strip $STRIP_BINARIES {} + 2> /dev/null || true
-    find "$pkgdir"/data/data/com.termux/files/usr/glibc/lib -name '*.a' -type f -exec strip $STRIP_STATIC {} + 2> /dev/null || true
-
-    # Do not strip these for gdb and valgrind functionality, but strip the rest
-    find "$pkgdir"/data/data/com.termux/files/usr/glibc/lib \
-      -not -name 'ld-*.so*' \
-      -not -name 'libc.so*' \
-      -not -name 'libpthread.so*' \
-      -not -name 'libthread_db.so*' \
-      -name '*.so*' -type f -exec strip $STRIP_SHARED {} + 2> /dev/null || true
-  fi
+  # install C.UTF-8 so that it is always available
+  install -dm755 "$pkgdir/data/data/com.termux/files/usr/glibc/lib/locale"
+  cp -r "$srcdir/C.UTF-8" -t "$pkgdir/data/data/com.termux/files/usr/glibc/lib/locale"
+  sed -i '/#C\.UTF-8 /d' "$pkgdir/data/data/com.termux/files/usr/glibc/etc/locale.gen"
 
   # Provide tracing probes to libstdc++ for exceptions, possibly for other
   # libraries too. Useful for gdb's catch command.
   install -Dm644 "$srcdir/sdt.h" "$pkgdir/data/data/com.termux/files/usr/glibc/include/sys/sdt.h"
   install -Dm644 "$srcdir/sdt-config.h" "$pkgdir/data/data/com.termux/files/usr/glibc/include/sys/sdt-config.h"
-
-  # Provided by libxcrypt; keep the old shared library for backwards compatibility
-  rm -f "$pkgdir"/data/data/com.termux/files/usr/glibc/include/crypt.h "$pkgdir"/data/data/com.termux/files/usr/glibc/lib/libcrypt.{a,so}
 
   sed -i 's|!/bin/bash|!/data/data/com.termux/files/usr/bin/bash|' "$pkgdir"/data/data/com.termux/files/usr/glibc/bin/*
   mkdir -p "$pkgdir"/data/data/com.termux/files/usr/bin

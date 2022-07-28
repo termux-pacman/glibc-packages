@@ -10,7 +10,9 @@ pkgdesc='Zstandard - Fast real-time compression algorithm'
 url='https://facebook.github.io/zstd/'
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 license=(BSD GPL2)
-#makedepends=(gtest)
+depends=(glibc gcc-libs zlib-glibc xz-glibc lz4-glibc)
+makedepends=(cmake ninja)
+provides=(libzstd.so)
 options=(debug)
 source=(https://github.com/facebook/zstd/releases/download/v${pkgver}/zstd-${pkgver}.tar.zst{,.sig})
 sha256sums=('3ea06164971edec7caa2045a1932d757c1815858e4c2b68c7ef812647535c23f'
@@ -19,18 +21,34 @@ b2sums=('513e4526a92bcb59416b3457d186a30e554f9e0cf21d7114eb3e9fbcbd9d662c8d95cf0
         'SKIP')
 validpgpkeys=(4EF4AC63455FC9F4545D9B7DEF8FE99528B52FFD)
 
+prepare() {
+  cd zstd-${pkgver}
+  # avoid error on tests without static libs, we use LD_LIBRARY_PATH
+  sed '/build static library to build tests/d' -i build/cmake/CMakeLists.txt
+  sed 's/libzstd_static/libzstd_shared/g' -i build/cmake/tests/CMakeLists.txt
+}
+
 build() {
   cd zstd-${pkgver}
-  make
-  make -C contrib/pzstd
+  export CFLAGS+=' -ffat-lto-objects'
+  export CXXFLAGS+=' -ffat-lto-objects'
+
+  cmake -S build/cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=None \
+    -DCMAKE_INSTALL_PREFIX=${prefix}/glibc \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DZSTD_BUILD_CONTRIB=ON \
+    -DZSTD_BUILD_STATIC=OFF \
+    -DZSTD_BUILD_TESTS=ON \
+    -DZSTD_PROGRAMS_LINK_SHARED=ON
+  cmake --build build
 }
 
 package() {
   cd zstd-${pkgver}
-  make PREFIX=${prefix}/glibc DESTDIR="${pkgdir}" install
+  DESTDIR="${pkgdir}" cmake --install build
   ln -sf ${prefix}/glibc/bin/zstd "${terdir}/usr/glibc/bin/zstdmt"
-  install -Dm 755 contrib/pzstd/pzstd -t "${terdir}/usr/glibc/bin"
-  install -Dm 644 LICENSE -t "${terdir}/usr/glibc/share/licenses/${pkgname}"
+  install -Dm 644 LICENSE -t "${terdir}/usr/glibc/share/licenses/zstd"
 }
 
 # vim: ts=2 sw=2 et:

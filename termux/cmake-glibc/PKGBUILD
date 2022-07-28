@@ -9,6 +9,7 @@ pkgdesc='A cross-platform open-source make system'
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url="https://www.cmake.org/"
 license=('custom')
+depends=('curl-glibc' 'libarchive-glibc' 'hicolor-icon-theme-glibc' 'jsoncpp-glibc' 'libuv-glibc' 'rhash-glibc')
 makedepends=('emacs')
 source=("https://www.cmake.org/files/v${pkgver%.*}/cmake-${pkgver}.tar.gz")
 sha512sums=('0925adf973d642fd76d4089b61b3882babb0a85050c4c57d5f5f3bd6b17564a9feb0beed236cd636e25f69072fa30b67ea3f80932380b6b6576f2dd78b8e6931')

@@ -14,8 +14,8 @@ pkgdesc='A generic library support script'
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url='https://www.gnu.org/software/libtool'
 license=(GPL)
-#groups=(base-devel)
-checkdepends=(gcc-fortran)
+depends=(bash tar glibc)
+makedepends=("gcc-glibc>=$_gccver" git help2man)
 options=(debug)
 _commit=6d7ce133ce54898cf28abd89d167cccfbc3c9b2b
 source=(git+https://git.savannah.gnu.org/git/libtool.git#commit=$_commit

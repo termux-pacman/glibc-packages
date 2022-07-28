@@ -10,7 +10,7 @@ arch=('aarch64' 'arm' 'x86_64' 'i686')
 license=('GPL2' 'LGPL2.1')
 url="http://www.unixodbc.org/"
 backup=('data/data/com.termux/files/usr/glibc/etc/odbc.ini' 'data/data/com.termux/files/usr/glibc/etc/odbcinst.ini')
-#depends=('readline' 'libltdl')
+depends=('readline-glibc' 'libtool-glibc')
 source=(ftp://ftp.unixodbc.org/pub/unixODBC/unixODBC-$pkgver.tar.gz)
 sha256sums=('d9e55c8e7118347e3c66c87338856dad1516b490fb7c756c1562a2c267c73b5c')
 

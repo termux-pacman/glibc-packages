@@ -12,7 +12,7 @@ pkgdesc='Multiple-precision floating-point library'
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url='https://www.mpfr.org/'
 license=('GPL3' 'LGPL3')
-depends=()
+depends=('glibc' 'gmp-glibc')
 #makedepends=('autoconf-archive')
 source=("https://ftp.gnu.org/gnu/mpfr/mpfr-${_pkgver}.tar.xz"{,.sig}
          patches.diff) # wget https://www.mpfr.org/mpfr-4.1.0/allpatches -O patches.diff

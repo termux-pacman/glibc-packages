@@ -8,6 +8,7 @@ pkgdesc="Multi-platform support library with a focus on asynchronous I/O"
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url="https://github.com/libuv/libuv"
 license=('custom')
+depends=('glibc' 'libnsl-glibc')
 source=(https://dist.libuv.org/dist/v$pkgver/libuv-v$pkgver.tar.gz{,.sign})
 sha512sums=('ba48140ac5733e09462a731fe9194c902b011a1a93a63175949c616367bde56bd1c114e8487c5580bee2d4656b45ab8cdc4fc335f67dd35e793c1a943f69fb34'
             'SKIP')

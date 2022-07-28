@@ -11,6 +11,7 @@ pkgdesc="Handle ELF object files and DWARF debugging information"
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url="https://sourceware.org/elfutils/"
 license=(LGPL3 GPL3)
+makedepends=(curl-glibc gcc-libs libarchive-glibc xz-glibc zlib-glibc zstd-glibc)
 options=(debug staticlibs)
 source=(https://sourceware.org/$pkgbase/ftp/$pkgver/$pkgbase-$pkgver.tar.bz2{,.sig})
 sha512sums=('a9b9e32b503b8b50a62d4e4001097ed2721d3475232a6380e6b9853bd1647aec016440c0ca7ceb950daf1144f8db9814ab43cf33cc0ebef7fc91e9e775c9e874'
@@ -93,6 +94,7 @@ package_debuginfod-glibc() {
 
 package_elfutils-glibc() {
   pkgdesc+=" (utilities)"
+  depends=(gcc-libs glibc libelf-glibc=$pkgver)
 
   cp -r elfutils/* "$pkgdir"
   install -vDm 644 $pkgbase-$pkgver/{AUTHORS,ChangeLog,NEWS,NOTES,README} -t "$terdir/usr/glibc/share/doc/$pkgname/"
@@ -100,6 +102,7 @@ package_elfutils-glibc() {
 
 package_libelf-glibc() {
   pkgdesc+=" (libraries)"
+  depends=(gcc-libs curl-glibc xz-glibc zlib-glibc zstd-glibc)
   # NOTE: the shared objects can not be added to provides as they are not versioned
 
   cp -r libelf/* "$pkgdir"

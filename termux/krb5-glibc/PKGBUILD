@@ -8,6 +8,7 @@ pkgdesc='The Kerberos network authentication system'
 url='https://web.mit.edu/kerberos/'
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 license=('custom')
+depends=('glibc' 'e2fsprogs-glibc' 'keyutils-glibc' 'openssl-glibc')
 #makedepends=('perl')
 backup=(
   'data/data/com.termux/files/usr/glibc/etc/krb5.conf'

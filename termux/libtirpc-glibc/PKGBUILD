@@ -8,7 +8,7 @@ pkgdesc="Transport Independent RPC library (SunRPC replacement)"
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url="http://git.linux-nfs.org/?p=steved/libtirpc.git;a=summary"
 license=('BSD')
-#depends=('krb5')
+depends=('krb5-glibc')
 backup=('data/data/com.termux/files/usr/glibc/etc/netconfig')
 # git tree: git://linux-nfs.org/~steved/libtirpc
 source=(https://downloads.sourceforge.net/sourceforge/libtirpc/libtirpc-${pkgver}.tar.bz2)

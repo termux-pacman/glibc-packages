@@ -10,6 +10,8 @@ pkgdesc="GNU C Library"
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url='https://www.gnu.org/software/libc/'
 license=('GPL' 'LGPL')
+depends=(linux-api-headers)
+makedepends=(git gcc-glibc python)
 options=(!strip staticlibs)
 source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz{,.sig}
 	'_Fork.c.patch'

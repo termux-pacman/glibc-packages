@@ -19,7 +19,7 @@ export PATH=$PREFIX/glibc/bin:$PATH
 if [ "$1" = "--shell" ]; then
 	exec $SHELL
 else
-	exec $PREFIX/glibc/lib/ld.so $@
+	exec ld.so $@
 fi
 
 exit $?

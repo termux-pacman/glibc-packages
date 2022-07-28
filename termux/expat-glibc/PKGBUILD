@@ -10,6 +10,7 @@ pkgdesc="An XML parser library"
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url="https://libexpat.github.io/"
 license=(MIT)
+depends=(glibc)
 makedepends=(cmake-glibc)
 provides=(libexpat.so)
 options=(debug)

@@ -13,8 +13,16 @@ pkgrel=0
 pkgdesc='The GNU Compiler Collection'
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url='https://gcc.gnu.org/'
+makedepends=(
+  binutils-glibc
+  gcc-glibc
+  git
+  libmpc-glibc
+  libxcrypt-glibc
+  python
+  zstd-glibc
+)
 license=(GPL LGPL FDL)
-depends=()
 replaces=($_arch-gcc-bootstrap)
 options=(!emptydirs !strip staticlibs)
 source=(https://ftp.gnu.org/gnu/gcc/gcc-$pkgver/gcc-$pkgver.tar.xz{,.sig}
@@ -84,6 +92,7 @@ build() {
 
 package_gcc-libs() {
   pkgdesc='Runtime libraries shipped by GCC'
+  depends=('glibc>=2.27')
   options=(!emptydirs !strip)
 
   cd gcc-build
@@ -118,6 +127,7 @@ package_gcc-libs() {
 
 package_gcc-glibc() {
   pkgdesc="The GNU Compiler Collection - C and C++ frontends"
+  depends=("gcc-libs=$pkgver-$pkgrel" 'binutils-glibc>=2.28' libmpc-glibc zstd-glibc)
   options=(!emptydirs)
 
   cd gcc-build

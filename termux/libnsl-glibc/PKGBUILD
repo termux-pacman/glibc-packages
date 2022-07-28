@@ -8,6 +8,7 @@ pkgdesc="Public client interface library for NIS(YP)"
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url="https://github.com/thkukuk/libnsl"
 license=(LGPL2.1)
+depends=(glibc libtirpc-glibc)
 provides=(libnsl.so)
 options=(debug)
 source=("libnsl-$pkgver.tar.gz::$url/archive/v$pkgver.tar.gz")

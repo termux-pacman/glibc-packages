@@ -12,6 +12,7 @@ pkgdesc='A set of programs to assemble and manipulate binary and object files'
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url='https://www.gnu.org/software/binutils/'
 license=('GPL3' 'GPL' 'FDL1.3' 'custom:FSFAP')
+depends=(glibc zlib-glibc libelf-glibc)
 #_commit=cb5f6a3e146cc70bc2d864989386df80acec5d3e
 #source=(git+https://sourceware.org/git/binutils-gdb.git#commit=$_commit)
 source=(https://ftp.gnu.org/gnu/binutils/binutils-$pkgver.tar.xz{,.sig}

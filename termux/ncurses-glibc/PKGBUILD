@@ -10,11 +10,9 @@ pkgdesc='System V Release 4.0 curses emulation library'
 arch=('aarch64' 'arm' 'x86_64' 'i686')
 url='https://invisible-island.net/ncurses/ncurses.html'
 license=(MIT)
-#depends=(glibc gcc-libs)
-#makedepends=(autoconf-archive)
-#optdepends=('bash: for ncursesw6-config')
+depends=(glibc gcc-libs)
+makedepends=(autoconf-archive)
 provides=(libncurses++w.so libformw.so libmenuw.so libpanelw.so libncursesw.so)
-#replaces=(alacritty-terminfo)
 options=(debug)
 source=(
   https://invisible-mirror.net/archives/ncurses/ncurses-$pkgver.tar.gz{,.asc}
