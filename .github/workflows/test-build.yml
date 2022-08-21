@@ -1,0 +1,48 @@
+name: Test build glibc for termux
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target_arch: [aarch64, armv7]
+    name: build glibc
+    steps:
+      - uses: actions/checkout@v2.1.0
+      - uses: uraimo/run-on-arch-action@v2
+        name: Run commands
+        id: build
+        with:
+          arch: ${{ matrix.target_arch }}
+          distro: archarm_latest
+          githubToken: ${{ github.token }}
+          setup: |
+            mkdir -p "${PWD}/builder"
+          dockerRunArgs: |
+            --volume "${PWD}/builder:/builder"
+          install: |
+            pacman -Syu --noconfirm
+            pacman -S base-devel python git --noconfirm --needed
+          run: |
+            useradd -m user-build
+            mkdir -p /data/data/com.termux/files/usr/bin
+            ln -s /bin/patch /data/data/com.termux/files/usr/bin/patch
+            cd /home/user-build
+            sudo -H -u user-build bash -c "git clone https://github.com/Maxython/glibc-for-termux"
+            cd glibc-for-termux/distro/glibc
+            for i in $(cat key-gpg.info); do
+              sudo -H -u user-build bash -c "gpg --recv-keys ${i}"
+            done
+            sudo -H -u user-build bash -c "makepkg"
+            sudo -H -u user-build bash -c "tar cJf glibc-packages-${{ matrix.target_arch }}.tar.xz *.pkg.*"
+            mv glibc-packages-${{ matrix.target_arch }}.tar.xz /builder
+      - name: Show the files
+        run: |
+          ls -al "./builder"
+      - uses: actions/upload-artifact@v3
+        with:
+          name: my-artifact
+          path: "./builder/glibc-packages-${{ matrix.target_arch }}.tar.xz"
+          if-no-files-found: error

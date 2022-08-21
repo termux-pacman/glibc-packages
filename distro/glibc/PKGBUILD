@@ -1,11 +1,8 @@
 # Maintainer: Anatol Pomozov
 # Maintainer: Eli Schwartz <eschwartz@archlinux.org>
 # Contributor: Christer Solskogen <christer.solskogen@gmail.com>
-# Build order: aarch64-binutils -> aarch64-linux-api-headers -> aarch64-gcc-bootstrap -> aarch64-glibc -> aarch64-gcc -> aarch64-glibc (again)
 
-_arch=aarch64
-_target=$_arch-unknown-linux-gnu
-pkgname=$_arch-glibc
+pkgname=glibc
 pkgver=2.35
 pkgrel=1
 _commit=be176490b818b65b5162c332eb6b581690b16e5c
@@ -66,8 +63,7 @@ build() {
   echo "sbindir=/data/data/com.termux/files/usr/glibc/bin" >> configparms
   echo "rootsbindir=/data/data/com.termux/files/usr/glibc/bin" >> configparms
 
-  CFLAGS=${CFLAGS/-Wp,-D_FORTIFY_SOURCE=2 -O2 -pipe/}
-
+  unset CFLAGS
   ../glibc-$pkgver/configure \
       --prefix=/data/data/com.termux/files/usr/glibc \
       --libdir=/data/data/com.termux/files/usr/glibc/lib \
@@ -75,23 +71,23 @@ build() {
       --with-bugurl=https://github.com/Maxython/glibc-for-termux/issues \
       --enable-bind-now \
       --enable-cet \
-      --enable-kernel=4.4 \
+      --enable-kernel=3.2 \
       --enable-multi-arch \
       --enable-stack-protector=strong \
       --enable-systemtap \
       --disable-profile \
       --disable-crypt \
-      --disable-werror
+      --disable-werror CFLAGS="-O2 -pipe"
 
   echo "build-programs=no" >> configparms
   make -O
 
   sed -i "/build-programs=/s#no#yes#" configparms
-  echo "CFLAGS=-Wp,-D_FORTIFY_SOURCE=2 -O2 -pipe" >> configparms
+  echo "CFLAGS=-O2 -pipe" >> configparms
   make -O
   make info
 
-  locale/localedef -c -f ../glibc/localedata/charmaps/UTF-8 -i ../glibc/localedata/locales/C ../C.UTF-8/
+  localedef -c -f ../glibc/localedata/charmaps/UTF-8 -i ../glibc/localedata/locales/C ../C.UTF-8/
 }
 
 package() {
