@@ -1,6 +1,5 @@
-diff -uNr src/glibc-2.35/sysdeps/unix/sysv/linux/clone-internal.c src/glibc-2.35/sysdeps/unix/sysv/linux/clone-internal.c.patch
---- src/glibc-2.35/sysdeps/unix/sysv/linux/clone-internal.c
-+++ src/glibc-2.35/sysdeps/unix/sysv/linux/clone-internal.c.patch
+--- src/glibc-2.36/sysdeps/unix/sysv/linux/clone-internal.c
++++ src/glibc-2.36/sysdeps/unix/sysv/linux/clone-internal.c.patch
 @@ -48,17 +48,6 @@ __clone_internal (struct clone_args *cl_args,
  		  int (*func) (void *arg), void *arg)
  {

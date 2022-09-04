@@ -3,8 +3,8 @@
 # Contributor: Christer Solskogen <christer.solskogen@gmail.com>
 
 pkgname=glibc
-pkgver=2.35
-pkgrel=1
+pkgver=2.36
+pkgrel=0
 _commit=be176490b818b65b5162c332eb6b581690b16e5c
 pkgdesc="GNU C Library"
 arch=(any)
@@ -25,16 +25,16 @@ source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz{,.sig}
         'sdt-config.h'
         'sdt.h'
 	'grun')
-sha256sums=('5123732f6b67ccd319305efd399971d58592122bcc2a6518a1bd2510dd0cf52e'
+sha256sums=('1c959fea240906226062cb4b1e7ebce71a9f0e3c0836c09e7e3423d434fcfe75'
             'SKIP'
-            '0a25d0358ba67c9cad1d94707615d9a6249b5234a9de601a10f281a5c604cc83'
-            '0cc8d30b73368bfb92f7ea8298e4a791bb8d641c97ec86ef1c1be6052920fe32'
-            '69a74af5419df4b914190b29cedee762413716fdc397eee22d7dcb5a5efdb092'
-            '55871505df12af8eea2e6d9d50d1337437d12f082f6fd2c673f9911cb9747938'
-            '55365e5bf9d758ded46e82fd6165b6a1c7828ab96d9de18346653553fce3018d'
-            '47a5eed52a0c91e86b7f26e5e716ce24b8eb545eee21dc17f98cafc1f4a2dbb4'
-            'e4eb6b3a3b42b28e15010c7a062141f8fd262c85185a746639f4432594fe9a1d'
-            'f35852b69cd3fc78f7e77b566075b24e7a641dd60484e05abfcb838294225d1a'
+            '9254552968fb94543cc394ab99c641f2d72198b5f448e1847f7d697e669fbefd'
+            'bc0530006920c0038d25bccc2ad63bdf5f2bdfd18374ea7dfa0c59e3e2a16a50'
+            '07452446c739a133d440f83589f8e43f7be9727c931447d08eb3b708db1782a8'
+            'd201d7bcc91e7c62ca981462280d57326d334c0a7ec9eefa50b8d5ff96341bfd'
+            '7b94b8d249685256de0ed6d0fd6d880a9c03234d4879b5f0ac1f52ea0a8042d0'
+            '3d39f4166fc13f848eedceb7f877700d36b8613d4b5bdb0c564e7fcf6bf8c95e'
+            'd984384ebcb6a4bffd2428cb6ec0dc8c456cd0492eb3dceff80e5e73e37c6e61'
+            'a2f394168cdb48a3320195fa056d0540dbb5462e313115247d604e31b24587b1'
             'cdd916c0dc29e5d958ddef5c3530947244fd740ce7645601bfabae53512323b8'
             'd42648cea552ba5353a32e264686e992263289d5cc86207314dffc54ab514981'
             'cdc234959c6fdb43f000d3bb7d1080b0103f4080f5e67bcfe8ae1aaf477812f0'

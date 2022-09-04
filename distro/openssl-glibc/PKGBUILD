@@ -1,7 +1,7 @@
 # Maintainer: Pierre Schmitz <pierre@archlinux.de>
 
 pkgname=openssl-glibc
-_ver=1.1.1n
+_ver=1.1.1q
 # use a pacman compatible version scheme
 pkgver=${_ver/[a-z]/.${_ver//[0-9.]/}}
 pkgrel=0
@@ -13,7 +13,7 @@ makedepends=('perl')
 backup=('data/data/com.termux/files/usr/glibc/etc/ssl/openssl.cnf')
 source=("https://www.openssl.org/source/openssl-${_ver}.tar.gz"{,.asc}
 	'ca-dir.patch')
-sha256sums=('40dceb51a4f6a5275bde0e6bf20ef4b91bfc32ed57c0552e2e8e15463372b17a'
+sha256sums=('d7939ce614029cdff0b6c20f0e2e5703158a489a72b2507b8bd51bf8c8fd10ca'
             'SKIP'
             '9ffaf3fb5443fe1b7a18dc407f04a4a781834bcbc52187ff97f4c1fa1e2f8cdf')
 validpgpkeys=('8657ABB260F056B1E5190839D9C4D26D0E604491'

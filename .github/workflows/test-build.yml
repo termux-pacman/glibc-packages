@@ -1,6 +1,9 @@
 name: Test build glibc for termux
 
-on: push
+on:
+  push:
+    paths:
+    - 'distro/**'
 
 jobs:
   build:
@@ -24,7 +27,7 @@ jobs:
             --volume "${PWD}/builder:/builder"
           install: |
             pacman -Syu --noconfirm
-            pacman -S base-devel python git --noconfirm --needed
+            pacman -S base-devel python git cmake python-setuptools ruby-ronn publicsuffix-list gtk-doc autoconf-archive gtest --noconfirm --needed
           run: |
             useradd -m user-build
             mkdir -p /data/data/com.termux/files/usr/bin
@@ -32,9 +35,11 @@ jobs:
             cd /home/user-build
             sudo -H -u user-build bash -c "git clone https://github.com/Maxython/glibc-for-termux"
             cd glibc-for-termux/distro/glibc
-            for i in $(cat key-gpg.info); do
-              sudo -H -u user-build bash -c "gpg --recv-keys ${i}"
-            done
+            if [[ -f key-gpg.info ]]; then
+              for i in $(cat key-gpg.info); do
+                sudo -H -u user-build bash -c "gpg --recv-keys ${i}"
+              done
+            fi
             sudo -H -u user-build bash -c "makepkg"
             sudo -H -u user-build bash -c "tar cJf glibc-packages-${{ matrix.target_arch }}.tar.xz *.pkg.*"
             mv glibc-packages-${{ matrix.target_arch }}.tar.xz /builder

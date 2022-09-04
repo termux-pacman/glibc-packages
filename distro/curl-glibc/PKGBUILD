@@ -6,14 +6,14 @@
 
 pkgbase=curl
 pkgname=(curl-glibc libcurl-compat-glibc)
-pkgver=7.82.0
+pkgver=7.85.0
 pkgrel=0
 pkgdesc='An URL retrieval utility and library'
 arch=(any)
 url='https://curl.haxx.se'
 license=('MIT')
 source=("https://curl.haxx.se/download/curl-${pkgver}.tar.gz"{,.asc})
-sha512sums=('d4c4a785876e0d1ba1c1adbe65528d56a8b81fc03ff724e87819cfe51aca60f8a7bf2ac9384f30c3a6bbd28669b2bd3e9a6794737243c836c4902d085a72c474'
+sha512sums=('bbad693bcde9c55e5942499950d76011f53ad43d3270eee2c8db486bcf46f5fc92b32dd8752caf4c5976fe493d083e2d34fa299cb96fb8e76d8f5fcc2cc56a36'
             'SKIP')
 validpgpkeys=('27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2') # Daniel Stenberg
 
