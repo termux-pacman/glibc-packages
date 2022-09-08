@@ -1,6 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-# version: 1.0
+# version: 1.1
 # this command allows you to run commands that depend on glibc
 # or run a shell with access to commands from a configured glibc.
 
@@ -17,7 +17,11 @@ unset LD_PRELOAD
 export PATH=$PREFIX/glibc/bin:$PATH
 
 if [ "$1" = "--shell" ]; then
-	exec $SHELL
+	if [[ -z "$2" ]]; then
+		exec $SHELL
+	else
+		exec $2
+	fi
 else
 	exec ld.so $@
 fi

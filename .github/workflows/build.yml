@@ -1,4 +1,4 @@
-name: Test build glibc for termux
+name: Compiling glibc packages for termux
 
 on:
   push:
@@ -11,9 +11,15 @@ jobs:
     strategy:
       matrix:
         target_arch: [aarch64, armv7]
-    name: build glibc
+    name: build
     steps:
       - uses: actions/checkout@v2.1.0
+      - uses: jitterbit/get-changed-files@v1
+        id: pkgs
+        with:
+          format: space-delimited
+          token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
       - uses: uraimo/run-on-arch-action@v2
         name: Run commands
         id: build
@@ -34,20 +40,26 @@ jobs:
             ln -s /bin/patch /data/data/com.termux/files/usr/bin/patch
             cd /home/user-build
             sudo -H -u user-build bash -c "git clone https://github.com/Maxython/glibc-for-termux"
-            cd glibc-for-termux/distro/glibc
-            if [[ -f key-gpg.info ]]; then
-              for i in $(cat key-gpg.info); do
-                sudo -H -u user-build bash -c "gpg --recv-keys ${i}"
-              done
-            fi
-            sudo -H -u user-build bash -c "makepkg"
-            sudo -H -u user-build bash -c "tar cJf glibc-packages-${{ matrix.target_arch }}.tar.xz *.pkg.*"
-            mv glibc-packages-${{ matrix.target_arch }}.tar.xz /builder
-      - name: Show the files
-        run: |
-          ls -al "./builder"
+            cd glibc-for-termux/distro
+            build_pkg="|"
+            for j in ${{ steps.pkgs.outputs.added_modified }}; do
+              jl=(${j//// })
+              if [[ "${jl[0]}" = "distro" && ! $(echo "$build_pkg" | grep "|${jl[1]}|") && -d "${jl[1]}" ]]; then
+                cd "${jl[1]}"
+                if [[ -f key-gpg.info ]]; then
+                  for i in $(cat key-gpg.info); do
+                    sudo -H -u user-build bash -c "gpg --recv-keys ${i}"
+                  done
+                fi
+                sudo -H -u user-build bash -c "makepkg"
+                tar cJf glibc-packages-${{ matrix.target_arch }}.tar.xz *.pkg.*
+                mv glibc-packages-${{ matrix.target_arch }}.tar.xz /builder
+                build_pkg+="${jl[1]}|"
+                cd ..
+              fi
+            done
       - uses: actions/upload-artifact@v3
         with:
-          name: my-artifact
+          name: glibc-packages
           path: "./builder/glibc-packages-${{ matrix.target_arch }}.tar.xz"
           if-no-files-found: error
