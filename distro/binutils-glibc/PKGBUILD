@@ -49,6 +49,17 @@ prepare() {
 build() {
   cd binutils-build
 
+  case "$(uname -m)" in
+    "aarch64")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+    "armv7l")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+  esac
+
   "$srcdir/binutils-gdb/configure" \
     --prefix=/data/data/com.termux/files/usr/glibc \
     --with-lib-path=/data/data/com.termux/files/usr/glibc/lib:/data/data/com.termux/files/usr/glibc/local/lib \
@@ -74,17 +85,6 @@ build() {
     --with-debuginfod \
     --with-pic \
     --with-system-zlib
-
-  case "$(uname -m)" in
-    "aarch64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "armv7l")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-  esac
 
   make -O tooldir=/data/data/com.termux/files/usr/glibc
 
