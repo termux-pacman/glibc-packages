@@ -111,3 +111,4 @@ package() {
 
   rm -f "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/info/dir
 }
+

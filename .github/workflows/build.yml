@@ -38,7 +38,8 @@ jobs:
             useradd -m user-build
             mkdir -p /data/data/com.termux/files/usr/bin
             ln -s /bin/patch /data/data/com.termux/files/usr/bin/patch
-            tar xJf gfb/${{ matrix.target_arch }}/glibc-*-any.pkg.tar.xz -C / data
+            mkdir -p /data/data/com.termux/files/usr/glibc
+            ln -s /lib /data/data/com.termux/files/usr/glibc/lib
             cd /home/user-build
             sudo -H -u user-build bash -c "git clone https://github.com/Maxython/glibc-for-termux"
             cd glibc-for-termux/distro
