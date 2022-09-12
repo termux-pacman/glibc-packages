@@ -1,0 +1,11 @@
+--- src/gcc-12.2.0/gcc/config/arm/linux-elf.h	2022-08-19 11:09:52.584662523 +0300
++++ src/gcc-12.2.0/gcc/config/arm/linux-elf.h.patch	2022-09-12 13:00:24.577915905 +0300
+@@ -60,7 +60,7 @@
+ 
+ #define LIBGCC_SPEC "%{mfloat-abi=soft*:-lfloat} -lgcc"
+ 
+-#define GLIBC_DYNAMIC_LINKER "/lib/ld-linux.so.2"
++#define GLIBC_DYNAMIC_LINKER "/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
+ 
+ #define LINUX_TARGET_LINK_SPEC  "%{h*} \
+    %{static:-Bstatic} \

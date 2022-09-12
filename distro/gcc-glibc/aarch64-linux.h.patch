@@ -1,6 +1,5 @@
-diff -uNr src/gcc-12.1.0/gcc/config/aarch64/aarch64-linux.h src/gcc-12.1.0/gcc/config/aarch64/aarch64-linux.h.patch
---- src/gcc-12.1.0/gcc/config/aarch64/aarch64-linux.h	2021-07-28 06:55:07.004283395 +0000
-+++ src/gcc-12.1.0/gcc/config/aarch64/aarch64-linux.h.patch	2022-02-25 07:07:09.797697862 +0000
+--- src/gcc-12.2.0/gcc/config/aarch64/aarch64-linux.h	2021-07-28 06:55:07.004283395 +0000
++++ src/gcc-12.2.0/gcc/config/aarch64/aarch64-linux.h.patch	2022-02-25 07:07:09.797697862 +0000
 @@ -21,10 +21,10 @@
  #ifndef GCC_AARCH64_LINUX_H
  #define GCC_AARCH64_LINUX_H

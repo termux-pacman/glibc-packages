@@ -14,20 +14,21 @@ replaces=($_arch-gcc-bootstrap)
 options=(!emptydirs !strip staticlibs)
 source=(https://ftp.gnu.org/gnu/gcc/gcc-$pkgver/gcc-$pkgver.tar.xz{,.sig}
         c89 c99
-        aarch64-linux.h.patch)
+        aarch64-linux.h.patch
+        arm-linux-eabi.h.patch
+        arm-linux-elf.h.patch)
 _libdir=data/data/com.termux/files/usr/glibc/lib/gcc/$CHOST/${pkgver%%+*}
-
 sha256sums=('e549cf9cf3594a00e27b6589d4322d70e0720cdd213f39beb4181e06926230ff'
             'SKIP'
             'd87254ee2c816aee66b00dd5002966cf3fe9aca4969eaf160c47150583357790'
             '9ad6d475acf0b19ca0e420f32867c6a5186ffbae50481ec64a140165f8988b60'
+            'SKIP'
+            'SKIP'
             'SKIP')
-
 validpgpkeys=(F3691687D867B81B51CE07D9BBE43771487328A9  # bpiotrowski@archlinux.org
               86CFFCA918CF3AF47147588051E8B148A9999C34  # evangelos@foutrelis.com
               13975A70E63C361C73AE69EF6EEB81F8981C74C7  # richard.guenther@gmail.com
               D3A93CAD751C2AF4F8C7AD516C35B99309B5FA62) # Jakub Jelinek <jakub@redhat.com>
-
 _basedir=gcc-$pkgver
 
 prepare() {
@@ -43,13 +44,21 @@ prepare() {
 build() {
   cd gcc-build
 
-  CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-  CXXFLAGS="${CFLAGS}"
+  case "$(uname -m)" in
+    "aarch64")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+    "armv7l")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+  esac
 
   "$srcdir"/$_basedir/configure \
       --prefix=/data/data/com.termux/files/usr/glibc \
       --libdir=/data/data/com.termux/files/usr/glibc/lib \
-      --disable-nls --enable-default-pie \
+      --enable-kernel=3.2 --disable-nls --enable-default-pie \
       --enable-languages=c,c++,fortran \
       --with-system-zlib --enable-__cxa_atexit \
       --enable-linker-build-id --enable-plugin \
