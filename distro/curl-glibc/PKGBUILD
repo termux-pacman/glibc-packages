@@ -20,6 +20,7 @@ validpgpkeys=('27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2') # Daniel Stenberg
 _configure_options=(
   --prefix='/data/data/com.termux/files/usr/glibc'
   --mandir='/data/data/com.termux/files/usr/glibc/share/man'
+  --enable-kernel='3.2'
   --disable-ldap
   --disable-ldaps
   --disable-manual
@@ -37,8 +38,16 @@ build() {
   # build curl
   cd "${srcdir}"/build-curl
 
-  CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-  CXXFLAGS="${CFLAGS}"
+  case "$(uname -m)" in
+    "aarch64")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+    "armv7l")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+  esac
 
   "${srcdir}/${pkgbase}-${pkgver}"/configure \
     "${_configure_options[@]}" \
