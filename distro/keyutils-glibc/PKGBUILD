@@ -29,8 +29,18 @@ prepare() {
 
 build() {
   cd keyutils
-  CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-  CXXFLAGS="${CFLAGS}"
+
+  case "$(uname -m)" in
+    "aarch64")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+    "armv7l")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+  esac
+
   make CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" SBINDIR='/data/data/com.termux/files/usr/glibc/bin' BINDIR='/data/data/com.termux/files/usr/glibc/bin'
 }
 
