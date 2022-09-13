@@ -53,3 +53,4 @@ package_minizip-glibc() {
 	# https://github.com/madler/zlib/pull/229
 	rm "${pkgdir}/data/data/com.termux/files/usr/glibc/include/minizip/crypt.h"
 }
+
