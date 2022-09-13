@@ -29,12 +29,29 @@ prepare() {
 build() {
 	cd "$srcdir/openssl-$_ver"
 
-	CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-	CXXFLAGS="${CFLAGS}"
+	case "$(uname -m)" in
+		"aarch64")
+			CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
+			CXXFLAGS="${CFLAGS}"
+			;;
+		"armv7l")
+			CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
+			CXXFLAGS="${CFLAGS}"
+			;;
+	esac
+
+	if [ "${CARCH}" == 'armv7h' ]; then
+		openssltarget='linux-armv4'
+		optflags=''
+	elif [ "${CARCH}" == 'aarch64' ]; then
+		openssltarget='linux-aarch64'
+		optflags='no-afalgeng'
+	fi
 
 	# mark stack as non-executable: http://bugs.archlinux.org/task/12434
 	./Configure --prefix=/data/data/com.termux/files/usr/glibc --openssldir=/data/data/com.termux/files/usr/glibc/etc/ssl --libdir=lib \
-		shared no-ssl3-method enable-ec_nistp_64_gcc_128 linux-aarch64\
+		shared no-ssl3-method ${optflags} \
+		"${openssltarget}" \
 		"-Wa,--noexecstack ${CPPFLAGS} ${CFLAGS} ${LDFLAGS}"
 
 	make depend
