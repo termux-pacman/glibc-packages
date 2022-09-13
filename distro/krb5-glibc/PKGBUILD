@@ -44,14 +44,25 @@ prepare() {
 
 build() {
    cd krb5-${pkgver}/src
-   CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-   CXXFLAGS="${CFLAGS}"
+
+   case "$(uname -m)" in
+      "aarch64")
+         CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
+         CXXFLAGS="${CFLAGS}"
+         ;;
+      "armv7l")
+         CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
+         CXXFLAGS="${CFLAGS}"
+         ;;
+   esac
+
    export CFLAGS+=" -fPIC -fno-strict-aliasing -fstack-protector-all"
    export CPPFLAGS+=" -I/usr/include/et"
    ./configure --prefix=/data/data/com.termux/files/usr/glibc \
                --sbindir=/data/data/com.termux/files/usr/glibc/bin \
                --sysconfdir=/data/data/com.termux/files/usr/glibc/etc \
                --localstatedir=/data/data/com.termux/files/usr/glibc/var/lib \
+               --enable-kernel=3.2 \
                --enable-shared \
                --with-system-et \
                --disable-rpath \
