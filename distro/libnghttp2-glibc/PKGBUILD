@@ -14,8 +14,16 @@ sha512sums=('599bc8e52bbe7f5bdfbf493ea2199c4c4bdeb9eac174d4c56b11fb321b11b86e826
 build() {
   cd nghttp2-$pkgver
 
-  CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-  CXXFLAGS="${CFLAGS}"
+  case "$(uname -m)" in
+    "aarch64")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+    "armv7l")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+  esac
 
   autoreconf -i
   ./configure \
