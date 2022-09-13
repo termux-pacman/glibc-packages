@@ -84,10 +84,10 @@ package_libcurl-compat-glibc() {
 
   make -C lib DESTDIR="${pkgdir}" install
 
-  mv "${pkgdir}"/data/data/com.termux/files/usr/glibc/lib/libcurl{,-compat}.so.4.7.0
+  mv "${pkgdir}"/data/data/com.termux/files/usr/glibc/lib/libcurl{,-compat}.so.4.8.0
   rm "${pkgdir}"/data/data/com.termux/files/usr/glibc/lib/libcurl.{a,so}*
-  for version in 3 4.0.0 4.1.0 4.2.0 4.3.0 4.4.0 4.5.0 4.6.0; do
-    ln -s libcurl-compat.so.4.7.0 "${pkgdir}"/data/data/com.termux/files/usr/glibc/lib/libcurl.so.${version}
+  for version in 3 4.0.0 4.1.0 4.2.0 4.3.0 4.4.0 4.5.0 4.6.0 4.7.0; do
+    ln -s libcurl-compat.so.4.8.0 "${pkgdir}"/data/data/com.termux/files/usr/glibc/lib/libcurl.so.${version}
   done
 
   install -dm 0755 "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/licenses
