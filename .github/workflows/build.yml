@@ -4,6 +4,7 @@ on:
   push:
     paths:
     - 'distro/**'
+    - '.github/workflows/build.yml'
 
 jobs:
   build:
@@ -33,7 +34,7 @@ jobs:
             --volume "${PWD}/builder:/builder"
           install: |
             pacman -Syu --noconfirm
-            pacman -S base-devel python git cmake python-setuptools ruby-ronn publicsuffix-list gtk-doc autoconf-archive gtest --noconfirm --needed
+            pacman -S base-devel python git cmake python-setuptools ruby-ronn publicsuffix-list gtk-doc autoconf-archive gtest rsync --noconfirm --needed
           run: |
             useradd -m user-build
             mkdir -p /data/data/com.termux/files/usr/bin
