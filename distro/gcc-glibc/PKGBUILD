@@ -59,18 +59,36 @@ build() {
   esac
 
   "$srcdir"/$_basedir/configure \
-      --prefix=/data/data/com.termux/files/usr/glibc \
-      --libdir=/data/data/com.termux/files/usr/glibc/lib \
-      --enable-kernel=3.2 --disable-nls --enable-default-pie \
-      --enable-languages=c,c++,fortran \
-      --with-system-zlib --enable-__cxa_atexit \
-      --enable-linker-build-id --enable-plugin \
-      --with-linker-hash-style=gnu --enable-gnu-indirect-function \
-      --disable-multilib --disable-werror \
-      --enable-checking=release --disable-static \
-      --enable-fix-cortex-a53-835769 --enable-fix-cortex-a53-843419 \
-      --enable-host-shared --disable-libssp --disable-libstdcxx-pch \
-      --without-zstd --disable-bootstrap
+    --enable-bootstrap \
+    --prefix=/data/data/com.termux/files/usr/glibc \
+    --libdir=/data/data/com.termux/files/usr/glibc/lib \
+    --libexecdir=/data/data/com.termux/files/usr/glibc/lib \
+    --mandir=/data/data/com.termux/files/usr/glibc/share/man \
+    --infodir=/data/data/com.termux/files/usr/glibc/share/info \
+    --with-bugurl=https://github.com/Maxython/glibc-for-termux/issues \
+    --with-build-config=bootstrap-lto \
+    --with-linker-hash-style=gnu \
+    --with-system-zlib \
+    --enable-kernel=3.2 \
+    --enable-__cxa_atexit \
+    --enable-cet=auto \
+    --enable-checking=release \
+    --enable-clocale=gnu \
+    --enable-default-pie \
+    --enable-default-ssp \
+    --enable-gnu-indirect-function \
+    --enable-gnu-unique-object \
+    --enable-libstdcxx-backtrace \
+    --enable-link-serialization=1 \
+    --enable-linker-build-id \
+    --enable-lto \
+    --enable-multilib \
+    --enable-plugin \
+    --enable-shared \
+    --enable-threads=posix \
+    --disable-libssp \
+    --disable-libstdcxx-pch \
+    --disable-werror
 
   make -O BOOT_CFLAGS="$CFLAGS" \
       BOOT_CXXFLAGS="$CXXFLAGS"
