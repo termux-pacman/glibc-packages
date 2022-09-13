@@ -33,3 +33,4 @@ package() {
   # use headers from libdrm
   rm -r "$pkgdir/data/data/com.termux/files/usr/glibc/include/drm"
 }
+
