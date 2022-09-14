@@ -47,5 +47,5 @@ build() {
 package() {
   cd keyutils
   mkdir -p "${pkgdir}/data/data/com.termux/files/usr/glibc"
-  make DESTDIR="${pkgdir}/data/data/com.termux/files/usr/glibc" SBINDIR='/bin' BINDIR='/bin' LIBDIR='/lib' USRLIBDIR='/lib' install
+  make DESTDIR="${pkgdir}/data/data/com.termux/files/usr/glibc" SBINDIR='/bin' BINDIR='/bin' LIBDIR='/lib' USRLIBDIR="/lib" INCLUDEDIR="/include" SHAREDIR="/share/keyutils" MANDIR="/share/man" install
 }
