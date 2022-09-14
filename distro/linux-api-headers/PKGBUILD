@@ -23,7 +23,6 @@ build() {
   cd linux-$pkgver
 
   make mrproper
-  make headers_check
 }
 
 package() {
@@ -33,4 +32,3 @@ package() {
   # use headers from libdrm
   rm -r "$pkgdir/data/data/com.termux/files/usr/glibc/include/drm"
 }
-
