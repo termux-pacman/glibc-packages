@@ -62,7 +62,6 @@ build() {
                --sbindir=/data/data/com.termux/files/usr/glibc/bin \
                --sysconfdir=/data/data/com.termux/files/usr/glibc/etc \
                --localstatedir=/data/data/com.termux/files/usr/glibc/var/lib \
-               --enable-kernel=3.2 \
                --enable-shared \
                --with-system-et \
                --disable-rpath \
