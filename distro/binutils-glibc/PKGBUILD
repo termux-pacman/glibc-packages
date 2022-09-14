@@ -64,7 +64,6 @@ build() {
     --prefix=/data/data/com.termux/files/usr/glibc \
     --with-lib-path=/data/data/com.termux/files/usr/glibc/lib:/data/data/com.termux/files/usr/glibc/local/lib \
     --with-bugurl=https://github.com/Maxython/glibc-for-termux/issues \
-    --enable-kernel=3.2 \
     --enable-cet \
     --enable-deterministic-archives \
     --enable-gold \
