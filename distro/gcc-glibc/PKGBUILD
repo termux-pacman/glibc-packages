@@ -40,6 +40,7 @@ prepare() {
   done
 
   cd $_basedir
+  sed -i 's|mabi.lp64=../lib64|mabi.lp64=../lib|' gcc/config/aarch64/t-aarch64-linux
 
   mkdir -p "$srcdir"/gcc-build
 }
@@ -51,44 +52,40 @@ build() {
     "aarch64")
       CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
       CXXFLAGS="${CFLAGS}"
+      CONFIGFLAG="--with-arch=armv8-a --enable-fix-cortex-a53-835769 --enable-fix-cortex-a53-843419"
       ;;
     "armv7l")
       CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
       CXXFLAGS="${CFLAGS}"
+      CONFIGFLAG="--with-arch=armv7-a --with-float=hard --with-fpu=neon"
       ;;
   esac
 
   "$srcdir"/$_basedir/configure \
-    --enable-bootstrap \
     --prefix=/data/data/com.termux/files/usr/glibc \
     --libdir=/data/data/com.termux/files/usr/glibc/lib \
     --libexecdir=/data/data/com.termux/files/usr/glibc/lib \
     --mandir=/data/data/com.termux/files/usr/glibc/share/man \
     --infodir=/data/data/com.termux/files/usr/glibc/share/info \
     --with-bugurl=https://github.com/Maxython/glibc-for-termux/issues \
-    --with-build-config=bootstrap-lto \
-    --with-linker-hash-style=gnu \
-    --with-system-zlib \
-    --enable-kernel=3.2 \
-    --enable-__cxa_atexit \
-    --enable-cet=auto \
-    --enable-checking=release \
-    --enable-clocale=gnu \
+    $CONFIGFLAG \
+    --disable-multilib \
+    --disable-bootstrap \
+    --disable-nls \
     --enable-default-pie \
-    --enable-default-ssp \
-    --enable-gnu-indirect-function \
-    --enable-gnu-unique-object \
-    --enable-libstdcxx-backtrace \
-    --enable-link-serialization=1 \
+    --enable-languages=c,c++ \
+    --with-system-zlib \
+    --enable-__cxa_atexit \
     --enable-linker-build-id \
-    --enable-lto \
-    --enable-multilib \
     --enable-plugin \
-    --enable-shared \
-    --enable-threads=posix \
+    --with-linker-hash-style=gnu \
+    --enable-gnu-indirect-function \
+    --disable-werror \
+    --disable-checking \
+    --disable-static \
+    --enable-host-shared \
     --disable-libssp \
-    --disable-libstdcxx-pch \
-    --disable-werror
+    --disable-libstdcxx-pch
 
   make -O BOOT_CFLAGS="$CFLAGS" \
       BOOT_CXXFLAGS="$CXXFLAGS"
@@ -103,7 +100,6 @@ package_gcc-libs() {
   rm -f "$pkgdir/$_libdir/libgcc_eh.a"
 
   for lib in libatomic \
-             libgfortran \
              libgomp \
              libitm \
              libquadmath \
@@ -171,8 +167,6 @@ package_gcc-glibc() {
   make -C $CHOST/libsanitizer/lsan DESTDIR="$pkgdir" install-nodist_toolexeclibHEADERS
 
   make -C gcc DESTDIR="$pkgdir" install-man install-info
-  rm "$pkgdir"/data/data/com.termux/files/usr/glibc/share/man/man1/gfortran.1
-  rm "$pkgdir"/data/data/com.termux/files/usr/glibc/share/info/gfortran.info
 
   make -C libcpp DESTDIR="$pkgdir" install
   make -C gcc DESTDIR="$pkgdir" install-po
