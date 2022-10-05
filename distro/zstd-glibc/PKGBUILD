@@ -23,12 +23,12 @@ validpgpkeys=(4EF4AC63455FC9F4545D9B7DEF8FE99528B52FFD)
 build() {
   cd zstd-${pkgver}
 
-  case "$(uname -m)" in
+  case "$CARCH" in
     "aarch64")
       CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
       CXXFLAGS="${CFLAGS}"
       ;;
-    "armv7l")
+    "armv7h")
       CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
       CXXFLAGS="${CFLAGS}"
       ;;

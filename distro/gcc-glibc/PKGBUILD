@@ -48,13 +48,13 @@ prepare() {
 build() {
   cd gcc-build
 
-  case "$(uname -m)" in
+  case "$CARCH" in
     "aarch64")
       CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
       CXXFLAGS="${CFLAGS}"
       CONFIGFLAG="--with-arch=armv8-a --enable-fix-cortex-a53-835769 --enable-fix-cortex-a53-843419"
       ;;
-    "armv7l")
+    "armv7h")
       CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
       CXXFLAGS="${CFLAGS}"
       CONFIGFLAG="--with-arch=armv7-a --with-float=hard --with-fpu=neon"

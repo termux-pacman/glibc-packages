@@ -29,12 +29,12 @@ prepare() {
 build() {
 	cd "$srcdir/openssl-$_ver"
 
-	case "$(uname -m)" in
+	case "$CARCH" in
 		"aarch64")
 			CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
 			CXXFLAGS="${CFLAGS}"
 			;;
-		"armv7l")
+		"armv7h")
 			CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
 			CXXFLAGS="${CFLAGS}"
 			;;

@@ -17,12 +17,12 @@ validpgpkeys=('B1D2BD1375BECB784CF4F8C4D73CF638C53C06BE') # Simon Josefsson <sim
 build() {
   cd libidn2-$pkgver
 
-  case "$(uname -m)" in
+  case "$CARCH" in
     "aarch64")
       CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
       CXXFLAGS="${CFLAGS}"
       ;;
-    "armv7l")
+    "armv7h")
       CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
       CXXFLAGS="${CFLAGS}"
       ;;
