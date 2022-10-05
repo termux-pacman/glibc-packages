@@ -22,8 +22,16 @@ b2sums=('87c72651303a7870fd3f742e9ce8028e0dd48d3ded78ae7dea317ce54b98975f3724293
 build() {
   cd libpsl-${pkgver}
 
-  CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-  CXXFLAGS="${CFLAGS}"
+  case "$CARCH" in
+    "aarch64")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+    "armv7h")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+  esac
 
   ./configure \
     --prefix=/data/data/com.termux/files/usr/glibc \
