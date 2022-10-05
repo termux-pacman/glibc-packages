@@ -41,6 +41,7 @@ jobs:
             ln -s /bin/patch /data/data/com.termux/files/usr/bin/patch
             mkdir -p /data/data/com.termux/files/usr/glibc
             ln -s /lib /data/data/com.termux/files/usr/glibc/lib
+            ln -s /usr/share /data/data/com.termux/files/usr/glibc/share
             cd /home/user-build
             sudo -H -u user-build bash -c "git clone https://github.com/Maxython/glibc-for-termux"
             cd glibc-for-termux/distro
