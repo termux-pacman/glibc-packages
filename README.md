@@ -3,7 +3,7 @@ This repository stores AUR builds for compiling glibc packages and compiled glib
  - `distro` are builds that are configured to compile on a linux distribution (or on proot-distro).
  - `termux` are builds that are configured to compile on termux.
 
-At the moment, glibc packages have only been compiled for the `aarch64` architecture.
+At the moment, glibc packages have only been compiled for`aarch64` and `arm (armv7)` architectures.
 
 # Installation steps:
  1. **Installing the required packages.**  
@@ -16,8 +16,8 @@ At the moment, glibc packages have only been compiled for the `aarch64` architec
     *Important:* pay attention to where the packages were compiled, since the installation phase depends on it.
     ```bash
     # Installing the latest archive
-    wget https://github.com/Maxython/glibc-for-termux/releases/download/20220711/gpft-20220711-aarch64.tar.xz
-    tar xJf gpft-20220711-aarch64.tar.xz
+    wget https://github.com/Maxython/glibc-for-termux/releases/download/20221025/gpft-20221025-${arch}.tar.xz
+    tar xJf gpft-20221025-${arch}.tar.xz
     ```
  3. **Installing glibc packages.**  
     If you selected packages that were compiled in termux, then the installation should proceed like this:
