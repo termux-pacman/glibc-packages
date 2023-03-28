@@ -3,7 +3,7 @@ name: Compiling glibc packages for termux
 on:
   push:
     paths:
-    - 'distro/**'
+    - 'gpkg-dev/**'
     - '.github/workflows/build.yml'
 
 jobs:
@@ -14,7 +14,7 @@ jobs:
         target_arch: [aarch64, armv7]
     name: build
     steps:
-      - uses: actions/checkout@v2.1.0
+      - uses: actions/checkout@v3
       - uses: jitterbit/get-changed-files@v1
         id: pkgs
         with:
@@ -44,11 +44,11 @@ jobs:
             ln -s /usr/share /data/data/com.termux/files/usr/glibc/share
             cd /home/user-build
             sudo -H -u user-build bash -c "git clone https://github.com/Maxython/glibc-for-termux"
-            cd glibc-for-termux/distro
+            cd glibc-for-termux/gpkg-dev
             build_pkg="|"
             for j in ${{ steps.pkgs.outputs.added_modified }}; do
               jl=(${j//// })
-              if [[ "${jl[0]}" = "distro" && ! $(echo "$build_pkg" | grep "|${jl[1]}|") && -d "${jl[1]}" ]]; then
+              if [[ "${jl[0]}" = "gpkg-dev" && ! $(echo "$build_pkg" | grep "|${jl[1]}|") && -d "${jl[1]}" ]]; then
                 cd "${jl[1]}"
                 if [[ -f key-gpg.info ]]; then
                   for i in $(cat key-gpg.info); do
@@ -56,14 +56,14 @@ jobs:
                   done
                 fi
                 sudo -H -u user-build bash -c "makepkg"
-                tar cJf glibc-packages-${{ matrix.target_arch }}.tar.xz *.pkg.*
-                mv glibc-packages-${{ matrix.target_arch }}.tar.xz /builder
+                tar cJf glibc-packages-dev-${{ matrix.target_arch }}.tar.xz *.pkg.*
+                mv glibc-packages-dev-${{ matrix.target_arch }}.tar.xz /builder
                 build_pkg+="${jl[1]}|"
                 cd ..
               fi
             done
       - uses: actions/upload-artifact@v3
         with:
-          name: glibc-packages
-          path: "./builder/glibc-packages-${{ matrix.target_arch }}.tar.xz"
+          name: glibc-packages-dev
+          path: "./builder/glibc-packages-dev-${{ matrix.target_arch }}.tar.xz"
           if-no-files-found: error

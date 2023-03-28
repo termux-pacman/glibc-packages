@@ -1,9 +1,9 @@
 # Info
 This repository stores AUR builds for compiling glibc packages and compiled glibc packages in pacman format in the releases department. Here the AUR builds are divided into two types: 
- - `distro` are builds that are configured to compile on a linux distribution (or on proot-distro).
- - `termux` are builds that are configured to compile on termux.
+ - `gpkg-dev` are builds that are configured to compile on a linux distribution (or on proot-distro).
+ - `gpkg` are builds that are configured to compile on termux.
 
-At the moment, glibc packages have only been compiled for`aarch64` and `arm (armv7)` architectures.
+At the moment, glibc packages have only been compiled for `aarch64` and `arm (armv7)` architectures.
 
 # Installation steps:
  1. **Installing the required packages.**  
