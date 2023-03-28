@@ -1,10 +1,10 @@
-name: Compiling glibc packages for termux
+name: build-dev
 
 on:
   push:
     paths:
     - 'gpkg-dev/**'
-    - '.github/workflows/build.yml'
+    - '.github/workflows/build-dev.yml'
 
 jobs:
   build:
@@ -56,14 +56,39 @@ jobs:
                   done
                 fi
                 sudo -H -u user-build bash -c "makepkg"
-                tar cJf glibc-packages-dev-${{ matrix.target_arch }}.tar.xz *.pkg.*
-                mv glibc-packages-dev-${{ matrix.target_arch }}.tar.xz /builder
+                mkdir gpkg-dev
+                mv *.pkg.* gpkg-dev
+                tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz gpkg-dev
+                mv gpkg-dev-${{ matrix.target_arch }}.tar.xz /builder
                 build_pkg+="${jl[1]}|"
                 cd ..
               fi
             done
       - uses: actions/upload-artifact@v3
         with:
-          name: glibc-packages-dev
-          path: "./builder/glibc-packages-dev-${{ matrix.target_arch }}.tar.xz"
+          name: gpkg-dev-${{ matrix.target_arch }}
+          path: "./builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz"
           if-no-files-found: error
+  upload:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v3
+    - name: Get packages
+      uses: actions/download-artifact@v3
+      with:
+        path: ./
+    - name: Install aws-cli
+      run: |
+        git clone https://github.com/termux-pacman/aws-cli-action.git
+        ./aws-cli-action/setup.sh '${{ secrets.AWS_ACCESS_KEY_ID }}' '${{ secrets.AWS_ACCESS_KEY }}' '${{ secrets.AWS_REGION }}'
+    - name: Import GPG key
+      run: |
+        echo '${{ secrets.SF_GPG_BOT }}' > key.gpg
+        gpg --pinentry-mode=loopback --passphrase '${{ secrets.PW_GPG_BOT }}' --import key.gpg > /dev/null
+    - name: Uploading packages to aws
+      run: |
+        source ./aws-cli-action/func.sh
+        ls
