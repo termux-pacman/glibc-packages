@@ -56,9 +56,9 @@ jobs:
                   done
                 fi
                 sudo -H -u user-build bash -c "makepkg"
-                mkdir gpkg-dev
-                mv *.pkg.* gpkg-dev
-                tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz gpkg-dev
+                mkdir pkgs
+                mv *.pkg.* pkgs
+                tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz pkgs
                 mv gpkg-dev-${{ matrix.target_arch }}.tar.xz /builder
                 build_pkg+="${jl[1]}|"
                 cd ..
@@ -88,7 +88,19 @@ jobs:
       run: |
         echo '${{ secrets.SF_GPG_BOT }}' > key.gpg
         gpg --pinentry-mode=loopback --passphrase '${{ secrets.PW_GPG_BOT }}' --import key.gpg > /dev/null
+        rm key.gpg
     - name: Uploading packages to aws
       run: |
-        source ./aws-cli-action/func.sh
-        ls
+        #source ./aws-cli-action/func.sh
+        for path_to_archive in gpkg-dev-*/gpkg-dev-{aarch64,armv7}.tar.xz; do
+          archive="${path_to_archive##*/}"
+          arch=$(echo ${archive##*-} | sed 's/.tar.xz//; s/armv7/arm/')
+          tar xJf "$path_to_archive"
+          for pkg in pkgs/*.pkg.*; do
+            gpg --batch --pinentry-mode=loopback --passphrase '${{ secrets.PW_GPG_BOT }}' --detach-sign --use-agent -u '${{ secrets.KEY_GPG_BOT }}' --no-armor "$pkg"
+            for format_file in "" ".sig"; do
+              aws s3 cp "${pkg}${format_file}" s3://'${{ secrets.SFPU }}'/gpkg-dev/$arch/"${pkg##*/}${format_file}"
+            done
+          done
+          rm -fr pkgs
+        done
