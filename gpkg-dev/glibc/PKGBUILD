@@ -3,8 +3,8 @@
 # Contributor: Christer Solskogen <christer.solskogen@gmail.com>
 
 pkgname=glibc
-pkgver=2.36
-pkgrel=1
+pkgver=2.37
+pkgrel=0
 _commit=be176490b818b65b5162c332eb6b581690b16e5c
 pkgdesc="GNU C Library"
 arch=(any)
@@ -32,7 +32,7 @@ source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz{,.sig}
 	'fxstat64.c.patch'
 	'fstatat64.c.patch'
 	'clock_gettime.c.patch')
-sha256sums=('1c959fea240906226062cb4b1e7ebce71a9f0e3c0836c09e7e3423d434fcfe75'
+sha256sums=('2257eff111a1815d74f46856daaf40b019c1e553156c69d48ba0cbfc1bb91a43'
             'SKIP'
             '9254552968fb94543cc394ab99c641f2d72198b5f448e1847f7d697e669fbefd'
             'bc0530006920c0038d25bccc2ad63bdf5f2bdfd18374ea7dfa0c59e3e2a16a50'
@@ -56,6 +56,7 @@ sha256sums=('1c959fea240906226062cb4b1e7ebce71a9f0e3c0836c09e7e3423d434fcfe75'
             'SKIP')
 validpgpkeys=(7273542B39962DF7B299931416792B4EA25340F8  # "Carlos O'Donell <carlos@systemhalted.org>"
               BC7C7372637EC10C57D7AA6579C43DFBF1CF2187) # Siddhesh Poyarekar
+groups=('gpkg-dev')
 
 prepare() {
   for i in *.patch; do
@@ -148,4 +149,9 @@ package() {
   sed -i 's|!/bin/bash|!/data/data/com.termux/files/usr/bin/bash|' "$pkgdir"/data/data/com.termux/files/usr/glibc/bin/*
   mkdir -p "$pkgdir"/data/data/com.termux/files/usr/bin
   install -m755 "$srcdir/grun" "$pkgdir/data/data/com.termux/files/usr/bin"
+
+  # Replacing hard links with symbolic links
+  for i in $(find "$pkgdir" -type l); do
+    ln -sf "$(readlink $i)" "$i"
+  done
 }
