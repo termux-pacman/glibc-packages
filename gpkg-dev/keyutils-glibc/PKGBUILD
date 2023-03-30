@@ -13,39 +13,53 @@ makedepends=('git')
 backup=('data/data/com.termux/files/usr/glibc/etc/request-key.conf')
 validpgpkeys=('A86E54B0D5E1B4E0AB7C640FFBB7576BA7CB0B6B') # David Howells <dhowells@redhat.com>
 source=("git+https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git#tag=${_tag}?signed"
-        'request-key.conf.patch' 'reproducible.patch')
+        'request-key.conf.patch' 'reproducible.patch' 'Makefile.patch')
 sha256sums=('SKIP'
             '1ecf854011ce1a15e238653187fd6aed903b94c16d6a99bfca463bd8ca1c2f40'
-            '7bb7400b2b8c8f0288c86ec9191f8964a1e682745a204013d5fc7c2e1a253d8e')
+            '7bb7400b2b8c8f0288c86ec9191f8964a1e682745a204013d5fc7c2e1a253d8e'
+            'b349b8e63db5ed3133a80236b487c453220b35837d7502eb81ec24208b191eb0')
+groups=('gpkg-dev')
 
 prepare() {
   cd keyutils
   # fix paths of binaries in /etc/request-key.conf
-  /data/data/com.termux/files/usr/bin/patch -Np0 -i ../request-key.conf.patch
+  patch -Np0 -i ../request-key.conf.patch
 
   # make keyutils reproducible
-  /data/data/com.termux/files/usr/bin/patch -Np1 -i ../reproducible.patch
+  patch -Np1 -i ../reproducible.patch
+
+  # symlink setting
+  patch -Np1 -i ../Makefile.patch
 }
 
 build() {
   cd keyutils
 
-  case "$CARCH" in
-    "aarch64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "armv7h")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-  esac
+  #case "$CARCH" in
+  #  "aarch64")
+  #    CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
+  #    CXXFLAGS="${CFLAGS}"
+  #    ;;
+  #  "armv7h")
+  #    CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
+  #    CXXFLAGS="${CFLAGS}"
+  #    ;;
+  #esac
 
-  make CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" SBINDIR='/data/data/com.termux/files/usr/glibc/bin' BINDIR='/data/data/com.termux/files/usr/glibc/bin'
+  make CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" \
+    SBINDIR='/data/data/com.termux/files/usr/glibc/bin' \
+    BINDIR='/data/data/com.termux/files/usr/glibc/bin'
 }
 
 package() {
   cd keyutils
   mkdir -p "${pkgdir}/data/data/com.termux/files/usr/glibc"
-  make DESTDIR="${pkgdir}/data/data/com.termux/files/usr/glibc" SBINDIR='/bin' BINDIR='/bin' LIBDIR='/lib' USRLIBDIR="/lib" INCLUDEDIR="/include" SHAREDIR="/share/keyutils" MANDIR="/share/man" install
+  make DESTDIR="${pkgdir}/data/data/com.termux/files/usr/glibc" \
+    SBINDIR='/bin' \
+    BINDIR='/bin' \
+    LIBDIR='/lib' \
+    USRLIBDIR="/lib" \
+    INCLUDEDIR="/include" \
+    SHAREDIR="/share/keyutils" \
+    MANDIR="/share/man" install
 }
