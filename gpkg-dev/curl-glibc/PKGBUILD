@@ -6,21 +6,21 @@
 
 pkgbase=curl
 pkgname=(curl-glibc libcurl-compat-glibc)
-pkgver=7.85.0
+pkgver=8.0.1
 pkgrel=0
 pkgdesc='An URL retrieval utility and library'
 arch=(any)
 url='https://curl.haxx.se'
 license=('MIT')
 source=("https://curl.haxx.se/download/curl-${pkgver}.tar.gz"{,.asc})
-sha512sums=('bbad693bcde9c55e5942499950d76011f53ad43d3270eee2c8db486bcf46f5fc92b32dd8752caf4c5976fe493d083e2d34fa299cb96fb8e76d8f5fcc2cc56a36'
+sha512sums=('87d945e65176613c6296f8b130bd6c5355e3ca3c62ee4010edd481950cad9760482fd3be8a84e51501c118c29ebc284b8f87c49b06f9d248e9da5819fda38f8f'
             'SKIP')
 validpgpkeys=('27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2') # Daniel Stenberg
+groups=('gpkg-dev')
 
 _configure_options=(
   --prefix='/data/data/com.termux/files/usr/glibc'
   --mandir='/data/data/com.termux/files/usr/glibc/share/man'
-  --enable-kernel='3.2'
   --disable-ldap
   --disable-ldaps
   --disable-manual
@@ -28,9 +28,16 @@ _configure_options=(
   --enable-threaded-resolver
   --with-libssh2
   --with-openssl
+  --with-gssapi
   --with-random='/dev/urandom'
   --with-ca-bundle='/data/data/com.termux/files/usr/glibc/etc/ssl/certs/ca-certificates.crt'
 )
+
+prepare() {
+  cd curl
+  sed -i "/\WLIBCURL_VERSION\W/c #define LIBCURL_VERSION \"${pkgver}\"" include/curl/curlver.h
+  autoreconf -fi
+}
 
 build() {
   mkdir build-curl{,-compat} || true
@@ -63,6 +70,7 @@ build() {
     --disable-versioned-symbols
   sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
   make -C lib
+  patchelf --set-soname 'libcurl-gnutls.so.4' ./lib/.libs/libcurl.so
 }
 
 package_curl-glibc() {
