@@ -7,12 +7,12 @@ pkgrel=0
 pkgdesc='A free library for arbitrary precision arithmetic'
 arch=(any)
 url='https://gmplib.org/'
-depends=()
 license=(LGPL3 GPL)
 source=(https://gmplib.org/download/gmp/gmp-$pkgver.tar.lz{,.sig})
 md5sums=('03a31d8cbaf29d136252f8f38875ed82'
          'SKIP')
 validpgpkeys=('343C2FF0FBEE5EC2EDBEF399F3599FF828C67298')   # Niels Möller
+groups=('gpkg-dev')
 
 build() {
   cd gmp-$pkgver
