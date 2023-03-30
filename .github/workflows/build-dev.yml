@@ -37,8 +37,6 @@ jobs:
             pacman -S base-devel python git cmake python-setuptools ruby-ronn publicsuffix-list gtk-doc autoconf-archive gtest rsync --noconfirm --needed
           run: |
             useradd -m user-build
-            mkdir -p /data/data/com.termux/files/usr/bin
-            ln -s /bin/patch /data/data/com.termux/files/usr/bin/patch
             mkdir -p /data/data/com.termux/files/usr/glibc
             ln -s /lib /data/data/com.termux/files/usr/glibc/lib
             ln -s /usr/share /data/data/com.termux/files/usr/glibc/share
