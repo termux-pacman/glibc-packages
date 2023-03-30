@@ -14,6 +14,7 @@ license=('MIT')
 options=(staticlibs)
 source=("https://libisl.sourceforge.io/isl-${pkgver}.tar.xz")
 b2sums=('54a13ba8a5d7666f62f3fb20db278d15b803400cb8b69f119b18fd1f54f7d02f1e07cd1e189803fc416afaa81b35e2247ef6b3da3d8cddc463b05cc9b3921890')
+groups=('gpkg-dev')
 
 build() {
   cd "${srcdir}"/isl-${pkgver}
