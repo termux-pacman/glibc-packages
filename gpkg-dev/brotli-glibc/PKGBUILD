@@ -15,6 +15,7 @@ license=('MIT')
 makedepends=('git' 'glibc' 'gcc-libs' 'cmake' 'python-setuptools')
 source=(brotli::"git+${url}#commit=${_gitcommit}")
 sha512sums=('SKIP')
+groups=('gpkg-dev')
 
 prepare() {
   cd brotli
@@ -45,13 +46,14 @@ build() {
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/data/data/com.termux/files/usr/glibc \
     -DCMAKE_INSTALL_LIBDIR=lib \
-	-DBUILD_SHARED_LIBS=True
-  make -C build VERBOSE=1
+    -DBUILD_SHARED_LIBS=True \
+    -DCMAKE_C_FLAGS="$CFLAGS -ffat-lto-objects"
+  cmake --build build -v
 }
 
 package() {
   cd brotli
-  make -C build DESTDIR="$pkgdir" install
+  DESTDIR="$pkgdir" cmake --install build
   local man;
   for man in docs/*.?; do
     install -Dm 644 "$man" "$pkgdir/data/data/com.termux/files/usr/glibc/share/man/man${man##*.}/${man##*/}"
