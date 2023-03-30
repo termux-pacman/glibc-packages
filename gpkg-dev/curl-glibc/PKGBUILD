@@ -34,7 +34,7 @@ _configure_options=(
 )
 
 prepare() {
-  cd curl
+  cd ${pkgbase}-${pkgver}
   sed -i "/\WLIBCURL_VERSION\W/c #define LIBCURL_VERSION \"${pkgver}\"" include/curl/curlver.h
   autoreconf -fi
 }
@@ -70,7 +70,6 @@ build() {
     --disable-versioned-symbols
   sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
   make -C lib
-  patchelf --set-soname 'libcurl-gnutls.so.4' ./lib/.libs/libcurl.so
 }
 
 package_curl-glibc() {
