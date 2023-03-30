@@ -35,11 +35,12 @@ prepare() {
   # Change the gold configuration script to only warn about
   # unsupported targets.  This allows the binutils to be built with
   # BPF support enabled.
-  /data/data/com.termux/files/usr/bin/patch -Np1 -i "${srcdir}"/gold-warn-unsupported.patch
+  patch -Np1 -i "${srcdir}"/gold-warn-unsupported.patch
 }
 
 build() {
   cd binutils-build
+  alias ln='ln -s'
 
   case "$CARCH" in
     "aarch64")
@@ -87,6 +88,8 @@ build() {
 
 package() {
   cd binutils-build
+  alias ln='ln -s'
+
   make prefix="$pkgdir/data/data/com.termux/files/usr/glibc" tooldir="$pkgdir/data/data/com.termux/files/usr/glibc" install
 
   # Remove unwanted files
@@ -101,10 +104,4 @@ package() {
   install -Dm644 -t "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/licenses/${pkgname}/ FSFAP
 
   rm -f "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/info/dir
-
-  # Replacing hard links with symbolic links
-  for i in $(find "$pkgdir" -type l); do
-    ln -sf "$(readlink $i)" "$i"
-  done
 }
-
