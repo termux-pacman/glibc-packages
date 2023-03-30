@@ -34,33 +34,33 @@ source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz{,.sig}
 	'clock_gettime.c.patch')
 sha256sums=('2257eff111a1815d74f46856daaf40b019c1e553156c69d48ba0cbfc1bb91a43'
             'SKIP'
-            '9254552968fb94543cc394ab99c641f2d72198b5f448e1847f7d697e669fbefd'
-            'bc0530006920c0038d25bccc2ad63bdf5f2bdfd18374ea7dfa0c59e3e2a16a50'
-            '07452446c739a133d440f83589f8e43f7be9727c931447d08eb3b708db1782a8'
-            'd201d7bcc91e7c62ca981462280d57326d334c0a7ec9eefa50b8d5ff96341bfd'
-            '7b94b8d249685256de0ed6d0fd6d880a9c03234d4879b5f0ac1f52ea0a8042d0'
-            '3d39f4166fc13f848eedceb7f877700d36b8613d4b5bdb0c564e7fcf6bf8c95e'
-            'd984384ebcb6a4bffd2428cb6ec0dc8c456cd0492eb3dceff80e5e73e37c6e61'
-            'a2f394168cdb48a3320195fa056d0540dbb5462e313115247d604e31b24587b1'
+            '74da3d03fb81e2511140411bc8bad2a893258a2465c5eec5ac955dccddf9621d'
+            '9223be94da6667f0dff0bf7afb032932dd9a151f23af178faa4d1d7f26c58608'
+            'dd0f14f9ccca83424bc2b841346047d16c59d229c1a459fc764e6c67f4fe91ba'
+            '6814b1c02455fc482d7ea340112bcca1cdd4e13ca2c16f156654d7a65dbdcda2'
+            '27e1ea17f40c57f6bac2e46816d0684170818b58ecced7a83efb8e7f0f038af0'
+            'b6286fe9ffd9707d171db5dd53b3c084d7d38402e1a32eb8b9bd455d9a8b5ab6'
+            'ec053954ab9e19b850227048a61e622bd15d6a651fd7498e507e908485374299'
+            '0f778f5a2d20e8710647370e89c793eb27bbf8ef9824558d0154185c91ecd12c'
             'cdd916c0dc29e5d958ddef5c3530947244fd740ce7645601bfabae53512323b8'
             'd42648cea552ba5353a32e264686e992263289d5cc86207314dffc54ab514981'
             'cdc234959c6fdb43f000d3bb7d1080b0103f4080f5e67bcfe8ae1aaf477812f0'
             '774061aff612a377714a509918a9e0e0aafce708b87d2d7e06b1bd1f6542fe70'
             '016a827f4876283a1f169b2f8849b077450ba5903d8f4c7ff3c2737df4d8ffdc'
-            'SKIP'
-            'SKIP'
-            'SKIP'
-            'SKIP'
-            'SKIP'
-            'SKIP'
-            'SKIP')
+            'e0f6a51cbd64a30394d6a22e5e14603766ac924e9b6690adb673517821c2015e'
+            'e67383acf8935a68353f0f1c786161222fbb08c9255cffa3ccb06565e1401cbc'
+            'cd981ed4c8b77ee1551ae5a017dcc9b7891a6078450633eafe528e3984254f40'
+            'e6b3bac73759e231cfa0099be3ca50f7b5a379ecdac18a598999e87d51c8f249'
+            '4de3605da9e6f907315eb87c58c529faf6f703518daa6fe060c51715c5a0e455'
+            'a6ea8efc55de0e26494bf8839ae32d95c36b6956788535a9a8912ad989510f36'
+            '18f01ed2c6ed8acb122adc443fd428c8a37bc6a7d518f4e433e2ee462eebd5eb')
 validpgpkeys=(7273542B39962DF7B299931416792B4EA25340F8  # "Carlos O'Donell <carlos@systemhalted.org>"
               BC7C7372637EC10C57D7AA6579C43DFBF1CF2187) # Siddhesh Poyarekar
 groups=('gpkg-dev')
 
 prepare() {
   for i in *.patch; do
-    /data/data/com.termux/files/usr/bin/patch -Np1 -i ${srcdir}/$i
+    patch -Np1 -i ${srcdir}/$i
   done
 
   mkdir -p glibc-build
@@ -77,6 +77,7 @@ prepare() {
 
 build() {
   cd glibc-build
+  alias ln='ln -s'
   echo "slibdir=/data/data/com.termux/files/usr/glibc/lib" > configparms
   echo "rtlddir=/data/data/com.termux/files/usr/glibc/lib" >> configparms
   echo "sbindir=/data/data/com.termux/files/usr/glibc/bin" >> configparms
@@ -112,6 +113,7 @@ package() {
   backup=(data/data/com.termux/files/usr/glibc/etc/gai.conf
           data/data/com.termux/files/usr/glibc/etc/locale.gen
           data/data/com.termux/files/usr/glibc/etc/nscd.conf)
+  alias ln='ln -s'
 
   make -C glibc-build install_root="$pkgdir" install
   rm -f "$pkgdir"/data/data/com.termux/files/usr/glibc/etc/ld.so.{cache,conf}
@@ -149,9 +151,4 @@ package() {
   sed -i 's|!/bin/bash|!/data/data/com.termux/files/usr/bin/bash|' "$pkgdir"/data/data/com.termux/files/usr/glibc/bin/*
   mkdir -p "$pkgdir"/data/data/com.termux/files/usr/bin
   install -m755 "$srcdir/grun" "$pkgdir/data/data/com.termux/files/usr/bin"
-
-  # Replacing hard links with symbolic links
-  for i in $(find "$pkgdir" -type l); do
-    ln -sf "$(readlink $i)" "$i"
-  done
 }
