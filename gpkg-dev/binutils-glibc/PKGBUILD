@@ -40,7 +40,6 @@ prepare() {
 
 build() {
   cd binutils-build
-  alias ln='ln -s'
 
   case "$CARCH" in
     "aarch64")
@@ -88,7 +87,6 @@ build() {
 
 package() {
   cd binutils-build
-  alias ln='ln -s'
 
   make prefix="$pkgdir/data/data/com.termux/files/usr/glibc" tooldir="$pkgdir/data/data/com.termux/files/usr/glibc" install
 

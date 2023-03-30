@@ -77,7 +77,6 @@ prepare() {
 
 build() {
   cd glibc-build
-  alias ln='ln -s'
   echo "slibdir=/data/data/com.termux/files/usr/glibc/lib" > configparms
   echo "rtlddir=/data/data/com.termux/files/usr/glibc/lib" >> configparms
   echo "sbindir=/data/data/com.termux/files/usr/glibc/bin" >> configparms
@@ -113,7 +112,6 @@ package() {
   backup=(data/data/com.termux/files/usr/glibc/etc/gai.conf
           data/data/com.termux/files/usr/glibc/etc/locale.gen
           data/data/com.termux/files/usr/glibc/etc/nscd.conf)
-  alias ln='ln -s'
 
   make -C glibc-build install_root="$pkgdir" install
   rm -f "$pkgdir"/data/data/com.termux/files/usr/glibc/etc/ld.so.{cache,conf}
