@@ -13,7 +13,7 @@ source=("https://www.openssl.org/source/openssl-${pkgver}.tar.gz"{,.asc}
 	'ca-dir.patch')
 sha256sums=('6c13d2bf38fdf31eac3ce2a347073673f5d63263398f1f69d0df4a41253e4b3e'
             'SKIP'
-            '9ffaf3fb5443fe1b7a18dc407f04a4a781834bcbc52187ff97f4c1fa1e2f8cdf')
+            '326478a21829b79710ce0d8f7437e3be10c542471fef3bdf5f70ac232a5bf9e8')
 validpgpkeys=('8657ABB260F056B1E5190839D9C4D26D0E604491'
 	'7953AC1FBC3DC8B3B292393ED5E9E43F7DF9EE8C')
 groups=('gpkg-dev')
