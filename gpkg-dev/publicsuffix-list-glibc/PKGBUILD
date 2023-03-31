@@ -11,6 +11,7 @@ license=('custom:MPL2')
 makedepends=('git')
 source=(${pkgname}::"git+https://github.com/publicsuffix/list#commit=${_gitcommit}")
 sha512sums=('SKIP')
+groups=('gpkg-dev')
 
 pkgver() {
   cd ${pkgname}
