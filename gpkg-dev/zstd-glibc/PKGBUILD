@@ -4,21 +4,29 @@
 # Contributor: Johan Förberg <johan@forberg.se>
 
 pkgname=zstd-glibc
-pkgver=1.5.2
+pkgver=1.5.4
 pkgrel=0
 pkgdesc='Zstandard - Fast real-time compression algorithm'
 url='https://facebook.github.io/zstd/'
 arch=(any)
 license=(BSD GPL2)
 depends=()
-makedepends=(gtest)
+makedepends=(gtest ninja)
 options=(debug)
 source=(https://github.com/facebook/zstd/releases/download/v${pkgver}/zstd-${pkgver}.tar.zst{,.sig})
-sha256sums=('3ea06164971edec7caa2045a1932d757c1815858e4c2b68c7ef812647535c23f'
+sha256sums=('6925880b84aca086308c27036ef1c16e76817372301ead7c37f90e23567f704e'
             'SKIP')
-b2sums=('513e4526a92bcb59416b3457d186a30e554f9e0cf21d7114eb3e9fbcbd9d662c8d95cf0b06237f6fe3f756862c63de0aa146d6a23cb4111c16e6459608d115f1'
+b2sums=('8caea5dae06928076c2e54b059a501bd757663bae5948cb49ae32a7591c11636b22cb3b45d4f91653da800e1815cf5b28f72c69f4696ada4fdc746a272239da9'
         'SKIP')
 validpgpkeys=(4EF4AC63455FC9F4545D9B7DEF8FE99528B52FFD)
+groups=('gpkg-dev')
+
+prepare() {
+  cd zstd-${pkgver}
+  # avoid error on tests without static libs, we use LD_LIBRARY_PATH
+  sed '/build static library to build tests/d' -i build/cmake/CMakeLists.txt
+  sed 's/libzstd_static/libzstd_shared/g' -i build/cmake/tests/CMakeLists.txt
+}
 
 build() {
   cd zstd-${pkgver}
@@ -34,15 +42,25 @@ build() {
       ;;
   esac
 
-  make
-  make -C contrib/pzstd
+  CFLAGS+=' -ffat-lto-objects'
+  CXXFLAGS+=' -ffat-lto-objects'
+
+  cmake -S build/cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=None \
+    -DCMAKE_INSTALL_PREFIX=/data/data/com.termux/files/usr/glibc \
+    -DZSTD_ZLIB_SUPPORT=ON \
+    -DZSTD_LZMA_SUPPORT=ON \
+    -DZSTD_LZ4_SUPPORT=ON \
+    -DZSTD_BUILD_CONTRIB=ON \
+    -DZSTD_BUILD_STATIC=OFF \
+    -DZSTD_BUILD_TESTS=ON \
+    -DZSTD_PROGRAMS_LINK_SHARED=ON
+  cmake --build build
 }
 
 package() {
   cd zstd-${pkgver}
-  make PREFIX=/data/data/com.termux/files/usr/glibc DESTDIR="${pkgdir}" install
-  ln -sf /data/data/com.termux/files/usr/glibc/bin/zstd "${pkgdir}/data/data/com.termux/files/usr/glibc/bin/zstdmt"
-  install -Dm 755 contrib/pzstd/pzstd -t "${pkgdir}/data/data/com.termux/files/usr/glibc/bin"
+  DESTDIR="${pkgdir}" cmake --install build
   install -Dm 644 LICENSE -t "${pkgdir}/data/data/com.termux/files/usr/glibc/share/licenses/${pkgname}"
 }
 
