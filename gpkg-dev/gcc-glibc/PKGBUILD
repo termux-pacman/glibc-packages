@@ -3,15 +3,15 @@
 # Contributor: Christer Solskogen <christer.solskogen@gmail.com>
 
 pkgname=(gcc-glibc gcc-libs)
-pkgver=12.2.0
+pkgver=12.2.1
+_commit=abaa8f9cc4c06dcdae13a33be9253762861d8657
 pkgrel=0
 pkgdesc='The GNU Compiler Collection'
 arch=(any)
 url='https://gcc.gnu.org/'
 license=(GPL LGPL FDL)
-depends=()
 options=(!emptydirs !strip staticlibs)
-source=(https://ftp.gnu.org/gnu/gcc/gcc-$pkgver/gcc-$pkgver.tar.xz{,.sig}
+source=(git+https://sourceware.org/git/gcc.git#commit=${_commit}
         c89 c99
         aarch64-linux.h.patch
         arm-linux-eabi.h.patch
@@ -19,24 +19,24 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-$pkgver/gcc-$pkgver.tar.xz{,.sig}
         collect2.cc.patch
         gcc.cc.patch)
 _libdir=data/data/com.termux/files/usr/glibc/lib/gcc/$CHOST/${pkgver%%+*}
-sha256sums=('e549cf9cf3594a00e27b6589d4322d70e0720cdd213f39beb4181e06926230ff'
-            'SKIP'
+sha256sums=('SKIP'
             'd87254ee2c816aee66b00dd5002966cf3fe9aca4969eaf160c47150583357790'
             '9ad6d475acf0b19ca0e420f32867c6a5186ffbae50481ec64a140165f8988b60'
-            'SKIP'
-            'SKIP'
-            'SKIP'
-            'SKIP'
-            'SKIP')
+            '37e98441ccb324011479ee3eb1b069b983dea0c9c1ee601b3633e80dfa1cb8d9'
+            'de16eac29651182497efc25e35a326525dce5d923ddf3efaf64790139088d9f3'
+            '4f528cfb635c25feb1231d2547ca5b60f65f5319382b1cf07ee8fd74052e76e4'
+            'fef816cd40d5c62199f437586b07ba266e3a7004001c4a27cb9efbd936772001'
+            '642a609f5e650fc48086dd252c55bf1af4352aeaddeac39c47f82422aa1235d2')
 validpgpkeys=(F3691687D867B81B51CE07D9BBE43771487328A9  # bpiotrowski@archlinux.org
               86CFFCA918CF3AF47147588051E8B148A9999C34  # evangelos@foutrelis.com
               13975A70E63C361C73AE69EF6EEB81F8981C74C7  # richard.guenther@gmail.com
               D3A93CAD751C2AF4F8C7AD516C35B99309B5FA62) # Jakub Jelinek <jakub@redhat.com>
 _basedir=gcc-$pkgver
+groups=('gpkg-dev')
 
 prepare() {
   for i in *.patch; do
-    /data/data/com.termux/files/usr/bin/patch -Np1 -i ${srcdir}/$i
+    patch -Np1 -i ${srcdir}/$i
   done
 
   cd $_basedir
