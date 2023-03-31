@@ -22,7 +22,7 @@ prepare() {
 	cd "$srcdir/openssl-$pkgver"
 
 	# set ca dir to /etc/ssl by default
-	patch -p0 -i "$srcdir/ca-dir.patch"
+	patch -Np1 -i "$srcdir/ca-dir.patch"
 }
 
 build() {
@@ -47,10 +47,11 @@ build() {
 		optflags='no-afalgeng'
 	fi
 
+	export PATH=/usr/bin/core_perl:$PATH
+
 	# mark stack as non-executable: http://bugs.archlinux.org/task/12434
 	./Configure --prefix=/data/data/com.termux/files/usr/glibc --openssldir=/data/data/com.termux/files/usr/glibc/etc/ssl --libdir=lib \
-		shared no-ssl3-method ${optflags} \
-		"${openssltarget}" \
+		shared enable-ktls ${optflags} "${openssltarget}" \
 		"-Wa,--noexecstack ${CPPFLAGS} ${CFLAGS} ${LDFLAGS}"
 
 	make depend
