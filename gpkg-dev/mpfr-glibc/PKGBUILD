@@ -22,8 +22,8 @@ sha512sums=('58e843125884ca58837ae5159cd4092af09e8f21931a2efd19c15de057c9d1dc075
 b2sums=('dd88ae3a6a910ad8faeb791b49c3b1085de5d0d4c49c637c124bf4d9bc79fb621d0d1d69e07d0642b9b678f6d355a5830d083dfd189e1e91d0e04c970c10bd64'
         'SKIP'
         'd6bed1d6fca2319db457096a81aca060c1bd934fcdf9c5f98ba44920a7e97c2a5e9c539ec554feb723fb98c84096e1cb615c0d973133c67f3c2097edc1c5b803')
-# NOTE: key holder contacted about unsafe key (2021-05-03)
-validpgpkeys=('07F3DBBECC1A39605078094D980C197698C3739D') # Vincent Lefevre <vincent@vinc17.net>
+validpgpkeys=('07F3DBBECC1A39605078094D980C197698C3739D'
+              'A534BE3F83E241D918280AEB5831D11A0D4DB02A') # Vincent Lefevre <vincent@vinc17.net>
 groups=('gpkg-dev')
 
 prepare() {
