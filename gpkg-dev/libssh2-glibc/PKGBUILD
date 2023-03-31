@@ -16,6 +16,7 @@ validpgpkeys=('27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2'   # Daniel Stenberg
 source=("https://www.libssh2.org/download/libssh2-$pkgver.tar.gz"{,.asc})
 sha256sums=('2d64e90f3ded394b91d3a2e774ca203a4179f69aebee03003e5a6fa621e41d51'
             'SKIP')
+groups=('gpkg-dev')
 
 build() {
   cd "libssh2-$pkgver"
