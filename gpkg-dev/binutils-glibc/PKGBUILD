@@ -7,7 +7,7 @@
 
 pkgname=binutils-glibc
 pkgver=2.40
-pkgrel=0
+pkgrel=1
 pkgdesc='A set of programs to assemble and manipulate binary and object files'
 arch=(any)
 url='https://www.gnu.org/software/binutils/'
@@ -55,7 +55,7 @@ build() {
   "$srcdir/binutils-gdb/configure" \
     --prefix=/data/data/com.termux/files/usr/glibc \
     --with-lib-path=/data/data/com.termux/files/usr/glibc/lib:/data/data/com.termux/files/usr/glibc/local/lib \
-    --with-bugurl=https://github.com/Maxython/glibc-for-termux/issues \
+    --with-bugurl=https://github.com/termux-pacman/glibc-packages/issues \
     --enable-cet \
     --enable-deterministic-archives \
     --enable-gold \
