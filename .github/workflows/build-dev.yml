@@ -4,7 +4,6 @@ on:
   push:
     paths:
     - 'gpkg-dev/**'
-    - '.github/workflows/build-dev.yml'
 
 jobs:
   build-1:
@@ -48,7 +47,7 @@ jobs:
                     sudo -H -u user-build bash -c "gpg --recv-keys ${i}"
                   done
                 fi
-                sudo -H -u user-build bash -c "timeout 330m makepkg"
+                sudo -H -u user-build bash -c "timeout 300m makepkg || true"
                 mkdir pkgs
                 if [ -f *.pkg.* ]; then
                   mv *.pkg.* pkgs
@@ -66,7 +65,7 @@ jobs:
             done
       - uses: actions/upload-artifact@v3
         with:
-          name: build-gpkg-dev-${{ matrix.target_arch }}
+          name: build-1-gpkg-dev-${{ matrix.target_arch }}
           path: "./builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz"
           if-no-files-found: error
   build-2:
@@ -84,7 +83,7 @@ jobs:
       - name: Get packages
         uses: actions/download-artifact@v3
         with:
-          name: build-gpkg-dev-${{ matrix.target_arch }}
+          name: build-1-gpkg-dev-${{ matrix.target_arch }}
           path: ./builder
       - uses: uraimo/run-on-arch-action@v2
         name: Run commands
@@ -120,7 +119,81 @@ jobs:
                 tar xJf /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz -C .
                 if [ ! -f pkgs/*.pkg.* ]; then
                   mv pkgs/* .
-                  sudo -H -u user-build bash -c "makepkg"
+                  sudo -H -u user-build bash -c "timeout 300m makepkg -e || true"
+                  if [ -f *.pkg.* ]; then
+                    mv *.pkg.* pkgs
+                    tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz pkgs
+                    rm /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz
+                    mv gpkg-dev-${{ matrix.target_arch }}.tar.xz /builder
+                    build_pkg+="${jl[1]}|"
+                    cd ..
+                  else
+                    mv src pkgs
+                    tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz pkgs
+                    rm /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz
+                    mv gpkg-dev-${{ matrix.target_arch }}.tar.xz /builder
+                    break
+                  fi
+                fi
+              fi
+            done
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build-2-gpkg-dev-${{ matrix.target_arch }}
+          path: "./builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz"
+          if-no-files-found: error
+  build-3:
+    runs-on: ubuntu-latest
+    needs: build-2
+    strategy:
+      matrix:
+        target_arch: [aarch64, armv7]
+    name: build
+    steps:
+      - uses: actions/checkout@v3
+      - name: Create dir builder
+        run: |
+          mkdir -p ./builder
+      - name: Get packages
+        uses: actions/download-artifact@v3
+        with:
+          name: build-2-gpkg-dev-${{ matrix.target_arch }}
+          path: ./builder
+      - uses: uraimo/run-on-arch-action@v2
+        name: Run commands
+        id: build
+        with:
+          arch: ${{ matrix.target_arch }}
+          distro: archarm_latest
+          githubToken: ${{ github.token }}
+          dockerRunArgs: |
+            --volume "${PWD}/builder:/builder"
+          install: |
+            pacman -Syu --noconfirm
+            pacman -S base-devel python git cmake python-setuptools ruby-ronn publicsuffix-list gtk-doc autoconf-archive gtest rsync ninja --noconfirm --needed
+          run: |
+            useradd -m user-build
+            mkdir -p /data/data/com.termux/files/usr/glibc
+            ln -s /lib /data/data/com.termux/files/usr/glibc/lib
+            ln -s /usr/share /data/data/com.termux/files/usr/glibc/share
+            cd /home/user-build
+            git config --global --add safe.directory '*'
+            sudo -H -u user-build bash -c "git clone https://github.com/termux-pacman/glibc-packages"
+            cd glibc-packages/gpkg-dev
+            build_pkg="|"
+            for j in $(git show --pretty="" --name-only ${{ github.sha }}); do
+              jl=(${j//// })
+              if [[ "${jl[0]}" = "gpkg-dev" && ! $(echo "$build_pkg" | grep "|${jl[1]}|") && -d "${jl[1]}" ]]; then
+                cd "${jl[1]}"
+                if [[ -f key-gpg.info ]]; then
+                  for i in $(cat key-gpg.info); do
+                    sudo -H -u user-build bash -c "gpg --recv-keys ${i}"
+                  done
+                fi
+                tar xJf /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz -C .
+                if [ ! -f pkgs/*.pkg.* ]; then
+                  mv pkgs/* .
+                  sudo -H -u user-build bash -c "makepkg -e"
                   mv *.pkg.* pkgs
                   tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz pkgs
                   rm /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz
@@ -137,7 +210,7 @@ jobs:
           if-no-files-found: error
   upload:
     if: github.event_name != 'pull_request'
-    needs: build-2
+    needs: build-3
     runs-on: ubuntu-latest
     steps:
     - name: Clone repository

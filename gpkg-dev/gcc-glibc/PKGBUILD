@@ -3,15 +3,16 @@
 # Contributor: Christer Solskogen <christer.solskogen@gmail.com>
 
 pkgname=(gcc-glibc gcc-libs)
-pkgver=12.2.1
-_commit=abaa8f9cc4c06dcdae13a33be9253762861d8657
+pkgver=12.2.0
+#_commit=abaa8f9cc4c06dcdae13a33be9253762861d8657
 pkgrel=0
 pkgdesc='The GNU Compiler Collection'
 arch=(any)
 url='https://gcc.gnu.org/'
 license=(GPL LGPL FDL)
 options=(!emptydirs !strip staticlibs)
-source=(git+https://sourceware.org/git/gcc.git#commit=${_commit}
+#source=(git+https://sourceware.org/git/gcc.git#commit=${_commit}
+source=(https://ftp.gnu.org/gnu/gcc/gcc-$pkgver/gcc-$pkgver.tar.xz{,.sig}
         c89 c99
         aarch64-linux.h.patch
         arm-linux-eabi.h.patch
@@ -19,7 +20,8 @@ source=(git+https://sourceware.org/git/gcc.git#commit=${_commit}
         collect2.cc.patch
         gcc.cc.patch)
 _libdir=data/data/com.termux/files/usr/glibc/lib/gcc/$CHOST/${pkgver%%+*}
-sha256sums=('SKIP'
+sha256sums=('e549cf9cf3594a00e27b6589d4322d70e0720cdd213f39beb4181e06926230ff'
+            'SKIP'
             'd87254ee2c816aee66b00dd5002966cf3fe9aca4969eaf160c47150583357790'
             '9ad6d475acf0b19ca0e420f32867c6a5186ffbae50481ec64a140165f8988b60'
             '37e98441ccb324011479ee3eb1b069b983dea0c9c1ee601b3633e80dfa1cb8d9'
