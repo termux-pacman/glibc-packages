@@ -4,7 +4,7 @@
 
 pkgname=glibc
 pkgver=2.37
-pkgrel=0
+pkgrel=1
 _commit=be176490b818b65b5162c332eb6b581690b16e5c
 pkgdesc="GNU C Library"
 arch=(any)
@@ -87,7 +87,7 @@ build() {
       --prefix=/data/data/com.termux/files/usr/glibc \
       --libdir=/data/data/com.termux/files/usr/glibc/lib \
       --libexecdir=/data/data/com.termux/files/usr/glibc/lib \
-      --with-bugurl=https://github.com/Maxython/glibc-for-termux/issues \
+      --with-bugurl=https://github.com/termux-pacman/glibc-packages/issues \
       --enable-bind-now \
       --enable-cet \
       --enable-multi-arch \
