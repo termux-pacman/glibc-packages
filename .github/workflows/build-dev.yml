@@ -27,7 +27,7 @@ jobs:
             --volume "${PWD}/builder:/builder"
           install: |
             pacman -Syu --noconfirm
-            pacman -S base-devel python git cmake python-setuptools ruby-ronn publicsuffix-list gtk-doc autoconf-archive gtest rsync ninja --noconfirm --needed
+            pacman -S base-devel python git cmake python-setuptools ruby-ronn publicsuffix-list gtk-doc autoconf-archive gtest rsync ninja openssl --noconfirm --needed
           run: |
             useradd -m user-build
             mkdir -p /data/data/com.termux/files/usr/glibc
@@ -49,7 +49,7 @@ jobs:
                 fi
                 sudo -H -u user-build bash -c 'timeout --preserve-status 300m makepkg || ([ "$?" = "143" ] && true)'
                 mkdir pkgs
-                if [ -f *.pkg.* ]; then
+                if $(ls *.pkg.* &> /dev/null); then
                   mv *.pkg.* pkgs
                   tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz pkgs
                   mv gpkg-dev-${{ matrix.target_arch }}.tar.xz /builder
@@ -96,7 +96,7 @@ jobs:
             --volume "${PWD}/builder:/builder"
           install: |
             pacman -Syu --noconfirm
-            pacman -S base-devel python git cmake python-setuptools ruby-ronn publicsuffix-list gtk-doc autoconf-archive gtest rsync ninja --noconfirm --needed
+            pacman -S base-devel python git cmake python-setuptools ruby-ronn publicsuffix-list gtk-doc autoconf-archive gtest rsync ninja openssl --noconfirm --needed
           run: |
             useradd -m user-build
             mkdir -p /data/data/com.termux/files/usr/glibc
@@ -117,10 +117,10 @@ jobs:
                   done
                 fi
                 tar xJf /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz -C .
-                if [ ! -f pkgs/*.pkg.* ]; then
+                if ! $(ls pkgs/*.pkg.* &> /dev/null); then
                   mv pkgs/* .
                   sudo -H -u user-build bash -c 'timeout --preserve-status 300m makepkg -e || ([ "$?" = "143" ] && true)'
-                  if [ -f *.pkg.* ]; then
+                  if $(ls *.pkg.* &> /dev/null); then
                     mv *.pkg.* pkgs
                     tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz pkgs
                     rm /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz
@@ -170,7 +170,7 @@ jobs:
             --volume "${PWD}/builder:/builder"
           install: |
             pacman -Syu --noconfirm
-            pacman -S base-devel python git cmake python-setuptools ruby-ronn publicsuffix-list gtk-doc autoconf-archive gtest rsync ninja --noconfirm --needed
+            pacman -S base-devel python git cmake python-setuptools ruby-ronn publicsuffix-list gtk-doc autoconf-archive gtest rsync ninja openssl --noconfirm --needed
           run: |
             useradd -m user-build
             mkdir -p /data/data/com.termux/files/usr/glibc
@@ -191,7 +191,7 @@ jobs:
                   done
                 fi
                 tar xJf /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz -C .
-                if [ ! -f pkgs/*.pkg.* ]; then
+                if ! $(ls pkgs/*.pkg.* &> /dev/null); then
                   mv pkgs/* .
                   sudo -H -u user-build bash -c "makepkg -e"
                   mv *.pkg.* pkgs
