@@ -1,6 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-# version: 1.1
+# version: 1.2
 # this command allows you to run commands that depend on glibc
 # or run a shell with access to commands from a configured glibc.
 
@@ -9,6 +9,8 @@ if [[ -z "$1" ]]; then
 	echo "or run a shell with access to commands from a configured glibc."
 	echo ""
 	echo "  --shell - launching a customized shell"
+	echo ""
+	echo "  --help - print help text from ld.so command"
 	echo ""
 	exit 0
 fi
@@ -20,7 +22,8 @@ if [ "$1" = "--shell" ]; then
 	if [[ -z "$2" ]]; then
 		exec $SHELL
 	else
-		exec $2
+		commands="$@"
+		exec ${commands#* }
 	fi
 else
 	exec ld.so $@

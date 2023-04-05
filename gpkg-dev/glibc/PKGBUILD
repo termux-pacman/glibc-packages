@@ -4,7 +4,7 @@
 
 pkgname=glibc
 pkgver=2.37
-pkgrel=1
+pkgrel=2
 _commit=be176490b818b65b5162c332eb6b581690b16e5c
 pkgdesc="GNU C Library"
 arch=(any)
@@ -31,7 +31,8 @@ source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz{,.sig}
 	'fxstatat64.c.patch'
 	'fxstat64.c.patch'
 	'fstatat64.c.patch'
-	'clock_gettime.c.patch')
+	'clock_gettime.c.patch'
+        'chmod.c.patch')
 sha256sums=('2257eff111a1815d74f46856daaf40b019c1e553156c69d48ba0cbfc1bb91a43'
             'SKIP'
             '74da3d03fb81e2511140411bc8bad2a893258a2465c5eec5ac955dccddf9621d'
@@ -46,14 +47,15 @@ sha256sums=('2257eff111a1815d74f46856daaf40b019c1e553156c69d48ba0cbfc1bb91a43'
             'd42648cea552ba5353a32e264686e992263289d5cc86207314dffc54ab514981'
             'cdc234959c6fdb43f000d3bb7d1080b0103f4080f5e67bcfe8ae1aaf477812f0'
             '774061aff612a377714a509918a9e0e0aafce708b87d2d7e06b1bd1f6542fe70'
-            '016a827f4876283a1f169b2f8849b077450ba5903d8f4c7ff3c2737df4d8ffdc'
+            '20b8869cd114ce32bbcc418d1f18931646ed29a6d713f21fb71a136e026e8c7f'
             'e0f6a51cbd64a30394d6a22e5e14603766ac924e9b6690adb673517821c2015e'
             'e67383acf8935a68353f0f1c786161222fbb08c9255cffa3ccb06565e1401cbc'
             'cd981ed4c8b77ee1551ae5a017dcc9b7891a6078450633eafe528e3984254f40'
             'e6b3bac73759e231cfa0099be3ca50f7b5a379ecdac18a598999e87d51c8f249'
             '4de3605da9e6f907315eb87c58c529faf6f703518daa6fe060c51715c5a0e455'
             'a6ea8efc55de0e26494bf8839ae32d95c36b6956788535a9a8912ad989510f36'
-            '18f01ed2c6ed8acb122adc443fd428c8a37bc6a7d518f4e433e2ee462eebd5eb')
+            '18f01ed2c6ed8acb122adc443fd428c8a37bc6a7d518f4e433e2ee462eebd5eb'
+            '769b294e226877f12d47ac4ff86ab9246da6e547781071c1ee38e60772484c74')
 validpgpkeys=(7273542B39962DF7B299931416792B4EA25340F8  # "Carlos O'Donell <carlos@systemhalted.org>"
               BC7C7372637EC10C57D7AA6579C43DFBF1CF2187) # Siddhesh Poyarekar
 groups=('gpkg-dev')
@@ -69,10 +71,6 @@ prepare() {
 
   sed -i 's|/tmp|/data/data/com.termux/files/usr/tmp|g' $(grep -R /tmp/ ${srcdir}/glibc-${pkgver} | grep -v /var/ | awk -F'[:=]' '{printf $1 "\n"}')
   sed -i 's|/var/tmp|/data/data/com.termux/files/usr/tmp|g' $(grep -R /var/tmp ${srcdir}/glibc-${pkgver} | awk -F'[:=]' '{printf $1 "\n"}')
-
-  if [ -f ${srcdir}/glibc-${pkgver}/sysdeps/unix/sysv/linux/generic/chmod.c ]; then
-    mv ${srcdir}/glibc-${pkgver}/sysdeps/unix/sysv/linux/generic/chmod.c ${srcdir}/glibc-${pkgver}/sysdeps/unix/sysv/linux/chmod.c
-  fi
 }
 
 build() {
