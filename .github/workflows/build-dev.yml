@@ -47,7 +47,7 @@ jobs:
                     sudo -H -u user-build bash -c "gpg --recv-keys ${i}"
                   done
                 fi
-                sudo -H -u user-build bash -c "timeout 300m makepkg || true"
+                sudo -H -u user-build bash -c 'timeout --preserve-status 300m makepkg || ([ "$?" = "143" ] && true)'
                 mkdir pkgs
                 if [ -f *.pkg.* ]; then
                   mv *.pkg.* pkgs
@@ -119,7 +119,7 @@ jobs:
                 tar xJf /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz -C .
                 if [ ! -f pkgs/*.pkg.* ]; then
                   mv pkgs/* .
-                  sudo -H -u user-build bash -c "timeout 300m makepkg -e || true"
+                  sudo -H -u user-build bash -c 'timeout --preserve-status 300m makepkg -e || ([ "$?" = "143" ] && true)'
                   if [ -f *.pkg.* ]; then
                     mv *.pkg.* pkgs
                     tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz pkgs

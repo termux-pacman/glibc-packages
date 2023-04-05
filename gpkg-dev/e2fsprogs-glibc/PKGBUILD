@@ -1,0 +1,82 @@
+# Maintainer: Ronald van Haren <ronald.archlinux.org>
+# Contributor: judd <jvinet@zeroflux.org>
+
+pkgname=e2fsprogs-glibc
+pkgver=1.47.0
+pkgrel=1
+pkgdesc='Ext2/3/4 filesystem utilities'
+arch=(any)
+license=('GPL' 'LGPL' 'MIT')
+url='http://e2fsprogs.sourceforge.net'
+source=(https://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v${pkgver}/e2fsprogs-${pkgver}.tar.xz
+        'MIT-LICENSE')
+sha256sums=('144af53f2bbd921cef6f8bea88bb9faddca865da3fbc657cc9b4d2001097d5db'
+            'cc45386c1d71f438ad648fd7971e49e3074ad9dbacf9dd3a5b4cb61fd294ecbb')
+groups=('gpkg-dev')
+
+prepare() {
+  cd "${srcdir}/e2fsprogs-${pkgver}"
+
+  # Remove unnecessary init.d directory
+  sed -i '/init\.d/s|^|#|' misc/Makefile.in
+}
+
+build() {
+  cd "${srcdir}/e2fsprogs-${pkgver}"
+
+  case "$CARCH" in
+    "aarch64")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+    "armv7h")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+  esac
+
+  ./configure \
+      --prefix=/data/data/com.termux/files/usr/glibc \
+      --with-root-prefix='' \
+      --libdir=/data/data/com.termux/files/usr/glibc/lib \
+      --sbindir=/data/data/com.termux/files/usr/glibc/bin \
+      --sysconfdir=/data/data/com.termux/files/usr/glibc/etc \
+      --enable-elf-shlibs \
+      --disable-fsck \
+      --disable-uuidd \
+      --disable-libuuid \
+      --disable-libblkid
+  make
+
+  # regenerate locale files
+  find po/ -name '*.gmo' -delete
+  make -C po update-gmo
+}
+
+package() {
+  provides=('libcom_err.so'
+            'libe2p.so'
+            'libext2fs.so'
+            'libss.so')
+  backup=('etc/mke2fs.conf'
+          'etc/e2scrub.conf')
+
+  unset MAKEFLAGS
+
+  cd "${srcdir}/e2fsprogs-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install install-libs
+
+  sed -i -e 's/^AWK=.*/AWK=awk/' "${pkgdir}/data/data/com.termux/files/usr/glibc/bin/compile_et"
+
+  # remove references to build directory
+  sed -i -e 's#^DIR=.*#DIR="/data/data/com.termux/files/usr/glibc/share/ss"#' "${pkgdir}/data/data/com.termux/files/usr/glibc/bin/mk_cmds"
+  sed -i -e 's#^DIR=.*#DIR="/data/data/com.termux/files/usr/glibc/share/et"#' "${pkgdir}/data/data/com.termux/files/usr/glibc/bin/compile_et"
+
+  # remove static libraries with a shared counterpart
+  rm "${pkgdir}"/data/data/com.termux/files/usr/glibc/lib/lib{com_err,e2p,ext2fs,ss}.a
+
+  # install MIT license
+  install -D -m0644 "${srcdir}/MIT-LICENSE" \
+    "${pkgdir}/data/data/com.termux/files/usr/glibc/share/licenses/${pkgname}/MIT-LICENSE"
+}
