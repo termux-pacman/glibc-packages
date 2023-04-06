@@ -1,0 +1,39 @@
+# Maintainer: Bartłomiej Piotrowski <bpiotrowski@archlinux.org>
+# Maintainer: Dan McGee <dan@archlinux.org>
+
+pkgname=libarchive-glibc
+pkgver=3.6.2
+pkgrel=0
+pkgdesc='Multi-format archive and compression library'
+arch=(any)
+url='https://libarchive.org/'
+license=('BSD')
+#depends=('acl' 'libacl.so' 'bzip2' 'expat' 'lz4' 'openssl' 'libcrypto.so' 'xz'
+#         'zlib' 'zstd')
+provides=('libarchive.so')
+source=("https://github.com/libarchive/libarchive/releases/download/v${pkgver}/libarchive-${pkgver}.tar.xz")
+sha256sums=('9e2c1b80d5fbe59b61308fdfab6c79b5021d7ff4ff2489fb12daf0a96a83551d')
+groups=('gpkg-dev')
+
+build() {
+  cd "libarchive-${pkgver}"
+
+  ./configure \
+      --prefix=/data/data/com.termux/files/usr/glibc \
+      --without-xml2 \
+      --without-nettle \
+      --disable-bsdtar \
+      --disable-bsdcat \
+      --disable-bsdcpio \
+      --disable-static
+  make
+}
+
+package() {
+  cd "libarchive-${pkgver}"
+
+  make DESTDIR="$pkgdir" install
+  sed -i "s/iconv //" "$pkgdir"/data/data/com.termux/files/usr/glibc/lib/pkgconfig/libarchive.pc
+  install -Dm0644 COPYING "$pkgdir/data/data/com.termux/files/usr/glibc/share/licenses/libarchive/COPYING"
+  rm -fr "$pkgdir/data/data/com.termux/files/usr/glibc/bin"
+}
