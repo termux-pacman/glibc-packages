@@ -42,12 +42,7 @@ jobs:
               jl=(${j//// })
               if [[ "${jl[0]}" = "gpkg-dev" && ! $(echo "$build_pkg" | grep "|${jl[1]}|") && -d "${jl[1]}" ]]; then
                 cd "${jl[1]}"
-                if [[ -f key-gpg.info ]]; then
-                  for i in $(cat key-gpg.info); do
-                    sudo -H -u user-build bash -c "gpg --recv-keys ${i}"
-                  done
-                fi
-                sudo -H -u user-build bash -c 'timeout --preserve-status 300m makepkg || ([ "$?" = "143" ] && true)'
+                sudo -H -u user-build bash -c 'timeout --preserve-status 290m makepkg --noarchive && (([ "$?" = "0" ] && makepkg -R) || ([ "$?" = "143" ] && true))'
                 mkdir pkgs
                 if $(ls *.pkg.* &> /dev/null); then
                   mv *.pkg.* pkgs
@@ -111,15 +106,10 @@ jobs:
               jl=(${j//// })
               if [[ "${jl[0]}" = "gpkg-dev" && ! $(echo "$build_pkg" | grep "|${jl[1]}|") && -d "${jl[1]}" ]]; then
                 cd "${jl[1]}"
-                if [[ -f key-gpg.info ]]; then
-                  for i in $(cat key-gpg.info); do
-                    sudo -H -u user-build bash -c "gpg --recv-keys ${i}"
-                  done
-                fi
                 tar xJf /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz -C .
                 if ! $(ls pkgs/*.pkg.* &> /dev/null); then
                   mv pkgs/* .
-                  sudo -H -u user-build bash -c 'timeout --preserve-status 300m makepkg -e || ([ "$?" = "143" ] && true)'
+                  sudo -H -u user-build bash -c 'timeout --preserve-status 300m makepkg -e --noarchive || (([ "$?" = "0" ] && makepkg -R) || ([ "$?" = "143" ] && true))'
                   if $(ls *.pkg.* &> /dev/null); then
                     mv *.pkg.* pkgs
                     tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz pkgs
@@ -185,11 +175,6 @@ jobs:
               jl=(${j//// })
               if [[ "${jl[0]}" = "gpkg-dev" && ! $(echo "$build_pkg" | grep "|${jl[1]}|") && -d "${jl[1]}" ]]; then
                 cd "${jl[1]}"
-                if [[ -f key-gpg.info ]]; then
-                  for i in $(cat key-gpg.info); do
-                    sudo -H -u user-build bash -c "gpg --recv-keys ${i}"
-                  done
-                fi
                 tar xJf /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz -C .
                 if ! $(ls pkgs/*.pkg.* &> /dev/null); then
                   mv pkgs/* .
