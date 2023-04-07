@@ -4,14 +4,14 @@
 
 pkgname=glibc
 pkgver=2.37
-pkgrel=3
+pkgrel=4
 _commit=be176490b818b65b5162c332eb6b581690b16e5c
 pkgdesc="GNU C Library"
 arch=(any)
 url='https://www.gnu.org/software/libc/'
 license=('GPL' 'LGPL')
 options=(!strip staticlibs)
-source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz{,.sig}
+source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz
 	'_Fork.c.patch'
 	'dl-tls_init_tp.c.patch'
 	'pthread_create.c.patch'
@@ -34,9 +34,9 @@ source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz{,.sig}
 	'clock_gettime.c.patch'
         'chmod.c.patch'
         'send.c.patch'
-        'setdirs.patch')
+        'setdirs.patch'
+        'recv.c.patch')
 sha256sums=('2257eff111a1815d74f46856daaf40b019c1e553156c69d48ba0cbfc1bb91a43'
-            'SKIP'
             '74da3d03fb81e2511140411bc8bad2a893258a2465c5eec5ac955dccddf9621d'
             '9223be94da6667f0dff0bf7afb032932dd9a151f23af178faa4d1d7f26c58608'
             'dd0f14f9ccca83424bc2b841346047d16c59d229c1a459fc764e6c67f4fe91ba'
@@ -59,9 +59,8 @@ sha256sums=('2257eff111a1815d74f46856daaf40b019c1e553156c69d48ba0cbfc1bb91a43'
             '18f01ed2c6ed8acb122adc443fd428c8a37bc6a7d518f4e433e2ee462eebd5eb'
             '769b294e226877f12d47ac4ff86ab9246da6e547781071c1ee38e60772484c74'
             'f5b5b6ae3596f6fd617d015ff9c417a35da37c86ae3a49b5b5ce88275ed09f12'
-            '46e846c4237ab332ffb64abf46d3a95fd773173346e20a7e2b16f385beaab8d4')
-validpgpkeys=(7273542B39962DF7B299931416792B4EA25340F8  # "Carlos O'Donell <carlos@systemhalted.org>"
-              BC7C7372637EC10C57D7AA6579C43DFBF1CF2187) # Siddhesh Poyarekar
+            '46e846c4237ab332ffb64abf46d3a95fd773173346e20a7e2b16f385beaab8d4'
+            'b8b573fcb85d59fc11ddef9aebb691b8047d700ea1894784883a1359c6ef94a8')
 groups=('gpkg-dev')
 
 prepare() {
