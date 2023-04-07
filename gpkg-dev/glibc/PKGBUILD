@@ -4,7 +4,7 @@
 
 pkgname=glibc
 pkgver=2.37
-pkgrel=2
+pkgrel=3
 _commit=be176490b818b65b5162c332eb6b581690b16e5c
 pkgdesc="GNU C Library"
 arch=(any)
@@ -32,7 +32,9 @@ source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz{,.sig}
 	'fxstat64.c.patch'
 	'fstatat64.c.patch'
 	'clock_gettime.c.patch'
-        'chmod.c.patch')
+        'chmod.c.patch'
+        'send.c.patch'
+        'setdirs.patch')
 sha256sums=('2257eff111a1815d74f46856daaf40b019c1e553156c69d48ba0cbfc1bb91a43'
             'SKIP'
             '74da3d03fb81e2511140411bc8bad2a893258a2465c5eec5ac955dccddf9621d'
@@ -55,7 +57,9 @@ sha256sums=('2257eff111a1815d74f46856daaf40b019c1e553156c69d48ba0cbfc1bb91a43'
             '4de3605da9e6f907315eb87c58c529faf6f703518daa6fe060c51715c5a0e455'
             'a6ea8efc55de0e26494bf8839ae32d95c36b6956788535a9a8912ad989510f36'
             '18f01ed2c6ed8acb122adc443fd428c8a37bc6a7d518f4e433e2ee462eebd5eb'
-            '769b294e226877f12d47ac4ff86ab9246da6e547781071c1ee38e60772484c74')
+            '769b294e226877f12d47ac4ff86ab9246da6e547781071c1ee38e60772484c74'
+            'f5b5b6ae3596f6fd617d015ff9c417a35da37c86ae3a49b5b5ce88275ed09f12'
+            '46e846c4237ab332ffb64abf46d3a95fd773173346e20a7e2b16f385beaab8d4')
 validpgpkeys=(7273542B39962DF7B299931416792B4EA25340F8  # "Carlos O'Donell <carlos@systemhalted.org>"
               BC7C7372637EC10C57D7AA6579C43DFBF1CF2187) # Siddhesh Poyarekar
 groups=('gpkg-dev')
@@ -68,9 +72,6 @@ prepare() {
   mkdir -p glibc-build
 
   [[ ! -d glibc ]] && ln -s glibc-$pkgver glibc
-
-  sed -i 's|/tmp|/data/data/com.termux/files/usr/tmp|g' $(grep -R /tmp/ ${srcdir}/glibc-${pkgver} | grep -v /var/ | awk -F'[:=]' '{printf $1 "\n"}')
-  sed -i 's|/var/tmp|/data/data/com.termux/files/usr/tmp|g' $(grep -R /var/tmp ${srcdir}/glibc-${pkgver} | awk -F'[:=]' '{printf $1 "\n"}')
 }
 
 build() {
