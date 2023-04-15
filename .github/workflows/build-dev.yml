@@ -2,6 +2,11 @@ name: build-dev
 
 on:
   push:
+    branches:
+    - main
+    paths:
+    - 'gpkg-dev/**'
+  pull_request:
     paths:
     - 'gpkg-dev/**'
 
@@ -23,8 +28,20 @@ jobs:
           githubToken: ${{ github.token }}
           setup: |
             mkdir -p "${PWD}/builder"
+            if [ ${{ github.event_name }} = "pull_request" ]; then
+              url_api="https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files"
+              list=$(curl -s -X GET -G $url_api | jq -r '.[] | .filename')
+            else
+              list=$(git show --pretty="" --name-only ${{ github.sha }})
+            fi
+            for i in $list; do
+              il=(${i//// })
+              if [[ "${il[0]}" = "gpkg-dev" && -d "${il[0]}/${il[1]}" ]]; then
+                echo "${il[1]}" >> "${PWD}/builder/gpkg-dev-need.txt"
+              fi
+            done
           dockerRunArgs: |
-            --volume "${PWD}/builder:/builder"
+            --volume "${PWD}/builder:/builder" --volume "${PWD}/gpkg-dev:/root/gpkg-dev"
           install: |
             pacman -Syu --noconfirm
             pacman -S base-devel python git cmake python-setuptools ruby-ronn publicsuffix-list gtk-doc autoconf-archive gtest rsync ninja openssl meson --noconfirm --needed
@@ -33,31 +50,26 @@ jobs:
             mkdir -p /data/data/com.termux/files/usr/glibc
             ln -s /lib /data/data/com.termux/files/usr/glibc/lib
             ln -s /usr/share /data/data/com.termux/files/usr/glibc/share
-            cd /home/user-build
-            git config --global --add safe.directory '*'
-            sudo -H -u user-build bash -c "git clone https://github.com/termux-pacman/glibc-packages"
-            cd glibc-packages/gpkg-dev
-            build_pkg="|"
-            for j in $(git show --pretty="" --name-only ${{ github.sha }}); do
-              jl=(${j//// })
-              if [[ "${jl[0]}" = "gpkg-dev" && ! $(echo "$build_pkg" | grep "|${jl[1]}|") && -d "${jl[1]}" ]]; then
-                cd "${jl[1]}"
-                sudo -H -u user-build bash -c '(timeout --preserve-status 290m makepkg --noarchive && ([ "$?" = "0" ] && makepkg -R)) || ([ "$?" = "143" ] && true)'
-                mkdir pkgs
-                if $(ls *.pkg.* &> /dev/null); then
-                  mv *.pkg.* pkgs
-                  tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz pkgs
-                  mv gpkg-dev-${{ matrix.target_arch }}.tar.xz /builder
-                  build_pkg+="${jl[1]}|"
-                  cd ..
-                else
-                  mv src pkgs
-                  tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz pkgs
-                  mv gpkg-dev-${{ matrix.target_arch }}.tar.xz /builder
-                  break
-                fi
+            chown -R user-build:user-build gpkg-dev
+            cd gpkg-dev
+            mkdir /root/pkgs
+            for i in $(cat /builder/gpkg-dev-need.txt); do
+              cd "${i}"
+              sudo -H -u user-build bash -c '(timeout --preserve-status 300m makepkg --noarchive && ([ "$?" = "0" ] && makepkg -R)) || ([ "$?" = "143" ] && true)'
+              if $(ls *.pkg.* &> /dev/null); then
+                mv *.pkg.* /root/pkgs
+                echo " ${i} " >> /root/pkgs/gpkg-dev-done.txt
+                cd ..
+              else
+                mv src /root/pkgs
+                echo "${i}" > /root/pkgs/gpkg-dev-continue.txt
+                break
               fi
             done
+            cd /root
+            mv /builder/gpkg-dev-need.txt pkgs
+            tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz pkgs
+            mv gpkg-dev-${{ matrix.target_arch }}.tar.xz /builder
       - uses: actions/upload-artifact@v3
         with:
           name: build-1-gpkg-dev-${{ matrix.target_arch }}
@@ -88,7 +100,7 @@ jobs:
           distro: archarm_latest
           githubToken: ${{ github.token }}
           dockerRunArgs: |
-            --volume "${PWD}/builder:/builder"
+            --volume "${PWD}/builder:/builder" --volume "${PWD}/gpkg-dev:/root/gpkg-dev"
           install: |
             pacman -Syu --noconfirm
             pacman -S base-devel python git cmake python-setuptools ruby-ronn publicsuffix-list gtk-doc autoconf-archive gtest rsync ninja openssl meson --noconfirm --needed
@@ -97,36 +109,33 @@ jobs:
             mkdir -p /data/data/com.termux/files/usr/glibc
             ln -s /lib /data/data/com.termux/files/usr/glibc/lib
             ln -s /usr/share /data/data/com.termux/files/usr/glibc/share
-            cd /home/user-build
-            git config --global --add safe.directory '*'
-            sudo -H -u user-build bash -c "git clone https://github.com/termux-pacman/glibc-packages"
-            cd glibc-packages/gpkg-dev
-            build_pkg="|"
-            for j in $(git show --pretty="" --name-only ${{ github.sha }}); do
-              jl=(${j//// })
-              if [[ "${jl[0]}" = "gpkg-dev" && ! $(echo "$build_pkg" | grep "|${jl[1]}|") && -d "${jl[1]}" ]]; then
-                cd "${jl[1]}"
-                tar xJf /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz -C .
-                if ! $(ls pkgs/*.pkg.* &> /dev/null); then
-                  mv pkgs/* .
-                  sudo -H -u user-build bash -c '(timeout --preserve-status 300m makepkg -e --noarchive && ([ "$?" = "0" ] && makepkg -R)) || ([ "$?" = "143" ] && true)'
-                  if $(ls *.pkg.* &> /dev/null); then
-                    mv *.pkg.* pkgs
-                    tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz pkgs
-                    rm /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz
-                    mv gpkg-dev-${{ matrix.target_arch }}.tar.xz /builder
-                    build_pkg+="${jl[1]}|"
-                    cd ..
-                  else
-                    mv src pkgs
-                    tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz pkgs
-                    rm /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz
-                    mv gpkg-dev-${{ matrix.target_arch }}.tar.xz /builder
-                    break
-                  fi
-                fi
+            tar xJf /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz -C /root
+            cd gpkg-dev
+            for i in $(cat /root/pkgs/gpkg-dev-need.txt); do
+              if [ -f /root/pkgs/gpkg-dev-done.txt ] && $(grep -q " $i " /root/pkgs/gpkg-dev-done.txt); then
+                continue
+              fi
+              cd "$i"
+              if [ -f /root/pkgs/gpkg-dev-continue.txt && "$(cat /root/pkgs/gpkg-dev-continue.txt)" = "$i" ]; then
+                mv /root/pkgs/src .
+              else
+                sudo -H -u user-build bash -c "makepkg -o"
+              fi
+              sudo -H -u user-build bash -c '(timeout --preserve-status 300m makepkg -e --noarchive && ([ "$?" = "0" ] && makepkg -R)) || ([ "$?" = "143" ] && true)'
+              if $(ls *.pkg.* &> /dev/null); then
+                mv *.pkg.* /root/pkgs
+                echo " ${i} " >> /root/pkgs/gpkg-dev-done.txt
+                cd ..
+              else
+                mv src /root/pkgs
+                echo "${i}" > /root/pkgs/gpkg-dev-continue.txt
+                break
               fi
             done
+            cd /root
+            tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz pkgs
+            rm /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz
+            mv gpkg-dev-${{ matrix.target_arch }}.tar.xz /builder
       - uses: actions/upload-artifact@v3
         with:
           name: build-2-gpkg-dev-${{ matrix.target_arch }}
@@ -157,7 +166,7 @@ jobs:
           distro: archarm_latest
           githubToken: ${{ github.token }}
           dockerRunArgs: |
-            --volume "${PWD}/builder:/builder"
+            --volume "${PWD}/builder:/builder" --volume "${PWD}/gpkg-dev:/root/gpkg-dev"
           install: |
             pacman -Syu --noconfirm
             pacman -S base-devel python git cmake python-setuptools ruby-ronn publicsuffix-list gtk-doc autoconf-archive gtest rsync ninja openssl meson --noconfirm --needed
@@ -166,28 +175,27 @@ jobs:
             mkdir -p /data/data/com.termux/files/usr/glibc
             ln -s /lib /data/data/com.termux/files/usr/glibc/lib
             ln -s /usr/share /data/data/com.termux/files/usr/glibc/share
-            cd /home/user-build
-            git config --global --add safe.directory '*'
-            sudo -H -u user-build bash -c "git clone https://github.com/termux-pacman/glibc-packages"
-            cd glibc-packages/gpkg-dev
-            build_pkg="|"
-            for j in $(git show --pretty="" --name-only ${{ github.sha }}); do
-              jl=(${j//// })
-              if [[ "${jl[0]}" = "gpkg-dev" && ! $(echo "$build_pkg" | grep "|${jl[1]}|") && -d "${jl[1]}" ]]; then
-                cd "${jl[1]}"
-                tar xJf /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz -C .
-                if ! $(ls pkgs/*.pkg.* &> /dev/null); then
-                  mv pkgs/* .
-                  sudo -H -u user-build bash -c "makepkg -e"
-                  mv *.pkg.* pkgs
-                  tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz pkgs
-                  rm /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz
-                  mv gpkg-dev-${{ matrix.target_arch }}.tar.xz /builder
-                  build_pkg+="${jl[1]}|"
-                  cd ..
-                fi
+            tar xJf /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz -C /root
+            cd gpkg-dev
+            for i in $(cat /root/pkgs/gpkg-dev-need.txt); do
+              if [ -f /root/pkgs/gpkg-dev-done.txt ] && $(grep -q " $i " /root/pkgs/gpkg-dev-done.txt); then
+                continue
               fi
+              cd "$i"
+              if [ -f /root/pkgs/gpkg-dev-continue.txt && "$(cat /root/pkgs/gpkg-dev-continue.txt)" = "$i" ]; then
+                mv /root/pkgs/src .
+              else
+                sudo -H -u user-build bash -c "makepkg -o"
+              fi
+              sudo -H -u user-build bash -c "makepkg -e"
+              mv *.pkg.* /root/pkgs
+              echo " ${i} " >> /root/pkgs/gpkg-dev-done.txt
+              cd ..
             done
+            cd /root
+            tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz pkgs
+            rm /builder/gpkg-dev-${{ matrix.target_arch }}.tar.xz
+            mv gpkg-dev-${{ matrix.target_arch }}.tar.xz /builder
       - uses: actions/upload-artifact@v3
         with:
           name: gpkg-dev-${{ matrix.target_arch }}
