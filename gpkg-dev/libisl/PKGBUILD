@@ -5,15 +5,15 @@
 # Contributor: Allan McRae <allan at archlinux dot org>
 
 pkgname=libisl-glibc
-pkgver=0.25
-pkgrel=1
+pkgver=0.26
+pkgrel=0
 pkgdesc='Library for manipulating sets and relations of integer points bounded by linear constraints'
 arch=('any')
 url='https://libisl.sourceforge.io'
 license=('MIT')
 options=(staticlibs)
 source=("https://libisl.sourceforge.io/isl-${pkgver}.tar.xz")
-b2sums=('54a13ba8a5d7666f62f3fb20db278d15b803400cb8b69f119b18fd1f54f7d02f1e07cd1e189803fc416afaa81b35e2247ef6b3da3d8cddc463b05cc9b3921890')
+b2sums=('2cfe2e0774a991d2385e66f58490c5454382cabc82d74eb4bbe5a603293b7bdc34ca3b087f0884f9da319c447747edc76275ecaf2f171237939f9c7d3c52ced7')
 groups=('gpkg-dev')
 
 build() {
