@@ -3,7 +3,7 @@
 pkgname=publicsuffix-list-glibc
 _gitcommit=ab0530155af1fe4b58194fe6792c4ec9731666bf
 pkgver=20230222.1337.ab05301
-pkgrel=0
+pkgrel=1
 pkgdesc='Cross-vendor public domain suffix database'
 url='https://github.com/publicsuffix/list'
 arch=('any')

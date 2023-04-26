@@ -19,7 +19,7 @@ Server = https://s3.amazonaws.com/termux-pacman.us/gpkg-dev/$arch
 
 ### Other information:
  - [Old README](/README-old.md)
- - Architecture support: aarch64 and arm
+ - Architecture support: all (aarch64, arm, x86_64, i686)
  - Security level: full (db and packages are protected by signature)
  - Signature: termux-pacman organization gpg key
  - Storage: aws s3 (US)
