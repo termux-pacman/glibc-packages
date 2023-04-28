@@ -1,8 +1,5 @@
-# Maintainer: Frederik Schwan <freswa at archlinux dot org>
-# Contributor: Andrew Sun  <adsun701 at gmail dot com>
-# Contributor: Kritias     <theodoridisgr at gmail dot com>
-# Contributor: sudokode    <sudokode at gmail dot com>
-# Contributor: Allan McRae <allan at archlinux dot org>
+# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
+# - https://github.com/archlinux/svntogit-packages/blob/packages/libisl/trunk/PKGBUILD
 
 pkgname=libisl-glibc
 pkgver=0.26
