@@ -1,8 +1,5 @@
-# Maintainer: Felix Yan <felixonmars@archlinux.org>
-# Maintainer: Levente Polyak <anthraxx[at]archlinux[dot]org>
-# Contributor: Lex Black <autumn-wind at web dot de>
-# Contributor: TingPing <tingping@tingping.se>
-# Contributor: Guillaume Horel <guillaume.horel@gmail.com>
+# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
+# - https://github.com/archlinux/svntogit-packages/blob/packages/brotli/trunk/PKGBUILD
 
 pkgname=brotli-glibc
 _gitcommit=e61745a6b7add50d380cfd7d3883dd6c62fc2c71
@@ -37,6 +34,14 @@ build() {
       ;;
     "armv7h")
       CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+    "x86_64")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+    "i686")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
       CXXFLAGS="${CFLAGS}"
       ;;
   esac
