@@ -1,10 +1,10 @@
-# Maintainer: Bartłomiej Piotrowski <bpiotrowski@archlinux.org>
-# Maintainer: Dan McGee <dan@archlinux.org>
+# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
+# - https://github.com/archlinux/svntogit-packages/blob/packages/libarchive/trunk/PKGBUILD
 
 pkgname=libarchive-glibc
 pkgver=3.6.2
 pkgrel=0
-pkgdesc='Multi-format archive and compression library'
+pkgdesc='Multi-format archive and compression library (lite version)'
 arch=(any)
 url='https://libarchive.org/'
 license=('BSD')
