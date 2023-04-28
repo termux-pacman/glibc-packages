@@ -1,5 +1,5 @@
-# Maintainer: Allan McRae <allan@archlinux.org>
-# Contributer: Jan de Groot <jgc@archlinux.org>
+# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
+# - https://github.com/archlinux/svntogit-packages/blob/packages/gmp/trunk/PKGBUILD
 
 pkgname=gmp-glibc
 pkgver=6.2.1
@@ -8,10 +8,8 @@ pkgdesc='A free library for arbitrary precision arithmetic'
 arch=(any)
 url='https://gmplib.org/'
 license=(LGPL3 GPL)
-source=(https://gmplib.org/download/gmp/gmp-$pkgver.tar.lz{,.sig})
-md5sums=('03a31d8cbaf29d136252f8f38875ed82'
-         'SKIP')
-validpgpkeys=('343C2FF0FBEE5EC2EDBEF399F3599FF828C67298')   # Niels Möller
+source=(https://gmplib.org/download/gmp/gmp-$pkgver.tar.lz)
+md5sums=('03a31d8cbaf29d136252f8f38875ed82')
 groups=('gpkg-dev')
 
 build() {
