@@ -1,5 +1,5 @@
-# Maintainer: Stéphane Gaudreault <stephane@archlinux.org>
-# Contributor: Tobias Powalowski <tpowa@archlinux.org>
+# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
+# - https://github.com/archlinux/svntogit-packages/blob/packages/keyutils/trunk/PKGBUILD
 
 pkgname=keyutils-glibc
 _tag='5678a1aae8834b5c16b5ed7dc72ef8836a29e122' # git rev-parse v${pkgver}
@@ -11,8 +11,7 @@ url='https://www.kernel.org/'
 license=('GPL2' 'LGPL2.1')
 makedepends=('git')
 backup=('data/data/com.termux/files/usr/glibc/etc/request-key.conf')
-validpgpkeys=('A86E54B0D5E1B4E0AB7C640FFBB7576BA7CB0B6B') # David Howells <dhowells@redhat.com>
-source=("git+https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git#tag=${_tag}?signed"
+source=("git+https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git#tag=${_tag}"
         'request-key.conf.patch' 'reproducible.patch' 'Makefile.patch')
 sha256sums=('SKIP'
             '1ecf854011ce1a15e238653187fd6aed903b94c16d6a99bfca463bd8ca1c2f40'
@@ -35,16 +34,24 @@ prepare() {
 build() {
   cd keyutils
 
-  #case "$CARCH" in
-  #  "aarch64")
-  #    CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-  #    CXXFLAGS="${CFLAGS}"
-  #    ;;
-  #  "armv7h")
-  #    CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
-  #    CXXFLAGS="${CFLAGS}"
-  #    ;;
-  #esac
+  case "$CARCH" in
+    "aarch64")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+    "armv7h")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+    "x86_64")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+    "i686")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+  esac
 
   make CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" \
     SBINDIR='/data/data/com.termux/files/usr/glibc/bin' \
