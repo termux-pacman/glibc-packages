@@ -1,5 +1,5 @@
-# Maintainer: Anatol Pomozov
-# Contributor: Zhuoyun Wei <wzyboy@wzyboy.org>
+# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
+# - https://github.com/archlinux/svntogit-packages/blob/packages/libnghttp2/trunk/PKGBUILD
 
 pkgname=libnghttp2-glibc
 pkgver=1.52.0
@@ -14,17 +14,6 @@ groups=('gpkg-dev')
 
 build() {
   cd nghttp2-$pkgver
-
-  case "$CARCH" in
-    "aarch64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "armv7h")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-  esac
 
   autoreconf -i
   ./configure \
