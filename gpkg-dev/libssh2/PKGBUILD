@@ -1,8 +1,5 @@
-# Maintainer: Dave Reisner <dreisner@archlinux.org>
-# Contributor: Angel Velasquez <angvp@archlinux.org>
-# Contributor: Sergej Pupykin <pupykin.s+arch@gmail.com>
-# Contributor: Andrea Scarpino <andrea@archlinux.org>
-# Contributor: ice-man <icemanf@gmail.com>
+# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
+# - https://github.com/archlinux/svntogit-packages/blob/packages/libssh2/trunk/PKGBUILD
 
 pkgname=libssh2-glibc
 pkgver=1.10.0
@@ -11,26 +8,12 @@ pkgdesc="A library implementing the SSH2 protocol as defined by Internet Drafts"
 url="https://www.libssh2.org/"
 arch=(any)
 license=('BSD')
-validpgpkeys=('27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2'   # Daniel Stenberg
-              '914C533DF9B2ADA2204F586D78E11C6B279D5C91')  # Daniel Stenberg (old key)
-source=("https://www.libssh2.org/download/libssh2-$pkgver.tar.gz"{,.asc})
-sha256sums=('2d64e90f3ded394b91d3a2e774ca203a4179f69aebee03003e5a6fa621e41d51'
-            'SKIP')
+source=("https://www.libssh2.org/download/libssh2-$pkgver.tar.gz")
+sha256sums=('2d64e90f3ded394b91d3a2e774ca203a4179f69aebee03003e5a6fa621e41d51')
 groups=('gpkg-dev')
 
 build() {
   cd "libssh2-$pkgver"
-
-  case "$CARCH" in
-    "aarch64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "armv7h")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-  esac
 
   ./configure --prefix=/data/data/com.termux/files/usr/glibc
   make
