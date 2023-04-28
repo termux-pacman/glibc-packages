@@ -1,5 +1,5 @@
-# Maintainer: Levente Polyak <anthraxx[at]archlinux[dot]org>
-# Contributor: Darshit Shah <darnir@gmail.com>
+# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
+# - https://github.com/archlinux/svntogit-packages/blob/packages/libpsl/trunk/PKGBUILD
 
 pkgname=libpsl-glibc
 pkgver=0.21.2
@@ -30,6 +30,14 @@ build() {
       ;;
     "armv7h")
       CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+    "x86_64")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+    "i686")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
       CXXFLAGS="${CFLAGS}"
       ;;
   esac
