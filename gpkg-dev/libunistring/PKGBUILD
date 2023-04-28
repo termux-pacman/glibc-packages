@@ -1,9 +1,5 @@
-# Maintainer: Levente Polyak <anthraxx[at]archlinux[dot]org>
-# Contributor: Bartłomiej Piotrowski <bpiotrowski@archlinux.org>
-# Contributor: Jan de Groot <jgc@archlinux.org>
-# Contributor: Sergej Pupykin <pupykin.s+arch@gmail.com>
-# Contributor: Emmanuel 'guinness' Boudreault
-# Contributor: Patrick McCarty <pnorcks at gmail dot com>
+# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
+# - https://github.com/archlinux/svntogit-packages/blob/packages/libunistring/trunk/PKGBUILD
 
 pkgname=libunistring-glibc
 pkgver=1.1
@@ -12,13 +8,9 @@ pkgdesc='Library for manipulating Unicode strings and C strings'
 url='https://www.gnu.org/software/libunistring/'
 arch=(any)
 license=(GPL)
-source=(https://ftp.gnu.org/gnu/libunistring/libunistring-${pkgver}.tar.xz{,.sig})
-validpgpkeys=('462225C3B46F34879FC8496CD605848ED7E69871'  # Daiki Ueno <ueno@unixuser.org>
-              '9001B85AF9E1B83DF1BDA942F5BE8B267C6A406D') # Bruno Haible (Open Source Development) <bruno@clisp.org>
-sha256sums=('827c1eb9cb6e7c738b171745dac0888aa58c5924df2e59239318383de0729b98'
-            'SKIP')
-b2sums=('721adc90884006480055b95d0fa06cd862417aa02b467f1e14688292ad9c11f1e33520b14ed5dc2d2724c6df8713d3af1e8032014259d8355156cb72edfcb983'
-        'SKIP')
+source=(https://ftp.gnu.org/gnu/libunistring/libunistring-${pkgver}.tar.xz)
+sha256sums=('827c1eb9cb6e7c738b171745dac0888aa58c5924df2e59239318383de0729b98')
+b2sums=('721adc90884006480055b95d0fa06cd862417aa02b467f1e14688292ad9c11f1e33520b14ed5dc2d2724c6df8713d3af1e8032014259d8355156cb72edfcb983')
 groups=('gpkg-dev')
 
 prepare() {
@@ -29,17 +21,6 @@ prepare() {
 
 build() {
   cd libunistring-$pkgver
-
-  case "$CARCH" in
-    "aarch64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "armv7h")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-  esac
 
   ./configure --prefix=/data/data/com.termux/files/usr/glibc
   make
