@@ -1,9 +1,5 @@
-# Maintainer: Giancarlo Razzolini <grazzolini@archlinux.org>
-# Maintainer: Frederik Schwan <freswa at archlinux dot org>
-# Contributor:  Bartłomiej Piotrowski <bpiotrowski@archlinux.org>
-# Contributor: Allan McRae <allan@archlinux.org>
-
-# toolchain build order: linux-api-headers->glibc->binutils->gcc->glibc->binutils->gcc
+# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
+# - https://github.com/archlinux/svntogit-packages/blob/packages/binutils/trunk/PKGBUILD
 
 pkgname=binutils-glibc
 pkgver=2.40
@@ -14,12 +10,10 @@ url='https://www.gnu.org/software/binutils/'
 license=('GPL3' 'GPL' 'FDL1.3' 'custom:FSFAP')
 #_commit=cb5f6a3e146cc70bc2d864989386df80acec5d3e
 #source=(git+https://sourceware.org/git/binutils-gdb.git#commit=$_commit)
-source=(https://ftp.gnu.org/gnu/binutils/binutils-$pkgver.tar.xz{,.sig}
+source=(https://ftp.gnu.org/gnu/binutils/binutils-$pkgver.tar.xz
         gold-warn-unsupported.patch)
 sha256sums=('0f8a4c272d7f17f369ded10a4aca28b8e304828e95526da482b0ccc4dfc9d8e1'
-            'SKIP'
             '2d430b66f84a19c154725ec535280c493be1d34f1a90f95208dce02fecd0e4e4')
-validpgpkeys=(3A24BC1E8FB409FA9F14371813FCEF89DD9E3C4F)
 groups=('gpkg-dev')
 
 prepare() {
@@ -48,6 +42,14 @@ build() {
       ;;
     "armv7h")
       CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+    "x86_64")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+    "i686")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
       CXXFLAGS="${CFLAGS}"
       ;;
   esac
