@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # system definitions
+export LANG="en_US.UTF-8"
 DIR_SOURCE="gpkg-dev"
 DIR_BUILD="pkgs"
 DIR_SCRIPT="script"

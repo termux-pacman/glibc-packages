@@ -31,8 +31,10 @@ fi
 	chmod a+rwx *
 
 	# start building
-	if [ ! -d src ]; then
+	if [ ! -f src.tar.gz ]; then
 		sudo -H -u ${GPKG_DEV_USER_NAME} bash -c "makepkg -o"
+	else
+		sudo -H -u ${GPKG_DEV_USER_NAME} bash -c "tar xf src.tar.gz"
 	fi
 	sudo -H -u ${GPKG_DEV_USER_NAME} bash -c '(timeout --preserve-status 300m makepkg -e --noarchive && ([ "$?" = "0" ] && makepkg -R)) || ([ "$?" = "143" ] && true)'
 
@@ -40,7 +42,8 @@ fi
 		mv *.pkg.* ${GPKG_DEV_DIR_BUILD}
 		echo " ${pkgname} " >> ${GPKG_DEV_DIR_BUILD}/gpkg-dev-done.txt
 	else
-		mv src ${GPKG_DEV_DIR_BUILD}
+		sudo -H -u ${GPKG_DEV_USER_NAME} bash -c "tar cf src.tar.gz src"
+		mv src.tar.gz ${GPKG_DEV_DIR_BUILD}
 		echo "${pkgname}" > ${GPKG_DEV_DIR_BUILD}/gpkg-dev-continue.txt
 	fi
 )

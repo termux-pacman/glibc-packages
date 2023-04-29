@@ -1,6 +1,5 @@
-# Maintainer: Anatol Pomozov <anatol.pomozov@gmail.com>
-# Maintainer: Eli Schwartz <eschwartz@archlinux.org>
-# Contributor: Christer Solskogen <christer.solskogen@gmail.com>
+# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
+# - https://github.com/archlinux/svntogit-packages/blob/packages/gcc/trunk/PKGBUILD
 
 pkgname=(gcc-glibc gcc-libs)
 pkgver=12.2.0
@@ -14,20 +13,16 @@ options=(!emptydirs !strip staticlibs)
 #source=(git+https://sourceware.org/git/gcc.git#commit=${_commit}
 source=(https://ftp.gnu.org/gnu/gcc/gcc-$pkgver/gcc-$pkgver.tar.xz
         c89 c99
-        aarch64-linux.h.patch
-        arm-linux-eabi.h.patch
-        arm-linux-elf.h.patch
         collect2.cc.patch
-        gcc.cc.patch)
+        gcc.cc.patch
+        set_glibc_dynamic_linker.patch)
 _libdir=data/data/com.termux/files/usr/glibc/lib/gcc/$CHOST/${pkgver%%+*}
 sha256sums=('e549cf9cf3594a00e27b6589d4322d70e0720cdd213f39beb4181e06926230ff'
             'd87254ee2c816aee66b00dd5002966cf3fe9aca4969eaf160c47150583357790'
             '9ad6d475acf0b19ca0e420f32867c6a5186ffbae50481ec64a140165f8988b60'
-            '37e98441ccb324011479ee3eb1b069b983dea0c9c1ee601b3633e80dfa1cb8d9'
-            'de16eac29651182497efc25e35a326525dce5d923ddf3efaf64790139088d9f3'
-            '4f528cfb635c25feb1231d2547ca5b60f65f5319382b1cf07ee8fd74052e76e4'
             'fef816cd40d5c62199f437586b07ba266e3a7004001c4a27cb9efbd936772001'
-            '642a609f5e650fc48086dd252c55bf1af4352aeaddeac39c47f82422aa1235d2')
+            '642a609f5e650fc48086dd252c55bf1af4352aeaddeac39c47f82422aa1235d2'
+            'b35824482ecff2f5b8fb18f20e87c01f9400555829675094e5e121e22e97fe1c')
 _basedir=gcc-$pkgver
 groups=('gpkg-dev')
 
@@ -45,18 +40,28 @@ prepare() {
 build() {
   cd gcc-build
 
+  CFLAGS=${CFLAGS/-Werror=format-security/}
+  CXXFLAGS=${CXXFLAGS/-Werror=format-security/}
+
+  CONFIGFLAG=""
+  CFLAGS+=" -Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib"
   case "$CARCH" in
     "aarch64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-      CXXFLAGS="${CFLAGS}"
+      CFLAGS+=" -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
       CONFIGFLAG="--with-arch=armv8-a --enable-fix-cortex-a53-835769 --enable-fix-cortex-a53-843419"
       ;;
     "armv7h")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
-      CXXFLAGS="${CFLAGS}"
+      CFLAGS+=" -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
       CONFIGFLAG="--with-arch=armv7-a --with-float=hard --with-fpu=neon"
       ;;
+    "x86_64")
+      CFLAGS+=" -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
+      ;;
+    "i686")
+      CFLAGS+=" -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
+      ;;
   esac
+  CXXFLAGS="${CFLAGS}"
 
   "$srcdir"/$_basedir/configure \
     --prefix=/data/data/com.termux/files/usr/glibc \
@@ -65,6 +70,7 @@ build() {
     --mandir=/data/data/com.termux/files/usr/glibc/share/man \
     --infodir=/data/data/com.termux/files/usr/glibc/share/info \
     --with-bugurl=https://github.com/termux-pacman/glibc-packages/issues \
+    --build=$CHOST \
     $CONFIGFLAG \
     --disable-multilib \
     --disable-bootstrap \
@@ -146,10 +152,12 @@ package_gcc-glibc() {
   make -C $CHOST/libstdc++-v3/python DESTDIR="$pkgdir" install
 
   make DESTDIR="$pkgdir" install-libcc1
-  install -d "$pkgdir/data/data/com.termux/files/usr/glibc/share/gdb/auto-load/usr/lib"
-  mv "$pkgdir"/data/data/com.termux/files/usr/glibc/lib/libstdc++.so.6.*-gdb.py \
-    "$pkgdir/data/data/com.termux/files/usr/glibc/share/gdb/auto-load/usr/lib/"
-  rm "$pkgdir"/data/data/com.termux/files/usr/glibc/lib/libstdc++.so*
+  if [ -f "$pkgdir"/data/data/com.termux/files/usr/glibc/lib/libstdc++.so.6.*-gdb.py ]; then
+    install -d "$pkgdir/data/data/com.termux/files/usr/glibc/share/gdb/auto-load/usr/lib"
+    mv "$pkgdir"/data/data/com.termux/files/usr/glibc/lib/libstdc++.so.6.*-gdb.py \
+      "$pkgdir/data/data/com.termux/files/usr/glibc/share/gdb/auto-load/usr/lib/"
+  fi
+  rm "$pkgdir"/data/data/com.termux/files/usr/glibc/lib/libstdc++.so* || true
 
   make DESTDIR="$pkgdir" install-fixincludes
   make -C gcc DESTDIR="$pkgdir" install-mkheaders
