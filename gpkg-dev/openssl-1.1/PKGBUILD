@@ -1,4 +1,5 @@
-# Maintainer: Pierre Schmitz <pierre@archlinux.de>
+# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
+# - https://github.com/archlinux/svntogit-packages/blob/packages/openssl-1.1/trunk/PKGBUILD
 
 pkgname=openssl-glibc-1.1
 _pkgname=openssl
@@ -27,17 +28,25 @@ prepare() {
 build() {
 	cd "$srcdir/$_pkgname-$_ver"
 
-	if [ "${CARCH}" == 'armv7h' ]; then
+	CFLAGS+=" -Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib"
+	if [ "${CARCH}" = "armv7h" ]; then
 		openssltarget='linux-armv4'
 		optflags=''
-		CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
-		CXXFLAGS="${CFLAGS}"
-	elif [ "${CARCH}" == 'aarch64' ]; then
+		CFLAGS+=" -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
+	elif [ "${CARCH}" = "aarch64" ]; then
 		openssltarget='linux-aarch64'
 		optflags='no-afalgeng'
-		CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-		CXXFLAGS="${CFLAGS}"
+		CFLAGS+=" -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
+	elif [ "${CARCH}" = "x86_64" ]; then
+		openssltarget='linux-x86_64'
+		optflags='enable-ec_nistp_64_gcc_128'
+		CFLAGS+=" -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
+	elif [ "${CARCH}" = "i686" ]; then
+		openssltarget='linux-generic32'
+		optflags='no-sse2'
+		CFLAGS+=" -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
 	fi
+	CXXFLAGS="${CFLAGS}"
 
 	# mark stack as non-executable: http://bugs.archlinux.org/task/12434
 	./Configure --prefix=/data/data/com.termux/files/usr/glibc --openssldir=/data/data/com.termux/files/usr/glibc/etc/ssl --libdir=lib/openssl-1.1 \
