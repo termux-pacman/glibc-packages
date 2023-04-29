@@ -1,4 +1,5 @@
-# Maintainer: Pierre Schmitz <pierre@archlinux.de>
+# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
+# - https://github.com/archlinux/svntogit-packages/blob/packages/openssl/trunk/PKGBUILD
 
 pkgname=openssl-glibc
 pkgver=3.0.8
@@ -9,13 +10,10 @@ url='https://www.openssl.org'
 license=('custom:BSD')
 makedepends=('perl')
 backup=('data/data/com.termux/files/usr/glibc/etc/ssl/openssl.cnf')
-source=("https://www.openssl.org/source/openssl-${pkgver}.tar.gz"{,.asc}
+source=("https://www.openssl.org/source/openssl-${pkgver}.tar.gz"
 	'ca-dir.patch')
 sha256sums=('6c13d2bf38fdf31eac3ce2a347073673f5d63263398f1f69d0df4a41253e4b3e'
-            'SKIP'
             '326478a21829b79710ce0d8f7437e3be10c542471fef3bdf5f70ac232a5bf9e8')
-validpgpkeys=('8657ABB260F056B1E5190839D9C4D26D0E604491'
-	'7953AC1FBC3DC8B3B292393ED5E9E43F7DF9EE8C')
 groups=('gpkg-dev')
 
 prepare() {
@@ -37,14 +35,28 @@ build() {
 			CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
 			CXXFLAGS="${CFLAGS}"
 			;;
+		"x86_64")
+			CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
+			CXXFLAGS="${CFLAGS}"
+			;;
+		"i686")
+			CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
+			CXXFLAGS="${CFLAGS}"
+			;;
 	esac
 
-	if [ "${CARCH}" == 'armv7h' ]; then
+	if [ "${CARCH}" = "armv7h" ]; then
 		openssltarget='linux-armv4'
 		optflags=''
-	elif [ "${CARCH}" == 'aarch64' ]; then
+	elif [ "${CARCH}" = "aarch64" ]; then
 		openssltarget='linux-aarch64'
 		optflags='no-afalgeng'
+	elif [ "${CARCH}" = "x86_64" ]; then
+		openssltarget='linux-x86_64'
+		optflags='enable-ec_nistp_64_gcc_128'
+	elif [ "${CARCH}" = "i686" ]; then
+		openssltarget='linux-generic32'
+		optflags='no-sse2'
 	fi
 
 	export PATH=/usr/bin/core_perl:$PATH
