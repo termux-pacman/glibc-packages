@@ -1,8 +1,5 @@
-# Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
-# Contributor: Johannes Löthberg <johannes@kyriasis.com>
-# Contributor: Piotr Gorski <lucjan.lucjanov@gmail.com>
-# Contributor: Lucy <lucy@luz.lu>
-# Contributor: Bartlomiej Piotrowski <nospam@bpiotrowski.pl>
+# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
+# - https://github.com/archlinux/svntogit-packages/blob/packages/pkgconf/trunk/PKGBUILD
 
 pkgname=pkgconf-glibc
 pkgver=1.8.1
@@ -34,6 +31,14 @@ build() {
       ;;
     "armv7h")
       CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+    "x86_64")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
+      CXXFLAGS="${CFLAGS}"
+      ;;
+    "i686")
+      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
       CXXFLAGS="${CFLAGS}"
       ;;
   esac
