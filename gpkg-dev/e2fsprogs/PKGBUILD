@@ -3,7 +3,7 @@
 
 pkgname=e2fsprogs-glibc
 pkgver=1.47.0
-pkgrel=1
+pkgrel=2
 pkgdesc='Ext2/3/4 filesystem utilities'
 arch=(any)
 license=('GPL' 'LGPL' 'MIT')
@@ -49,6 +49,8 @@ build() {
       --libdir=/data/data/com.termux/files/usr/glibc/lib \
       --sbindir=/data/data/com.termux/files/usr/glibc/bin \
       --sysconfdir=/data/data/com.termux/files/usr/glibc/etc \
+      --with-systemd-unit-dir=/data/data/com.termux/files/usr/glibc/lib/systemd \
+      --with-udev-rules-dir=/data/data/com.termux/files/usr/glibc/lib/udev \
       --enable-elf-shlibs \
       --disable-fsck \
       --disable-uuidd \

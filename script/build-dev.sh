@@ -30,6 +30,29 @@ fi
 	cd $pkgname
 	chmod a+rwx *
 
+	# packages removal check
+	new_pkg_list=$(sudo -H -u ${GPKG_DEV_USER_NAME} bash -c "makepkg --packagelist")
+	(
+		chmod a+rwx ${GPKG_DEV_DIR_BUILD}/PKGBUILDs
+		cd ${GPKG_DEV_DIR_BUILD}/PKGBUILDs
+		mv $pkgname PKGBUILD
+		chmod a+rwx PKGBUILD
+		for i in $(sudo -H -u ${GPKG_DEV_USER_NAME} bash -c "makepkg --packagelist"); do
+			delete=true
+			pkgpart=$(get_name $(basename $i))
+			for j in $new_pkg_list; do
+				if [ $pkgpart = $(get_name $(basename $j)) ]; then
+					delete=false
+					break
+				fi
+			done
+			if $delete; then
+				echo "$pkgpart" >> ${GPKG_DEV_DIR_BUILD}/deleted_gpkg-dev_packages.txt
+			fi
+		done
+		mv PKGBUILD $pkgname
+	)
+
 	# start building
 	if [ ! -f src.tar.gz ]; then
 		sudo -H -u ${GPKG_DEV_USER_NAME} bash -c "makepkg -o"
