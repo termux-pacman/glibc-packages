@@ -19,13 +19,15 @@ jobs:
       fail-fast: false
     steps:
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
       with:
         platforms: 'arm64,arm'
     - name: Get list gpkg-dev packages
       run: |
-        mkdir -p "pkgs"
+        mkdir -p "pkgs/PKGBUILDs"
         if [ ${{ github.event_name }} = "pull_request" ]; then
           list=$(curl --header "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -s -X GET -G \
             "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" | jq -r '.[] | .filename')
@@ -35,8 +37,13 @@ jobs:
         fi
         for i in $list; do
           il=(${i//// })
-          if [[ "${il[0]}" = "gpkg-dev" && -d "${il[0]}/${il[1]}" ]]; then
-            echo "${il[1]}" >> "pkgs/gpkg-dev-need.txt"
+          if [ "${il[0]}" = "gpkg-dev" ]; then
+            if [ -d "${il[0]}/${il[1]}" ]; then
+              echo "${il[1]}" >> "pkgs/gpkg-dev-need.txt"
+              curl -L "https://raw.githubusercontent.com/termux-pacman/glibc-packages/$(git log -n 2 --format=format:%H gpkg-dev/${il[1]} | tail -1)/gpkg-dev/${il[1]}/PKGBUILD" -o pkgs/PKGBUILDs/${il[1]}
+            else
+              echo "${il[1]}" >> "pkgs/deleted_gpkg-dev_packages.txt"
+            fi
           fi
         done
     - name: Build gpkg-dev packages
@@ -156,16 +163,24 @@ jobs:
         rm key.gpg
     - name: Uploading packages to aws
       run: |
-        #source ./aws-cli-action/func.sh
+        sfuf() {
+          gpg --batch --pinentry-mode=loopback --passphrase '${{ secrets.PW_GPG_BOT }}' --detach-sign --use-agent -u '${{ secrets.KEY_GPG_BOT }}' --no-armor "$1"
+          for format_file in "" ".sig"; do
+            aws s3 cp "${1}${format_file}" s3://'${{ secrets.SFPU }}'/gpkg-dev/$arch/"${1##*/}${format_file}"
+          done
+        }
         for path_to_archive in gpkg-dev-*/gpkg-dev-{aarch64,arm,x86_64,i686}.tar.xz; do
           archive="${path_to_archive##*/}"
           arch=$(echo ${archive##*-} | sed 's/.tar.xz//')
           tar xJf "$path_to_archive"
+          dp_file="deleted_gpkg-dev_packages.txt"
+          if [[ -f pkgs/$dp_file ]]; then
+            path_dp_file=pkgs/${{ github.sha }}_${dp_file}
+            mv pkgs/${dp_file} ${path_dp_file}
+            sfuf "${path_dp_file}"
+          fi
           for pkg in pkgs/*.pkg.*; do
-            gpg --batch --pinentry-mode=loopback --passphrase '${{ secrets.PW_GPG_BOT }}' --detach-sign --use-agent -u '${{ secrets.KEY_GPG_BOT }}' --no-armor "$pkg"
-            for format_file in "" ".sig"; do
-              aws s3 cp "${pkg}${format_file}" s3://'${{ secrets.SFPU }}'/gpkg-dev/$arch/"${pkg##*/}${format_file}"
-            done
+            sfuf "$pkg"
           done
           rm -fr pkgs
         done
