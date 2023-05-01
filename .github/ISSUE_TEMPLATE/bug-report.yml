@@ -1,0 +1,21 @@
+name: "Bug report"
+description: "Problem with glibc packages"
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    attributes:
+      label: Problem description
+      description: Describe your problem and describe what you are doing that is causing you to get this problem.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: System information
+      description: Run the "termux-info" command, then copy and paste the result. Our actions to fix your problem depend on this.
+      value: |
+        termux-info:
+        ```
+        ```
+    validations:
+      required: true
