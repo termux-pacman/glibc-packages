@@ -24,31 +24,12 @@ prepare() {
 build() {
   cd zstd-${pkgver}
 
-  case "$CARCH" in
-    "aarch64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "armv7h")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "x86_64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "i686")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-  esac
-
   CFLAGS+=' -ffat-lto-objects'
   CXXFLAGS+=' -ffat-lto-objects'
 
   cmake -S build/cmake -B build -G Ninja \
     -DCMAKE_BUILD_TYPE=None \
-    -DCMAKE_INSTALL_PREFIX=/data/data/com.termux/files/usr/glibc \
+    -DCMAKE_INSTALL_PREFIX=$GLIBC_PREFIX \
     -DZSTD_ZLIB_SUPPORT=ON \
     -DZSTD_LZMA_SUPPORT=ON \
     -DZSTD_LZ4_SUPPORT=ON \
@@ -62,7 +43,7 @@ build() {
 package() {
   cd zstd-${pkgver}
   DESTDIR="${pkgdir}" cmake --install build
-  install -Dm 644 LICENSE -t "${pkgdir}/data/data/com.termux/files/usr/glibc/share/licenses/${pkgname}"
+  install -Dm 644 LICENSE -t "${pkgdir}/$GLIBC_PREFIX/share/licenses/${pkgname}"
 }
 
 # vim: ts=2 sw=2 et:

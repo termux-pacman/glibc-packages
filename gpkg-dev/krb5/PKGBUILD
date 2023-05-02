@@ -34,31 +34,12 @@ prepare() {
 build() {
    cd krb5-${pkgver}/src
 
-   case "$CARCH" in
-      "aarch64")
-         CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-         CXXFLAGS="${CFLAGS}"
-         ;;
-      "armv7h")
-         CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
-         CXXFLAGS="${CFLAGS}"
-         ;;
-      "x86_64")
-         CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
-         CXXFLAGS="${CFLAGS}"
-         ;;
-      "i686")
-         CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
-         CXXFLAGS="${CFLAGS}"
-         ;;
-   esac
-
    export CFLAGS+=" -fPIC -fno-strict-aliasing -fstack-protector-all"
    export CPPFLAGS+=" -I/usr/include/et"
-   ./configure --prefix=/data/data/com.termux/files/usr/glibc \
-               --sbindir=/data/data/com.termux/files/usr/glibc/bin \
-               --sysconfdir=/data/data/com.termux/files/usr/glibc/etc \
-               --localstatedir=/data/data/com.termux/files/usr/glibc/var/lib \
+   ./configure --prefix=$GLIBC_PREFIX \
+               --sbindir=$GLIBC_PREFIX/bin \
+               --sysconfdir=$GLIBC_PREFIX/etc \
+               --localstatedir=$GLIBC_PREFIX/var/lib \
                --enable-shared \
                --with-system-et \
                --with-system-ss \
@@ -72,19 +53,19 @@ build() {
 
 package() {
    cd krb5-${pkgver}/src
-   make DESTDIR="${pkgdir}" EXAMPLEDIR=/data/data/com.termux/files/usr/glibc/share/doc/${pkgname}/examples install
+   make DESTDIR="${pkgdir}" EXAMPLEDIR=$GLIBC_PREFIX/share/doc/${pkgname}/examples install
 
    # Fix FS#29889
    install -m 644 plugins/kdb/ldap/libkdb_ldap/kerberos.{ldif,schema} \
-     "${pkgdir}/data/data/com.termux/files/usr/glibc/share/doc/${pkgname}/examples"
+     "${pkgdir}/$GLIBC_PREFIX/share/doc/${pkgname}/examples"
 
-   install -Dpm 644 config-files/krb5.conf -t "${pkgdir}/data/data/com.termux/files/usr/glibc/etc"
-   install -Dpm 644 config-files/kdc.conf -t "${pkgdir}/data/data/com.termux/files/usr/glibc/var/lib/krb5kdc"
+   install -Dpm 644 config-files/krb5.conf -t "${pkgdir}/$GLIBC_PREFIX/etc"
+   install -Dpm 644 config-files/kdc.conf -t "${pkgdir}/$GLIBC_PREFIX/var/lib/krb5kdc"
 
-   install -Dm 644 util/ac_check_krb5.m4 -t "${pkgdir}/data/data/com.termux/files/usr/glibc/share/aclocal"
+   install -Dm 644 util/ac_check_krb5.m4 -t "${pkgdir}/$GLIBC_PREFIX/share/aclocal"
 
    install -Dm 644 "${srcdir}"/krb5-${pkgver}/NOTICE \
-     "${pkgdir}/data/data/com.termux/files/usr/glibc/share/licenses/${pkgname}/LICENSE"
+     "${pkgdir}/$GLIBC_PREFIX/share/licenses/${pkgname}/LICENSE"
 }
 
 # vim: ts=2 sw=2 et:

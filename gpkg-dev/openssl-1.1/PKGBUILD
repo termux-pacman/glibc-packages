@@ -28,28 +28,22 @@ prepare() {
 build() {
 	cd "$srcdir/$_pkgname-$_ver"
 
-	CFLAGS+=" -Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib"
 	if [ "${CARCH}" = "armv7h" ]; then
 		openssltarget='linux-armv4'
 		optflags=''
-		CFLAGS+=" -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
 	elif [ "${CARCH}" = "aarch64" ]; then
 		openssltarget='linux-aarch64'
 		optflags='no-afalgeng'
-		CFLAGS+=" -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
 	elif [ "${CARCH}" = "x86_64" ]; then
 		openssltarget='linux-x86_64'
 		optflags='enable-ec_nistp_64_gcc_128'
-		CFLAGS+=" -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
 	elif [ "${CARCH}" = "i686" ]; then
 		openssltarget='linux-generic32'
 		optflags='no-sse2'
-		CFLAGS+=" -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
 	fi
-	CXXFLAGS="${CFLAGS}"
 
 	# mark stack as non-executable: http://bugs.archlinux.org/task/12434
-	./Configure --prefix=/data/data/com.termux/files/usr/glibc --openssldir=/data/data/com.termux/files/usr/glibc/etc/ssl --libdir=lib/openssl-1.1 \
+	./Configure --prefix=$GLIBC_PREFIX --openssldir=$GLIBC_PREFIX/etc/ssl --libdir=lib/openssl-1.1 \
 		shared no-ssl3-method ${optflags} "${openssltarget}" \
 		"-Wa,--noexecstack ${CPPFLAGS} ${CFLAGS} ${LDFLAGS}"
 
@@ -63,18 +57,18 @@ package() {
 	make DESTDIR="$pkgdir" install_sw
 
 	# Move some files around
-	install -m755 -d "$pkgdir/data/data/com.termux/files/usr/glibc/include/openssl-1.1"
-	mv "$pkgdir/data/data/com.termux/files/usr/glibc/include/openssl" "$pkgdir/data/data/com.termux/files/usr/glibc/include/openssl-1.1/"
-	mv "$pkgdir/data/data/com.termux/files/usr/glibc/lib/openssl-1.1/libcrypto.so.1.1" "$pkgdir/data/data/com.termux/files/usr/glibc/lib/"
-	mv "$pkgdir/data/data/com.termux/files/usr/glibc/lib/openssl-1.1/libssl.so.1.1" "$pkgdir/data/data/com.termux/files/usr/glibc/lib/"
-	ln -sf ../libssl.so.1.1 "$pkgdir/data/data/com.termux/files/usr/glibc/lib/openssl-1.1/libssl.so"
-    ln -sf ../libcrypto.so.1.1 "$pkgdir/data/data/com.termux/files/usr/glibc/lib/openssl-1.1/libcrypto.so"
-	mv "$pkgdir/data/data/com.termux/files/usr/glibc/bin/openssl" "$pkgdir/data/data/com.termux/files/usr/glibc/bin/openssl-1.1"
+	install -m755 -d "$pkgdir/$GLIBC_PREFIX/include/openssl-1.1"
+	mv "$pkgdir/$GLIBC_PREFIX/include/openssl" "$pkgdir/$GLIBC_PREFIX/include/openssl-1.1/"
+	mv "$pkgdir/$GLIBC_PREFIX/lib/openssl-1.1/libcrypto.so.1.1" "$pkgdir/$GLIBC_PREFIX/lib/"
+	mv "$pkgdir/$GLIBC_PREFIX/lib/openssl-1.1/libssl.so.1.1" "$pkgdir/$GLIBC_PREFIX/lib/"
+	ln -sf ../libssl.so.1.1 "$pkgdir/$GLIBC_PREFIX/lib/openssl-1.1/libssl.so"
+	ln -sf ../libcrypto.so.1.1 "$pkgdir/$GLIBC_PREFIX/lib/openssl-1.1/libcrypto.so"
+	mv "$pkgdir/$GLIBC_PREFIX/bin/openssl" "$pkgdir/$GLIBC_PREFIX/bin/openssl-1.1"
 
 	# Update includedir in .pc files
-	sed -e 's|/include$|/include/openssl-1.1|' -i "$pkgdir"/data/data/com.termux/files/usr/glibc/lib/openssl-1.1/pkgconfig/*.pc
+	sed -e 's|/include$|/include/openssl-1.1|' -i "$pkgdir"/$GLIBC_PREFIX/lib/openssl-1.1/pkgconfig/*.pc
 
-	rm -rf "$pkgdir"/data/data/com.termux/files/usr/glibc/{etc,bin/c_rehash}
+	rm -rf "$pkgdir"/$GLIBC_PREFIX/{etc,bin/c_rehash}
 
-	install -D -m644 LICENSE "$pkgdir/data/data/com.termux/files/usr/glibc/share/licenses/$pkgname/LICENSE"
+	install -D -m644 LICENSE "$pkgdir/$GLIBC_PREFIX/share/licenses/$pkgname/LICENSE"
 }

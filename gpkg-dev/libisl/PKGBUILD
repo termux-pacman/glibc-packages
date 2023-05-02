@@ -15,7 +15,7 @@ groups=('gpkg-dev')
 
 build() {
   cd "${srcdir}"/isl-${pkgver}
-  ./configure --prefix=/data/data/com.termux/files/usr/glibc
+  ./configure --prefix=$GLIBC_PREFIX
   make
 }
 
@@ -24,8 +24,8 @@ package() {
 
   make DESTDIR="${pkgdir}" install
 
-  install -dm755 "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/gdb/auto-load/usr/lib/
-  mv "${pkgdir}"/data/data/com.termux/files/usr/glibc/lib/libisl.so.*-gdb.py "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/gdb/auto-load/usr/lib/
+  install -dm755 "${pkgdir}"/$GLIBC_PREFIX/share/gdb/auto-load/usr/lib/
+  mv "${pkgdir}"/$GLIBC_PREFIX/lib/libisl.so.*-gdb.py "${pkgdir}"/$GLIBC_PREFIX/share/gdb/auto-load/usr/lib/
   
-  install -Dm644 LICENSE "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/licenses/isl/LICENSE
+  install -Dm644 LICENSE "${pkgdir}"/$GLIBC_PREFIX/share/licenses/isl/LICENSE
 }

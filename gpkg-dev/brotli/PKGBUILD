@@ -27,29 +27,10 @@ pkgver() {
 build() {
   cd brotli
 
-  case "$CARCH" in
-    "aarch64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "armv7h")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "x86_64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "i686")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-  esac
-
   python setup.py build
   cmake -B build \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=/data/data/com.termux/files/usr/glibc \
+    -DCMAKE_INSTALL_PREFIX=$GLIBC_PREFIX \
     -DCMAKE_INSTALL_LIBDIR=lib \
     -DBUILD_SHARED_LIBS=True \
     -DCMAKE_C_FLAGS="$CFLAGS -ffat-lto-objects"
@@ -61,7 +42,7 @@ package() {
   DESTDIR="$pkgdir" cmake --install build
   local man;
   for man in docs/*.?; do
-    install -Dm 644 "$man" "$pkgdir/data/data/com.termux/files/usr/glibc/share/man/man${man##*.}/${man##*/}"
+    install -Dm 644 "$man" "$pkgdir/$GLIBC_PREFIX/share/man/man${man##*.}/${man##*/}"
   done
-  install -Dm 644 LICENSE -t "$pkgdir/data/data/com.termux/files/usr/glibc/share/licenses/$pkgname"
+  install -Dm 644 LICENSE -t "$pkgdir/$GLIBC_PREFIX/share/licenses/$pkgname"
 }

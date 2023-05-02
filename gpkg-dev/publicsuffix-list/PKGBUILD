@@ -22,9 +22,9 @@ pkgver() {
 
 package() {
   cd ${pkgname}
-  install -Dm 644 public_suffix_list.dat tests/test_psl.txt -t "${pkgdir}/data/data/com.termux/files/usr/glibc/share/publicsuffix"
-  ln -s public_suffix_list.dat "${pkgdir}/data/data/com.termux/files/usr/glibc/share/publicsuffix/effective_tld_names.dat"
-  install -Dm 644 LICENSE -t "${pkgdir}/data/data/com.termux/files/usr/glibc/share/licenses/${pkgname}"
+  install -Dm 644 public_suffix_list.dat tests/test_psl.txt -t "${pkgdir}/$GLIBC_PREFIX/share/publicsuffix"
+  ln -s public_suffix_list.dat "${pkgdir}/$GLIBC_PREFIX/share/publicsuffix/effective_tld_names.dat"
+  install -Dm 644 LICENSE -t "${pkgdir}/$GLIBC_PREFIX/share/licenses/${pkgname}"
 }
 
 # vim: ts=2 sw=2 et:

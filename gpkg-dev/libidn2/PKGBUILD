@@ -16,27 +16,8 @@ groups=('gpkg-dev')
 build() {
   cd libidn2-$pkgver
 
-  case "$CARCH" in
-    "aarch64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "armv7h")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "x86_64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "i686")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-  esac
-
   ./configure \
-    --prefix=/data/data/com.termux/files/usr/glibc \
+    --prefix=$GLIBC_PREFIX \
     --disable-static
   make
 }
@@ -44,7 +25,7 @@ build() {
 package() {
   cd libidn2-$pkgver
   make DESTDIR="$pkgdir" install
-  rm -f "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/info/dir
+  rm -f "${pkgdir}"/$GLIBC_PREFIX/share/info/dir
 }
 
 # vim:set ts=2 sw=2 et:

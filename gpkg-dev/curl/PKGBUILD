@@ -14,8 +14,8 @@ sha512sums=('87d945e65176613c6296f8b130bd6c5355e3ca3c62ee4010edd481950cad9760482
 groups=('gpkg-dev')
 
 _configure_options=(
-  --prefix='/data/data/com.termux/files/usr/glibc'
-  --mandir='/data/data/com.termux/files/usr/glibc/share/man'
+  --prefix="$GLIBC_PREFIX"
+  --mandir="$GLIBC_PREFIX/share/man"
   --disable-ldap
   --disable-ldaps
   --disable-manual
@@ -24,7 +24,7 @@ _configure_options=(
   --with-openssl
   --with-gssapi
   --with-random='/dev/urandom'
-  --with-ca-bundle='/data/data/com.termux/files/usr/glibc/etc/ssl/certs/ca-certificates.crt'
+  --with-ca-bundle="$GLIBC_PREFIX/etc/ssl/certs/ca-certificates.crt"
 )
 
 prepare() {
@@ -38,25 +38,6 @@ build() {
 
   # build curl
   cd "${srcdir}"/build-curl
-
-  case "$CARCH" in
-    "aarch64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "armv7h")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "x86_64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "i686")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-  esac
 
   "${srcdir}/${pkgbase}-${pkgver}"/configure \
     "${_configure_options[@]}" \
@@ -83,7 +64,7 @@ package_curl-glibc() {
   cd "${srcdir}/curl-${pkgver}"
 
   # license
-  install -Dt "${pkgdir}/data/data/com.termux/files/usr/glibc/share/licenses/curl" -m0644 COPYING
+  install -Dt "${pkgdir}/$GLIBC_PREFIX/share/licenses/curl" -m0644 COPYING
 }
 
 package_libcurl-compat-glibc() {
@@ -93,12 +74,12 @@ package_libcurl-compat-glibc() {
 
   make -C lib DESTDIR="${pkgdir}" install
 
-  mv "${pkgdir}"/data/data/com.termux/files/usr/glibc/lib/libcurl{,-compat}.so.4.8.0
-  rm "${pkgdir}"/data/data/com.termux/files/usr/glibc/lib/libcurl.{a,so}*
+  mv "${pkgdir}"/$GLIBC_PREFIX/lib/libcurl{,-compat}.so.4.8.0
+  rm "${pkgdir}"/$GLIBC_PREFIX/lib/libcurl.{a,so}*
   for version in 3 4.0.0 4.1.0 4.2.0 4.3.0 4.4.0 4.5.0 4.6.0 4.7.0; do
-    ln -s libcurl-compat.so.4.8.0 "${pkgdir}"/data/data/com.termux/files/usr/glibc/lib/libcurl.so.${version}
+    ln -s libcurl-compat.so.4.8.0 "${pkgdir}"/$GLIBC_PREFIX/lib/libcurl.so.${version}
   done
 
-  install -dm 0755 "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/licenses
-  ln -s curl "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/licenses/libcurl-compat
+  install -dm 0755 "${pkgdir}"/$GLIBC_PREFIX/share/licenses
+  ln -s curl "${pkgdir}"/$GLIBC_PREFIX/share/licenses/libcurl-compat
 }

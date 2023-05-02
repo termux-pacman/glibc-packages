@@ -14,14 +14,14 @@ groups=('gpkg-dev')
 
 build() {
   cd "${srcdir}/mpc-${pkgver}"
-  ./configure --prefix=/data/data/com.termux/files/usr/glibc
+  ./configure --prefix=$GLIBC_PREFIX
   make
 }
 
 package() {
   cd "${srcdir}/mpc-${pkgver}"
   make DESTDIR="${pkgdir}" install
-  mv "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/info/{mpc,libmpc}.info
-  rm "$pkgdir"/data/data/com.termux/files/usr/glibc/share/info/dir
+  mv "${pkgdir}"/$GLIBC_PREFIX/share/info/{mpc,libmpc}.info
+  rm "$pkgdir"/$GLIBC_PREFIX/share/info/dir
 }
 

@@ -23,14 +23,14 @@ build() {
 	cd "${srcdir}/zlib-$pkgver"
 
 	CFLAGS+=" -ffat-lto-objects"
-	./configure --prefix=/data/data/com.termux/files/usr/glibc
+	./configure --prefix=$GLIBC_PREFIX
 	make
 
 	cd contrib/minizip
 	cp Makefile Makefile.orig
 	cp ../README.contrib readme.txt
 	autoreconf --install
-	./configure --prefix=/data/data/com.termux/files/usr/glibc --enable-static=no
+	./configure --prefix=$GLIBC_PREFIX --enable-static=no
 	make
 }
 
@@ -39,7 +39,7 @@ package_zlib-glibc() {
 
 	cd "${srcdir}/zlib-$pkgver"
 	make install DESTDIR="${pkgdir}"
-	install -D -m644 LICENSE "${pkgdir}/data/data/com.termux/files/usr/glibc/share/licenses/zlib/LICENSE"
+	install -D -m644 LICENSE "${pkgdir}/$GLIBC_PREFIX/share/licenses/zlib/LICENSE"
 }
 
 package_minizip-glibc() {
@@ -47,9 +47,9 @@ package_minizip-glibc() {
 
 	cd "${srcdir}/zlib-$pkgver/contrib/minizip"
 	make install DESTDIR="${pkgdir}"
-	install -D -m644 "${srcdir}/zlib-$pkgver/LICENSE" "${pkgdir}/data/data/com.termux/files/usr/glibc/share/licenses/minizip/LICENSE"
+	install -D -m644 "${srcdir}/zlib-$pkgver/LICENSE" "${pkgdir}/$GLIBC_PREFIX/share/licenses/minizip/LICENSE"
 
 	# https://github.com/madler/zlib/pull/229
-	rm "${pkgdir}/data/data/com.termux/files/usr/glibc/include/minizip/crypt.h"
+	rm "${pkgdir}/$GLIBC_PREFIX/include/minizip/crypt.h"
 }
 

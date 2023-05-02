@@ -34,34 +34,15 @@ prepare() {
 build() {
   cd keyutils
 
-  case "$CARCH" in
-    "aarch64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "armv7h")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "x86_64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "i686")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-  esac
-
   make CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" \
-    SBINDIR='/data/data/com.termux/files/usr/glibc/bin' \
-    BINDIR='/data/data/com.termux/files/usr/glibc/bin'
+    SBINDIR="$GLIBC_PREFIX/bin" \
+    BINDIR="$GLIBC_PREFIX/bin"
 }
 
 package() {
   cd keyutils
-  mkdir -p "${pkgdir}/data/data/com.termux/files/usr/glibc"
-  make DESTDIR="${pkgdir}/data/data/com.termux/files/usr/glibc" \
+  mkdir -p "${pkgdir}/$GLIBC_PREFIX"
+  make DESTDIR="${pkgdir}/$GLIBC_PREFIX" \
     SBINDIR='/bin' \
     BINDIR='/bin' \
     LIBDIR='/lib' \

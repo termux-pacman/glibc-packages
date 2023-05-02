@@ -23,41 +23,22 @@ prepare() {
 build() {
   cd libpsl-${pkgver}
 
-  case "$CARCH" in
-    "aarch64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "armv7h")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "x86_64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "i686")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-  esac
-
   ./configure \
-    --prefix=/data/data/com.termux/files/usr/glibc \
+    --prefix=$GLIBC_PREFIX \
     --disable-static \
     --disable-dependency-tracking \
     --enable-man \
     --enable-gtk-doc \
     --enable-{builtin,runtime}=libidn2 \
-    --with-psl-file=/data/data/com.termux/files/usr/glibc/share/publicsuffix/effective_tld_names.dat \
-    --with-psl-testfile=/data/data/com.termux/files/usr/glibc/share/publicsuffix/test_psl.txt
+    --with-psl-file=$GLIBC_PREFIX/share/publicsuffix/effective_tld_names.dat \
+    --with-psl-testfile=$GLIBC_PREFIX/share/publicsuffix/test_psl.txt
   LC_CTYPE=en_US.UTF-8 make
 }
 
 package() {
   cd libpsl-${pkgver}
   make DESTDIR="${pkgdir}" install
-  install -Dm 644 COPYING -t "${pkgdir}/data/data/com.termux/files/usr/glibc/share/licenses/${pkgname}"
+  install -Dm 644 COPYING -t "${pkgdir}/$GLIBC_PREFIX/share/licenses/${pkgname}"
 }
 
 # vim: ts=2 sw=2 et:

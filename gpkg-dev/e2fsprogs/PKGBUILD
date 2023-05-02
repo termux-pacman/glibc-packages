@@ -24,33 +24,14 @@ prepare() {
 build() {
   cd "${srcdir}/e2fsprogs-${pkgver}"
 
-  case "$CARCH" in
-    "aarch64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "armv7h")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "x86_64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "i686")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-  esac
-
   ./configure \
-      --prefix=/data/data/com.termux/files/usr/glibc \
+      --prefix=$GLIBC_PREFIX \
       --with-root-prefix='' \
-      --libdir=/data/data/com.termux/files/usr/glibc/lib \
-      --sbindir=/data/data/com.termux/files/usr/glibc/bin \
-      --sysconfdir=/data/data/com.termux/files/usr/glibc/etc \
-      --with-systemd-unit-dir=/data/data/com.termux/files/usr/glibc/lib/systemd \
-      --with-udev-rules-dir=/data/data/com.termux/files/usr/glibc/lib/udev \
+      --libdir=$GLIBC_PREFIX/lib \
+      --sbindir=$GLIBC_PREFIX/bin \
+      --sysconfdir=$GLIBC_PREFIX/etc \
+      --with-systemd-unit-dir=$GLIBC_PREFIX/lib/systemd \
+      --with-udev-rules-dir=$GLIBC_PREFIX/lib/udev \
       --enable-elf-shlibs \
       --disable-fsck \
       --disable-uuidd \
@@ -68,8 +49,6 @@ package() {
             'libe2p.so'
             'libext2fs.so'
             'libss.so')
-  backup=('etc/mke2fs.conf'
-          'etc/e2scrub.conf')
 
   unset MAKEFLAGS
 
@@ -77,16 +56,16 @@ package() {
 
   make DESTDIR="${pkgdir}" install install-libs
 
-  sed -i -e 's/^AWK=.*/AWK=awk/' "${pkgdir}/data/data/com.termux/files/usr/glibc/bin/compile_et"
+  sed -i -e 's/^AWK=.*/AWK=awk/' "${pkgdir}/$GLIBC_PREFIX/bin/compile_et"
 
   # remove references to build directory
-  sed -i -e 's#^DIR=.*#DIR="/data/data/com.termux/files/usr/glibc/share/ss"#' "${pkgdir}/data/data/com.termux/files/usr/glibc/bin/mk_cmds"
-  sed -i -e 's#^DIR=.*#DIR="/data/data/com.termux/files/usr/glibc/share/et"#' "${pkgdir}/data/data/com.termux/files/usr/glibc/bin/compile_et"
+  sed -i -e 's#^DIR=.*#DIR="$GLIBC_PREFIX/share/ss"#' "${pkgdir}/$GLIBC_PREFIX/bin/mk_cmds"
+  sed -i -e 's#^DIR=.*#DIR="$GLIBC_PREFIX/share/et"#' "${pkgdir}/$GLIBC_PREFIX/bin/compile_et"
 
   # remove static libraries with a shared counterpart
-  rm "${pkgdir}"/data/data/com.termux/files/usr/glibc/lib/lib{com_err,e2p,ext2fs,ss}.a
+  rm "${pkgdir}"/$GLIBC_PREFIX/lib/lib{com_err,e2p,ext2fs,ss}.a
 
   # install MIT license
   install -D -m0644 "${srcdir}/MIT-LICENSE" \
-    "${pkgdir}/data/data/com.termux/files/usr/glibc/share/licenses/${pkgname}/MIT-LICENSE"
+    "${pkgdir}/$GLIBC_PREFIX/share/licenses/${pkgname}/MIT-LICENSE"
 }
