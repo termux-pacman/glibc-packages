@@ -5,7 +5,7 @@ set -e
 # adding configuration
 . $(dirname "$(realpath "$0")")/init.sh
 . $(dirname "$(realpath "$0")")/set_flags.sh
-. $(dirname "$(realpath "$0")")/functions/get-name.sh
+. $(dirname "$(realpath "$0")")/functions/get_name.sh
 
 pkgname="$1"
 
@@ -57,11 +57,11 @@ fi
 
 	# start building
 	if [ ! -f src.tar.gz ]; then
-		sudo -H -u ${GPKG_DEV_USER_NAME} bash -c "makepkg -o"
+		sudo -Es -H -u ${GPKG_DEV_USER_NAME} bash -c "makepkg -o"
 	else
 		sudo -H -u ${GPKG_DEV_USER_NAME} bash -c "tar xf src.tar.gz"
 	fi
-	sudo -H -u ${GPKG_DEV_USER_NAME} bash -c '(timeout --preserve-status 300m makepkg -e --noarchive && ([ "$?" = "0" ] && makepkg -R)) || ([ "$?" = "143" ] && true)'
+	sudo -Es -H -u ${GPKG_DEV_USER_NAME} bash -c '(timeout --preserve-status 300m makepkg -e --noarchive && ([ "$?" = "0" ] && makepkg -R)) || ([ "$?" = "143" ] && true)'
 
 	if $(ls *.pkg.* &> /dev/null); then
 		mv *.pkg.* ${GPKG_DEV_DIR_BUILD}

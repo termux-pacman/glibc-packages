@@ -11,10 +11,10 @@ esac
 
 # adding flags to makepkg.conf
 if ! $(is_termux) && [ -f /etc/makepkg.conf ]; then
-	if ! $(grep CFLAGS /etc/makepkg.conf | grep -q "$FLAGS"); then
+	if ! $(grep CFLAGS /etc/makepkg.conf | grep -q -e "$FLAGS"); then
 		echo 'CFLAGS="$CFLAGS '$FLAGS'"' >> /etc/makepkg.conf
 	fi
-	if ! $(grep CXXFLAGS /etc/makepkg.conf | grep -q "$FLAGS"); then
+	if ! $(grep CXXFLAGS /etc/makepkg.conf | grep -q -e "$FLAGS"); then
 		echo 'CXXFLAGS="$CXXFLAGS '$FLAGS'"' >> /etc/makepkg.conf
 	fi
 fi
