@@ -74,16 +74,16 @@ prepare() {
 
 build() {
   cd glibc-build
-  echo "slibdir=/data/data/com.termux/files/usr/glibc/lib" > configparms
-  echo "rtlddir=/data/data/com.termux/files/usr/glibc/lib" >> configparms
-  echo "sbindir=/data/data/com.termux/files/usr/glibc/bin" >> configparms
-  echo "rootsbindir=/data/data/com.termux/files/usr/glibc/bin" >> configparms
+  echo "slibdir=$GLIBC_PREFIX/lib" > configparms
+  echo "rtlddir=$GLIBC_PREFIX/lib" >> configparms
+  echo "sbindir=$GLIBC_PREFIX/bin" >> configparms
+  echo "rootsbindir=$GLIBC_PREFIX/bin" >> configparms
 
   unset CFLAGS
   ../glibc-$pkgver/configure \
-      --prefix=/data/data/com.termux/files/usr/glibc \
-      --libdir=/data/data/com.termux/files/usr/glibc/lib \
-      --libexecdir=/data/data/com.termux/files/usr/glibc/lib \
+      --prefix=$GLIBC_PREFIX \
+      --libdir=$GLIBC_PREFIX/lib \
+      --libexecdir=$GLIBC_PREFIX/lib \
       --with-bugurl=https://github.com/termux-pacman/glibc-packages/issues \
       --enable-bind-now \
       --enable-cet \
@@ -106,44 +106,40 @@ build() {
 }
 
 package() {
-  backup=(data/data/com.termux/files/usr/glibc/etc/gai.conf
-          data/data/com.termux/files/usr/glibc/etc/locale.gen
-          data/data/com.termux/files/usr/glibc/etc/nscd.conf)
-
   make -C glibc-build install_root="$pkgdir" install
-  rm -f "$pkgdir"/data/data/com.termux/files/usr/glibc/etc/ld.so.{cache,conf}
+  rm -f "$pkgdir"/$GLIBC_PREFIX/etc/ld.so.{cache,conf}
 
   # Shipped in tzdata
-  rm -f "$pkgdir"/usr/bin/{tzselect,zdump,zic}
+  rm -f "$pkgdir"/$GLIBC_PREFIX/bin/{tzselect,zdump,zic}
 
   cd glibc
 
-  install -dm755 "$pkgdir"/data/data/com.termux/files/usr/glibc/lib/{locale,systemd/system,tmpfiles.d}
-  install -m644 nscd/nscd.conf "$pkgdir/data/data/com.termux/files/usr/glibc/etc/nscd.conf"
-  install -m644 nscd/nscd.service "$pkgdir/data/data/com.termux/files/usr/glibc/lib/systemd/system"
-  install -m644 nscd/nscd.tmpfiles "$pkgdir/data/data/com.termux/files/usr/glibc/lib/tmpfiles.d/nscd.conf"
-  install -dm755 "$pkgdir/data/data/com.termux/files/usr/glibc/var/db/nscd"
+  install -dm755 "$pkgdir"/$GLIBC_PREFIX/lib/{locale,systemd/system,tmpfiles.d}
+  install -m644 nscd/nscd.conf "$pkgdir/$GLIBC_PREFIX/etc/nscd.conf"
+  install -m644 nscd/nscd.service "$pkgdir/$GLIBC_PREFIX/lib/systemd/system"
+  install -m644 nscd/nscd.tmpfiles "$pkgdir/$GLIBC_PREFIX/lib/tmpfiles.d/nscd.conf"
+  install -dm755 "$pkgdir/$GLIBC_PREFIX/var/db/nscd"
 
-  install -m644 posix/gai.conf "$pkgdir"/data/data/com.termux/files/usr/glibc/etc/gai.conf
+  install -m644 posix/gai.conf "$pkgdir"/$GLIBC_PREFIX/etc/gai.conf
 
-  install -m755 "$srcdir/locale-gen" "$pkgdir/data/data/com.termux/files/usr/glibc/bin"
+  install -m755 "$srcdir/locale-gen" "$pkgdir/$GLIBC_PREFIX/bin"
 
   # Create /etc/locale.gen
-  install -m644 "$srcdir/locale.gen.txt" "$pkgdir/data/data/com.termux/files/usr/glibc/etc/locale.gen"
+  install -m644 "$srcdir/locale.gen.txt" "$pkgdir/$GLIBC_PREFIX/etc/locale.gen"
   sed -e '1,3d' -e 's|/| |g' -e 's|\\| |g' -e 's|^|#|g' \
-    "$srcdir/glibc/localedata/SUPPORTED" >> "$pkgdir/data/data/com.termux/files/usr/glibc/etc/locale.gen"
+    "$srcdir/glibc/localedata/SUPPORTED" >> "$pkgdir/$GLIBC_PREFIX/etc/locale.gen"
 
   # install C.UTF-8 so that it is always available
-  install -dm755 "$pkgdir/data/data/com.termux/files/usr/glibc/lib/locale"
-  cp -r "$srcdir/C.UTF-8" -t "$pkgdir/data/data/com.termux/files/usr/glibc/lib/locale"
-  sed -i '/#C\.UTF-8 /d' "$pkgdir/data/data/com.termux/files/usr/glibc/etc/locale.gen"
+  install -dm755 "$pkgdir/$GLIBC_PREFIX/lib/locale"
+  cp -r "$srcdir/C.UTF-8" -t "$pkgdir/$GLIBC_PREFIX/lib/locale"
+  sed -i '/#C\.UTF-8 /d' "$pkgdir/$GLIBC_PREFIX/etc/locale.gen"
 
   # Provide tracing probes to libstdc++ for exceptions, possibly for other
   # libraries too. Useful for gdb's catch command.
-  install -Dm644 "$srcdir/sdt.h" "$pkgdir/data/data/com.termux/files/usr/glibc/include/sys/sdt.h"
-  install -Dm644 "$srcdir/sdt-config.h" "$pkgdir/data/data/com.termux/files/usr/glibc/include/sys/sdt-config.h"
+  install -Dm644 "$srcdir/sdt.h" "$pkgdir/$GLIBC_PREFIX/include/sys/sdt.h"
+  install -Dm644 "$srcdir/sdt-config.h" "$pkgdir/$GLIBC_PREFIX/include/sys/sdt-config.h"
 
-  sed -i 's|!/bin/bash|!/data/data/com.termux/files/usr/bin/bash|' "$pkgdir"/data/data/com.termux/files/usr/glibc/bin/*
-  mkdir -p "$pkgdir"/data/data/com.termux/files/usr/bin
-  install -m755 "$srcdir/grun" "$pkgdir/data/data/com.termux/files/usr/bin"
+  sed -i "s|!/bin/bash|!$TERMUX_PREFIX/bin/bash|" "$pkgdir"/$GLIBC_PREFIX/bin/*
+  mkdir -p "$pkgdir"/$TERMUX_PREFIX/bin
+  install -m755 "$srcdir/grun" "$pkgdir/$TERMUX_PREFIX/bin"
 }

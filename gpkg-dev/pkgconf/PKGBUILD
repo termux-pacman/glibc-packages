@@ -24,37 +24,18 @@ prepare() {
 }
 
 build() {
-  case "$CARCH" in
-    "aarch64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "armv7h")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "x86_64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "i686")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-  esac
-
-  meson pkgconf build -D tests=false --prefix=/data/data/com.termux/files/usr/glibc
+  meson pkgconf build -D tests=false --prefix=$GLIBC_PREFIX
   meson compile -C build
 }
 
 package() {
   meson install -C build --destdir "$pkgdir"
 
-  ln -s pkgconf "$pkgdir/data/data/com.termux/files/usr/glibc/bin/pkg-config"
+  ln -s pkgconf "$pkgdir/$GLIBC_PREFIX/bin/pkg-config"
 
-  ln -s pkgconf.1 "$pkgdir/data/data/com.termux/files/usr/glibc/share/man/man1/pkg-config.1"
+  ln -s pkgconf.1 "$pkgdir/$GLIBC_PREFIX/share/man/man1/pkg-config.1"
 
-  install -Dt "$pkgdir/data/data/com.termux/files/usr/glibc/share/licenses/pkgconf" -m644 pkgconf/COPYING
+  install -Dt "$pkgdir/$GLIBC_PREFIX/share/licenses/pkgconf" -m644 pkgconf/COPYING
 }
 
 # vim:set sw=2 et:

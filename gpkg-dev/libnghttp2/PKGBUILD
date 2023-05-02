@@ -17,7 +17,7 @@ build() {
 
   autoreconf -i
   ./configure \
-    --prefix=/data/data/com.termux/files/usr/glibc \
+    --prefix=$GLIBC_PREFIX \
     --disable-examples \
     --disable-python-bindings \
     --enable-lib-only
@@ -28,5 +28,5 @@ package() {
   cd nghttp2-$pkgver/lib
 
   make DESTDIR="$pkgdir" install
-  install -Dm644 ../COPYING "$pkgdir/data/data/com.termux/files/usr/glibc/share/licenses/libnghttp2/COPYING"
+  install -Dm644 ../COPYING "$pkgdir/$GLIBC_PREFIX/share/licenses/libnghttp2/COPYING"
 }

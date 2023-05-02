@@ -2,6 +2,8 @@
 
 # system definitions
 export LANG="en_US.UTF-8"
+export TERMUX_PREFIX="/data/data/com.termux/files/usr"
+export GLIBC_PREFIX="${TERMUX_PREFIX}/glibc"
 DIR_SOURCE="gpkg-dev"
 DIR_BUILD="pkgs"
 DIR_SCRIPT="script"
@@ -18,24 +20,13 @@ error() {
 	exit 1
 }
 
-chech_not_termux() {
-	if ([ -n "$TERMUX_APK_RELEASE" ] || \
-	[ -n "$TERMUX_APP_PID" ] || \
-	[ -n "$TERMUX_VERSION" ]) && \
-	[ $(uname -o) = "Android" ]; then
-		error "does not support running on termux"
-	fi
+is_termux() {
+	([ -n "$TERMUX_APK_RELEASE" ] || [ -n "$TERMUX_APP_PID" ] || [ -n "$TERMUX_VERSION" ]) && [ $(uname -o) = "Android" ]
+	return $?
 }
 
-get_name() {
-	local name=""
-	local file_sp=(${1//-/ })
-	for k in $(seq 0 $((${#file_sp[*]}-4))); do
-		if [ -z $name ]; then
-			name="${file_sp[k]}"
-		else
-			name+="-${file_sp[k]}"
-		fi
-	done
-	echo $name | sed 's/+/0/g'
+check_not_termux() {
+	if $(is_termux); then
+		error "does not support running on termux"
+	fi
 }

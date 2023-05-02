@@ -4,10 +4,12 @@ set -e
 
 # adding configuration
 . $(dirname "$(realpath "$0")")/init.sh
+. $(dirname "$(realpath "$0")")/set_flags.sh
+. $(dirname "$(realpath "$0")")/functions/get-name.sh
 
 pkgname="$1"
 
-chech_not_termux
+check_not_termux
 
 if [ -z "$pkgname" ]; then
 	error "no package name specified"
