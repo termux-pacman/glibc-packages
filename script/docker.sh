@@ -9,7 +9,7 @@ set -e
 arch="$1"
 command="$@"
 
-chech_not_termux
+check_not_termux
 
 # checking and setting arch value
 case $arch in

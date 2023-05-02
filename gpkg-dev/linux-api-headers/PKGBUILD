@@ -24,7 +24,7 @@ build() {
 
 package() {
   cd linux-$pkgver
-  make INSTALL_HDR_PATH="$pkgdir/data/data/com.termux/files/usr/glibc" headers_install
+  make INSTALL_HDR_PATH="$pkgdir/$GLIBC_PREFIX" headers_install
   # use headers from libdrm
-  rm -r "$pkgdir/data/data/com.termux/files/usr/glibc/include/drm"
+  rm -r "$pkgdir/$GLIBC_PREFIX/include/drm"
 }

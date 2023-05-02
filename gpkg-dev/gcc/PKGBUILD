@@ -44,31 +44,17 @@ build() {
   CXXFLAGS=${CXXFLAGS/-Werror=format-security/}
 
   CONFIGFLAG=""
-  CFLAGS+=" -Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib"
   case "$CARCH" in
-    "aarch64")
-      CFLAGS+=" -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-      CONFIGFLAG="--with-arch=armv8-a --enable-fix-cortex-a53-835769 --enable-fix-cortex-a53-843419"
-      ;;
-    "armv7h")
-      CFLAGS+=" -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
-      CONFIGFLAG="--with-arch=armv7-a --with-float=hard --with-fpu=neon"
-      ;;
-    "x86_64")
-      CFLAGS+=" -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
-      ;;
-    "i686")
-      CFLAGS+=" -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
-      ;;
+    "aarch64") CONFIGFLAG="--with-arch=armv8-a --enable-fix-cortex-a53-835769 --enable-fix-cortex-a53-843419";;
+    "armv7h") CONFIGFLAG="--with-arch=armv7-a --with-float=hard --with-fpu=neon";;
   esac
-  CXXFLAGS="${CFLAGS}"
 
   "$srcdir"/$_basedir/configure \
-    --prefix=/data/data/com.termux/files/usr/glibc \
-    --libdir=/data/data/com.termux/files/usr/glibc/lib \
-    --libexecdir=/data/data/com.termux/files/usr/glibc/lib \
-    --mandir=/data/data/com.termux/files/usr/glibc/share/man \
-    --infodir=/data/data/com.termux/files/usr/glibc/share/info \
+    --prefix=$GLIBC_PREFIX \
+    --libdir=$GLIBC_PREFIX/lib \
+    --libexecdir=$GLIBC_PREFIX/lib \
+    --mandir=$GLIBC_PREFIX/share/man \
+    --infodir=$GLIBC_PREFIX/share/info \
     --with-bugurl=https://github.com/termux-pacman/glibc-packages/issues \
     --build=$CHOST \
     $CONFIGFLAG \
@@ -126,9 +112,9 @@ package_gcc-libs() {
 
   # Install Runtime Library Exception
   install -Dm644 "$srcdir/gcc-${pkgver}/COPYING.RUNTIME" \
-    "$pkgdir/data/data/com.termux/files/usr/glibc/share/licenses/gcc-libs/RUNTIME.LIBRARY.EXCEPTION"
+    "$pkgdir/$GLIBC_PREFIX/share/licenses/gcc-libs/RUNTIME.LIBRARY.EXCEPTION"
 
-  rm -f "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/info/dir
+  rm -f "${pkgdir}"/$GLIBC_PREFIX/glibc/share/info/dir
 }
 
 package_gcc-glibc() {
@@ -140,11 +126,11 @@ package_gcc-glibc() {
   make -C gcc DESTDIR="$pkgdir" install-driver install-cpp install-gcc-ar \
     c++.install-common install-headers install-plugin install-lto-wrapper
 
-  install -m755 -t "$pkgdir/data/data/com.termux/files/usr/glibc/bin/" gcc/gcov{,-tool}
+  install -m755 -t "$pkgdir/$GLIBC_PREFIX/bin/" gcc/gcov{,-tool}
   install -m755 -t "$pkgdir/${_libdir}/" gcc/{cc1,cc1plus,collect2,lto1}
 
   make -C $CHOST/libgcc DESTDIR="$pkgdir" install
-  rm -f "$pkgdir"/data/data/com.termux/files/usr/glibc/lib/libgcc_s.so*
+  rm -f "$pkgdir"/$GLIBC_PREFIX/lib/libgcc_s.so*
 
   make -C $CHOST/libstdc++-v3/src DESTDIR="$pkgdir" install
   make -C $CHOST/libstdc++-v3/include DESTDIR="$pkgdir" install
@@ -152,20 +138,20 @@ package_gcc-glibc() {
   make -C $CHOST/libstdc++-v3/python DESTDIR="$pkgdir" install
 
   make DESTDIR="$pkgdir" install-libcc1
-  if [ -f "$pkgdir"/data/data/com.termux/files/usr/glibc/lib/libstdc++.so.6.*-gdb.py ]; then
-    install -d "$pkgdir/data/data/com.termux/files/usr/glibc/share/gdb/auto-load/usr/lib"
-    mv "$pkgdir"/data/data/com.termux/files/usr/glibc/lib/libstdc++.so.6.*-gdb.py \
-      "$pkgdir/data/data/com.termux/files/usr/glibc/share/gdb/auto-load/usr/lib/"
+  if [ -f "$pkgdir"/$GLIBC_PREFIX/lib/libstdc++.so.6.*-gdb.py ]; then
+    install -d "$pkgdir/$GLIBC_PREFIX/share/gdb/auto-load/usr/lib"
+    mv "$pkgdir"/$GLIBC_PREFIX/lib/libstdc++.so.6.*-gdb.py \
+      "$pkgdir/$GLIBC_PREFIX/share/gdb/auto-load/usr/lib/"
   fi
-  rm "$pkgdir"/data/data/com.termux/files/usr/glibc/lib/libstdc++.so* || true
+  rm "$pkgdir"/$GLIBC_PREFIX/lib/libstdc++.so* || true
 
   make DESTDIR="$pkgdir" install-fixincludes
   make -C gcc DESTDIR="$pkgdir" install-mkheaders
 
   make -C lto-plugin DESTDIR="$pkgdir" install
-  install -dm755 "$pkgdir"/data/data/com.termux/files/usr/glibc/lib/bfd-plugins/
+  install -dm755 "$pkgdir"/$GLIBC_PREFIX/lib/bfd-plugins/
   ln -s /${_libdir}/liblto_plugin.so \
-    "$pkgdir/data/data/com.termux/files/usr/glibc/lib/bfd-plugins/"
+    "$pkgdir/$GLIBC_PREFIX/lib/bfd-plugins/"
 
   make -C $CHOST/libgomp DESTDIR="$pkgdir" install-nodist_{libsubinclude,toolexeclib}HEADERS
   make -C $CHOST/libitm DESTDIR="$pkgdir" install-nodist_toolexeclibHEADERS
@@ -178,27 +164,27 @@ package_gcc-glibc() {
   make -C $CHOST/libsanitizer/lsan DESTDIR="$pkgdir" install-nodist_toolexeclibHEADERS
 
   make -C gcc DESTDIR="$pkgdir" install-man install-info
-  rm "$pkgdir"/data/data/com.termux/files/usr/glibc/share/man/man1/lto-dump.1
+  rm "$pkgdir"/$GLIBC_PREFIX/share/man/man1/lto-dump.1
 
   make -C libcpp DESTDIR="$pkgdir" install
   make -C gcc DESTDIR="$pkgdir" install-po
 
   # many packages expect this symlink
-  ln -s gcc "$pkgdir"/data/data/com.termux/files/usr/glibc/bin/cc
+  ln -s gcc "$pkgdir"/$GLIBC_PREFIX/bin/cc
 
   # POSIX conformance launcher scripts for c89 and c99
-  install -Dm755 "$srcdir/c89" "$pkgdir/data/data/com.termux/files/usr/glibc/bin/c89"
-  install -Dm755 "$srcdir/c99" "$pkgdir/data/data/com.termux/files/usr/glibc/bin/c99"
+  install -Dm755 "$srcdir/c89" "$pkgdir/$GLIBC_PREFIX/bin/c89"
+  install -Dm755 "$srcdir/c99" "$pkgdir/$GLIBC_PREFIX/bin/c99"
 
   # byte-compile python libraries
-  python -m compileall "$pkgdir/data/data/com.termux/files/usr/glibc/share/gcc-${pkgver%%+*}/"
-  python -O -m compileall "$pkgdir/data/data/com.termux/files/usr/glibc/share/gcc-${pkgver%%+*}/"
+  python -m compileall "$pkgdir/$GLIBC_PREFIX/share/gcc-${pkgver%%+*}/"
+  python -O -m compileall "$pkgdir/$GLIBC_PREFIX/share/gcc-${pkgver%%+*}/"
 
   # Install Runtime Library Exception
-  install -d "$pkgdir/data/data/com.termux/files/usr/glibc/share/licenses/$pkgname/"
-  ln -s /data/data/com.termux/files/usr/glibc/share/licenses/gcc-libs/RUNTIME.LIBRARY.EXCEPTION \
-    "$pkgdir/data/data/com.termux/files/usr/glibc/share/licenses/$pkgname/"
+  install -d "$pkgdir/$GLIBC_PREFIX/share/licenses/$pkgname/"
+  ln -s $GLIBC_PREFIX/share/licenses/gcc-libs/RUNTIME.LIBRARY.EXCEPTION \
+    "$pkgdir/$GLIBC_PREFIX/share/licenses/$pkgname/"
 
-  rm -f "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/info/dir
+  rm -f "${pkgdir}"/$GLIBC_PREFIX/share/info/dir
 }
 

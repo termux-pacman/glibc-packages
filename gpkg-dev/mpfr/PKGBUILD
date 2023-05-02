@@ -29,7 +29,7 @@ prepare() {
 
 build() {
   cd mpfr-${_pkgver}
-  ./configure --prefix=/data/data/com.termux/files/usr/glibc \
+  ./configure --prefix=$GLIBC_PREFIX \
     --enable-thread-safe \
     --enable-shared
   make
@@ -38,6 +38,6 @@ build() {
 package() {
   cd mpfr-${_pkgver}
   make DESTDIR="$pkgdir" install
-  rm "$pkgdir"/data/data/com.termux/files/usr/glibc/share/info/dir
+  rm "$pkgdir"/$GLIBC_PREFIX/share/info/dir
 }
 

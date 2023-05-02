@@ -35,28 +35,9 @@ prepare() {
 build() {
   cd binutils-build
 
-  case "$CARCH" in
-    "aarch64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-aarch64.so.1"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "armv7h")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-armhf.so.3"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "x86_64")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux-x86-64.so.2"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-    "i686")
-      CFLAGS="-Wl,-rpath=/data/data/com.termux/files/usr/glibc/lib -Wl,--dynamic-linker=/data/data/com.termux/files/usr/glibc/lib/ld-linux.so.2"
-      CXXFLAGS="${CFLAGS}"
-      ;;
-  esac
-
   "$srcdir/binutils-gdb/configure" \
-    --prefix=/data/data/com.termux/files/usr/glibc \
-    --with-lib-path=/data/data/com.termux/files/usr/glibc/lib:/data/data/com.termux/files/usr/glibc/local/lib \
+    --prefix=$GLIBC_PREFIX \
+    --with-lib-path=$GLIBC_PREFIX/lib:$GLIBC_PREFIX/local/lib \
     --with-bugurl=https://github.com/termux-pacman/glibc-packages/issues \
     --enable-cet \
     --enable-deterministic-archives \
@@ -79,7 +60,7 @@ build() {
     --with-pic \
     --with-system-zlib
 
-  make -O tooldir=/data/data/com.termux/files/usr/glibc
+  make -O tooldir=$GLIBC_PREFIX
 
   # Extract the FSF All Permissive License
   # <https://www.gnu.org/prep/maintain/html_node/License-Notices-for-Other-Files.html>
@@ -90,18 +71,18 @@ build() {
 package() {
   cd binutils-build
 
-  make prefix="$pkgdir/data/data/com.termux/files/usr/glibc" tooldir="$pkgdir/data/data/com.termux/files/usr/glibc" install
+  make prefix="$pkgdir/$GLIBC_PREFIX" tooldir="$pkgdir/$GLIBC_PREFIX" install
 
   # Remove unwanted files
-  rm -f "$pkgdir"/data/data/com.termux/files/usr/glibc/share/man/man1/{dlltool,nlmconv,windres,windmc}*
+  rm -f "$pkgdir"/$GLIBC_PREFIX/share/man/man1/{dlltool,nlmconv,windres,windmc}*
 
   # No shared linking to these files outside binutils
-  rm -f "$pkgdir"/data/data/com.termux/files/usr/glibc/lib/lib{bfd,opcodes}.so
-  echo 'INPUT( /data/data/com.termux/files/usr/glibc/lib/libbfd.a -liberty -lz -ldl )' > "$pkgdir/data/data/com.termux/files/usr/glibc/lib/libbfd.so"
-  echo 'INPUT( /data/data/com.termux/files/usr/glibc/lib/libopcodes.a -lbfd )' > "$pkgdir/data/data/com.termux/files/usr/glibc/lib/libopcodes.so"
+  rm -f "$pkgdir"/$GLIBC_PREFIX/lib/lib{bfd,opcodes}.so
+  echo 'INPUT( $GLIBC_PREFIX/lib/libbfd.a -liberty -lz -ldl )' > "$pkgdir/$GLIBC_PREFIX/lib/libbfd.so"
+  echo 'INPUT( $GLIBC_PREFIX/lib/libopcodes.a -lbfd )' > "$pkgdir/$GLIBC_PREFIX/lib/libopcodes.so"
 
   # install FSF All Permissive License
-  install -Dm644 -t "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/licenses/${pkgname}/ FSFAP
+  install -Dm644 -t "${pkgdir}"/$GLIBC_PREFIX/share/licenses/${pkgname}/ FSFAP
 
-  rm -f "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/info/dir
+  rm -f "${pkgdir}"/$GLIBC_PREFIX/share/info/dir
 }

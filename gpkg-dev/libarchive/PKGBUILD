@@ -19,7 +19,7 @@ build() {
   cd "libarchive-${pkgver}"
 
   ./configure \
-      --prefix=/data/data/com.termux/files/usr/glibc \
+      --prefix=$GLIBC_PREFIX \
       --without-xml2 \
       --without-nettle \
       --disable-bsdtar \
@@ -33,7 +33,7 @@ package() {
   cd "libarchive-${pkgver}"
 
   make DESTDIR="$pkgdir" install
-  sed -i "s/iconv //" "$pkgdir"/data/data/com.termux/files/usr/glibc/lib/pkgconfig/libarchive.pc
-  install -Dm0644 COPYING "$pkgdir/data/data/com.termux/files/usr/glibc/share/licenses/libarchive/COPYING"
-  rm -fr "$pkgdir/data/data/com.termux/files/usr/glibc/bin"
+  sed -i "s/iconv //" "$pkgdir"/$GLIBC_PREFIX/lib/pkgconfig/libarchive.pc
+  install -Dm0644 COPYING "$pkgdir/$GLIBC_PREFIX/share/licenses/libarchive/COPYING"
+  rm -fr "$pkgdir/$GLIBC_PREFIX/glibc/bin"
 }

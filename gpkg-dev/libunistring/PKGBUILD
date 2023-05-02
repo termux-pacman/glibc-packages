@@ -22,13 +22,13 @@ prepare() {
 build() {
   cd libunistring-$pkgver
 
-  ./configure --prefix=/data/data/com.termux/files/usr/glibc
+  ./configure --prefix=$GLIBC_PREFIX
   make
 }
 
 package() {
   make -C libunistring-$pkgver DESTDIR="$pkgdir" install
-  rm -f "${pkgdir}"/data/data/com.termux/files/usr/glibc/share/info/dir
+  rm -f "${pkgdir}"/$GLIBC_PREFIX/share/info/dir
 }
 
 # vim: ts=2 sw=2 et:

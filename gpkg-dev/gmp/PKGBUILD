@@ -16,7 +16,7 @@ build() {
   cd gmp-$pkgver
 
   ./configure --build=${CHOST} \
-    --prefix=/data/data/com.termux/files/usr/glibc \
+    --prefix=$GLIBC_PREFIX \
     --enable-cxx \
     --enable-fat
   make
@@ -25,6 +25,6 @@ build() {
 package() {
   cd gmp-$pkgver
   make DESTDIR="${pkgdir}" install
-  rm "$pkgdir"/data/data/com.termux/files/usr/glibc/share/info/dir
+  rm "$pkgdir"/$GLIBC_PREFIX/share/info/dir
 }
 

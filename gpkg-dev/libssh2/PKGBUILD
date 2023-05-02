@@ -15,7 +15,7 @@ groups=('gpkg-dev')
 build() {
   cd "libssh2-$pkgver"
 
-  ./configure --prefix=/data/data/com.termux/files/usr/glibc
+  ./configure --prefix=$GLIBC_PREFIX
   make
 }
 
@@ -23,5 +23,5 @@ package() {
   cd "libssh2-$pkgver"
 
   make DESTDIR="$pkgdir" install
-  install -Dm644 COPYING "$pkgdir/data/data/com.termux/files/usr/glibc/share/licenses/$pkgname/LICENSE"
+  install -Dm644 COPYING "$pkgdir/$GLIBC_PREFIX/share/licenses/$pkgname/LICENSE"
 }
