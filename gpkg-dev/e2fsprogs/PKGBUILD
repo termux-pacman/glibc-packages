@@ -3,14 +3,14 @@
 
 pkgname=e2fsprogs-glibc
 pkgver=1.47.0
-pkgrel=2
+pkgrel=3
 pkgdesc='Ext2/3/4 filesystem utilities'
 arch=(any)
 license=('GPL' 'LGPL' 'MIT')
 url='http://e2fsprogs.sourceforge.net'
-source=(https://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v${pkgver}/e2fsprogs-${pkgver}.tar.xz
+source=(https://github.com/tytso/e2fsprogs/archive/refs/tags/v${pkgver}.tar.gz
         'MIT-LICENSE')
-sha256sums=('144af53f2bbd921cef6f8bea88bb9faddca865da3fbc657cc9b4d2001097d5db'
+sha256sums=('74c8ea97c73294edc6c11dc5e7fbb4324f86c28efd66ad0ba50be4eec8a48be2'
             'cc45386c1d71f438ad648fd7971e49e3074ad9dbacf9dd3a5b4cb61fd294ecbb')
 groups=('gpkg-dev')
 
@@ -24,8 +24,11 @@ prepare() {
 build() {
   cd "${srcdir}/e2fsprogs-${pkgver}"
 
+  export LDFLAGS="${GPKG_DEV_FLAGS}"
+
   ./configure \
       --prefix=$GLIBC_PREFIX \
+      --enable-symlink-install \
       --with-root-prefix='' \
       --libdir=$GLIBC_PREFIX/lib \
       --sbindir=$GLIBC_PREFIX/bin \
@@ -45,11 +48,6 @@ build() {
 }
 
 package() {
-  provides=('libcom_err.so'
-            'libe2p.so'
-            'libext2fs.so'
-            'libss.so')
-
   unset MAKEFLAGS
 
   cd "${srcdir}/e2fsprogs-${pkgver}"

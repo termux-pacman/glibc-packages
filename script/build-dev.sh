@@ -3,9 +3,11 @@
 set -e
 
 # adding configuration
-. $(dirname "$(realpath "$0")")/init.sh
-. $(dirname "$(realpath "$0")")/set_flags.sh
-. $(dirname "$(realpath "$0")")/functions/get_name.sh
+PWD_SCRIPT=$(dirname "$(realpath "$0")")
+. ${PWD_SCRIPT}/init.sh
+. ${PWD_SCRIPT}/set_flags.sh
+. ${PWD_SCRIPT}/functions/get_name.sh
+export PATH="${PWD_SCRIPT}/tools:$PATH"
 
 pkgname="$1"
 
@@ -61,7 +63,7 @@ fi
 	else
 		sudo -H -u ${GPKG_DEV_USER_NAME} bash -c "tar xf src.tar.gz"
 	fi
-	sudo -Es -H -u ${GPKG_DEV_USER_NAME} bash -c '(timeout --preserve-status 300m makepkg -e --noarchive && ([ "$?" = "0" ] && makepkg -R)) || ([ "$?" = "143" ] && true)'
+	sudo -Es -H -u ${GPKG_DEV_USER_NAME} bash -c '(timeout --preserve-status 330m makepkg -e --noarchive && ([ "$?" = "0" ] && makepkg -R)) || ([ "$?" = "143" ] && true)'
 
 	if $(ls *.pkg.* &> /dev/null); then
 		mv *.pkg.* ${GPKG_DEV_DIR_BUILD}
