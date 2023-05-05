@@ -135,6 +135,7 @@ jobs:
           fi
         done
         rm gpkg-dev-${{ matrix.target_arch }}.tar.xz
+        rm -fr pkgs/PKGBUILDs
         tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz pkgs
     - uses: actions/upload-artifact@v3
       with:

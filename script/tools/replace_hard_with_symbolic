@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+# replacing hard links in a package with symbolic links
+
+to_file() {
+	local a=$(echo $1 | sed 's|/||')
+	local b=(${2//// })
+	local points=""
+	for i in ${b[@]::${#b[@]}-1}; do
+		local c=$(echo $a | awk -F '/' '{printf $1}')
+		if [ "$c" != "$i" ]; then
+			points="../${points}"
+			continue
+		fi
+		a=$(echo $a | sed "s|$c/||")
+	done
+	echo "${points}${a}"
+}
+
+declare -A list
+for i in $(find "$1" -type f -links +1); do
+	list[$(ls -i "$i" | awk '{printf $1}')]+="$i "
+done
+for i in ${!list[@]}; do
+	root_file=""
+	for j in ${list[$i]}; do
+		if [ -z "$root_file" ]; then
+			root_file="$j"
+			continue
+		fi
+		rm $j
+		ln -s $(to_file "$root_file" "$j") $j
+	done
+done
