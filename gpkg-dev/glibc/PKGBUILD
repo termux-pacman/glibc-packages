@@ -3,7 +3,7 @@
 
 pkgname=glibc
 pkgver=2.37
-pkgrel=4
+pkgrel=5
 _commit=be176490b818b65b5162c332eb6b581690b16e5c
 pkgdesc="GNU C Library"
 arch=(any)
@@ -142,4 +142,6 @@ package() {
   sed -i "s|!/bin/bash|!$TERMUX_PREFIX/bin/bash|" "$pkgdir"/$GLIBC_PREFIX/bin/*
   mkdir -p "$pkgdir"/$TERMUX_PREFIX/bin
   install -m755 "$srcdir/grun" "$pkgdir/$TERMUX_PREFIX/bin"
+
+  replace_hard_with_symbolic "$pkgdir"
 }
