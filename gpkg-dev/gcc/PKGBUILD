@@ -4,7 +4,7 @@
 pkgname=(gcc-glibc gcc-libs)
 pkgver=12.2.0
 #_commit=abaa8f9cc4c06dcdae13a33be9253762861d8657
-pkgrel=2
+pkgrel=3
 pkgdesc='The GNU Compiler Collection'
 arch=(any)
 url='https://gcc.gnu.org/'
@@ -114,7 +114,7 @@ package_gcc-libs() {
   install -Dm644 "$srcdir/gcc-${pkgver}/COPYING.RUNTIME" \
     "$pkgdir/$GLIBC_PREFIX/share/licenses/gcc-libs/RUNTIME.LIBRARY.EXCEPTION"
 
-  rm -f "${pkgdir}"/$GLIBC_PREFIX/glibc/share/info/dir
+  rm -f "${pkgdir}"/$GLIBC_PREFIX/share/info/dir
 }
 
 package_gcc-glibc() {
@@ -186,5 +186,7 @@ package_gcc-glibc() {
     "$pkgdir/$GLIBC_PREFIX/share/licenses/$pkgname/"
 
   rm -f "${pkgdir}"/$GLIBC_PREFIX/share/info/dir
+
+  replace_hard_with_symbolic "$pkgdir"
 }
 
