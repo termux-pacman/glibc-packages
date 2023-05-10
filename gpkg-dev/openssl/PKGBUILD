@@ -3,13 +3,12 @@
 
 pkgname=openssl-glibc
 pkgver=3.0.8
-pkgrel=0
+pkgrel=1
 pkgdesc='The Open Source toolkit for Secure Sockets Layer and Transport Layer Security'
 arch=(any)
 url='https://www.openssl.org'
 license=('custom:BSD')
 makedepends=('perl')
-backup=("$GLIBC_PREFIX/etc/ssl/openssl.cnf")
 source=("https://www.openssl.org/source/openssl-${pkgver}.tar.gz"
 	'ca-dir.patch')
 sha256sums=('6c13d2bf38fdf31eac3ce2a347073673f5d63263398f1f69d0df4a41253e4b3e'
@@ -57,4 +56,7 @@ package() {
 	make DESTDIR="$pkgdir" MANDIR=$GLIBC_PREFIX/share/man MANSUFFIX=ssl install_sw install_ssldirs install_man_docs
 
 	install -D -m644 LICENSE.txt "$pkgdir/$GLIBC_PREFIX/share/licenses/$pkgname/LICENSE"
+
+	ln -s "$TERMUX_PREFIX/etc/resolv.conf" "$pkgdir/$GLIBC_PREFIX/etc"
+	ln -s "$TERMUX_PREFIX/etc/tls/cert.pem" "$pkgdir/$GLIBC_PREFIX/etc/ssl/certs/ca-certificates.crt"
 }
