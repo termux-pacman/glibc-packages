@@ -2,9 +2,9 @@
 # - https://github.com/archlinux/svntogit-packages/blob/packages/gcc/trunk/PKGBUILD
 
 pkgname=(gcc-glibc gcc-libs)
-pkgver=12.2.0
-#_commit=abaa8f9cc4c06dcdae13a33be9253762861d8657
-pkgrel=3
+pkgver=13.1.0
+#_commit=9a167ee2f8b9a0859fbab6cfdc276cf1f272effe
+pkgrel=0
 pkgdesc='The GNU Compiler Collection'
 arch=(any)
 url='https://gcc.gnu.org/'
@@ -17,13 +17,12 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-$pkgver/gcc-$pkgver.tar.xz
         gcc.cc.patch
         set_glibc_dynamic_linker.patch)
 _libdir=data/data/com.termux/files/usr/glibc/lib/gcc/$CHOST/${pkgver%%+*}
-sha256sums=('e549cf9cf3594a00e27b6589d4322d70e0720cdd213f39beb4181e06926230ff'
+sha256sums=('61d684f0aa5e76ac6585ad8898a2427aade8979ed5e7f85492286c4dfc13ee86'
             'd87254ee2c816aee66b00dd5002966cf3fe9aca4969eaf160c47150583357790'
             '9ad6d475acf0b19ca0e420f32867c6a5186ffbae50481ec64a140165f8988b60'
-            'fef816cd40d5c62199f437586b07ba266e3a7004001c4a27cb9efbd936772001'
-            '642a609f5e650fc48086dd252c55bf1af4352aeaddeac39c47f82422aa1235d2'
-            'b35824482ecff2f5b8fb18f20e87c01f9400555829675094e5e121e22e97fe1c')
-_basedir=gcc-$pkgver
+            '102f7791ace23391eef292efd0ba193cd05421ad02b7b6ca25bc5f9422ec3d96'
+            '4ecd9cd6ad521ba93b6bc5b34687b2883e8246f2fd6e3afdeee91f34e233bac0'
+            '7c4e3f5f31ed59beee30aa40675b339a6d6b05b3d46b98a2f468bb4db95075c4')
 groups=('gpkg-dev')
 
 prepare() {
@@ -31,7 +30,7 @@ prepare() {
     patch -Np1 -i ${srcdir}/$i
   done
 
-  cd $_basedir
+  cd gcc-${pkgver}
   sed -i 's|mabi.lp64=../lib64|mabi.lp64=../lib|' gcc/config/aarch64/t-aarch64-linux
 
   mkdir -p "$srcdir"/gcc-build
@@ -49,7 +48,7 @@ build() {
     "armv7h") CONFIGFLAG="--with-arch=armv7-a --with-float=hard --with-fpu=neon";;
   esac
 
-  "$srcdir"/$_basedir/configure \
+  "$srcdir"/gcc-${pkgver}/configure \
     --prefix=$GLIBC_PREFIX \
     --libdir=$GLIBC_PREFIX/lib \
     --libexecdir=$GLIBC_PREFIX/lib \
