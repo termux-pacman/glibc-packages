@@ -1,0 +1,42 @@
+# The original PKGBUILD was taken from the gitlab.archlinux.org/archlinux/packaging repo:
+# - https://gitlab.archlinux.org/archlinux/packaging/packages/lz4/-/blob/main/PKGBUILD
+
+pkgname=lz4-glibc
+pkgver=1.9.4
+pkgrel=0
+pkgdesc='Extremely fast compression algorithm'
+arch=('any')
+url='https://lz4.github.io/lz4/'
+license=('GPL2')
+checkdepends=('diffutils')
+source=("git+https://github.com/lz4/lz4.git#tag=v$pkgver")
+sha256sums=('SKIP')
+groups=('gpkg-dev')
+
+prepare() {
+  cd lz4
+  # apply patch from the source array (should be a pacman feature)
+  local src
+  for src in "${source[@]}"; do
+    src="${src%%::*}"
+    src="${src##*/}"
+    [[ $src = *.patch ]] || continue
+    msg2 "Applying patch $src..."
+    patch -Np1 < "../$src"
+  done
+}
+
+build() {
+  # do not use the main makefile, it calls sub make with -e
+  # exported CLFAGS by makepkg break the version. see FS#50071
+  cd lz4
+  make -C lib PREFIX=$GLIBC_PREFIX
+  make -C programs PREFIX=$GLIBC_PREFIX lz4 lz4c
+}
+
+package() {
+  cd lz4
+  make install PREFIX=$GLIBC_PREFIX DESTDIR="$pkgdir"
+}
+
+# vim:set ts=2 sw=2 et:
