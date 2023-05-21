@@ -1,0 +1,30 @@
+# The original PKGBUILD was taken from the gitlab.archlinux.org/archlinux/packaging repo:
+# - https://gitlab.archlinux.org/archlinux/packaging/packages/acl/-/blob/main/PKGBUILD
+
+pkgname=acl-glibc
+pkgver=2.3.1
+pkgrel=0
+pkgdesc='Access control list utilities, libraries and headers'
+arch=('any')
+url='https://savannah.nongnu.org/projects/acl'
+license=('LGPL')
+source=("https://download.savannah.gnu.org/releases/acl/acl-${pkgver}.tar.gz")
+sha256sums=('760c61c68901b37fdd5eefeeaf4c0c7a26bdfdd8ac747a1edff1ce0e243c11af')
+groups=('gpkg-dev')
+
+build() {
+  cd acl-$pkgver
+
+  ./configure \
+    --libdir=$GLIBC_PREFIX/lib \
+    --libexecdir=$GLIBC_PREFIX/lib \
+    --prefix=$GLIBC_PREFIX
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
+  make
+}
+
+package() {
+  cd acl-$pkgver
+
+  make DESTDIR="${pkgdir}" install
+}
