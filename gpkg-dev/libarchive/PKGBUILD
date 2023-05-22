@@ -1,5 +1,5 @@
-# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
-# - https://github.com/archlinux/svntogit-packages/blob/packages/libarchive/trunk/PKGBUILD
+# The original PKGBUILD was taken from the gitlab.archlinux.org/archlinux/packaging repo:
+# - https://gitlab.archlinux.org/archlinux/packaging/packages/libarchive/-/blob/main/PKGBUILD
 
 pkgname=libarchive-glibc
 pkgver=3.6.2
@@ -8,9 +8,6 @@ pkgdesc='Multi-format archive and compression library (lite version)'
 arch=(any)
 url='https://libarchive.org/'
 license=('BSD')
-#depends=('acl' 'libacl.so' 'bzip2' 'expat' 'lz4' 'openssl' 'libcrypto.so' 'xz'
-#         'zlib' 'zstd')
-provides=('libarchive.so')
 source=("https://github.com/libarchive/libarchive/releases/download/v${pkgver}/libarchive-${pkgver}.tar.xz")
 sha256sums=('9e2c1b80d5fbe59b61308fdfab6c79b5021d7ff4ff2489fb12daf0a96a83551d')
 groups=('gpkg-dev')

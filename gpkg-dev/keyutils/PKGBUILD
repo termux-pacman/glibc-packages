@@ -1,5 +1,5 @@
-# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
-# - https://github.com/archlinux/svntogit-packages/blob/packages/keyutils/trunk/PKGBUILD
+# The original PKGBUILD was taken from the gitlab.archlinux.org/archlinux/packaging repo:
+# - https://gitlab.archlinux.org/archlinux/packaging/packages/keyutils/-/blob/main/PKGBUILD
 
 pkgname=keyutils-glibc
 _tag='5678a1aae8834b5c16b5ed7dc72ef8836a29e122' # git rev-parse v${pkgver}
@@ -9,7 +9,6 @@ pkgdesc='Linux Key Management Utilities'
 arch=(any)
 url='https://www.kernel.org/'
 license=('GPL2' 'LGPL2.1')
-makedepends=('git')
 backup=('data/data/com.termux/files/usr/glibc/etc/request-key.conf')
 source=("git+https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git#tag=${_tag}"
         'request-key.conf.patch' 'reproducible.patch' 'Makefile.patch')

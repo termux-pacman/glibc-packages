@@ -1,5 +1,5 @@
-# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
-# - https://github.com/archlinux/svntogit-packages/blob/packages/krb5/trunk/PKGBUILD
+# The original PKGBUILD was taken from the gitlab.archlinux.org/archlinux/packaging repo:
+# - https://gitlab.archlinux.org/archlinux/packaging/packages/krb5/-/blob/main/PKGBUILD
 
 pkgname=krb5-glibc
 _pkgvermajor=1.20
@@ -9,7 +9,6 @@ pkgdesc='The Kerberos network authentication system'
 url='https://web.mit.edu/kerberos/'
 arch=(any)
 license=('custom')
-makedepends=('perl')
 backup=(
   'data/data/com.termux/files/usr/glibc/etc/krb5.conf'
   'data/data/com.termux/files/usr/glibc/var/lib/krb5kdc/kdc.conf'

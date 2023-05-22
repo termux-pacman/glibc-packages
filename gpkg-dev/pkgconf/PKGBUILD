@@ -1,5 +1,5 @@
-# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
-# - https://github.com/archlinux/svntogit-packages/blob/packages/pkgconf/trunk/PKGBUILD
+# The original PKGBUILD was taken from the gitlab.archlinux.org/archlinux/packaging repo:
+# - https://gitlab.archlinux.org/archlinux/packaging/packages/pkgconf/-/blob/main/PKGBUILD
 
 pkgname=pkgconf-glibc
 pkgver=1.8.1
@@ -8,7 +8,6 @@ pkgdesc="Package compiler and linker metadata toolkit"
 url="https://gitea.treehouse.systems/ariadne/pkgconf"
 license=(custom:ISC)
 arch=(any)
-provides=(pkg-config pkgconfig libpkgconf.so)
 _commit=5436648cd4c890fa1e99be82adc333dad4f50eff  # tags/pkgconf-1.8.1
 source=("git+$url#commit=$_commit")
 sha256sums=('SKIP')

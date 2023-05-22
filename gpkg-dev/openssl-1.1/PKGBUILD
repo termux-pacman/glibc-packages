@@ -1,5 +1,5 @@
-# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
-# - https://github.com/archlinux/svntogit-packages/blob/packages/openssl-1.1/trunk/PKGBUILD
+# The original PKGBUILD was taken from the gitlab.archlinux.org/archlinux/packaging repo:
+# - https://gitlab.archlinux.org/archlinux/packaging/packages/openssl-1.1/-/blob/main/PKGBUILD
 
 pkgname=openssl-glibc-1.1
 _pkgname=openssl
@@ -11,7 +11,6 @@ pkgdesc='The Open Source toolkit for Secure Sockets Layer and Transport Layer Se
 arch=(any)
 url='https://www.openssl.org'
 license=('custom:BSD')
-provides=('libcrypto.so' 'libssl.so')
 source=("https://www.openssl.org/source/${_pkgname}-${_ver}.tar.gz"
         'ca-dir.patch')
 sha256sums=('8dee9b24bdb1dcbf0c3d1e9b02fb8f6bf22165e807f45adeb7c9677536859d3b'

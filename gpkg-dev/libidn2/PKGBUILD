@@ -1,5 +1,5 @@
-# The original PKGBUILD was taken from the archlinux/svntogit-packages repo:
-# - https://github.com/archlinux/svntogit-packages/blob/packages/libidn2/trunk/PKGBUILD
+# The original PKGBUILD was taken from the gitlab.archlinux.org/archlinux/packaging repo:
+# - https://gitlab.archlinux.org/archlinux/packaging/packages/libidn2/-/blob/main/PKGBUILD
 
 pkgname=libidn2-glibc
 pkgver=2.3.4
@@ -8,7 +8,6 @@ pkgdesc="Free software implementation of IDNA2008, Punycode and TR46"
 arch=(any)
 url="https://www.gnu.org/software/libidn/#libidn2"
 license=('GPL2' 'LGPL3')
-makedepends=('ruby-ronn')
 source=(https://ftp.gnu.org/gnu/libidn/libidn2-$pkgver.tar.gz)
 sha256sums=('93caba72b4e051d1f8d4f5a076ab63c99b77faee019b72b9783b267986dbb45f')
 groups=('gpkg-dev')

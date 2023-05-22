@@ -1,4 +1,5 @@
-# Maintainer: Levente Polyak <anthraxx[at]archlinux[dot]org>
+# The original PKGBUILD was taken from the gitlab.archlinux.org/archlinux/packaging repo:
+# - https://gitlab.archlinux.org/archlinux/packaging/packages/publicsuffix-list/-/blob/main/PKGBUILD
 
 pkgname=publicsuffix-list-glibc
 _gitcommit=ab0530155af1fe4b58194fe6792c4ec9731666bf
@@ -8,7 +9,6 @@ pkgdesc='Cross-vendor public domain suffix database'
 url='https://github.com/publicsuffix/list'
 arch=('any')
 license=('custom:MPL2')
-makedepends=('git')
 source=(${pkgname}::"git+https://github.com/publicsuffix/list#commit=${_gitcommit}")
 sha512sums=('SKIP')
 groups=('gpkg-dev')
