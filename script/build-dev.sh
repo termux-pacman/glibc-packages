@@ -4,16 +4,24 @@ set -e
 
 # adding configuration
 PWD_SCRIPT=$(dirname "$(realpath "$0")")
+ARCH="$1"
 . ${PWD_SCRIPT}/init.sh
-. ${PWD_SCRIPT}/set_flags.sh
+
+## checking and setting arch value
+case $ARCH in
+	aarch64|arm|x86_64|i686);;
+	*) error "Error: wrong arch specified (support only aarch64, arm, x86_64 and i686)";;
+esac
+
+. ${PWD_SCRIPT}/set_compiler.sh
 . ${PWD_SCRIPT}/functions/get_name.sh
 export PATH="${PWD_SCRIPT}/tools:$PATH"
 
-pkgname="$1"
+PKGNAME="$2"
 
 check_not_termux
 
-if [ -z "$pkgname" ]; then
+if [ -z "$PKGNAME" ]; then
 	error "no package name specified"
 fi
 
@@ -27,11 +35,11 @@ fi
 	fi
 	cd ${GPKG_DEV_DIR_SOURCE}
 
-	if [ ! -d $pkgname ]; then
-		error "not found $pkgname"
+	if [ ! -d $PKGNAME ]; then
+		error "not found $PKGNAME"
 	fi
-	chmod a+rwx $pkgname
-	cd $pkgname
+	chmod a+rwx $PKGNAME
+	cd $PKGNAME
 	chmod a+rwx *
 
 	# packages removal check
@@ -39,7 +47,7 @@ fi
 	(
 		chmod a+rwx ${GPKG_DEV_DIR_BUILD}/PKGBUILDs
 		cd ${GPKG_DEV_DIR_BUILD}/PKGBUILDs
-		mv $pkgname PKGBUILD
+		mv $PKGNAME PKGBUILD
 		chmod a+rwx PKGBUILD
 		for i in $(sudo -H -u ${GPKG_DEV_USER_NAME} bash -c "makepkg --packagelist"); do
 			delete=true
@@ -54,23 +62,12 @@ fi
 				echo "$pkgpart" >> ${GPKG_DEV_DIR_BUILD}/deleted_gpkg-dev_packages.txt
 			fi
 		done
-		mv PKGBUILD $pkgname
+		mv PKGBUILD $PKGNAME
 	)
 
 	# start building
-	if [ ! -f src.tar.gz ]; then
-		sudo -Es -H -u ${GPKG_DEV_USER_NAME} bash -c "makepkg -o"
-	else
-		sudo -H -u ${GPKG_DEV_USER_NAME} bash -c "tar xf src.tar.gz"
-	fi
-	sudo -Es -H -u ${GPKG_DEV_USER_NAME} bash -c '(timeout --preserve-status 330m makepkg -e --noarchive && ([ "$?" = "0" ] && makepkg -R)) || ([ "$?" = "143" ] && true)'
+	sudo -Es -H -u ${GPKG_DEV_USER_NAME} bash -c "makepkg"
 
-	if $(ls *.pkg.* &> /dev/null); then
-		mv *.pkg.* ${GPKG_DEV_DIR_BUILD}
-		echo " ${pkgname} " >> ${GPKG_DEV_DIR_BUILD}/gpkg-dev-done.txt
-	else
-		sudo -H -u ${GPKG_DEV_USER_NAME} bash -c "tar cf src.tar.gz src"
-		mv src.tar.gz ${GPKG_DEV_DIR_BUILD}
-		echo "${pkgname}" > ${GPKG_DEV_DIR_BUILD}/gpkg-dev-continue.txt
-	fi
+	mv *.pkg.* ${GPKG_DEV_DIR_BUILD}
+	echo " ${PKGNAME} " >> ${GPKG_DEV_DIR_BUILD}/gpkg-dev-done.txt
 )
