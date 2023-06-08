@@ -2,20 +2,26 @@
 # - https://gitlab.archlinux.org/archlinux/packaging/packages/openssl/-/blob/main/PKGBUILD
 
 pkgname=openssl-glibc
-pkgver=3.0.8
-pkgrel=1
+pkgver=3.1.1
+pkgrel=0
 pkgdesc='The Open Source toolkit for Secure Sockets Layer and Transport Layer Security'
 arch=(any)
 url='https://www.openssl.org'
 license=('custom:BSD')
 makedepends=('perl')
 source=("https://www.openssl.org/source/openssl-${pkgver}.tar.gz"
-	'ca-dir.patch')
-sha256sums=('6c13d2bf38fdf31eac3ce2a347073673f5d63263398f1f69d0df4a41253e4b3e'
-            '326478a21829b79710ce0d8f7437e3be10c542471fef3bdf5f70ac232a5bf9e8')
+	'ca-dir.patch'
+        '10-main.conf.patch')
+sha256sums=('b3aa61334233b852b63ddb048df181177c2c659eb9d4376008118f9c08d07674'
+            '326478a21829b79710ce0d8f7437e3be10c542471fef3bdf5f70ac232a5bf9e8'
+            '7d50a1d9df32b6e0f2f0e5dc00418663f22d05f5643cfde34e4fea9bffb4b51b')
 groups=('gpkg-dev')
 
 prepare() {
+	if [ "${CARCH}" = "armv7h" ]; then
+		patch -Np1 -i "$srcdir/10-main.conf.patch"
+	fi
+
 	cd "$srcdir/openssl-$pkgver"
 
 	# set ca dir to /etc/ssl by default

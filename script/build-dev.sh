@@ -6,14 +6,12 @@ set -e
 PWD_SCRIPT=$(dirname "$(realpath "$0")")
 ARCH="$1"
 . ${PWD_SCRIPT}/init.sh
-
 ## checking and setting arch value
 case $ARCH in
 	aarch64|arm|x86_64|i686);;
 	*) error "Error: wrong arch specified (support only aarch64, arm, x86_64 and i686)";;
 esac
-
-. ${PWD_SCRIPT}/set_compiler.sh
+. ${PWD_SCRIPT}/set_makepkg.sh
 . ${PWD_SCRIPT}/functions/get_name.sh
 export PATH="${PWD_SCRIPT}/tools:$PATH"
 
