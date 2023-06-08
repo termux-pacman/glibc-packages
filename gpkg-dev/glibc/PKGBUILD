@@ -3,7 +3,7 @@
 
 pkgname=glibc
 pkgver=2.37
-pkgrel=5
+pkgrel=6
 _commit=be176490b818b65b5162c332eb6b581690b16e5c
 pkgdesc="GNU C Library"
 arch=(any)
@@ -34,7 +34,13 @@ source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz
         'chmod.c.patch'
         'send.c.patch'
         'setdirs.patch'
-        'recv.c.patch')
+        'recv.c.patch'
+        'accept.c.patch'
+        'shmem-android.h'
+        'shmget.c.patch'
+        'shmat.c.patch'
+        'shmctl.c.patch'
+        'shmdt.c.patch')
 sha256sums=('2257eff111a1815d74f46856daaf40b019c1e553156c69d48ba0cbfc1bb91a43'
             '74da3d03fb81e2511140411bc8bad2a893258a2465c5eec5ac955dccddf9621d'
             '9223be94da6667f0dff0bf7afb032932dd9a151f23af178faa4d1d7f26c58608'
@@ -53,13 +59,19 @@ sha256sums=('2257eff111a1815d74f46856daaf40b019c1e553156c69d48ba0cbfc1bb91a43'
             'e67383acf8935a68353f0f1c786161222fbb08c9255cffa3ccb06565e1401cbc'
             'cd981ed4c8b77ee1551ae5a017dcc9b7891a6078450633eafe528e3984254f40'
             'e6b3bac73759e231cfa0099be3ca50f7b5a379ecdac18a598999e87d51c8f249'
-            '4de3605da9e6f907315eb87c58c529faf6f703518daa6fe060c51715c5a0e455'
+            '6ec88f600395da72987fdc3fcd09ac0b992770201a6a7f1a377445a35f0ea52d'
             'a6ea8efc55de0e26494bf8839ae32d95c36b6956788535a9a8912ad989510f36'
             '18f01ed2c6ed8acb122adc443fd428c8a37bc6a7d518f4e433e2ee462eebd5eb'
             '769b294e226877f12d47ac4ff86ab9246da6e547781071c1ee38e60772484c74'
             'f5b5b6ae3596f6fd617d015ff9c417a35da37c86ae3a49b5b5ce88275ed09f12'
             '46e846c4237ab332ffb64abf46d3a95fd773173346e20a7e2b16f385beaab8d4'
-            'b8b573fcb85d59fc11ddef9aebb691b8047d700ea1894784883a1359c6ef94a8')
+            'b8b573fcb85d59fc11ddef9aebb691b8047d700ea1894784883a1359c6ef94a8'
+            '59e711916c946fc961bb8c3a0da5d367a90ffedd31bbf7cf250e9bc1e1e04744'
+            '660e83ab93f745b8f10ca6bce4704203233d65d7ac10ce481186c59b31252cb0'
+            'd7569b8f5aa1816461cf42e8f290ea861157ebb8da936c6fa472593e681737f2'
+            '8a246f04d34253504bae46cf29e3e217c031f987b191de0fb2dafa38437e3809'
+            '210e48732cdad2a2b01cff15771fcf12730bdad3f2a93ef772c03c8b57c74cc7'
+            'e32f030f1f3d42974c3014e8ee3b78084046642d649d496fab31021a1991b2b7')
 groups=('gpkg-dev')
 
 prepare() {
@@ -67,9 +79,9 @@ prepare() {
     patch -Np1 -i ${srcdir}/$i
   done
 
-  mkdir -p glibc-build
+  install -Dm644 "${srcdir}/shmem-android.h" "glibc-$pkgver/sysdeps/unix/sysv/linux/shmem-android.h"
 
-  [[ ! -d glibc ]] && ln -s glibc-$pkgver glibc
+  mkdir -p glibc-build
 }
 
 build() {
@@ -84,6 +96,8 @@ build() {
       --prefix=$GLIBC_PREFIX \
       --libdir=$GLIBC_PREFIX/lib \
       --libexecdir=$GLIBC_PREFIX/lib \
+      --host=$GPKG_DEV_TARGET \
+      --target=$GPKG_DEV_TARGET \
       --with-bugurl=https://github.com/termux-pacman/glibc-packages/issues \
       --enable-bind-now \
       --enable-cet \
@@ -102,7 +116,7 @@ build() {
   make -O
   make info
 
-  localedef -c -f ../glibc/localedata/charmaps/UTF-8 -i ../glibc/localedata/locales/C ../C.UTF-8/
+  localedef -c -f ../glibc-$pkgver/localedata/charmaps/UTF-8 -i ../glibc-$pkgver/localedata/locales/C ../C.UTF-8/
 }
 
 package() {
@@ -112,7 +126,7 @@ package() {
   # Shipped in tzdata
   rm -f "$pkgdir"/$GLIBC_PREFIX/bin/{tzselect,zdump,zic}
 
-  cd glibc
+  cd glibc-$pkgver
 
   install -dm755 "$pkgdir"/$GLIBC_PREFIX/lib/{locale,systemd/system,tmpfiles.d}
   install -m644 nscd/nscd.conf "$pkgdir/$GLIBC_PREFIX/etc/nscd.conf"
@@ -127,7 +141,7 @@ package() {
   # Create /etc/locale.gen
   install -m644 "$srcdir/locale.gen.txt" "$pkgdir/$GLIBC_PREFIX/etc/locale.gen"
   sed -e '1,3d' -e 's|/| |g' -e 's|\\| |g' -e 's|^|#|g' \
-    "$srcdir/glibc/localedata/SUPPORTED" >> "$pkgdir/$GLIBC_PREFIX/etc/locale.gen"
+    "$srcdir/glibc-$pkgver/localedata/SUPPORTED" >> "$pkgdir/$GLIBC_PREFIX/etc/locale.gen"
 
   # install C.UTF-8 so that it is always available
   install -dm755 "$pkgdir/$GLIBC_PREFIX/lib/locale"

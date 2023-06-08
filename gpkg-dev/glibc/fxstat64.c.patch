@@ -15,8 +15,3 @@
  # endif
  #else
    /* All kABIs with non-LFS support, e.g. arm, csky, i386, hppa, m68k,
-@@ -79,3 +71,4 @@
- #endif
- 
- #endif /* LIB_COMPAT  */
-+
