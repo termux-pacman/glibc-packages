@@ -8,13 +8,9 @@ This repository stores and compiles packages based on the glibc library for term
 
 ### Code for connecting repository:
 gpkg-dev:
-<!--```
-[gpkg-dev]
-Server = https://service.termux-pacman.dev/gpkg-dev/$arch
-```-->
 ```
 [gpkg-dev]
-Server = https://s3.amazonaws.com/termux-pacman.us/gpkg-dev/$arch
+Server = https://service.termux-pacman.dev/gpkg-dev/$arch
 ```
 
 ### Other information:
@@ -22,6 +18,6 @@ Server = https://s3.amazonaws.com/termux-pacman.us/gpkg-dev/$arch
  - Architecture support: all (aarch64, arm, x86_64, i686)
  - Security level: full (db and packages are protected by signature)
  - Signature: termux-pacman organization gpg key
- - Storage: aws s3 (US)
+ - Powered by aws
  - Mirrors: does not exist
  - Organization maintaining: [termux-pacman](https://github.com/termux-pacman)
