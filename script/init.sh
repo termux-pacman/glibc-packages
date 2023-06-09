@@ -4,7 +4,7 @@
 export LANG="en_US.UTF-8"
 export TERMUX_PREFIX="/data/data/com.termux/files/usr"
 export GLIBC_PREFIX="${TERMUX_PREFIX}/glibc"
-export GPKG_DEV_FLAGS="-Wl,-rpath=${GLIBC_PREFIX}/lib"
+export GPKG_DEV_FLAGS="-pipe -fno-plt -fexceptions -Wp,-D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security -fstack-clash-protection -Wl,-rpath=${GLIBC_PREFIX}/lib"
 export GPKG_DEV_CC=""
 export GPKG_DEV_CXX=""
 export GPKG_DEV_CARCH=""
