@@ -33,7 +33,6 @@ export GPKG_DEV_CXX="$(echo $GPKG_DEV_CC | sed 's/gcc/g++/')"
 if ! $(is_termux) && [ -f /etc/makepkg.conf ]; then
 	if ! $(grep CFLAGS /etc/makepkg.conf | grep -q -e "$GPKG_DEV_FLAGS"); then
 		echo 'CFLAGS="'$GPKG_DEV_FLAGS'"' >> /etc/makepkg.conf
-		#echo 'CXXFLAGS="$CFLAGS -Wp,-D_GLIBCXX_ASSERTIONS"' >> /etc/makepkg.conf
 	fi
 	if ! $(grep CC /etc/makepkg.conf | grep -q "$GPKG_DEV_CC"); then
 		echo 'export CC="'$GPKG_DEV_CC'"' >> /etc/makepkg.conf
