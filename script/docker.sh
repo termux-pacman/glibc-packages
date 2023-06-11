@@ -4,6 +4,7 @@ set -e
 
 # adding configuration
 . $(dirname "$(realpath "$0")")/init.sh
+. $(dirname "$(realpath "$0")")/functions/error.sh
 
 # value designations
 arch="x86_64"
