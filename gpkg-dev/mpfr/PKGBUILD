@@ -3,33 +3,35 @@
 
 pkgname=mpfr-glibc
 _pkgver=4.2.0
-#_patchver=1
+_patchver=9
 pkgrel=0
-#pkgver=${_pkgver}.p${_patchver}
-pkgver=$_pkgver
+pkgver=${_pkgver}.p${_patchver}
+#pkgver=$_pkgver
 pkgdesc='Multiple-precision floating-point library'
 arch=(any)
 url='https://www.mpfr.org/'
 license=('GPL3' 'LGPL3')
 makedepends=('autoconf-archive')
 source=("https://ftp.gnu.org/gnu/mpfr/mpfr-${_pkgver}.tar.xz"
-        tsprintf.patch::https://gitlab.inria.fr/mpfr/mpfr/-/commit/5172494c09718ffcb7ef1f19b3b211e3bce8781a.patch)
+        patches.diff)
 sha512sums=('58e843125884ca58837ae5159cd4092af09e8f21931a2efd19c15de057c9d1dc0753ae95c592e2ce59a727fbc491af776db8b00a055320413cdcf2033b90505c'
-            '6d68ee5d286997c9a0bb66bf8da71a8af39e375091b743f1858dea9054b0f4f725ea0bcc37d39ac87b8a95ae508204c61413f4b2cb741807558952ee1a5d81e9')
+            'cb83f38abc6c51590fafc9d0ef28061796ef39bbf911f393291670b4748a733cb5335746b6c166c30e4ddeb6b16c7a2904ee5c28c82b68a1307f42c605083534')
 b2sums=('dd88ae3a6a910ad8faeb791b49c3b1085de5d0d4c49c637c124bf4d9bc79fb621d0d1d69e07d0642b9b678f6d355a5830d083dfd189e1e91d0e04c970c10bd64'
-        '16222c0f409d757b6cad515d13a1673be26302f48bc206f8526cb46a2d357404b181811da6180326be136a265d63b8e47b81107b01f4c8abc4637fd9d5fca4ea')
+        'a1f85dba4f0d69c64a76cd2287edc4f05f109a809b28a2b004f40564bed33aaa01bcbca02062a5c0634ef18bc39427679ef9e278e8f1f31aa01fae9912489e86')
 groups=('gpkg-dev')
 
 prepare() {
   cd mpfr-${_pkgver}
 
-  patch -p1 < "$srcdir"/tsprintf.patch
+  patch -p1 -i ../patches.diff
   autoreconf -fiv
 }
 
 build() {
   cd mpfr-${_pkgver}
   ./configure --prefix=$GLIBC_PREFIX \
+    --host=$GPKG_DEV_TARGET \
+    --target=$GPKG_DEV_TARGET \
     --enable-thread-safe \
     --enable-shared
   make
@@ -40,4 +42,3 @@ package() {
   make DESTDIR="$pkgdir" install
   rm "$pkgdir"/$GLIBC_PREFIX/share/info/dir
 }
-
