@@ -2,24 +2,29 @@
 # - https://gitlab.archlinux.org/archlinux/packaging/packages/linux-api-headers/-/blob/main/PKGBUILD
 
 pkgname=linux-api-headers
-pkgver=6.3
+pkgver=6.3.8
 pkgrel=0
 pkgdesc='Kernel headers sanitized for use in userspace'
 arch=(any)
 url='https://www.gnu.org/software/libc'
 license=(GPL2)
 source=(https://www.kernel.org/pub/linux/kernel/v${pkgver:0:1}.x/linux-${pkgver}.tar.xz)
-sha256sums=('ba3491f5ed6bd270a370c440434e3d69085fcdd528922fa01e73d7657db73b1e')
+sha256sums=('4323d421250e2e444c35d36f4aa8ddb56591dedc25c68d359d19c4ef9dd20955')
 groups=('gpkg-dev')
-
-build() {
-  cd linux-$pkgver
-  make mrproper
-}
 
 package() {
   cd linux-$pkgver
-  make INSTALL_HDR_PATH="$pkgdir/$GLIBC_PREFIX" headers_install
+
+  local target_arch="x86"
+  case "${CARCH}" in
+    "aarch64") target_arch="arm64";;
+    "armv7h") target_arch="arm";;
+  esac
+
+  make ARCH=$target_arch mrproper
+
+  make INSTALL_HDR_PATH="$pkgdir/$GLIBC_PREFIX" ARCH=$target_arch headers_install
+
   # use headers from libdrm
   rm -r "$pkgdir/$GLIBC_PREFIX/include/drm"
 }
