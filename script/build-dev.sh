@@ -15,7 +15,7 @@ esac
 . ${PWD_SCRIPT}/utils/set_makepkg.sh
 . ${PWD_SCRIPT}/utils/get_deleted_pkgs.sh
 . ${PWD_SCRIPT}/utils/get_depends.sh
-export PATH="${PWD_SCRIPT}/tools:$PATH"
+export PATH="${PWD_SCRIPT}/tools:/usr/bin/core_perl:$PATH"
 
 PKGNAME="$2"
 
