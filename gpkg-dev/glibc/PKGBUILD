@@ -3,7 +3,7 @@
 
 pkgname=glibc
 pkgver=2.37
-pkgrel=6
+pkgrel=7
 _commit=be176490b818b65b5162c332eb6b581690b16e5c
 pkgdesc="GNU C Library"
 arch=(any)
@@ -40,7 +40,8 @@ source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz
         'shmget.c.patch'
         'shmat.c.patch'
         'shmctl.c.patch'
-        'shmdt.c.patch')
+        'shmdt.c.patch'
+        'ftruncate.c.patch')
 sha256sums=('2257eff111a1815d74f46856daaf40b019c1e553156c69d48ba0cbfc1bb91a43'
             '74da3d03fb81e2511140411bc8bad2a893258a2465c5eec5ac955dccddf9621d'
             '9223be94da6667f0dff0bf7afb032932dd9a151f23af178faa4d1d7f26c58608'
@@ -71,7 +72,8 @@ sha256sums=('2257eff111a1815d74f46856daaf40b019c1e553156c69d48ba0cbfc1bb91a43'
             'd7569b8f5aa1816461cf42e8f290ea861157ebb8da936c6fa472593e681737f2'
             '8a246f04d34253504bae46cf29e3e217c031f987b191de0fb2dafa38437e3809'
             '210e48732cdad2a2b01cff15771fcf12730bdad3f2a93ef772c03c8b57c74cc7'
-            'e32f030f1f3d42974c3014e8ee3b78084046642d649d496fab31021a1991b2b7')
+            'e32f030f1f3d42974c3014e8ee3b78084046642d649d496fab31021a1991b2b7'
+            '645dbf18806320f6381cec70ec5c7cd2ee7ccb6c5546f8e169fe31a55f1d419b')
 groups=('gpkg-dev')
 
 prepare() {
