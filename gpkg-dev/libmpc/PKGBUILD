@@ -3,7 +3,7 @@
 
 pkgname=libmpc-glibc
 pkgver=1.3.1
-pkgrel=0
+pkgrel=1
 pkgdesc="Library for the arithmetic of complex numbers with arbitrarily high precision"
 arch=('any')
 url="http://www.multiprecision.org/"
@@ -14,7 +14,9 @@ groups=('gpkg-dev')
 
 build() {
   cd "${srcdir}/mpc-${pkgver}"
-  ./configure --prefix=$GLIBC_PREFIX
+  ./configure --prefix=$GLIBC_PREFIX \
+              --host=$GPKG_DEV_TARGET \
+              --target=$GPKG_DEV_TARGET
   make
 }
 
