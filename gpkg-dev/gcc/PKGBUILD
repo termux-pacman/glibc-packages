@@ -4,7 +4,7 @@
 pkgname=(gcc-glibc gcc-libs)
 pkgver=13.1.0
 #_commit=9a167ee2f8b9a0859fbab6cfdc276cf1f272effe
-pkgrel=0
+pkgrel=1
 pkgdesc='The GNU Compiler Collection'
 arch=(any)
 url='https://gcc.gnu.org/'
@@ -16,7 +16,7 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-$pkgver/gcc-$pkgver.tar.xz
         collect2.cc.patch
         gcc.cc.patch
         set_glibc_dynamic_linker.patch)
-_libdir=data/data/com.termux/files/usr/glibc/lib/gcc/$CHOST/${pkgver%%+*}
+_libdir=data/data/com.termux/files/usr/glibc/lib/gcc/$GPKG_DEV_TARGET/${pkgver%%+*}
 sha256sums=('61d684f0aa5e76ac6585ad8898a2427aade8979ed5e7f85492286c4dfc13ee86'
             'd87254ee2c816aee66b00dd5002966cf3fe9aca4969eaf160c47150583357790'
             '9ad6d475acf0b19ca0e420f32867c6a5186ffbae50481ec64a140165f8988b60'
@@ -31,7 +31,8 @@ prepare() {
   done
 
   cd gcc-${pkgver}
-  sed -i 's|mabi.lp64=../lib64|mabi.lp64=../lib|' gcc/config/aarch64/t-aarch64-linux
+  sed -i '/m64=/s/lib64/lib/' gcc/config/i386/t-linux64
+  sed -i '/lp64=/s/lib64/lib/' gcc/config/aarch64/t-aarch64-linux
 
   mkdir -p "$srcdir"/gcc-build
 }
@@ -45,17 +46,25 @@ build() {
   CONFIGFLAG=""
   case "$CARCH" in
     "aarch64") CONFIGFLAG="--with-arch=armv8-a --enable-fix-cortex-a53-835769 --enable-fix-cortex-a53-843419";;
-    "armv7h") CONFIGFLAG="--with-arch=armv7-a --with-float=hard --with-fpu=neon";;
+    "armv7h") CONFIGFLAG="--with-arch=armv7-a --with-float=hard --with-fpu=neon"
+              CFLAGS+=" -lm";;
+    "x86_64") CONFIGFLAG="--with-arch=x86-64";;
+    "i686") CONFIGFLAG="--with-arch=i686"
+            CFLAGS+=" -m32";;
   esac
 
   "$srcdir"/gcc-${pkgver}/configure \
+    --host=${GPKG_DEV_TARGET} \
+    --build=${GPKG_DEV_TARGET} \
     --prefix=$GLIBC_PREFIX \
     --libdir=$GLIBC_PREFIX/lib \
     --libexecdir=$GLIBC_PREFIX/lib \
     --mandir=$GLIBC_PREFIX/share/man \
     --infodir=$GLIBC_PREFIX/share/info \
     --with-bugurl=https://github.com/termux-pacman/glibc-packages/issues \
-    --build=$CHOST \
+    --with-gmp=$GLIBC_PREFIX \
+    --with-mpfr=$GLIBC_PREFIX \
+    --with-mpc=$GLIBC_PREFIX \
     $CONFIGFLAG \
     --disable-multilib \
     --disable-bootstrap \
@@ -73,10 +82,10 @@ build() {
     --disable-static \
     --enable-host-shared \
     --disable-libssp \
-    --disable-libstdcxx-pch
+    --disable-libstdcxx-pch \
+    LD_FOR_TARGET="$GLIBC_PREFIX/bin/ld"
 
-  make -O BOOT_CFLAGS="$CFLAGS" \
-      BOOT_CXXFLAGS="$CXXFLAGS"
+  make
 }
 
 package_gcc-libs() {
@@ -84,7 +93,7 @@ package_gcc-libs() {
   options=(!emptydirs !strip)
 
   cd gcc-build
-  make -C $CHOST/libgcc DESTDIR="$pkgdir" install-shared
+  make -C $GPKG_DEV_TARGET/libgcc DESTDIR="$pkgdir" install-shared
   rm -f "$pkgdir/$_libdir/libgcc_eh.a"
 
   for lib in libatomic \
@@ -94,19 +103,19 @@ package_gcc-libs() {
              libsanitizer/{a,l,ub}san \
              libstdc++-v3/src \
              libvtv; do
-    make -C $CHOST/$lib DESTDIR="$pkgdir" install-toolexeclibLTLIBRARIES
+    make -C $GPKG_DEV_TARGET/$lib DESTDIR="$pkgdir" install-toolexeclibLTLIBRARIES
   done
 
   if [[ $CARCH == "x86_64" || $CARCH == "aarch64" ]]; then
-    make -C $CHOST/libsanitizer/tsan DESTDIR="$pkgdir" install-toolexeclibLTLIBRARIES
+    make -C $GPKG_DEV_TARGET/libsanitizer/tsan DESTDIR="$pkgdir" install-toolexeclibLTLIBRARIES
   fi
 
-  make -C $CHOST/libstdc++-v3/po DESTDIR="$pkgdir" install
+  make -C $GPKG_DEV_TARGET/libstdc++-v3/po DESTDIR="$pkgdir" install
 
   for lib in libgomp \
              libitm \
              libquadmath; do
-    make -C $CHOST/$lib DESTDIR="$pkgdir" install-info
+    make -C $GPKG_DEV_TARGET/$lib DESTDIR="$pkgdir" install-info
   done
 
   # Install Runtime Library Exception
@@ -128,13 +137,13 @@ package_gcc-glibc() {
   install -m755 -t "$pkgdir/$GLIBC_PREFIX/bin/" gcc/gcov{,-tool}
   install -m755 -t "$pkgdir/${_libdir}/" gcc/{cc1,cc1plus,collect2,lto1}
 
-  make -C $CHOST/libgcc DESTDIR="$pkgdir" install
+  make -C $GPKG_DEV_TARGET/libgcc DESTDIR="$pkgdir" install
   rm -f "$pkgdir"/$GLIBC_PREFIX/lib/libgcc_s.so*
 
-  make -C $CHOST/libstdc++-v3/src DESTDIR="$pkgdir" install
-  make -C $CHOST/libstdc++-v3/include DESTDIR="$pkgdir" install
-  make -C $CHOST/libstdc++-v3/libsupc++ DESTDIR="$pkgdir" install
-  make -C $CHOST/libstdc++-v3/python DESTDIR="$pkgdir" install
+  make -C $GPKG_DEV_TARGET/libstdc++-v3/src DESTDIR="$pkgdir" install
+  make -C $GPKG_DEV_TARGET/libstdc++-v3/include DESTDIR="$pkgdir" install
+  make -C $GPKG_DEV_TARGET/libstdc++-v3/libsupc++ DESTDIR="$pkgdir" install
+  make -C $GPKG_DEV_TARGET/libstdc++-v3/python DESTDIR="$pkgdir" install
 
   make DESTDIR="$pkgdir" install-libcc1
   if [ -f "$pkgdir"/$GLIBC_PREFIX/lib/libstdc++.so.6.*-gdb.py ]; then
@@ -152,15 +161,15 @@ package_gcc-glibc() {
   ln -s /${_libdir}/liblto_plugin.so \
     "$pkgdir/$GLIBC_PREFIX/lib/bfd-plugins/"
 
-  make -C $CHOST/libgomp DESTDIR="$pkgdir" install-nodist_{libsubinclude,toolexeclib}HEADERS
-  make -C $CHOST/libitm DESTDIR="$pkgdir" install-nodist_toolexeclibHEADERS
-  make -C $CHOST/libquadmath DESTDIR="$pkgdir" install-nodist_libsubincludeHEADERS
-  make -C $CHOST/libsanitizer DESTDIR="$pkgdir" install-nodist_{saninclude,toolexeclib}HEADERS
-  make -C $CHOST/libsanitizer/asan DESTDIR="$pkgdir" install-nodist_toolexeclibHEADERS
+  make -C $GPKG_DEV_TARGET/libgomp DESTDIR="$pkgdir" install-nodist_{libsubinclude,toolexeclib}HEADERS
+  make -C $GPKG_DEV_TARGET/libitm DESTDIR="$pkgdir" install-nodist_toolexeclibHEADERS
+  make -C $GPKG_DEV_TARGET/libquadmath DESTDIR="$pkgdir" install-nodist_libsubincludeHEADERS
+  make -C $GPKG_DEV_TARGET/libsanitizer DESTDIR="$pkgdir" install-nodist_{saninclude,toolexeclib}HEADERS
+  make -C $GPKG_DEV_TARGET/libsanitizer/asan DESTDIR="$pkgdir" install-nodist_toolexeclibHEADERS
   if [[ $CARCH == "aarch64" ]]; then
-    make -C $CHOST/libsanitizer/tsan DESTDIR="$pkgdir" install-nodist_toolexeclibHEADERS
+    make -C $GPKG_DEV_TARGET/libsanitizer/tsan DESTDIR="$pkgdir" install-nodist_toolexeclibHEADERS
   fi
-  make -C $CHOST/libsanitizer/lsan DESTDIR="$pkgdir" install-nodist_toolexeclibHEADERS
+  make -C $GPKG_DEV_TARGET/libsanitizer/lsan DESTDIR="$pkgdir" install-nodist_toolexeclibHEADERS
 
   make -C gcc DESTDIR="$pkgdir" install-man install-info
   rm "$pkgdir"/$GLIBC_PREFIX/share/man/man1/lto-dump.1
@@ -187,5 +196,15 @@ package_gcc-glibc() {
   rm -f "${pkgdir}"/$GLIBC_PREFIX/share/info/dir
 
   replace_hard_with_symbolic "$pkgdir"
+
+  if [ -d $pkgdir/$GLIBC_PREFIX/lib64 ]; then
+    mv $pkgdir/$GLIBC_PREFIX/lib64/* $pkgdir/$GLIBC_PREFIX/lib
+    rm -fr $pkgdir/$GLIBC_PREFIX/lib64
+  fi
+
+  if [ -d $pkgdir/$GLIBC_PREFIX/lib32 ]; then
+    mv $pkgdir/$GLIBC_PREFIX/lib32/* $pkgdir/$GLIBC_PREFIX/lib
+    rm -fr $pkgdir/$GLIBC_PREFIX/lib32
+  fi
 }
 

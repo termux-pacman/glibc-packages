@@ -1,0 +1,9 @@
+glibc
+gmp-glibc
+mpfr-glibc
+libmpc-glibc
+zlib-glibc
+gcc-libs
+libisl-glibc
+zstd-glibc
+binutils-glibc
