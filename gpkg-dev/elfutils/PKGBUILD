@@ -1,0 +1,92 @@
+# The original PKGBUILD was taken from xthe gitlab.archlinux.org/archlinux/packaging repo:
+# - https://gitlab.archlinux.org/archlinux/packaging/packages/elfutils/-/blob/main/PKGBUILD
+
+pkgbase=elfutils-glibc
+pkgname=(debuginfod-glibc elfutils-glibc libelf-glibc)
+pkgver=0.189
+pkgrel=0
+pkgdesc="Handle ELF object files and DWARF debugging information"
+arch=(any)
+url="https://sourceware.org/elfutils/"
+license=(LGPL3 GPL3)
+options=(staticlibs)
+source=(https://sourceware.org/elfutils/ftp/$pkgver/elfutils-$pkgver.tar.bz2)
+sha512sums=('93a877e34db93e5498581d0ab2d702b08c0d87e4cafd9cec9d6636dfa85a168095c305c11583a5b0fb79374dd93bc8d0e9ce6016e6c172764bcea12861605b71')
+b2sums=('30596271e14cf3408326abc38a9775b849b8cb0ee119a5455df9434a7d3b9a57afb15e0236a179a26c7bd400d303749964c9d6350c419f747784fd99d12517e0')
+groups=('gpkg-dev')
+
+_pick() {
+  local p="$1" f d; shift
+  for f; do
+    d="$srcdir/$p/${f#$pkgdir/}"
+    mkdir -p "$(dirname "$d")"
+    mv "$f" "$d"
+    rmdir -p --ignore-fail-on-non-empty "$(dirname "$f")"
+  done
+}
+
+prepare() {
+  # remove failing test due to missing glibc debug package during test: https://bugs.archlinux.org/task/74875
+  sed -e 's/run-backtrace-native.sh//g' -i elfutils-$pkgver/tests/Makefile.am
+  cd elfutils-$pkgver
+  autoreconf -fiv
+}
+
+
+build() {
+  local configure_options=(
+    --host=$GPKG_DEV_TARGET
+    --target=$GPKG_DEV_TARGET
+    --prefix=$GLIBC_PREFIX
+    --sysconfdir=$GLIBC_PREFIX/etc
+    --program-prefix="eu-"
+    --enable-deterministic-archives
+    --disable-debuginfod
+    --disable-demangler
+  )
+
+  # fat-lto-objects is required for non-mangled .a files in libelf
+  CFLAGS+=" -ffat-lto-objects"
+  LDFLAGS+=" -lz -lzstd -lcurl -lssh2 -lssl -lcrypto -lbrotlidec -lbrotlicommon"
+  cd elfutils-$pkgver
+  ./configure "${configure_options[@]}"
+  make
+}
+
+package_debuginfod-glibc() {
+  pkgdesc+=" (debuginfod)"
+
+  make DESTDIR="$pkgdir" install -C elfutils-$pkgver
+  install -vDm 644 elfutils-$pkgver/{AUTHORS,ChangeLog,NEWS,NOTES,README} -t "$pkgdir/$GLIBC_PREFIX/share/doc/$pkgname/"
+
+  # set the default DEBUGINFOD_URLS environment variable to the distribution's debuginfod URL
+  printf "https://github.com/termux-pacman/glibc-packages/issues\n" > "$pkgdir/$GLIBC_PREFIX/etc/debuginfod/termux-pacman.urls"
+
+  (
+    cd "$pkgdir"
+
+    _pick libelf ${GLIBC_PREFIX:1}/etc/debuginfod/*
+    _pick libelf ${GLIBC_PREFIX:1}/etc/profile.d/*
+    _pick libelf ${GLIBC_PREFIX:1}/{include,lib}
+    _pick elfutils ${GLIBC_PREFIX:1}/bin/eu-*
+    _pick elfutils ${GLIBC_PREFIX:1}/share/locale
+    _pick elfutils ${GLIBC_PREFIX:1}/share/man/man1/eu-*
+    _pick elfutils ${GLIBC_PREFIX:1}/share/man/man3/elf_*
+  )
+
+}
+
+package_elfutils-glibc() {
+  pkgdesc+=" (utilities)"
+
+  mv -v elfutils/* "$pkgdir"
+  install -vDm 644 elfutils-$pkgver/{AUTHORS,ChangeLog,NEWS,NOTES,README} -t "$pkgdir/$GLIBC_PREFIX/share/doc/$pkgname/"
+}
+
+package_libelf-glibc() {
+  pkgdesc+=" (libraries)"
+  # NOTE: the shared objects can not be added to provides as they are not versioned
+
+  mv -v libelf/* "$pkgdir"
+  install -vDm 644 elfutils-$pkgver/{AUTHORS,ChangeLog,NEWS,NOTES,README} -t "$pkgdir/$GLIBC_PREFIX/share/doc/$pkgname/"
+}
