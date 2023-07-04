@@ -3,7 +3,7 @@
 
 pkgname=glibc
 pkgver=2.37
-pkgrel=7
+pkgrel=8
 _commit=be176490b818b65b5162c332eb6b581690b16e5c
 pkgdesc="GNU C Library"
 arch=(any)
@@ -41,7 +41,11 @@ source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz
         'shmat.c.patch'
         'shmctl.c.patch'
         'shmdt.c.patch'
-        'ftruncate.c.patch')
+        'ftruncate.c.patch'
+        'aarch64-arch-syscall.h.patch'
+        'arm-arch-syscall.h.patch'
+        'x86_64-arch-syscall.h.patch'
+        'i386-arch-syscall.h.patch')
 sha256sums=('2257eff111a1815d74f46856daaf40b019c1e553156c69d48ba0cbfc1bb91a43'
             '74da3d03fb81e2511140411bc8bad2a893258a2465c5eec5ac955dccddf9621d'
             '9223be94da6667f0dff0bf7afb032932dd9a151f23af178faa4d1d7f26c58608'
@@ -55,7 +59,7 @@ sha256sums=('2257eff111a1815d74f46856daaf40b019c1e553156c69d48ba0cbfc1bb91a43'
             'd42648cea552ba5353a32e264686e992263289d5cc86207314dffc54ab514981'
             'cdc234959c6fdb43f000d3bb7d1080b0103f4080f5e67bcfe8ae1aaf477812f0'
             '774061aff612a377714a509918a9e0e0aafce708b87d2d7e06b1bd1f6542fe70'
-            '20b8869cd114ce32bbcc418d1f18931646ed29a6d713f21fb71a136e026e8c7f'
+            '17e408e3d587551146d85741f932241e0bf60899490bb73195a2bd391510f099'
             'e0f6a51cbd64a30394d6a22e5e14603766ac924e9b6690adb673517821c2015e'
             'e67383acf8935a68353f0f1c786161222fbb08c9255cffa3ccb06565e1401cbc'
             'cd981ed4c8b77ee1551ae5a017dcc9b7891a6078450633eafe528e3984254f40'
@@ -73,7 +77,11 @@ sha256sums=('2257eff111a1815d74f46856daaf40b019c1e553156c69d48ba0cbfc1bb91a43'
             '8a246f04d34253504bae46cf29e3e217c031f987b191de0fb2dafa38437e3809'
             '210e48732cdad2a2b01cff15771fcf12730bdad3f2a93ef772c03c8b57c74cc7'
             'e32f030f1f3d42974c3014e8ee3b78084046642d649d496fab31021a1991b2b7'
-            '645dbf18806320f6381cec70ec5c7cd2ee7ccb6c5546f8e169fe31a55f1d419b')
+            '645dbf18806320f6381cec70ec5c7cd2ee7ccb6c5546f8e169fe31a55f1d419b'
+            '4ee6aaf740d18758de333a38e979791197ae3053f91fefe83871639de525601c'
+            '6a63b915b8f50e05a9a2287241e907f0c2a2b39f8d696c18a3e23267805d6a92'
+            'f29c92c48adae65e86256b4ae5180c77aa6957d90bbc7abb54042c2820b2a26f'
+            'e378b410d1f1750b7751910dffcd525f58be71ab1b4f54a09e1eedd7fa3829f4')
 groups=('gpkg-dev')
 
 prepare() {
@@ -82,6 +90,8 @@ prepare() {
   done
 
   install -Dm644 "${srcdir}/shmem-android.h" "glibc-$pkgver/sysdeps/unix/sysv/linux/shmem-android.h"
+
+  rm glibc-$pkgver/sysdeps/unix/sysv/linux/*/clone3.S
 
   mkdir -p glibc-build
 }
