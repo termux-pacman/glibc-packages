@@ -1,0 +1,58 @@
+pkgname=cbt
+pkgver=2.40
+pkgrel=0
+pkgdesc='Cross Binutils for Termux (only for Linux)'
+arch=(x86_64)
+url='https://www.gnu.org/software/binutils/'
+license=('GPL3' 'GPL' 'FDL1.3' 'custom:FSFAP')
+source=(https://ftp.gnu.org/gnu/binutils/binutils-$pkgver.tar.xz)
+sha256sums=('0f8a4c272d7f17f369ded10a4aca28b8e304828e95526da482b0ccc4dfc9d8e1')
+groups=('cgct')
+
+build() {
+	unset CFLAGS CXXFLAGS AR LD CC CXX
+	CFLAGS="-O2 -pipe -fno-plt -fexceptions -Wp,-D_FORTIFY_SOURCE=2 -Wformat -fstack-clash-protection"
+	CXXFLAGS="${CFLAGS} -Wp,-D_GLIBCXX_ASSERTIONS"
+
+	for target in aarch64-linux-gnu arm-linux-gnueabihf x86_64-linux-gnu i686-linux-gnu; do
+		arch_build=${target/-*}
+		CGCT_PREFIX="${DIR_TERMUX}/cgct/${arch_build}"
+		mkdir binutils-${arch_build}
+		cd binutils-${arch_build}
+
+		"$srcdir"/binutils-${pkgver}/configure \
+			--target=$target \
+			--prefix=$CGCT_PREFIX \
+			--disable-multilib \
+			--with-gnu-as \
+			--with-gnu-ld \
+			--disable-nls \
+			--enable-ld=default \
+			--enable-plugins \
+			--enable-deterministic-archives
+		make
+
+		cd ..
+	done
+}
+
+package() {
+	for target in aarch64-linux-gnu arm-linux-gnueabihf x86_64-linux-gnu i686-linux-gnu; do
+		arch_build=${target/-*}
+		CGCT_PREFIX="${DIR_TERMUX}/cgct/${arch_build}"
+		cd binutils-${arch_build}
+
+		make DESTDIR="$pkgdir" install
+
+		mv $pkgdir/${CGCT_PREFIX}/$target/bin/* $pkgdir/${CGCT_PREFIX}/bin
+		mv $pkgdir/${CGCT_PREFIX}/$target/lib/* $pkgdir/${CGCT_PREFIX}/lib
+		rm -fr $pkgdir/${CGCT_PREFIX}/$target
+		rm -fr $pkgdir/${CGCT_PREFIX}/share
+		rm -fr $pkgdir/${CGCT_PREFIX}/include
+		rm -fr $pkgdir/${CGCT_PREFIX}/etc
+
+		cd ..
+	done
+
+	replace_hard_with_symbolic "$pkgdir"
+}

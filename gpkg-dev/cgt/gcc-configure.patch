@@ -1,0 +1,22 @@
+--- src/gcc-13.1.0/gcc/configure	2023-04-26 10:11:18.000000000 +0300
++++ src/gcc-13.1.0/gcc/configure.patch	2023-07-16 13:12:24.569064972 +0300
+@@ -3734,9 +3734,6 @@
+     gcc_gxx_include_dir='${libsubdir}/include/c++'
+   else
+     libstdcxx_incdir='include/c++/$(version)'
+-    if test x$host != x$target; then
+-       libstdcxx_incdir="$target_alias/$libstdcxx_incdir"
+-    fi
+     gcc_gxx_include_dir="\$(libsubdir)/\$(libsubdir_to_prefix)$libstdcxx_incdir"
+   fi
+ elif test "${with_sysroot+set}" = set; then
+@@ -3780,9 +3777,6 @@
+     gcc_gxx_libcxx_include_dir='${libsubdir}/libc++_include/c++/v1'
+   else
+     libcxx_incdir='libc++_include/c++/$(version)/v1'
+-    if test x$host != x$target; then
+-       libcxx_incdir="$target_alias/$libcxx_incdir"
+-    fi
+     gcc_gxx_libcxx_include_dir="\$(libsubdir)/\$(libsubdir_to_prefix)$libcxx_incdir"
+   fi
+ elif test "${with_sysroot+set}" = set; then

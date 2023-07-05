@@ -37,10 +37,12 @@ jobs:
           il=(${i//// })
           if [ "${il[0]}" = "gpkg-dev" ]; then
             if [ -d "${il[0]}/${il[1]}" ]; then
-              echo "${il[1]}" >> "pkgs/gpkg-dev-need.txt"
-              curl -L "https://raw.githubusercontent.com/termux-pacman/glibc-packages/$(git log -n 2 --format=format:%H gpkg-dev/${il[1]} | tail -1)/gpkg-dev/${il[1]}/PKGBUILD" -o pkgs/PKGBUILDs/${il[1]}
+              if [ ! -f pkgs/gpkg-dev-need.txt ] || ! $(grep -q '^'${il[1]}'$' pkgs/gpkg-dev-need.txt); then
+                echo "${il[1]}" >> pkgs/gpkg-dev-need.txt
+                curl -L "https://raw.githubusercontent.com/termux-pacman/glibc-packages/$(git log -n 2 --format=format:%H gpkg-dev/${il[1]} | tail -1)/gpkg-dev/${il[1]}/PKGBUILD" -o pkgs/PKGBUILDs/${il[1]}
+              fi
             else
-              echo "${il[1]}" >> "pkgs/deleted_gpkg-dev_packages.txt"
+              echo "${il[1]}" >> pkgs/deleted_gpkg-dev_packages.txt
             fi
           fi
         done
