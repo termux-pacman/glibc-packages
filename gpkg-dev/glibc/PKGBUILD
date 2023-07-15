@@ -3,7 +3,7 @@
 
 pkgname=glibc
 pkgver=2.37
-pkgrel=9
+pkgrel=10
 _commit=be176490b818b65b5162c332eb6b581690b16e5c
 pkgdesc="GNU C Library"
 arch=(any)
@@ -70,10 +70,10 @@ sha256sums=('2257eff111a1815d74f46856daaf40b019c1e553156c69d48ba0cbfc1bb91a43'
             '18f01ed2c6ed8acb122adc443fd428c8a37bc6a7d518f4e433e2ee462eebd5eb'
             '769b294e226877f12d47ac4ff86ab9246da6e547781071c1ee38e60772484c74'
             'f5b5b6ae3596f6fd617d015ff9c417a35da37c86ae3a49b5b5ce88275ed09f12'
-            '46e846c4237ab332ffb64abf46d3a95fd773173346e20a7e2b16f385beaab8d4'
+            '743c2fe91676cd8ce6eb520286abd28d9ad2764180894aad49d5be17dab3ab0c'
             'b8b573fcb85d59fc11ddef9aebb691b8047d700ea1894784883a1359c6ef94a8'
             '59e711916c946fc961bb8c3a0da5d367a90ffedd31bbf7cf250e9bc1e1e04744'
-            '660e83ab93f745b8f10ca6bce4704203233d65d7ac10ce481186c59b31252cb0'
+            '0298e3d4aca6e7db5d674f318a31cb68257bcba0cac66828b00202e012cbf567'
             'd7569b8f5aa1816461cf42e8f290ea861157ebb8da936c6fa472593e681737f2'
             '8a246f04d34253504bae46cf29e3e217c031f987b191de0fb2dafa38437e3809'
             '210e48732cdad2a2b01cff15771fcf12730bdad3f2a93ef772c03c8b57c74cc7'
@@ -83,7 +83,7 @@ sha256sums=('2257eff111a1815d74f46856daaf40b019c1e553156c69d48ba0cbfc1bb91a43'
             '6a63b915b8f50e05a9a2287241e907f0c2a2b39f8d696c18a3e23267805d6a92'
             'f29c92c48adae65e86256b4ae5180c77aa6957d90bbc7abb54042c2820b2a26f'
             'e378b410d1f1750b7751910dffcd525f58be71ab1b4f54a09e1eedd7fa3829f4'
-            '01f0c982181626e32d485015215de4f80b17952e7ad46618bd00497918f079e2')
+            '8951c11eb881bf3da35146986cacd321dfb9f6d776dc620304f64251cc185b12')
 groups=('gpkg-dev')
 
 prepare() {
@@ -91,8 +91,9 @@ prepare() {
     patch -Np1 -i ${srcdir}/$i
   done
 
-  install -Dm644 "${srcdir}/shmem-android.h" "glibc-$pkgver/sysdeps/unix/sysv/linux/shmem-android.h"
-  install -Dm644 "${srcdir}/mprotect.c" "glibc-$pkgver/sysdeps/unix/sysv/linux/mprotect.c"
+  for i in shmem-android.h mprotect.c; do
+    install -Dm644 "${srcdir}/${i}" "glibc-$pkgver/sysdeps/unix/sysv/linux/${i}"
+  done
 
   rm glibc-$pkgver/sysdeps/unix/sysv/linux/*/clone3.S
 
@@ -112,11 +113,12 @@ build() {
       --libdir=$GLIBC_PREFIX/lib \
       --libexecdir=$GLIBC_PREFIX/lib \
       --host=$GPKG_DEV_TARGET \
+      --build=$GPKG_DEV_TARGET \
       --target=$GPKG_DEV_TARGET \
       --with-bugurl=https://github.com/termux-pacman/glibc-packages/issues \
       --enable-bind-now \
       --enable-cet \
-      --enable-multi-arch \
+      --disable-multi-arch \
       --enable-stack-protector=strong \
       --enable-systemtap \
       --disable-profile \
