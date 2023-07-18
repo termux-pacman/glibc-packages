@@ -1,0 +1,33 @@
+# The original PKGBUILD was taken from the gitlab.archlinux.org/archlinux/packaging repo:
+# - https://gitlab.archlinux.org/archlinux/packaging/packages/libxcrypt/-/blob/main/PKGBUILD
+
+pkgname=libxcrypt-glibc
+pkgver=4.4.36
+pkgrel=0
+pkgdesc='Modern library for one-way hashing of passwords'
+arch=('any')
+url='https://github.com/besser82/libxcrypt/'
+license=('LGPL')
+source=("${url}/releases/download/v${pkgver}/libxcrypt-${pkgver}.tar.xz")
+sha256sums=('e5e1f4caee0a01de2aee26e3138807d6d3ca2b8e67287966d1fefd65e1fd8943')
+
+build() {
+  mkdir build-libxcrypt
+
+  cd "${srcdir}/build-libxcrypt/"
+  "${srcdir}/libxcrypt-${pkgver}"/configure \
+    --host=$GPKG_DEV_TARGET \
+    --target=$GPKG_DEV_TARGET \
+    --prefix=$GLIBC_PREFIX \
+    --disable-static \
+    --enable-hashes=strong,glibc \
+    --enable-obsolete-api=no \
+    --disable-failure-tokens
+  make  
+}
+
+package() {
+  cd build-libxcrypt/
+
+  make DESTDIR="${pkgdir}" install
+}
