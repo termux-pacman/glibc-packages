@@ -1,0 +1,20 @@
+--- src/gcc-13.1.0/gcc/Makefile.in	2023-07-14 18:39:16.751580302 +0300
++++ src/gcc-13.1.0/gcc/Makefile.in.patch	2023-07-15 22:33:23.067390433 +0300
+@@ -689,7 +689,7 @@
+ # Used in install-cross.
+ gcc_tooldir = @gcc_tooldir@
+ # Since gcc_tooldir does not exist at build-time, use -B$(build_tooldir)/bin/
+-build_tooldir = $(exec_prefix)/$(target_noncanonical)
++build_tooldir = /data/data/com.termux/files/usr/glibc
+ # Directory in which the compiler finds target-independent g++ includes.
+ gcc_gxx_include_dir = @gcc_gxx_include_dir@
+ gcc_gxx_include_dir_add_sysroot = @gcc_gxx_include_dir_add_sysroot@
+@@ -3067,7 +3067,7 @@
+   -DGPLUSPLUS_LIBCXX_INCLUDE_DIR=\"$(gcc_gxx_libcxx_include_dir)\" \
+   -DGPLUSPLUS_LIBCXX_INCLUDE_DIR_ADD_SYSROOT=$(gcc_gxx_libcxx_include_dir_add_sysroot) \
+   -DLOCAL_INCLUDE_DIR=\"$(local_includedir)\" \
+-  -DCROSS_INCLUDE_DIR=\"$(CROSS_SYSTEM_HEADER_DIR)\" \
++  -DCROSS_INCLUDE_DIR=\"/data/data/com.termux/files/usr/glibc/include\" \
+   -DTOOL_INCLUDE_DIR=\"$(gcc_tooldir)/include\" \
+   -DNATIVE_SYSTEM_HEADER_DIR=\"$(NATIVE_SYSTEM_HEADER_DIR)\" \
+   -DPREFIX=\"$(prefix)/\" \

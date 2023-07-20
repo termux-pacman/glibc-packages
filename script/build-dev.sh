@@ -13,6 +13,7 @@ case $ARCH in
 esac
 . ${PWD_SCRIPT}/functions/get_name.sh
 . ${PWD_SCRIPT}/utils/set_makepkg.sh
+. ${PWD_SCRIPT}/utils/set_data.sh
 . ${PWD_SCRIPT}/utils/get_deleted_pkgs.sh
 . ${PWD_SCRIPT}/utils/get_depends.sh
 export PATH="${PWD_SCRIPT}/tools:/usr/bin/core_perl:$PATH"
@@ -42,15 +43,20 @@ fi
 	cd $PKGNAME
 	chmod a+rwx *
 
-	# packages removal check
-	get_deleted_pkgs
+	arch_pkg=$(grep 'arch=(.*)' PKGBUILD | sed 's\arch=(\\; s\)\\')
 
-	# Installing dependencies
-	get_depends
+	if [ "$arch_pkg" = "any" ] || [ "$arch_pkg" = "$ARCH" ]; then
+		# packages removal check
+		get_deleted_pkgs
 
-	# start building
-	sudo -Es -H -u ${GPKG_DEV_USER_NAME} bash -c "makepkg"
+		# Installing dependencies
+		get_depends
 
-	mv *.pkg.* ${GPKG_DEV_DIR_BUILD}
-	echo " ${PKGNAME} " >> ${GPKG_DEV_DIR_BUILD}/gpkg-dev-done.txt
+		# start building
+		sudo -Es -H -u ${GPKG_DEV_USER_NAME} bash -c "makepkg"
+
+		mv *.pkg.* ${GPKG_DEV_DIR_BUILD}
+	fi
+
+	echo "${PKGNAME}" >> ${GPKG_DEV_DIR_BUILD}/gpkg-dev-done.txt
 )
