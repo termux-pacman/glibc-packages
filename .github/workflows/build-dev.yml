@@ -96,7 +96,7 @@ jobs:
           mv pkgs/${dp_file} ${path_dp_file}
           sfuf "${path_dp_file}"
         fi
-        for pkg in pkgs/*.pkg.*; do
+        for pkg in $(ls pkgs/*.pkg.* 2> /dev/null); do
           sfuf "$pkg"
         done
         rm -fr pkgs
