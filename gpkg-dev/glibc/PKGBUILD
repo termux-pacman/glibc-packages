@@ -3,8 +3,7 @@
 
 pkgname=glibc
 pkgver=2.37
-pkgrel=10
-_commit=be176490b818b65b5162c332eb6b581690b16e5c
+pkgrel=11
 pkgdesc="GNU C Library"
 arch=(any)
 url='https://www.gnu.org/software/libc/'
@@ -83,7 +82,7 @@ sha256sums=('2257eff111a1815d74f46856daaf40b019c1e553156c69d48ba0cbfc1bb91a43'
             '6a63b915b8f50e05a9a2287241e907f0c2a2b39f8d696c18a3e23267805d6a92'
             'f29c92c48adae65e86256b4ae5180c77aa6957d90bbc7abb54042c2820b2a26f'
             'e378b410d1f1750b7751910dffcd525f58be71ab1b4f54a09e1eedd7fa3829f4'
-            '8951c11eb881bf3da35146986cacd321dfb9f6d776dc620304f64251cc185b12')
+            '27be199f7d469a44a9b840dac7275968761082d4735cc27326b5bca81bfce2b8')
 groups=('gpkg-dev')
 
 prepare() {
