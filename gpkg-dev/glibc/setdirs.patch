@@ -106,9 +106,18 @@ index 9714f75d..452e0dfc 100644
    if (__libc_enable_secure)
      {
 diff --git a/elf/rtld.c b/elf/rtld.c
-index b8467f37..3a82030a 100644
+index b8467f37..1c8d38f6 100644
 --- src/glibc-2.37/elf/rtld.c
 +++ src/glibc-2.37/elf/rtld.c
+@@ -1872,7 +1872,7 @@ dl_main (const ElfW(Phdr) *phdr,
+      open().  So we do this first.  If it succeeds we do almost twice
+      the work but this does not matter, since it is not for production
+      use.  */
+-  static const char preload_file[] = "/etc/ld.so.preload";
++  static const char preload_file[] = "/data/data/com.termux/files/usr/glibc/etc/ld.so.preload";
+   if (__glibc_unlikely (__access (preload_file, R_OK) == 0))
+     {
+       /* Read the contents of the file.  */
 @@ -2551,7 +2551,7 @@ process_envvars (struct dl_main_state *state)
  
    /* This is the default place for profiling data file.  */
@@ -194,7 +203,7 @@ index 19740f49..3fd69a5e 100644
    int r;
 diff --git a/io/bug-ftw4.c b/io/bug-ftw4.c
 index bfbf4544..de1478fb 100644
---- /io/bug-ftw4.c
+--- src/glibc-2.37/io/bug-ftw4.c
 +++ src/glibc-2.37/io/bug-ftw4.c
 @@ -35,7 +35,7 @@ cb (const char *name, const struct stat64 *st, int type)
  int
