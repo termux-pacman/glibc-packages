@@ -15,14 +15,14 @@
 int __mprotect(void *addr, size_t len, int prot) {
 #if !IS_IN(rtld)
 	if (prot & PROT_EXEC) {
-		void *caddr = malloc(sizeof(addr));
+		void *caddr = malloc(len);
 		if (caddr == NULL)
 			return errno;
-		memcpy(caddr, addr, sizeof(addr));
+		memcpy(caddr, addr, len);
 		addr = mmap(addr, len, prot, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
 		if (__glibc_unlikely(addr == MAP_FAILED))
 			return errno;
-		memcpy(addr, caddr, sizeof(caddr));
+		memcpy(addr, caddr, len);
 		free(caddr);
 		return 0;
 	}
