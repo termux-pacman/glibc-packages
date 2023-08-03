@@ -20,7 +20,7 @@ if [[ -z "$1" ]]; then
 	echo " --help - print help text from ld.so command"
 	echo ""
 	echo "Example: grun [--set] ./binary || grun --shell [gcc -v]"
-	echo "Bur report: https://github.com/termux-pacman/glibc-packages/issues"
+	echo "Bug report: https://github.com/termux-pacman/glibc-packages/issues"
 	exit 0
 fi
 
