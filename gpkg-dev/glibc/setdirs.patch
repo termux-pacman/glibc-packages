@@ -1,53 +1,7 @@
-diff --git a/debug/tst-fortify.c b/debug/tst-fortify.c
-index 7850a4e5..3845034c 100644
---- src/glibc-2.37/debug/tst-fortify.c
-+++ src/glibc-2.37/debug/tst-fortify.c
-@@ -1289,7 +1289,7 @@ do_test (void)
-       close (sp[1]);
-     }
- 
--  char fname[] = "/tmp/tst-chk1-dir-XXXXXX\0foo";
-+  char fname[] = "/data/data/com.termux/files/usr/tmp/tst-chk1-dir-XXXXXX\0foo";
-   char *enddir = strchr (fname, '\0');
-   if (mkdtemp (fname) == NULL)
-     {
-@@ -1320,27 +1320,27 @@ do_test (void)
-   CHK_FAIL_END
- #endif
- 
--  int tmpfd = open ("/tmp", O_RDONLY | O_DIRECTORY);
-+  int tmpfd = open ("/data/data/com.termux/files/usr/tmp", O_RDONLY | O_DIRECTORY);
-   if (tmpfd < 0)
-     FAIL ();
- 
--  if (readlinkat (tmpfd, fname + sizeof ("/tmp/") - 1, readlinkbuf, 4) != 3
-+  if (readlinkat (tmpfd, fname + sizeof ("/data/data/com.termux/files/usr/tmp/") - 1, readlinkbuf, 4) != 3
-       || memcmp (readlinkbuf, "bar", 3) != 0)
-     FAIL ();
--  if (readlinkat (tmpfd, fname + sizeof ("/tmp/") - 1, readlinkbuf + 1,
-+  if (readlinkat (tmpfd, fname + sizeof ("/data/data/com.termux/files/usr/tmp/") - 1, readlinkbuf + 1,
- 		  l0 + 3) != 3
-       || memcmp (readlinkbuf, "bbar", 4) != 0)
-     FAIL ();
- 
- #if __USE_FORTIFY_LEVEL >= 1
-   CHK_FAIL_START
--  if (readlinkat (tmpfd, fname + sizeof ("/tmp/") - 1, readlinkbuf + 2,
-+  if (readlinkat (tmpfd, fname + sizeof ("/data/data/com.termux/files/usr/tmp/") - 1, readlinkbuf + 2,
- 		  l0 + 3) != 3)
-     FAIL ();
-   CHK_FAIL_END
- 
-   CHK_FAIL_START
--  if (readlinkat (tmpfd, fname + sizeof ("/tmp/") - 1, readlinkbuf + 3,
-+  if (readlinkat (tmpfd, fname + sizeof ("/data/data/com.termux/files/usr/tmp/") - 1, readlinkbuf + 3,
- 		  4) != 3)
-     FAIL ();
-   CHK_FAIL_END
 diff --git a/dirent/bug-readdir1.c b/dirent/bug-readdir1.c
 index 4c3521db..6cd2fbe9 100644
---- src/glibc-2.37/dirent/bug-readdir1.c
-+++ src/glibc-2.37/dirent/bug-readdir1.c
+--- src/glibc-2.38/dirent/bug-readdir1.c
++++ src/glibc-2.38/dirent/bug-readdir1.c
 @@ -14,7 +14,7 @@ main (void)
    struct dirent* ent;
  
@@ -57,45 +11,10 @@ index 4c3521db..6cd2fbe9 100644
    if (dirp == NULL)
      {
        if (errno == ENOENT)
-diff --git a/dirent/tst-fdopendir.c b/dirent/tst-fdopendir.c
-index 6321af1d..7786fd65 100644
---- src/glibc-2.37/dirent/tst-fdopendir.c
-+++ src/glibc-2.37/dirent/tst-fdopendir.c
-@@ -14,7 +14,7 @@
- static int
- do_test (void)
- {
--  char fname[] = "/tmp/jXXXXXX";
-+  char fname[] = "/data/data/com.termux/files/usr/tmp/jXXXXXX";
-   int fd = mkstemp (fname);
-   if (fd == -1)
-     {
-@@ -67,7 +67,7 @@ do_test (void)
- 
-   unlink(fname);
- 
--  strcpy(fname, "/tmp/dXXXXXX");
-+  strcpy(fname, "/data/data/com.termux/files/usr/tmp/dXXXXXX");
-   char *d = mkdtemp (fname);
-   if (d == NULL)
-     {
-diff --git a/dirent/tst-fdopendir2.c b/dirent/tst-fdopendir2.c
-index 7709e4b3..2f873c7a 100644
---- src/glibc-2.37/dirent/tst-fdopendir2.c
-+++ src/glibc-2.37/dirent/tst-fdopendir2.c
-@@ -8,7 +8,7 @@
- static int
- do_test (void)
- {
--  char tmpl[] = "/tmp/tst-fdopendir2-XXXXXX";
-+  char tmpl[] = "/data/data/com.termux/files/usr/tmp/tst-fdopendir2-XXXXXX";
-   int fd = mkstemp (tmpl);
-   if (fd == -1)
-     {
 diff --git a/elf/dl-support.c b/elf/dl-support.c
 index 9714f75d..452e0dfc 100644
---- src/glibc-2.37/elf/dl-support.c
-+++ src/glibc-2.37/elf/dl-support.c
+--- src/glibc-2.38/elf/dl-support.c
++++ src/glibc-2.38/elf/dl-support.c
 @@ -314,7 +314,7 @@ _dl_non_dynamic_init (void)
    _dl_profile_output = getenv ("LD_PROFILE_OUTPUT");
    if (_dl_profile_output == NULL || _dl_profile_output[0] == '\0')
@@ -107,8 +26,8 @@ index 9714f75d..452e0dfc 100644
      {
 diff --git a/elf/rtld.c b/elf/rtld.c
 index b8467f37..1c8d38f6 100644
---- src/glibc-2.37/elf/rtld.c
-+++ src/glibc-2.37/elf/rtld.c
+--- src/glibc-2.38/elf/rtld.c
++++ src/glibc-2.38/elf/rtld.c
 @@ -1872,7 +1872,7 @@ dl_main (const ElfW(Phdr) *phdr,
       open().  So we do this first.  If it succeeds we do almost twice
       the work but this does not matter, since it is not for production
@@ -129,8 +48,8 @@ index b8467f37..1c8d38f6 100644
      {
 diff --git a/elf/sprof.c b/elf/sprof.c
 index dfca16b7..b3cbe1af 100644
---- src/glibc-2.37/elf/sprof.c
-+++ src/glibc-2.37/elf/sprof.c
+--- src/glibc-2.38/elf/sprof.c
++++ src/glibc-2.38/elf/sprof.c
 @@ -618,7 +618,7 @@ load_shobj (const char *name)
        *++cp = '\0';
  
@@ -151,45 +70,10 @@ index dfca16b7..b3cbe1af 100644
        name = ext_name;
  
        fd = open (ext_name, O_RDONLY);
-diff --git a/elf/tst-ldconfig-ld_so_conf-update.c b/elf/tst-ldconfig-ld_so_conf-update.c
-index 503afb32..e3adc370 100644
---- src/glibc-2.37/elf/tst-ldconfig-ld_so_conf-update.c
-+++ src/glibc-2.37/elf/tst-ldconfig-ld_so_conf-update.c
-@@ -32,7 +32,7 @@
- 
- 
- #define DSO "libldconfig-ld-mod.so"
--#define DSO_DIR "/tmp/tst-ldconfig"
-+#define DSO_DIR "/data/data/com.termux/files/usr/tmp/tst-ldconfig"
- #define CONF "/etc/ld.so.conf"
- 
- 
-@@ -73,7 +73,7 @@ do_test (void)
-      "lib" (for regular shared libraries) or "ld-" (for ld-linux-*).  */
-   char *mod_src_path = xasprintf ("%s/tst-ldconfig-ld-mod.so",
- 				  support_libdir_prefix);
--  if (rename (mod_src_path, "/tmp/tst-ldconfig/libldconfig-ld-mod.so"))
-+  if (rename (mod_src_path, "/data/data/com.termux/files/usr/tmp/tst-ldconfig/libldconfig-ld-mod.so"))
-     FAIL_EXIT1 ("Renaming/moving the DSO failed: %m");
-   free (mod_src_path);
- 
-diff --git a/grp/tst_fgetgrent.c b/grp/tst_fgetgrent.c
-index be411918..82ce2674 100644
---- src/glibc-2.37/grp/tst_fgetgrent.c
-+++ src/glibc-2.37/grp/tst_fgetgrent.c
-@@ -99,7 +99,7 @@ test_fgetgrent (const char *filename)
- int
- main (int argc, char *argv[])
- {
--  char file[] = "/tmp/tst_fgetgrent.XXXXXX";
-+  char file[] = "/data/data/com.termux/files/usr/tmp/tst_fgetgrent.XXXXXX";
-   int fd = mkstemp (file);
-   if (fd == -1)
-     {
 diff --git a/io/bug-ftw3.c b/io/bug-ftw3.c
 index 19740f49..3fd69a5e 100644
---- src/glibc-2.37/io/bug-ftw3.c
-+++ src/glibc-2.37/io/bug-ftw3.c
+--- src/glibc-2.38/io/bug-ftw3.c
++++ src/glibc-2.38/io/bug-ftw3.c
 @@ -18,8 +18,8 @@ cb (const char *fname, const struct stat *st, int flag)
  int
  main (void)
@@ -203,8 +87,8 @@ index 19740f49..3fd69a5e 100644
    int r;
 diff --git a/io/bug-ftw4.c b/io/bug-ftw4.c
 index bfbf4544..de1478fb 100644
---- src/glibc-2.37/io/bug-ftw4.c
-+++ src/glibc-2.37/io/bug-ftw4.c
+--- src/glibc-2.38/io/bug-ftw4.c
++++ src/glibc-2.38/io/bug-ftw4.c
 @@ -35,7 +35,7 @@ cb (const char *name, const struct stat64 *st, int type)
  int
  main (void)
@@ -214,36 +98,10 @@ index bfbf4544..de1478fb 100644
    int ret, i, result = 0, fd, fd1, fd2;
  
    if (mkdtemp (name) == NULL)
-diff --git a/io/test-utime.c b/io/test-utime.c
-index 580b84dd..37b72f56 100644
---- src/glibc-2.37/io/test-utime.c
-+++ src/glibc-2.37/io/test-utime.c
-@@ -27,7 +27,7 @@
- int
- main (int argc, char *argv[])
- {
--  char file[] = "/tmp/test-utime.XXXXXX";
-+  char file[] = "/data/data/com.termux/files/usr/tmp/test-utime.XXXXXX";
-   struct utimbuf ut;
-   struct stat st;
-   struct stat stnow;
-diff --git a/io/tst-open-tmpfile.c b/io/tst-open-tmpfile.c
-index 666a3a30..a459ac26 100644
---- src/glibc-2.37/io/tst-open-tmpfile.c
-+++ src/glibc-2.37/io/tst-open-tmpfile.c
-@@ -285,7 +285,7 @@ static int
- do_test (void)
- {
-   umask (0);
--  const char *paths[] = { ".", "/dev/shm", "/tmp",
-+  const char *paths[] = { ".", "/dev/shm", "/data/data/com.termux/files/usr/tmp",
-                           getenv ("TEST_TMPFILE_PATH"),
-                           NULL };
-   bool supported = false;
 diff --git a/libio/oldiopopen.c b/libio/oldiopopen.c
 index aa5e379c..d66cb7a1 100644
---- src/glibc-2.37/libio/oldiopopen.c
-+++ src/glibc-2.37/libio/oldiopopen.c
+--- src/glibc-2.38/libio/oldiopopen.c
++++ src/glibc-2.38/libio/oldiopopen.c
 @@ -106,7 +106,7 @@ _IO_old_proc_open (FILE *fp, const char *command, const char *mode)
        for (p = old_proc_file_chain; p; p = p->next)
  	__close (_IO_fileno ((FILE *) p));
@@ -255,8 +113,8 @@ index aa5e379c..d66cb7a1 100644
    __close (child_end);
 diff --git a/libio/stdio.h b/libio/stdio.h
 index ed80420a..97cc0fd2 100644
---- src/glibc-2.37/libio/stdio.h
-+++ src/glibc-2.37/libio/stdio.h
+--- src/glibc-2.38/libio/stdio.h
++++ src/glibc-2.38/libio/stdio.h
 @@ -117,7 +117,7 @@ typedef __fpos64_t fpos64_t;
  
  #if defined __USE_MISC || defined __USE_XOPEN
@@ -266,112 +124,10 @@ index ed80420a..97cc0fd2 100644
  #endif
  
  
-diff --git a/libio/tst-fgetws.c b/libio/tst-fgetws.c
-index 1e293327..56dd6961 100644
---- src/glibc-2.37/libio/tst-fgetws.c
-+++ src/glibc-2.37/libio/tst-fgetws.c
-@@ -19,8 +19,8 @@ main (int argc, char *argv[])
-   int result = 0;
-   const char il_str1[] = {0xe3, 0x81, '\0'};
-   const char il_str2[] = {'0', '\n', 'A', 'B', 0xe3, 0x81, 'E', '\0'};
--  char name1[] = "/tmp/tst-fgetws.out.XXXXXX";
--  char name2[] = "/tmp/tst-fgetws.out.XXXXXX";
-+  char name1[] = "/data/data/com.termux/files/usr/tmp/tst-fgetws.out.XXXXXX";
-+  char name2[] = "/data/data/com.termux/files/usr/tmp/tst-fgetws.out.XXXXXX";
-   int fd;
- 
-   puts ("This program runs on de_DE.UTF-8 locale.");
-diff --git a/libio/tst-fwrite-error.c b/libio/tst-fwrite-error.c
-index d8caa53f..6825a270 100644
---- src/glibc-2.37/libio/tst-fwrite-error.c
-+++ src/glibc-2.37/libio/tst-fwrite-error.c
-@@ -24,7 +24,7 @@
- static int
- do_test (void)
- {
--  char tmpl[] = "/tmp/tst-fwrite-error.XXXXXX";
-+  char tmpl[] = "/data/data/com.termux/files/usr/tmp/tst-fwrite-error.XXXXXX";
-   int fd = mkstemp (tmpl);
-   if (fd == -1)
-     {
-diff --git a/libio/tst-mmap-setvbuf.c b/libio/tst-mmap-setvbuf.c
-index 26d91f86..bd2d190e 100644
---- src/glibc-2.37/libio/tst-mmap-setvbuf.c
-+++ src/glibc-2.37/libio/tst-mmap-setvbuf.c
-@@ -23,7 +23,7 @@
- 
- int main (void)
- {
--  char name[] = "/tmp/tst-mmap-setvbuf.XXXXXX";
-+  char name[] = "/data/data/com.termux/files/usr/tmp/tst-mmap-setvbuf.XXXXXX";
-   char buf[4096];
-   const char * const test = "Let's see if mmap stdio works with setvbuf.\n";
-   char temp[strlen (test) + 1];
-diff --git a/libio/tst-ungetwc1.c b/libio/tst-ungetwc1.c
-index f71b3905..903a8760 100644
---- src/glibc-2.37/libio/tst-ungetwc1.c
-+++ src/glibc-2.37/libio/tst-ungetwc1.c
-@@ -13,7 +13,7 @@ do_test (void)
-   FILE *fp;
-   const char *str = "abcdef";
-   wint_t ret, wc, ungetone = 0x00E4;	/* 0x00E4 means `a umlaut'. */
--  char fname[] = "/tmp/tst-ungetwc1.out.XXXXXX";
-+  char fname[] = "/data/data/com.termux/files/usr/tmp/tst-ungetwc1.out.XXXXXX";
-   int fd;
-   int result = 0;
- 
-diff --git a/libio/tst-ungetwc2.c b/libio/tst-ungetwc2.c
-index a7c5193f..63517579 100644
---- src/glibc-2.37/libio/tst-ungetwc2.c
-+++ src/glibc-2.37/libio/tst-ungetwc2.c
-@@ -13,7 +13,7 @@ do_test (void)
-   FILE *fp;
-   const char *str = "abcdef";
-   wint_t ret, wc;
--  char fname[] = "/tmp/tst-ungetwc2.out.XXXXXX";
-+  char fname[] = "/data/data/com.termux/files/usr/tmp/tst-ungetwc2.out.XXXXXX";
-   int fd;
-   long int pos;
-   int result = 0;
-diff --git a/libio/tst-widetext.c b/libio/tst-widetext.c
-index f35f680e..d88e66a0 100644
---- src/glibc-2.37/libio/tst-widetext.c
-+++ src/glibc-2.37/libio/tst-widetext.c
-@@ -33,7 +33,7 @@
- static int
- do_test (void)
- {
--  char name[] = "/tmp/widetext.out.XXXXXX";
-+  char name[] = "/data/data/com.termux/files/usr/tmp/widetext.out.XXXXXX";
-   char mbbuf[SIZE];
-   char mb2buf[SIZE];
-   wchar_t wcbuf[SIZE];
-@@ -231,7 +231,7 @@ do_test (void)
- 
-   /* Now to reading and writing line-wise.  */
- 
--  fd = mkstemp (strcpy (name, "/tmp/widetext.out.XXXXXX"));
-+  fd = mkstemp (strcpy (name, "/data/data/com.termux/files/usr/tmp/widetext.out.XXXXXX"));
-   if (fd == -1)
-     {
-       printf ("%u: cannot open temporary file: %m\n", __LINE__);
-diff --git a/libio/tst_wprintf2.c b/libio/tst_wprintf2.c
-index de19ae37..f6c70307 100644
---- src/glibc-2.37/libio/tst_wprintf2.c
-+++ src/glibc-2.37/libio/tst_wprintf2.c
-@@ -13,7 +13,7 @@ main (int argc, char *argv[])
- {
-   int a = 3;
-   int fd;
--  char name[] = "/tmp/wprintf.out.XXXXXX";
-+  char name[] = "/data/data/com.termux/files/usr/tmp/wprintf.out.XXXXXX";
-   FILE *fp;
-   char buf[100];
-   size_t len;
 diff --git a/manual/examples/filecli.c b/manual/examples/filecli.c
 index 1ade5efe..dc05bac5 100644
---- src/glibc-2.37/manual/examples/filecli.c
-+++ src/glibc-2.37/manual/examples/filecli.c
+--- src/glibc-2.38/manual/examples/filecli.c
++++ src/glibc-2.38/manual/examples/filecli.c
 @@ -22,8 +22,8 @@
  #include <sys/socket.h>
  #include <sys/un.h>
@@ -385,8 +141,8 @@ index 1ade5efe..dc05bac5 100644
  
 diff --git a/manual/examples/filesrv.c b/manual/examples/filesrv.c
 index 75c6ff87..b959eb8e 100644
---- src/glibc-2.37/manual/examples/filesrv.c
-+++ src/glibc-2.37/manual/examples/filesrv.c
+--- src/glibc-2.38/manual/examples/filesrv.c
++++ src/glibc-2.38/manual/examples/filesrv.c
 @@ -21,7 +21,7 @@
  #include <sys/socket.h>
  #include <sys/un.h>
@@ -398,8 +154,8 @@ index 75c6ff87..b959eb8e 100644
  int
 diff --git a/manual/examples/ofdlocks.c b/manual/examples/ofdlocks.c
 index 9d777f73..a5ff883b 100644
---- src/glibc-2.37/manual/examples/ofdlocks.c
-+++ src/glibc-2.37/manual/examples/ofdlocks.c
+--- src/glibc-2.38/manual/examples/ofdlocks.c
++++ src/glibc-2.38/manual/examples/ofdlocks.c
 @@ -23,7 +23,7 @@
  #include <fcntl.h>
  #include <pthread.h>
@@ -418,36 +174,10 @@ index 9d777f73..a5ff883b 100644
  
    for (i = 0; i < ITERATIONS; i++)
      {
-diff --git a/misc/tst-dirname.c b/misc/tst-dirname.c
-index 95c765ca..a34c22bb 100644
---- src/glibc-2.37/misc/tst-dirname.c
-+++ src/glibc-2.37/misc/tst-dirname.c
-@@ -42,16 +42,16 @@ do_test (void)
-   int result = 0;
- 
-   /* These are the examples given in XPG4.2.  */
--  result |= test ("/usr/lib", "/usr");
--  result |= test ("/usr/", "/");
--  result |= test ("usr", ".");
-+  result |= test ("/data/data/com.termux/files/usr/glibc/lib", "/data/data/com.termux/files/usr/glibc");
-+  result |= test ("/data/data/com.termux/files/usr/glibc/", "/");
-+  result |= test ("data/data/com.termux/files/usr/glibc", ".");
-   result |= test ("/", "/");
-   result |= test (".", ".");
-   result |= test ("..", ".");
- 
-   /* Some more tests.   */
--  result |= test ("/usr/lib/", "/usr");
--  result |= test ("/usr", "/");
-+  result |= test ("/data/data/com.termux/files/usr/glibc/lib/", "/data/data/com.termux/files/usr/glibc");
-+  result |= test ("/data/data/com.termux/files/usr/glibc", "/");
-   result |= test ("a//", ".");
-   result |= test ("a////", ".");
-   result |= test ("////usr", "/");
 diff --git a/nis/ypclnt.c b/nis/ypclnt.c
 index 19a53a10..e5edbfa8 100644
---- src/glibc-2.37/nis/ypclnt.c
-+++ src/glibc-2.37/nis/ypclnt.c
+--- src/glibc-2.38/nis/ypclnt.c
++++ src/glibc-2.38/nis/ypclnt.c
 @@ -33,7 +33,7 @@
  
  /* This should only be defined on systems with a BSD compatible ypbind */
@@ -457,36 +187,10 @@ index 19a53a10..e5edbfa8 100644
  #endif
  
  struct dom_binding
-diff --git a/nptl/tst-cancel4_1.c b/nptl/tst-cancel4_1.c
-index 2bca9df7..8cac8989 100644
---- src/glibc-2.37/nptl/tst-cancel4_1.c
-+++ src/glibc-2.37/nptl/tst-cancel4_1.c
-@@ -52,7 +52,7 @@ tf_sendmmsg (void *arg)
-       if (++tries > 10)
- 	FAIL_EXIT1 ("too many unsuccessful bind calls");
- 
--      strcpy (sun.sun_path, "/tmp/tst-cancel4-socket-7-XXXXXX");
-+      strcpy (sun.sun_path, "/data/data/com.termux/files/usr/tmp/tst-cancel4-socket-7-XXXXXX");
-       if (mktemp (sun.sun_path) == NULL)
- 	FAIL_EXIT1 ("cannot generate temp file name");
- 
-diff --git a/nptl/tst-cancel4_2.c b/nptl/tst-cancel4_2.c
-index f5c17872..8da8aae9 100644
---- src/glibc-2.37/nptl/tst-cancel4_2.c
-+++ src/glibc-2.37/nptl/tst-cancel4_2.c
-@@ -47,7 +47,7 @@ tf_recvmmsg (void *arg)
-       if (++tries > 10)
- 	FAIL_EXIT1 ("too many unsuccessful bind calls");
- 
--      strcpy (sun.sun_path, "/tmp/tst-cancel4-socket-5-XXXXXX");
-+      strcpy (sun.sun_path, "/data/data/com.termux/files/usr/tmp/tst-cancel4-socket-5-XXXXXX");
-       if (mktemp (sun.sun_path) == NULL)
- 	FAIL_EXIT1 ("cannot generate temp file name");
- 
 diff --git a/nscd/nscd-client.h b/nscd/nscd-client.h
 index 7275ccb6..e40e3580 100644
---- src/glibc-2.37/nscd/nscd-client.h
-+++ src/glibc-2.37/nscd/nscd-client.h
+--- src/glibc-2.38/nscd/nscd-client.h
++++ src/glibc-2.38/nscd/nscd-client.h
 @@ -35,13 +35,13 @@
  #define NSCD_VERSION 2
  
@@ -506,8 +210,8 @@ index 7275ccb6..e40e3580 100644
  #define MAXKEYLEN 1024
 diff --git a/posix/annexc.c b/posix/annexc.c
 index ca50ac96..9b92273b 100644
---- src/glibc-2.37/posix/annexc.c
-+++ src/glibc-2.37/posix/annexc.c
+--- src/glibc-2.38/posix/annexc.c
++++ src/glibc-2.38/posix/annexc.c
 @@ -26,7 +26,7 @@
  
  #define HEADER_MAX          256
@@ -519,8 +223,8 @@ index ca50ac96..9b92273b 100644
  static const char *const aio_syms[] =
 diff --git a/posix/bug-getopt1.c b/posix/bug-getopt1.c
 index a5a37116..5bd994c9 100644
---- src/glibc-2.37/posix/bug-getopt1.c
-+++ src/glibc-2.37/posix/bug-getopt1.c
+--- src/glibc-2.38/posix/bug-getopt1.c
++++ src/glibc-2.38/posix/bug-getopt1.c
 @@ -40,7 +40,7 @@ one_test (const char *fmt, int argc, char *argv[], int expected[argc - 1])
  static int
  do_test (void)
@@ -532,8 +236,8 @@ index a5a37116..5bd994c9 100644
      {
 diff --git a/posix/bug-getopt2.c b/posix/bug-getopt2.c
 index 8f92f0c6..b2c52acc 100644
---- src/glibc-2.37/posix/bug-getopt2.c
-+++ src/glibc-2.37/posix/bug-getopt2.c
+--- src/glibc-2.38/posix/bug-getopt2.c
++++ src/glibc-2.38/posix/bug-getopt2.c
 @@ -38,7 +38,7 @@ one_test (const char *fmt, int argc, char *argv[], int expected[argc - 1])
  static int
  do_test (void)
@@ -545,8 +249,8 @@ index 8f92f0c6..b2c52acc 100644
      {
 diff --git a/posix/bug-getopt3.c b/posix/bug-getopt3.c
 index 45a8d3ec..42871b5f 100644
---- src/glibc-2.37/posix/bug-getopt3.c
-+++ src/glibc-2.37/posix/bug-getopt3.c
+--- src/glibc-2.38/posix/bug-getopt3.c
++++ src/glibc-2.38/posix/bug-getopt3.c
 @@ -49,7 +49,7 @@ one_test (const char *fmt, int argc, char *argv[], int n, int expected[n],
  static int
  do_test (void)
@@ -558,8 +262,8 @@ index 45a8d3ec..42871b5f 100644
      {
 diff --git a/posix/bug-getopt4.c b/posix/bug-getopt4.c
 index c5e3c149..5a172c50 100644
---- src/glibc-2.37/posix/bug-getopt4.c
-+++ src/glibc-2.37/posix/bug-getopt4.c
+--- src/glibc-2.38/posix/bug-getopt4.c
++++ src/glibc-2.38/posix/bug-getopt4.c
 @@ -53,7 +53,7 @@ one_test (const char *fmt, int argc, char *argv[], int n, int expected[n])
  static int
  do_test (void)
@@ -571,8 +275,8 @@ index c5e3c149..5a172c50 100644
      {
 diff --git a/posix/bug-getopt5.c b/posix/bug-getopt5.c
 index 4f67d9b2..c942a58e 100644
---- src/glibc-2.37/posix/bug-getopt5.c
-+++ src/glibc-2.37/posix/bug-getopt5.c
+--- src/glibc-2.38/posix/bug-getopt5.c
++++ src/glibc-2.38/posix/bug-getopt5.c
 @@ -48,7 +48,7 @@ one_test (const char *fmt, int argc, char *argv[], int n, int expected[n])
  static int
  do_test (void)
@@ -584,8 +288,8 @@ index 4f67d9b2..c942a58e 100644
      {
 diff --git a/posix/bug-regex9.c b/posix/bug-regex9.c
 index d74bc9b9..419fdfd4 100644
---- src/glibc-2.37/posix/bug-regex9.c
-+++ src/glibc-2.37/posix/bug-regex9.c
+--- src/glibc-2.38/posix/bug-regex9.c
++++ src/glibc-2.38/posix/bug-regex9.c
 @@ -23,7 +23,7 @@
  #include <stdlib.h>
  
@@ -595,244 +299,10 @@ index d74bc9b9..419fdfd4 100644
  
  int
  main (void)
-diff --git a/posix/test-errno.c b/posix/test-errno.c
-index 305bc429..f708e9fd 100644
---- src/glibc-2.37/posix/test-errno.c
-+++ src/glibc-2.37/posix/test-errno.c
-@@ -109,7 +109,7 @@ do_test (void)
-   fails |= test_wrp (EBADF, accept, -1, &sa, &sl);
-   fails |= test_wrp (EINVAL, access, "/", -1);
-   fails |= test_wrp (EBADF, bind, -1, (struct sockaddr *)&sin, sizeof sin);
--  fails |= test_wrp (ENOTDIR, chdir, "/bin/sh");
-+  fails |= test_wrp (ENOTDIR, chdir, "/data/data/com.termux/files/usr/bin/sh");
-   fails |= test_wrp (EBADF, close, -1);
-   fails |= test_wrp (EBADF, connect, -1, (struct sockaddr *)&sin, sizeof sin);
-   fails |= test_wrp (EBADF, dup, -1);
-@@ -142,7 +142,7 @@ do_test (void)
-   fails |= test_wrp (EINVAL, mprotect, (void *) -1, pagesize, -1);
-   fails |= test_wrp (EINVAL, msync, (void *) -1, pagesize, -1);
-   fails |= test_wrp (EINVAL, munmap, (void *) -1, 0);
--  fails |= test_wrp (EISDIR, open, "/bin", EISDIR, O_WRONLY);
-+  fails |= test_wrp (EISDIR, open, "/data/data/com.termux/files/usr/bin", EISDIR, O_WRONLY);
-   fails |= test_wrp (EBADF, read, -1, buf, 1);
-   fails |= test_wrp (EINVAL, readlink, "/", buf, sizeof buf);
-   fails |= test_wrp (EBADF, readv, -1, iov, 1);
-diff --git a/posix/tst-execveat.c b/posix/tst-execveat.c
-index 59157ff2..d7cc30ed 100644
---- src/glibc-2.37/posix/tst-execveat.c
-+++ src/glibc-2.37/posix/tst-execveat.c
-@@ -85,7 +85,7 @@ do_test (void)
-   struct stat64 st;
- #endif
- 
--  dirp = opendir ("/bin");
-+  dirp = opendir ("/data/data/com.termux/files/usr/glibc/bin");
-   if (dirp == NULL)
-     FAIL_EXIT1 ("failed to open /bin");
-   fd = dirfd (dirp);
-@@ -94,7 +94,7 @@ do_test (void)
- 
-   /* Check the pathname relative to a valid dirfd.  */
-   call_execveat (fd, "sh", 0, 0, __LINE__);
--  xchdir ("/bin");
-+  xchdir ("/data/data/com.termux/files/usr/glibc/bin");
-   /* Use the special value AT_FDCWD as dirfd. Quoting open(2):
-      If pathname is relative and dirfd is the special value AT_FDCWD, then
-      pathname is interpreted relative to the current working directory of
-@@ -103,31 +103,31 @@ do_test (void)
-   xclose (fd);
- #ifdef O_PATH
-   /* Check the pathname relative to a valid dirfd with O_PATH.  */
--  fd = xopen ("/bin", O_PATH | O_DIRECTORY, O_RDONLY);
-+  fd = xopen ("/data/data/com.termux/files/usr/bin", O_PATH | O_DIRECTORY, O_RDONLY);
-   call_execveat (fd, "sh", 0, 0, __LINE__);
-   xclose (fd);
- 
-   /* Check absolute pathname, dirfd should be ignored.  */
--  call_execveat (AT_FDCWD, "/bin/sh", 0, 0, __LINE__);
--  fd = xopen ("/usr", O_PATH | O_DIRECTORY, 0);
-+  call_execveat (AT_FDCWD, "/data/data/com.termux/files/usr/bin/sh", 0, 0, __LINE__);
-+  fd = xopen ("/data/data/com.termux/files/usr/glibc", O_PATH | O_DIRECTORY, 0);
-   /* Same check for absolute pathname, but with input file descriptor
-      openend with different flags.  The dirfd should be ignored.  */
--  call_execveat (fd, "/bin/sh", 0, 0, __LINE__);
-+  call_execveat (fd, "/data/data/com.termux/files/usr/bin/sh", 0, 0, __LINE__);
-   xclose (fd);
- #endif
- 
--  fd = xopen ("/usr", O_RDONLY, 0);
-+  fd = xopen ("/data/data/com.termux/files/usr/glibc", O_RDONLY, 0);
-   /* Same check for absolute pathname, but with input file descriptor
-      openend with different flags.  The dirfd should be ignored.  */
--  call_execveat (fd, "/bin/sh", 0, 0, __LINE__);
-+  call_execveat (fd, "/data/data/com.termux/files/usr/bin/sh", 0, 0, __LINE__);
-   xclose (fd);
- 
--  fd = xopen ("/bin/sh", O_RDONLY, 0);
-+  fd = xopen ("/data/data/com.termux/files/usr/bin/sh", O_RDONLY, 0);
-   /* Check relative pathname, where dirfd does not point to a directory.  */
-   call_execveat (fd, "sh", 0, ENOTDIR, __LINE__);
-   /* Check absolute pathname, but dirfd is a regular file.  The dirfd
-      should be ignored.  */
--  call_execveat (fd, "/bin/sh", 0, 0, __LINE__);
-+  call_execveat (fd, "/data/data/com.termux/files/usr/bin/sh", 0, 0, __LINE__);
-   xclose (fd);
- 
- #ifdef O_PATH
-@@ -135,7 +135,7 @@ do_test (void)
-      Obtain a file descriptor that can be used for two purposes: to
-      indicate a location in the filesystem tree and to perform
-      operations that act purely at the file descriptor level.  */
--  fd = xopen ("/bin/sh", O_PATH, 0);
-+  fd = xopen ("/data/data/com.termux/files/usr/bin/sh", O_PATH, 0);
-   /* Check the empty pathname.  Dirfd is a regular file with O_PATH.  */
-   call_execveat (fd, "", 0, ENOENT, __LINE__);
-   /* Same check for an empty pathname, but with AT_EMPTY_PATH flag.
-@@ -155,8 +155,8 @@ do_test (void)
-   tmp_sh = xasprintf ("%s/tmp_sh", tmp_dir);
-   add_temp_file (tmp_sh);
-   fd_out = xopen (symlink_name, O_CREAT | O_WRONLY, 0);
--  xstat ("/bin/sh", &st);
--  fd = xopen ("/bin/sh", O_RDONLY, 0);
-+  xstat ("/data/data/com.termux/files/usr/bin/sh", &st);
-+  fd = xopen ("/data/data/com.termux/files/usr/bin/sh", O_RDONLY, 0);
-   xcopy_file_range (fd, 0, fd_out, 0, st.st_size, 0);
-   xfchmod (fd_out, 0700);
-   xclose (fd);
-@@ -178,7 +178,7 @@ do_test (void)
-   call_execveat (fd, "sh", 0, EBADF, __LINE__);
-   /* Call execveat with closed fd, we expect this to pass because the pathname is
-      absolute.  */
--  call_execveat (fd, "/bin/sh", 0, 0, __LINE__);
-+  call_execveat (fd, "/data/data/com.termux/files/usr/bin/sh", 0, 0, __LINE__);
- 
-   return 0;
- }
-diff --git a/posix/tst-execvp4.c b/posix/tst-execvp4.c
-index 589a5601..6741cab1 100644
---- src/glibc-2.37/posix/tst-execvp4.c
-+++ src/glibc-2.37/posix/tst-execvp4.c
-@@ -12,7 +12,7 @@
- static int
- do_test (void)
- {
--  char buf[40] = "/usr/bin/does-not-exist";
-+  char buf[40] = "/data/data/com.termux/files/usr/glibc/bin/does-not-exist";
-   size_t stemlen = strlen (buf);
-   struct stat64 st;
-   int cnt = 0;
-diff --git a/posix/tst-fexecve.c b/posix/tst-fexecve.c
-index 0a2a09f1..a2c0e33b 100644
---- src/glibc-2.37/posix/tst-fexecve.c
-+++ src/glibc-2.37/posix/tst-fexecve.c
-@@ -31,7 +31,7 @@ try_fexecve (int fd)
-   if (pid == 0)
-     {
-       static const char *const argv[] = {
--	"/bin/sh", "-c", "true", NULL
-+	"/data/data/com.termux/files/usr/bin/sh", "-c", "true", NULL
-       };
-       fexecve (fd, (char *const *) argv, environ);
-       _exit (errno);
-@@ -68,14 +68,14 @@ do_test (void)
-   int fd;
-   int ret;
- 
--  fd = open ("/bin/sh", O_RDONLY);
-+  fd = open ("/data/data/com.termux/files/usr/bin/sh", O_RDONLY);
-   if (fd < 0)
-     FAIL_UNSUPPORTED ("/bin/sh cannot be opened: %m");
-   ret = try_fexecve (fd);
-   close (fd);
- 
- #ifdef O_PATH
--  fd = open ("/bin/sh", O_RDONLY | O_PATH);
-+  fd = open ("/data/data/com.termux/files/usr/bin/sh", O_RDONLY | O_PATH);
-   if (fd < 0)
-     FAIL_UNSUPPORTED ("/bin/sh cannot be opened (O_PATH): %m");
-   ret |= try_fexecve (fd);
-diff --git a/posix/tst-fork.c b/posix/tst-fork.c
-index 3e1abf17..a16caabd 100644
---- src/glibc-2.37/posix/tst-fork.c
-+++ src/glibc-2.37/posix/tst-fork.c
-@@ -42,7 +42,7 @@ main (void)
-   int status;
- 
-   if (tmpdir == NULL || *tmpdir == '\0')
--    tmpdir = "/tmp";
-+    tmpdir = "/data/data/com.termux/files/usr/tmp";
-   tmpdirlen = strlen (tmpdir);
- 
-   name = (char *) malloc (tmpdirlen + strlen ("/forkXXXXXX") + 1);
-diff --git a/posix/tst-mmap-offset.c b/posix/tst-mmap-offset.c
-index e8e8f250..76ae68a9 100644
---- src/glibc-2.37/posix/tst-mmap-offset.c
-+++ src/glibc-2.37/posix/tst-mmap-offset.c
-@@ -30,7 +30,7 @@
- 
- static int fd;
- static long int page_shift;
--static char fname[] = "/tmp/tst-mmap-offset-XXXXXX";
-+static char fname[] = "/data/data/com.termux/files/usr/tmp/tst-mmap-offset-XXXXXX";
- 
- static void
- do_prepare (int argc, char **argv)
-diff --git a/posix/tst-posix_fadvise-common.c b/posix/tst-posix_fadvise-common.c
-index fb461d30..fc995c87 100644
---- src/glibc-2.37/posix/tst-posix_fadvise-common.c
-+++ src/glibc-2.37/posix/tst-posix_fadvise-common.c
-@@ -31,7 +31,7 @@
- 
- static char *temp_filename;
- static int temp_fd;
--static char fifoname[] = "/tmp/tst-posix_fadvise-fifo-XXXXXX";
-+static char fifoname[] = "/data/data/com.termux/files/usr/tmp/tst-posix_fadvise-fifo-XXXXXX";
- static int fifofd;
- 
- static void
-diff --git a/posix/tst-spawn-chdir.c b/posix/tst-spawn-chdir.c
-index b335092d..1bae0df9 100644
---- src/glibc-2.37/posix/tst-spawn-chdir.c
-+++ src/glibc-2.37/posix/tst-spawn-chdir.c
-@@ -59,7 +59,7 @@ read_one_line (const char *path)
- const char *
- get_pwd_program (void)
- {
--  const char *const paths[] = { "/bin/pwd", "/usr/bin/pwd" };
-+  const char *const paths[] = { "/data/data/com.termux/files/glibc/bin/pwd", "/data/data/com.termux/files/usr/bin/pwd" };
-   for (size_t i = 0; i < array_length (paths); ++i)
-     if (access (paths[i], X_OK) == 0)
-       return paths[i];
-diff --git a/posix/tst-vfork3.c b/posix/tst-vfork3.c
-index 22501acc..7535ef4b 100644
---- src/glibc-2.37/posix/tst-vfork3.c
-+++ src/glibc-2.37/posix/tst-vfork3.c
-@@ -69,7 +69,7 @@ do_test (void)
- 
-   const char *path = getenv ("PATH");
-   if (path == NULL)
--    path = "/bin";
-+    path = "/data/data/com.termux/files/usr/glibc/bin";
-   char pathbuf[strlen (tmpdirname) + 1 + strlen (path) + 1];
-   strcpy (stpcpy (stpcpy (pathbuf, tmpdirname), ":"), path);
-   if (setenv ("PATH", pathbuf, 1) < 0)
-@@ -163,10 +163,10 @@ do_prepare (void)
-   add_temp_file (script1);
-   add_temp_file (script2);
- 
--  const char content0[] = "#!/bin/sh\necho empty\n";
-+  const char content0[] = "#!/data/data/com.termux/files/usr/bin/sh\necho empty\n";
-   create_script (script0, content0, sizeof content0);
- 
--  const char content1[] = "#!/bin/sh\necho script $1\n";
-+  const char content1[] = "#!/data/data/com.termux/files/usr/bin/sh\necho script $1\n";
-   create_script (script1, content1, sizeof content1);
- 
-   const char content2[] = "echo script $1\n";
 diff --git a/resolv/netdb.h b/resolv/netdb.h
 index ace9e482..d88ce5e1 100644
---- src/glibc-2.37/resolv/netdb.h
-+++ src/glibc-2.37/resolv/netdb.h
+--- src/glibc-2.38/resolv/netdb.h
++++ src/glibc-2.38/resolv/netdb.h
 @@ -40,12 +40,12 @@
  #include <bits/netdb.h>
  
@@ -853,8 +323,8 @@ index ace9e482..d88ce5e1 100644
  __BEGIN_DECLS
 diff --git a/resolv/resolv.h b/resolv/resolv.h
 index 3a79ffea..de3ab04e 100644
---- src/glibc-2.37/resolv/resolv.h
-+++ src/glibc-2.37/resolv/resolv.h
+--- src/glibc-2.38/resolv/resolv.h
++++ src/glibc-2.38/resolv/resolv.h
 @@ -91,7 +91,7 @@
   */
  
@@ -864,114 +334,10 @@ index 3a79ffea..de3ab04e 100644
  #endif
  
  struct res_sym {
-diff --git a/rt/tst-aio2.c b/rt/tst-aio2.c
-index 1de88196..a95150f8 100644
---- src/glibc-2.37/rt/tst-aio2.c
-+++ src/glibc-2.37/rt/tst-aio2.c
-@@ -43,7 +43,7 @@ thrfct (sigval_t arg)
- static int
- do_test (int argc, char *argv[])
- {
--  char name[] = "/tmp/aio2.XXXXXX";
-+  char name[] = "/data/data/com.termux/files/usr/tmp/aio2.XXXXXX";
-   int fd;
-   struct aiocb *arr[1];
-   struct aiocb cb;
-diff --git a/rt/tst-aio3.c b/rt/tst-aio3.c
-index b05a42ad..81f1d82c 100644
---- src/glibc-2.37/rt/tst-aio3.c
-+++ src/glibc-2.37/rt/tst-aio3.c
-@@ -42,7 +42,7 @@ thrfct (sigval_t arg)
- static int
- do_test (int argc, char *argv[])
- {
--  char name[] = "/tmp/aio3.XXXXXX";
-+  char name[] = "/data/data/com.termux/files/usr/tmp/aio3.XXXXXX";
-   int fd;
-   struct aiocb *arr[1];
-   struct aiocb cb;
-diff --git a/rt/tst-aio4.c b/rt/tst-aio4.c
-index 6df7b6cf..2464c754 100644
---- src/glibc-2.37/rt/tst-aio4.c
-+++ src/glibc-2.37/rt/tst-aio4.c
-@@ -60,7 +60,7 @@ wait_flag (void)
- static int
- do_test (int argc, char *argv[])
- {
--  char name[] = "/tmp/aio4.XXXXXX";
-+  char name[] = "/data/data/com.termux/files/usr/tmp/aio4.XXXXXX";
-   int fd;
-   struct aiocb *arr[1];
-   struct aiocb cb;
-diff --git a/rt/tst-aio5.c b/rt/tst-aio5.c
-index fe52eb02..827e2554 100644
---- src/glibc-2.37/rt/tst-aio5.c
-+++ src/glibc-2.37/rt/tst-aio5.c
-@@ -56,7 +56,7 @@ wait_flag (void)
- static int
- do_test (int argc, char *argv[])
- {
--  char name[] = "/tmp/aio5.XXXXXX";
-+  char name[] = "/data/data/com.termux/files/usr/tmp/aio5.XXXXXX";
-   int fd;
-   struct aiocb *arr[1];
-   struct aiocb cb;
-diff --git a/rt/tst-aio7.c b/rt/tst-aio7.c
-index c64f5e06..ad21626b 100644
---- src/glibc-2.37/rt/tst-aio7.c
-+++ src/glibc-2.37/rt/tst-aio7.c
-@@ -102,7 +102,7 @@ do_test (void)
-     const int ELEMS = 2;
-     int i, r, fd;
-     static char buff[BYTES];
--    char name[] = "/tmp/aio7.XXXXXX";
-+    char name[] = "/data/data/com.termux/files/usr/tmp/aio7.XXXXXX";
-     struct timespec timeout;
-     static struct aiocb cb0, cb1;
-     struct aiocb *list[ELEMS];
-diff --git a/rt/tst-mqueue.h b/rt/tst-mqueue.h
-index 1475f45e..6d9aaf79 100644
---- src/glibc-2.37/rt/tst-mqueue.h
-+++ src/glibc-2.37/rt/tst-mqueue.h
-@@ -68,7 +68,7 @@ do_cleanup (void)
- static void
- do_prepare (void)
- {
--  char name [] = "/tmp/tst-mqueueN.XXXXXX";
-+  char name [] = "/data/data/com.termux/files/usr/tmp/tst-mqueueN.XXXXXX";
-   temp_mq_fd = mkstemp (name);
-   if (temp_mq_fd == -1)
-     {
-diff --git a/rt/tst-mqueue3.c b/rt/tst-mqueue3.c
-index 126bfa45..dc11e46b 100644
---- src/glibc-2.37/rt/tst-mqueue3.c
-+++ src/glibc-2.37/rt/tst-mqueue3.c
-@@ -95,7 +95,7 @@ fct (union sigval s)
- int
- do_test (void)
- {
--  char tmpfname[] = "/tmp/tst-mqueue3-barrier.XXXXXX";
-+  char tmpfname[] = "/data/data/com.termux/files/usr/tmp/tst-mqueue3-barrier.XXXXXX";
-   int fd = mkstemp (tmpfname);
-   if (fd == -1)
-     {
-diff --git a/rt/tst-mqueue5.c b/rt/tst-mqueue5.c
-index ea5ff65a..d1438d65 100644
---- src/glibc-2.37/rt/tst-mqueue5.c
-+++ src/glibc-2.37/rt/tst-mqueue5.c
-@@ -555,7 +555,7 @@ do_test (void)
- {
-   int result = 0;
- 
--  char tmpfname[] = "/tmp/tst-mqueue5-barrier.XXXXXX";
-+  char tmpfname[] = "/data/data/com.termux/files/usr/tmp/tst-mqueue5-barrier.XXXXXX";
-   int fd = mkstemp (tmpfname);
-   if (fd == -1)
-     {
 diff --git a/stdio-common/bug7.c b/stdio-common/bug7.c
 index c9c2ef51..c08a474d 100644
---- src/glibc-2.37/stdio-common/bug7.c
-+++ src/glibc-2.37/stdio-common/bug7.c
+--- src/glibc-2.38/stdio-common/bug7.c
++++ src/glibc-2.38/stdio-common/bug7.c
 @@ -8,7 +8,7 @@ int
  main (int argc, char *argv[])
  {
@@ -994,22 +360,9 @@ index c9c2ef51..c08a474d 100644
      int fd1 = mkstemp (filename1);
 diff --git a/stdio-common/scanf14.c b/stdio-common/scanf14.c
 index 09f47d36..4d6c5b11 100644
---- src/glibc-2.37/stdio-common/scanf14.c
-+++ src/glibc-2.37/stdio-common/scanf14.c
+--- src/glibc-2.38/stdio-common/scanf14.c
++++ src/glibc-2.38/stdio-common/scanf14.c
 @@ -82,7 +82,7 @@ main (void)
- 
-   const char *tmpdir = getenv ("TMPDIR");
-   if (tmpdir == NULL || tmpdir[0] == '\0')
--    tmpdir = "/tmp";
-+    tmpdir = "/data/data/com.termux/files/usr/tmp";
- 
-   char fname[strlen (tmpdir) + sizeof "/tst-scanf14.XXXXXX"];
-   sprintf (fname, "%s/tst-scanf14.XXXXXX", tmpdir);
-diff --git a/stdio-common/scanf14a.c b/stdio-common/scanf14a.c
-index 506431d9..a906f09d 100644
---- src/glibc-2.37/stdio-common/scanf14a.c
-+++ src/glibc-2.37/stdio-common/scanf14a.c
-@@ -88,7 +88,7 @@ main (void)
  
    const char *tmpdir = getenv ("TMPDIR");
    if (tmpdir == NULL || tmpdir[0] == '\0')
@@ -1020,8 +373,8 @@ index 506431d9..a906f09d 100644
    sprintf (fname, "%s/tst-scanf14.XXXXXX", tmpdir);
 diff --git a/stdio-common/scanf15.c b/stdio-common/scanf15.c
 index acd01e7b..67d2364e 100644
---- src/glibc-2.37/stdio-common/scanf15.c
-+++ src/glibc-2.37/stdio-common/scanf15.c
+--- src/glibc-2.38/stdio-common/scanf15.c
++++ src/glibc-2.38/stdio-common/scanf15.c
 @@ -65,7 +65,7 @@ main (void)
  
    const char *tmpdir = getenv ("TMPDIR");
@@ -1033,22 +386,9 @@ index acd01e7b..67d2364e 100644
    sprintf (fname, "%s/tst-scanf15.XXXXXX", tmpdir);
 diff --git a/stdio-common/scanf16.c b/stdio-common/scanf16.c
 index 97d1082d..65e02d0b 100644
---- src/glibc-2.37/stdio-common/scanf16.c
-+++ src/glibc-2.37/stdio-common/scanf16.c
+--- src/glibc-2.38/stdio-common/scanf16.c
++++ src/glibc-2.38/stdio-common/scanf16.c
 @@ -113,7 +113,7 @@ main (void)
- 
-   const char *tmpdir = getenv ("TMPDIR");
-   if (tmpdir == NULL || tmpdir[0] == '\0')
--    tmpdir = "/tmp";
-+    tmpdir = "/data/data/com.termux/files/usr/tmp";
- 
-   char fname[strlen (tmpdir) + sizeof "/tst-scanf16.XXXXXX"];
-   sprintf (fname, "%s/tst-scanf16.XXXXXX", tmpdir);
-diff --git a/stdio-common/scanf16a.c b/stdio-common/scanf16a.c
-index 196dca29..34d0733c 100644
---- src/glibc-2.37/stdio-common/scanf16a.c
-+++ src/glibc-2.37/stdio-common/scanf16a.c
-@@ -118,7 +118,7 @@ main (void)
  
    const char *tmpdir = getenv ("TMPDIR");
    if (tmpdir == NULL || tmpdir[0] == '\0')
@@ -1059,8 +399,8 @@ index 196dca29..34d0733c 100644
    sprintf (fname, "%s/tst-scanf16.XXXXXX", tmpdir);
 diff --git a/stdio-common/scanf17.c b/stdio-common/scanf17.c
 index 3099689e..e3efec9e 100644
---- src/glibc-2.37/stdio-common/scanf17.c
-+++ src/glibc-2.37/stdio-common/scanf17.c
+--- src/glibc-2.38/stdio-common/scanf17.c
++++ src/glibc-2.38/stdio-common/scanf17.c
 @@ -96,7 +96,7 @@ main (void)
  
    const char *tmpdir = getenv ("TMPDIR");
@@ -1070,132 +410,10 @@ index 3099689e..e3efec9e 100644
  
    char fname[strlen (tmpdir) + sizeof "/tst-scanf17.XXXXXX"];
    sprintf (fname, "%s/tst-scanf17.XXXXXX", tmpdir);
-diff --git a/stdio-common/test-popen.c b/stdio-common/test-popen.c
-index 9ad9a5d6..36b32d25 100644
---- src/glibc-2.37/stdio-common/test-popen.c
-+++ src/glibc-2.37/stdio-common/test-popen.c
-@@ -59,7 +59,7 @@ do_test (void)
-      the perhaps incompatible new shared libraries.  */
-   unsetenv ("LD_LIBRARY_PATH");
- 
--  output = popen ("/bin/cat >" OBJPFX "tstpopen.tmp", "w");
-+  output = popen ("/data/data/com.termux/files/usr/bin/cat >" OBJPFX "tstpopen.tmp", "w");
-   if (output == NULL)
-     {
-       perror ("popen");
-@@ -69,7 +69,7 @@ do_test (void)
-   write_data (output);
-   wstatus = pclose (output);
-   printf ("writing pclose returned %d\n", wstatus);
--  input = popen ("/bin/cat " OBJPFX "tstpopen.tmp", "r");
-+  input = popen ("/data/data/com.termux/files/usr/bin/cat " OBJPFX "tstpopen.tmp", "r");
-   if (input == NULL)
-     {
-       perror (OBJPFX "tstpopen.tmp");
-@@ -83,7 +83,7 @@ do_test (void)
-   remove (OBJPFX "tstpopen.tmp");
- 
-   errno = 0;
--  output = popen ("/bin/cat", "m");
-+  output = popen ("/data/data/com.termux/files/usr/bin/cat", "m");
-   if (output != NULL)
-     {
-       puts ("popen called with illegal mode does not return NULL");
-diff --git a/stdio-common/test-vfprintf.c b/stdio-common/test-vfprintf.c
-index a4b9e3f5..83903a5c 100644
---- src/glibc-2.37/stdio-common/test-vfprintf.c
-+++ src/glibc-2.37/stdio-common/test-vfprintf.c
-@@ -45,7 +45,7 @@ do_test (void)
- 
-   mtrace ();
- 
--  strcpy (buf, "/tmp/test-vfprintfXXXXXX");
-+  strcpy (buf, "/data/data/com.termux/files/usr/tmp/test-vfprintfXXXXXX");
-   fd = mkstemp (buf);
-   if (fd == -1)
-     {
-diff --git a/stdio-common/tst-fdopen.c b/stdio-common/tst-fdopen.c
-index 136fff58..8d0fca3c 100644
---- src/glibc-2.37/stdio-common/tst-fdopen.c
-+++ src/glibc-2.37/stdio-common/tst-fdopen.c
-@@ -19,7 +19,7 @@ char buffer[256];
- int
- main (int argc, char *argv[])
- {
--  char name[] = "/tmp/tst-fdopen.XXXXXX";
-+  char name[] = "/data/data/com.termux/files/usr/tmp/tst-fdopen.XXXXXX";
-   FILE *fp = NULL;
-   int retval = 0;
-   int fd;
-diff --git a/stdio-common/tst-fseek.c b/stdio-common/tst-fseek.c
-index c4ac17cd..11678793 100644
---- src/glibc-2.37/stdio-common/tst-fseek.c
-+++ src/glibc-2.37/stdio-common/tst-fseek.c
-@@ -42,7 +42,7 @@ do_test (void)
- 
-   tmpdir = getenv ("TMPDIR");
-   if (tmpdir == NULL || tmpdir[0] == '\0')
--    tmpdir = "/tmp";
-+    tmpdir = "/data/data/com.termux/files/usr/tmp";
- 
-   asprintf (&fname, "%s/tst-fseek.XXXXXX", tmpdir);
-   if (fname == NULL)
-diff --git a/stdio-common/tst-perror.c b/stdio-common/tst-perror.c
-index 57835e0c..b0d4f08d 100644
---- src/glibc-2.37/stdio-common/tst-perror.c
-+++ src/glibc-2.37/stdio-common/tst-perror.c
-@@ -27,7 +27,7 @@ static int
- do_test (void)
- {
-   int fd;
--  char fname[] = "/tmp/tst-perror.XXXXXX";
-+  char fname[] = "/data/data/com.termux/files/usr/tmp/tst-perror.XXXXXX";
-   int result = 0;
-   char buf[200];
-   ssize_t n;
-diff --git a/stdio-common/tst-put-error.c b/stdio-common/tst-put-error.c
-index 52b71ced..a9f0b342 100644
---- src/glibc-2.37/stdio-common/tst-put-error.c
-+++ src/glibc-2.37/stdio-common/tst-put-error.c
-@@ -27,7 +27,7 @@
- static int
- do_test (void)
- {
--  char tmpl[] = "/tmp/tst-put-error.XXXXXX";
-+  char tmpl[] = "/data/data/com.termux/files/usr/tmp/tst-put-error.XXXXXX";
-   int fd = mkstemp (tmpl);
-   if (fd == -1)
-     error (EXIT_FAILURE, errno, "cannot create temporary file");
-diff --git a/stdio-common/tst-rndseek.c b/stdio-common/tst-rndseek.c
-index 60b55284..d8f99a41 100644
---- src/glibc-2.37/stdio-common/tst-rndseek.c
-+++ src/glibc-2.37/stdio-common/tst-rndseek.c
-@@ -4,7 +4,7 @@
- #include <unistd.h>
- 
- 
--static char fname[] = "/tmp/rndseek.XXXXXX";
-+static char fname[] = "/data/data/com.termux/files/usr/tmp/rndseek.XXXXXX";
- static char tempdata[65 * 1024];
- 
- 
-diff --git a/stdio-common/tst-ungetc.c b/stdio-common/tst-ungetc.c
-index 1344b2b5..929ad673 100644
---- src/glibc-2.37/stdio-common/tst-ungetc.c
-+++ src/glibc-2.37/stdio-common/tst-ungetc.c
-@@ -16,7 +16,7 @@
- int
- main (int argc, char *argv[])
- {
--  char name[] = "/tmp/tst-ungetc.XXXXXX";
-+  char name[] = "/data/data/com.termux/files/usr/tmp/tst-ungetc.XXXXXX";
-   FILE *fp = NULL;
-   int retval = 0;
-   int c;
 diff --git a/stdio-common/tstscanf.c b/stdio-common/tstscanf.c
 index 3a4ebf75..e0cb708a 100644
---- src/glibc-2.37/stdio-common/tstscanf.c
-+++ src/glibc-2.37/stdio-common/tstscanf.c
+--- src/glibc-2.38/stdio-common/tstscanf.c
++++ src/glibc-2.38/stdio-common/tstscanf.c
 @@ -62,7 +62,7 @@ main (int argc, char **argv)
  
    if (argc == 2 && !strcmp (argv[1], "-opipe"))
@@ -1216,8 +434,8 @@ index 3a4ebf75..e0cb708a 100644
  	{
 diff --git a/stdio-common/xbug.c b/stdio-common/xbug.c
 index 06f74aff..65c71415 100644
---- src/glibc-2.37/stdio-common/xbug.c
-+++ src/glibc-2.37/stdio-common/xbug.c
+--- src/glibc-2.38/stdio-common/xbug.c
++++ src/glibc-2.38/stdio-common/xbug.c
 @@ -60,7 +60,7 @@ main(int argc, char *argv[])
  
    unsetenv ("LD_LIBRARY_PATH");
@@ -1229,8 +447,8 @@ index 06f74aff..65c71415 100644
    ReadFile(&buffer, input);
 diff --git a/stdlib/isomac.c b/stdlib/isomac.c
 index 3a6009d9..8df654af 100644
---- src/glibc-2.37/stdlib/isomac.c
-+++ src/glibc-2.37/stdlib/isomac.c
+--- src/glibc-2.38/stdlib/isomac.c
++++ src/glibc-2.38/stdlib/isomac.c
 @@ -77,7 +77,7 @@
  
  #define HEADER_MAX          256
@@ -1242,8 +460,8 @@ index 3a6009d9..8df654af 100644
  static char *header[] =
 diff --git a/support/support_test_main.c b/support/support_test_main.c
 index 94f02dfb..5290519a 100644
---- src/glibc-2.37/support/support_test_main.c
-+++ src/glibc-2.37/support/support_test_main.c
+--- src/glibc-2.38/support/support_test_main.c
++++ src/glibc-2.38/support/support_test_main.c
 @@ -353,7 +353,7 @@ support_test_main (int argc, char **argv, const struct test_config *config)
      {
        test_dir = getenv ("TMPDIR");
@@ -1253,23 +471,10 @@ index 94f02dfb..5290519a 100644
      }
    if (support_set_test_dir != NULL)
      support_set_test_dir (test_dir);
-diff --git a/support/test-container.c b/support/test-container.c
-index f1a68b22..4f4c9734 100644
---- src/glibc-2.37/support/test-container.c
-+++ src/glibc-2.37/support/test-container.c
-@@ -1225,7 +1225,7 @@ main (int argc, char **argv)
-   sprintf (pid_buf, "%lu", (long unsigned)child);
-   setenv ("PID_OUTSIDE_CONTAINER", pid_buf, 0);
- 
--  maybe_xmkdir ("/tmp", 0755);
-+  maybe_xmkdir ("/data/data/com.termux/files/usr/tmp", 0755);
- 
-   if (require_pidns)
-     {
 diff --git a/sysdeps/generic/paths.h b/sysdeps/generic/paths.h
 index 893b4c22..fb12606f 100644
---- src/glibc-2.37/sysdeps/generic/paths.h
-+++ src/glibc-2.37/sysdeps/generic/paths.h
+--- src/glibc-2.38/sysdeps/generic/paths.h
++++ src/glibc-2.38/sysdeps/generic/paths.h
 @@ -33,43 +33,43 @@
  #define	_PATHS_H_
  
@@ -1341,8 +546,8 @@ index 893b4c22..fb12606f 100644
  #endif /* !_PATHS_H_ */
 diff --git a/sysdeps/posix/system.c b/sysdeps/posix/system.c
 index 2335a991..223f6d4f 100644
---- src/glibc-2.37/sysdeps/posix/system.c
-+++ src/glibc-2.37/sysdeps/posix/system.c
+--- src/glibc-2.38/sysdeps/posix/system.c
++++ src/glibc-2.38/sysdeps/posix/system.c
 @@ -31,7 +31,7 @@
  #include <not-cancel.h>
  #include <internal-signals.h>
@@ -1354,8 +559,8 @@ index 2335a991..223f6d4f 100644
  
 diff --git a/sysdeps/posix/tempname.c b/sysdeps/posix/tempname.c
 index f24d9622..987033bd 100644
---- src/glibc-2.37/sysdeps/posix/tempname.c
-+++ src/glibc-2.37/sysdeps/posix/tempname.c
+--- src/glibc-2.38/sysdeps/posix/tempname.c
++++ src/glibc-2.38/sysdeps/posix/tempname.c
 @@ -28,7 +28,7 @@
  
  #include <stdio.h>
@@ -1376,451 +581,17 @@ index f24d9622..987033bd 100644
        else
          {
            __set_errno (ENOENT);
-diff --git a/sysdeps/pthread/tst-barrier2.c b/sysdeps/pthread/tst-barrier2.c
-index ed8332ff..cab2ca32 100644
---- src/glibc-2.37/sysdeps/pthread/tst-barrier2.c
-+++ src/glibc-2.37/sysdeps/pthread/tst-barrier2.c
-@@ -31,7 +31,7 @@ static int
- do_test (void)
- {
-   size_t ps = sysconf (_SC_PAGESIZE);
--  char tmpfname[] = "/tmp/tst-barrier2.XXXXXX";
-+  char tmpfname[] = "/data/data/com.termux/files/usr/tmp/tst-barrier2.XXXXXX";
-   char data[ps];
-   void *mem;
-   int fd;
-diff --git a/sysdeps/pthread/tst-cancel16.c b/sysdeps/pthread/tst-cancel16.c
-index 511b9e1e..eae5955a 100644
---- src/glibc-2.37/sysdeps/pthread/tst-cancel16.c
-+++ src/glibc-2.37/sysdeps/pthread/tst-cancel16.c
-@@ -61,7 +61,7 @@ tf (void *arg)
- static int
- do_test (void)
- {
--  char fname[] = "/tmp/cancel16XXXXXX";
-+  char fname[] = "/data/data/com.termux/files/usr/tmp/cancel16XXXXXX";
-   fd = mkstemp (fname);
-   if (fd == -1)
-     {
-diff --git a/sysdeps/pthread/tst-cancel19.c b/sysdeps/pthread/tst-cancel19.c
-index b2f3d38c..a96a9fcb 100644
---- src/glibc-2.37/sysdeps/pthread/tst-cancel19.c
-+++ src/glibc-2.37/sysdeps/pthread/tst-cancel19.c
-@@ -167,7 +167,7 @@ do_test (void)
-       ret = 1;
-     }
- 
--  char fname[] = "/tmp/tst-cancel19-dir-XXXXXX\0foo/bar";
-+  char fname[] = "/data/data/com.termux/files/usr/tmp/tst-cancel19-dir-XXXXXX\0foo/bar";
-   char *enddir = strchr (fname, '\0');
-   if (mkdtemp (fname) == NULL)
-     {
-diff --git a/sysdeps/pthread/tst-cancel4-common.h b/sysdeps/pthread/tst-cancel4-common.h
-index 0d416a89..2803f0ef 100644
---- src/glibc-2.37/sysdeps/pthread/tst-cancel4-common.h
-+++ src/glibc-2.37/sysdeps/pthread/tst-cancel4-common.h
-@@ -88,7 +88,7 @@ cl (void *arg)
- 
- /* Named pipe used to check for blocking open.  It should be closed
-    after the cancellation handling.  */
--static char fifoname[] = "/tmp/tst-cancel4-fifo-XXXXXX";
-+static char fifoname[] = "/data/data/com.termux/files/usr/tmp/tst-cancel4-fifo-XXXXXX";
- static int fifofd;
- 
- static void
-diff --git a/sysdeps/pthread/tst-cancel4.c b/sysdeps/pthread/tst-cancel4.c
-index 4f5c8931..1dcf3253 100644
---- src/glibc-2.37/sysdeps/pthread/tst-cancel4.c
-+++ src/glibc-2.37/sysdeps/pthread/tst-cancel4.c
-@@ -84,7 +84,7 @@ tf_read  (void *arg)
-     fd = fds[0];
-   else
-     {
--      char fname[] = "/tmp/tst-cancel4-fd-XXXXXX";
-+      char fname[] = "/data/data/com.termux/files/usr/tmp/tst-cancel4-fd-XXXXXX";
-       tempfd = fd = mkstemp (fname);
-       if (fd == -1)
- 	FAIL_EXIT1 ("mkstemp failed: %m");
-@@ -116,7 +116,7 @@ tf_readv  (void *arg)
-     fd = fds[0];
-   else
-     {
--      char fname[] = "/tmp/tst-cancel4-fd-XXXXXX";
-+      char fname[] = "/data/data/com.termux/files/usr/tmp/tst-cancel4-fd-XXXXXX";
-       tempfd = fd = mkstemp (fname);
-       if (fd == -1)
- 	FAIL_EXIT1 ("mkstemp failed: %m");
-@@ -149,7 +149,7 @@ tf_write  (void *arg)
-     fd = fds[1];
-   else
-     {
--      char fname[] = "/tmp/tst-cancel4-fd-XXXXXX";
-+      char fname[] = "/data/data/com.termux/files/usr/tmp/tst-cancel4-fd-XXXXXX";
-       tempfd = fd = mkstemp (fname);
-       if (fd == -1)
- 	FAIL_EXIT1 ("mkstemp failed: %m");
-@@ -186,7 +186,7 @@ tf_writev  (void *arg)
-     fd = fds[1];
-   else
-     {
--      char fname[] = "/tmp/tst-cancel4-fd-XXXXXX";
-+      char fname[] = "/data/data/com.termux/files/usr/tmp/tst-cancel4-fd-XXXXXX";
-       tempfd = fd = mkstemp (fname);
-       if (fd == -1)
- 	FAIL_EXIT1 ("mkstemp failed: %m");
-@@ -275,7 +275,7 @@ tf_select (void *arg)
-     fd = fds[0];
-   else
-     {
--      char fname[] = "/tmp/tst-cancel4-fd-XXXXXX";
-+      char fname[] = "/data/data/com.termux/files/usr/tmp/tst-cancel4-fd-XXXXXX";
-       tempfd = fd = mkstemp (fname);
-       if (fd == -1)
- 	FAIL_EXIT1 ("mkstemp failed: %m");
-@@ -310,7 +310,7 @@ tf_pselect (void *arg)
-     fd = fds[0];
-   else
-     {
--      char fname[] = "/tmp/tst-cancel4-fd-XXXXXX";
-+      char fname[] = "/data/data/com.termux/files/usr/tmp/tst-cancel4-fd-XXXXXX";
-       tempfd = fd = mkstemp (fname);
-       if (fd == -1)
- 	FAIL_EXIT1 ("mkstemp failed: %m");
-@@ -345,7 +345,7 @@ tf_poll (void *arg)
-     fd = fds[0];
-   else
-     {
--      char fname[] = "/tmp/tst-cancel4-fd-XXXXXX";
-+      char fname[] = "/data/data/com.termux/files/usr/tmp/tst-cancel4-fd-XXXXXX";
-       tempfd = fd = mkstemp (fname);
-       if (fd == -1)
- 	FAIL_EXIT1 ("mkstemp failed: %m");
-@@ -378,7 +378,7 @@ tf_ppoll (void *arg)
-     fd = fds[0];
-   else
-     {
--      char fname[] = "/tmp/tst-cancel4-fd-XXXXXX";
-+      char fname[] = "/data/data/com.termux/files/usr/tmp/tst-cancel4-fd-XXXXXX";
-       tempfd = fd = mkstemp (fname);
-       if (fd == -1)
- 	FAIL_EXIT1 ("mkstemp failed: %m");
-@@ -693,7 +693,7 @@ tf_accept (void *arg)
-     {
-       TEST_VERIFY_EXIT (tries++ < 10);
- 
--      strcpy (sun.sun_path, "/tmp/tst-cancel4-socket-1-XXXXXX");
-+      strcpy (sun.sun_path, "/data/data/com.termux/files/usr/tmp/tst-cancel4-socket-1-XXXXXX");
-       TEST_VERIFY_EXIT (mktemp (sun.sun_path) != NULL);
- 
-       sun.sun_family = AF_UNIX;
-@@ -737,7 +737,7 @@ tf_send (void *arg)
-     {
-       TEST_VERIFY_EXIT (tries++ < 10);
- 
--      strcpy (sun.sun_path, "/tmp/tst-cancel4-socket-2-XXXXXX");
-+      strcpy (sun.sun_path, "/data/data/com.termux/files/usr/tmp/tst-cancel4-socket-2-XXXXXX");
-       TEST_VERIFY_EXIT (mktemp (sun.sun_path) != NULL);
- 
-       sun.sun_family = AF_UNIX;
-@@ -795,7 +795,7 @@ tf_recv (void *arg)
-     {
-       TEST_VERIFY_EXIT (tries++ < 10);
- 
--      strcpy (sun.sun_path, "/tmp/tst-cancel4-socket-3-XXXXXX");
-+      strcpy (sun.sun_path, "/data/data/com.termux/files/usr/tmp/tst-cancel4-socket-3-XXXXXX");
-       TEST_VERIFY_EXIT (mktemp (sun.sun_path) != NULL);
- 
-       sun.sun_family = AF_UNIX;
-@@ -846,7 +846,7 @@ tf_recvfrom (void *arg)
-     {
-       TEST_VERIFY_EXIT (tries++ < 10);
- 
--      strcpy (sun.sun_path, "/tmp/tst-cancel4-socket-4-XXXXXX");
-+      strcpy (sun.sun_path, "/data/data/com.termux/files/usr/tmp/tst-cancel4-socket-4-XXXXXX");
-       TEST_VERIFY_EXIT (mktemp (sun.sun_path) != NULL);
- 
-       sun.sun_family = AF_UNIX;
-@@ -894,7 +894,7 @@ tf_recvmsg (void *arg)
-     {
-       TEST_VERIFY_EXIT (tries++ < 10);
- 
--      strcpy (sun.sun_path, "/tmp/tst-cancel4-socket-5-XXXXXX");
-+      strcpy (sun.sun_path, "/data/data/com.termux/files/usr/tmp/tst-cancel4-socket-5-XXXXXX");
-       TEST_VERIFY_EXIT (mktemp (sun.sun_path) != NULL);
- 
-       sun.sun_family = AF_UNIX;
-@@ -970,7 +970,7 @@ tf_close (void *arg)
-     // blocks we can enable this test to run in both rounds.
-     abort ();
- 
--  char fname[] = "/tmp/tst-cancel-fd-XXXXXX";
-+  char fname[] = "/data/data/com.termux/files/usr/tmp/tst-cancel-fd-XXXXXX";
-   tempfd = mkstemp (fname);
-   if (tempfd == -1)
-     FAIL_EXIT1 ("mkstemp failed: %m");
-@@ -1025,7 +1025,7 @@ tf_pwrite (void *arg)
-     // blocks we can enable this test to run in both rounds.
-     abort ();
- 
--  char fname[] = "/tmp/tst-cancel4-fd-XXXXXX";
-+  char fname[] = "/data/data/com.termux/files/usr/tmp/tst-cancel4-fd-XXXXXX";
-   tempfd = mkstemp (fname);
-   if (tempfd == -1)
-     FAIL_EXIT1 ("mkstemp failed: %m");
-@@ -1055,7 +1055,7 @@ tf_preadv (void *arg)
-        blocks we can enable this test to run in both rounds.  */
-     abort ();
- 
--  char fname[] = "/tmp/tst-cancel4-fd-XXXXXX";
-+  char fname[] = "/data/data/com.termux/files/usr/tmp/tst-cancel4-fd-XXXXXX";
-   tempfd = fd = mkstemp (fname);
-   if (fd == -1)
-     FAIL_EXIT1 ("mkstemp failed: %m");
-@@ -1087,7 +1087,7 @@ tf_pwritev (void *arg)
-        blocks we can enable this test to run in both rounds.  */
-     abort ();
- 
--  char fname[] = "/tmp/tst-cancel4-fd-XXXXXX";
-+  char fname[] = "/data/data/com.termux/files/usr/tmp/tst-cancel4-fd-XXXXXX";
-   tempfd = fd = mkstemp (fname);
-   if (fd == -1)
-     FAIL_EXIT1 ("mkstemp failed: %m");
-@@ -1122,7 +1122,7 @@ tf_pwritev2 (void *arg)
- 
-   errno = 0;
- 
--  char fname[] = "/tmp/tst-cancel4-fd-XXXXXX";
-+  char fname[] = "/data/data/com.termux/files/usr/tmp/tst-cancel4-fd-XXXXXX";
-   tempfd = fd = mkstemp (fname);
-   if (fd == -1)
-     FAIL_EXIT1 ("mkstemp: %m");
-@@ -1157,7 +1157,7 @@ tf_preadv2 (void *arg)
- 
-   errno = 0;
- 
--  char fname[] = "/tmp/tst-cancel4-fd-XXXXXX";
-+  char fname[] = "/data/data/com.termux/files/usr/tmp/tst-cancel4-fd-XXXXXX";
-   tempfd = fd = mkstemp (fname);
-   if (fd == -1)
-     FAIL_EXIT1 ("mkstemp failed: %m");
-@@ -1273,7 +1273,7 @@ tf_sendto (void *arg)
-     {
-       TEST_VERIFY_EXIT (tries++ < 10);
- 
--      strcpy (sun.sun_path, "/tmp/tst-cancel4-socket-6-XXXXXX");
-+      strcpy (sun.sun_path, "/data/data/com.termux/files/usr/tmp/tst-cancel4-socket-6-XXXXXX");
-       TEST_VERIFY_EXIT (mktemp (sun.sun_path) != NULL);
- 
-       sun.sun_family = AF_UNIX;
-@@ -1331,7 +1331,7 @@ tf_sendmsg (void *arg)
-     {
-       TEST_VERIFY_EXIT (tries++ < 10);
- 
--      strcpy (sun.sun_path, "/tmp/tst-cancel4-socket-7-XXXXXX");
-+      strcpy (sun.sun_path, "/data/data/com.termux/files/usr/tmp/tst-cancel4-socket-7-XXXXXX");
-       TEST_VERIFY_EXIT (mktemp (sun.sun_path) != NULL);
- 
-       sun.sun_family = AF_UNIX;
-@@ -1414,7 +1414,7 @@ tf_connect (void *arg)
-     {
-       TEST_VERIFY_EXIT (tries++ < 10);
- 
--      strcpy (sun.sun_path, "/tmp/tst-cancel4-socket-2-XXXXXX");
-+      strcpy (sun.sun_path, "/data/data/com.termux/files/usr/tmp/tst-cancel4-socket-2-XXXXXX");
-       TEST_VERIFY_EXIT (mktemp (sun.sun_path) != NULL);
- 
-       sun.sun_family = AF_UNIX;
-diff --git a/sysdeps/pthread/tst-cond12.c b/sysdeps/pthread/tst-cond12.c
-index 5a5be42a..ebb81cf9 100644
---- src/glibc-2.37/sysdeps/pthread/tst-cond12.c
-+++ src/glibc-2.37/sysdeps/pthread/tst-cond12.c
-@@ -25,7 +25,7 @@
- #include <sys/wait.h>
- 
- 
--static char fname[] = "/tmp/tst-cond12-XXXXXX";
-+static char fname[] = "/data/data/com.termux/files/usr/tmp/tst-cond12-XXXXXX";
- static int fd;
- 
- 
-diff --git a/sysdeps/pthread/tst-cond4.c b/sysdeps/pthread/tst-cond4.c
-index 91d9dac6..239dd00b 100644
---- src/glibc-2.37/sysdeps/pthread/tst-cond4.c
-+++ src/glibc-2.37/sysdeps/pthread/tst-cond4.c
-@@ -32,7 +32,7 @@ static int
- do_test (void)
- {
-   size_t ps = sysconf (_SC_PAGESIZE);
--  char tmpfname[] = "/tmp/tst-cond4.XXXXXX";
-+  char tmpfname[] = "/data/data/com.termux/files/usr/tmp/tst-cond4.XXXXXX";
-   char data[ps];
-   void *mem;
-   int fd;
-diff --git a/sysdeps/pthread/tst-cond6.c b/sysdeps/pthread/tst-cond6.c
-index ac55a5c1..239d7560 100644
---- src/glibc-2.37/sysdeps/pthread/tst-cond6.c
-+++ src/glibc-2.37/sysdeps/pthread/tst-cond6.c
-@@ -34,7 +34,7 @@ static int
- do_test (void)
- {
-   size_t ps = sysconf (_SC_PAGESIZE);
--  char tmpfname[] = "/tmp/tst-cond6.XXXXXX";
-+  char tmpfname[] = "/data/data/com.termux/files/usr/tmp/tst-cond6.XXXXXX";
-   char data[ps];
-   void *mem;
-   int fd;
-diff --git a/sysdeps/pthread/tst-flock1.c b/sysdeps/pthread/tst-flock1.c
-index 7eef9070..922d7372 100644
---- src/glibc-2.37/sysdeps/pthread/tst-flock1.c
-+++ src/glibc-2.37/sysdeps/pthread/tst-flock1.c
-@@ -45,7 +45,7 @@ tf (void *arg)
- static int
- do_test (void)
- {
--  char tmp[] = "/tmp/tst-flock1-XXXXXX";
-+  char tmp[] = "/data/data/com.termux/files/usr/tmp/tst-flock1-XXXXXX";
- 
-   fd = mkstemp (tmp);
-   if (fd == -1)
-diff --git a/sysdeps/pthread/tst-flock2.c b/sysdeps/pthread/tst-flock2.c
-index 8762e93b..1cc09481 100644
---- src/glibc-2.37/sysdeps/pthread/tst-flock2.c
-+++ src/glibc-2.37/sysdeps/pthread/tst-flock2.c
-@@ -57,7 +57,7 @@ tf (void *arg)
- static int
- do_test (void)
- {
--  char tmp[] = "/tmp/tst-flock2-XXXXXX";
-+  char tmp[] = "/data/data/com.termux/files/usr/tmp/tst-flock2-XXXXXX";
- 
-   fd = mkstemp (tmp);
-   if (fd == -1)
-diff --git a/sysdeps/pthread/tst-mutex4.c b/sysdeps/pthread/tst-mutex4.c
-index 531dbfc2..cc49e01c 100644
---- src/glibc-2.37/sysdeps/pthread/tst-mutex4.c
-+++ src/glibc-2.37/sysdeps/pthread/tst-mutex4.c
-@@ -30,7 +30,7 @@ static int
- do_test (void)
- {
-   size_t ps = sysconf (_SC_PAGESIZE);
--  char tmpfname[] = "/tmp/tst-mutex4.XXXXXX";
-+  char tmpfname[] = "/data/data/com.termux/files/usr/tmp/tst-mutex4.XXXXXX";
-   char data[ps];
-   void *mem;
-   int fd;
-diff --git a/sysdeps/pthread/tst-mutex9.c b/sysdeps/pthread/tst-mutex9.c
-index 6e4b97ba..fb098ebf 100644
---- src/glibc-2.37/sysdeps/pthread/tst-mutex9.c
-+++ src/glibc-2.37/sysdeps/pthread/tst-mutex9.c
-@@ -45,7 +45,7 @@ do_test_clock (clockid_t clockid, int tmo_result)
-   const clockid_t clockid_for_get =
-     (clockid == CLOCK_USE_TIMEDLOCK) ? CLOCK_REALTIME : clockid;
-   size_t ps = sysconf (_SC_PAGESIZE);
--  char tmpfname[] = "/tmp/tst-mutex9.XXXXXX";
-+  char tmpfname[] = "/data/data/com.termux/files/usr/tmp/tst-mutex9.XXXXXX";
-   char data[ps];
-   void *mem;
-   int fd;
-diff --git a/sysdeps/pthread/tst-rwlock12.c b/sysdeps/pthread/tst-rwlock12.c
-index b5e5d524..4f6330f9 100644
---- src/glibc-2.37/sysdeps/pthread/tst-rwlock12.c
-+++ src/glibc-2.37/sysdeps/pthread/tst-rwlock12.c
-@@ -30,7 +30,7 @@ static int
- do_test (void)
- {
-   size_t ps = sysconf (_SC_PAGESIZE);
--  char tmpfname[] = "/tmp/tst-rwlock12.XXXXXX";
-+  char tmpfname[] = "/data/data/com.termux/files/usr/tmp/tst-rwlock12.XXXXXX";
-   char data[ps];
-   void *mem;
-   int fd;
-diff --git a/sysdeps/pthread/tst-rwlock4.c b/sysdeps/pthread/tst-rwlock4.c
-index 54c5bd27..c2067d24 100644
---- src/glibc-2.37/sysdeps/pthread/tst-rwlock4.c
-+++ src/glibc-2.37/sysdeps/pthread/tst-rwlock4.c
-@@ -30,7 +30,7 @@ static int
- do_test (void)
- {
-   size_t ps = sysconf (_SC_PAGESIZE);
--  char tmpfname[] = "/tmp/tst-rwlock4.XXXXXX";
-+  char tmpfname[] = "/data/data/com.termux/files/usr/tmp/tst-rwlock4.XXXXXX";
-   char data[ps];
-   void *mem;
-   int fd;
-diff --git a/sysdeps/pthread/tst-sem3.c b/sysdeps/pthread/tst-sem3.c
-index 6c6592cf..cdbec2cc 100644
---- src/glibc-2.37/sysdeps/pthread/tst-sem3.c
-+++ src/glibc-2.37/sysdeps/pthread/tst-sem3.c
-@@ -30,7 +30,7 @@ int
- do_test (void)
- {
-   size_t ps = sysconf (_SC_PAGESIZE);
--  char tmpfname[] = "/tmp/tst-sem3.XXXXXX";
-+  char tmpfname[] = "/data/data/com.termux/files/usr/tmp/tst-sem3.XXXXXX";
-   char data[ps];
-   void *mem;
-   int fd;
-diff --git a/sysdeps/pthread/tst-signal1.c b/sysdeps/pthread/tst-signal1.c
-index d1073e84..ede9dcf1 100644
---- src/glibc-2.37/sysdeps/pthread/tst-signal1.c
-+++ src/glibc-2.37/sysdeps/pthread/tst-signal1.c
-@@ -92,7 +92,7 @@ receiver (void)
- static int
- do_test (void)
- {
--  char tmp[] = "/tmp/tst-signal1-XXXXXX";
-+  char tmp[] = "/data/data/com.termux/files/usr/tmp/tst-signal1-XXXXXX";
- 
-   int fd = mkstemp (tmp);
-   if (fd == -1)
-diff --git a/sysdeps/pthread/tst-signal2.c b/sysdeps/pthread/tst-signal2.c
-index dfe7d9f6..f3fdd21a 100644
---- src/glibc-2.37/sysdeps/pthread/tst-signal2.c
-+++ src/glibc-2.37/sysdeps/pthread/tst-signal2.c
-@@ -98,7 +98,7 @@ receiver (void)
- static int
- do_test (void)
- {
--  char tmp[] = "/tmp/tst-signal1-XXXXXX";
-+  char tmp[] = "/data/data/com.termux/files/usr/tmp/tst-signal1-XXXXXX";
- 
-   int fd = mkstemp (tmp);
-   if (fd == -1)
-diff --git a/sysdeps/pthread/tst-spin2.c b/sysdeps/pthread/tst-spin2.c
-index 3b5393a1..d3a8db11 100644
---- src/glibc-2.37/sysdeps/pthread/tst-spin2.c
-+++ src/glibc-2.37/sysdeps/pthread/tst-spin2.c
-@@ -30,7 +30,7 @@ static int
- do_test (void)
- {
-   size_t ps = sysconf (_SC_PAGESIZE);
--  char tmpfname[] = "/tmp/tst-spin2.XXXXXX";
-+  char tmpfname[] = "/data/data/com.termux/files/usr/tmp/tst-spin2.XXXXXX";
-   char data[ps];
-   void *mem;
-   int fd;
-diff --git a/sysdeps/pthread/tst-umask1.c b/sysdeps/pthread/tst-umask1.c
-index 47feb10f..0b653087 100644
---- src/glibc-2.37/sysdeps/pthread/tst-umask1.c
-+++ src/glibc-2.37/sysdeps/pthread/tst-umask1.c
-@@ -131,5 +131,5 @@ do_test (const char *fname)
-   return result || res != NULL;
- }
- 
--#define TEST_FUNCTION do_test (argc < 2 ? "/tmp/tst-umask.tmp" : argv[1])
-+#define TEST_FUNCTION do_test (argc < 2 ? "/data/data/com.termux/files/usr/tmp/tst-umask.tmp" : argv[1])
- #include "../test-skeleton.c"
 diff --git a/sysdeps/unix/confstr.h b/sysdeps/unix/confstr.h
 index 15859c3b..5bddec1a 100644
---- src/glibc-2.37/sysdeps/unix/confstr.h
-+++ src/glibc-2.37/sysdeps/unix/confstr.h
+--- src/glibc-2.38/sysdeps/unix/confstr.h
++++ src/glibc-2.38/sysdeps/unix/confstr.h
 @@ -1 +1 @@
 -#define	CS_PATH	"/bin:/usr/bin"
 +#define	CS_PATH	"/data/data/com.termux/files/usr/glibc/bin:/data/data/com.termux/files/usr/bin:/system/bin"
 diff --git a/sysdeps/unix/sysv/linux/gentempfd.c b/sysdeps/unix/sysv/linux/gentempfd.c
 index 86b0a914..c5e2de8d 100644
---- src/glibc-2.37/sysdeps/unix/sysv/linux/gentempfd.c
-+++ src/glibc-2.37/sysdeps/unix/sysv/linux/gentempfd.c
+--- src/glibc-2.38/sysdeps/unix/sysv/linux/gentempfd.c
++++ src/glibc-2.38/sysdeps/unix/sysv/linux/gentempfd.c
 @@ -26,8 +26,8 @@ __gen_tempfd (int flags)
  {
    int fd = __open (P_tmpdir, O_RDWR | O_TMPFILE | O_EXCL | flags,
@@ -1834,8 +605,8 @@ index 86b0a914..c5e2de8d 100644
    return fd;
 diff --git a/sysdeps/unix/sysv/linux/paths.h b/sysdeps/unix/sysv/linux/paths.h
 index 1342ab3a..96629276 100644
---- src/glibc-2.37/sysdeps/unix/sysv/linux/paths.h
-+++ src/glibc-2.37/sysdeps/unix/sysv/linux/paths.h
+--- src/glibc-2.38/sysdeps/unix/sysv/linux/paths.h
++++ src/glibc-2.38/sysdeps/unix/sysv/linux/paths.h
 @@ -33,43 +33,43 @@
  #define	_PATHS_H_
  
@@ -1906,8 +677,8 @@ index 1342ab3a..96629276 100644
  #endif /* !_PATHS_H_ */
 diff --git a/sysdeps/unix/sysv/linux/riscv/dl-cache.h b/sysdeps/unix/sysv/linux/riscv/dl-cache.h
 index 2f82ed4e..a1d39dd6 100644
---- src/glibc-2.37/sysdeps/unix/sysv/linux/riscv/dl-cache.h
-+++ src/glibc-2.37/sysdeps/unix/sysv/linux/riscv/dl-cache.h
+--- src/glibc-2.38/sysdeps/unix/sysv/linux/riscv/dl-cache.h
++++ src/glibc-2.38/sysdeps/unix/sysv/linux/riscv/dl-cache.h
 @@ -58,7 +58,7 @@
  	"/lib32/ilp32",							\
  	NULL,								\
@@ -1917,61 +688,16 @@ index 2f82ed4e..a1d39dd6 100644
        size_t len = strlen (dir);					\
        char path[len + 10];						\
        const char **ptr;							\
-diff --git a/sysdeps/unix/sysv/linux/tst-mount.c b/sysdeps/unix/sysv/linux/tst-mount.c
-index abf9761d..8ab2a2c1 100644
---- src/glibc-2.37/sysdeps/unix/sysv/linux/tst-mount.c
-+++ src/glibc-2.37/sysdeps/unix/sysv/linux/tst-mount.c
-@@ -57,23 +57,23 @@ do_test (void)
-   int mfd = fsmount (fd, FSMOUNT_CLOEXEC, MOUNT_ATTR_NODEV);
-   TEST_VERIFY (mfd != -1);
- 
--  TEST_COMPARE (move_mount (-1, "", AT_FDCWD, "/tmp", 0), -1);
-+  TEST_COMPARE (move_mount (-1, "", AT_FDCWD, "/data/data/com.termux/files/usr/tmp", 0), -1);
-   TEST_COMPARE (errno, ENOENT);
-   {
--    int r = move_mount (mfd, "", AT_FDCWD, "/tmp", MOVE_MOUNT_F_EMPTY_PATH);
-+    int r = move_mount (mfd, "", AT_FDCWD, "/data/data/com.termux/files/usr/tmp", MOVE_MOUNT_F_EMPTY_PATH);
-     TEST_VERIFY (r != -1);
-   }
- 
-   TEST_COMPARE (fspick (AT_FDCWD, "", 0), -1);
-   TEST_COMPARE (errno, ENOENT);
-   {
--    int pfd = fspick (AT_FDCWD, "/tmp", FSPICK_CLOEXEC);
-+    int pfd = fspick (AT_FDCWD, "/data/data/com.termux/files/usr/tmp", FSPICK_CLOEXEC);
-     TEST_VERIFY (pfd != -1);
-   }
- 
-   TEST_COMPARE (open_tree (AT_FDCWD, "", 0), -1);
-   TEST_COMPARE (errno, ENOENT);
--  int fd_tree = open_tree (AT_FDCWD, "/tmp",
-+  int fd_tree = open_tree (AT_FDCWD, "/data/data/com.termux/files/usr/tmp",
- 			   OPEN_TREE_CLONE | OPEN_TREE_CLOEXEC);
-   TEST_VERIFY (fd_tree != -1);
- 
-diff --git a/sysdeps/unix/sysv/linux/tst-sync_file_range.c b/sysdeps/unix/sysv/linux/tst-sync_file_range.c
-index 2d4277a1..530ffa9b 100644
---- src/glibc-2.37/sysdeps/unix/sysv/linux/tst-sync_file_range.c
-+++ src/glibc-2.37/sysdeps/unix/sysv/linux/tst-sync_file_range.c
-@@ -34,7 +34,7 @@
- static char *temp_filename;
- static int temp_fd;
- 
--static char fifoname[] = "/tmp/tst-posix_fadvise-fifo-XXXXXX";
-+static char fifoname[] = "/data/data/com.termux/files/usr/tmp/tst-posix_fadvise-fifo-XXXXXX";
- static int fifofd;
- 
- void
 diff --git a/timezone/tzfile.h b/timezone/tzfile.h
 index ee911044..b48048e1 100644
---- src/glibc-2.37/timezone/tzfile.h
-+++ src/glibc-2.37/timezone/tzfile.h
+--- src/glibc-2.38/timezone/tzfile.h
++++ src/glibc-2.38/timezone/tzfile.h
 @@ -22,11 +22,11 @@
  */
  
  #ifndef TZDIR
 -#define TZDIR	"/usr/share/zoneinfo" /* Time zone object file directory */
-+#define TZDIR	"/data/data/com.termux/files/usr/glibc/share/zoneinfo" /* Time zone object file directory */
++#define TZDIR	"/system/usr/share/zoneinfo" /* Time zone object file directory */
  #endif /* !defined TZDIR */
  
  #ifndef TZDEFAULT

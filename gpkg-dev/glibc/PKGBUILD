@@ -2,8 +2,8 @@
 # - https://gitlab.archlinux.org/archlinux/packaging/packages/glibc/-/blob/main/PKGBUILD
 
 pkgname=glibc
-pkgver=2.37
-pkgrel=11
+pkgver=2.38
+pkgrel=0
 pkgdesc="GNU C Library"
 arch=(any)
 url='https://www.gnu.org/software/libc/'
@@ -45,44 +45,44 @@ source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz
         'arm-arch-syscall.h.patch'
         'x86_64-arch-syscall.h.patch'
         'i386-arch-syscall.h.patch'
-        'mprotect.c')
-sha256sums=('2257eff111a1815d74f46856daaf40b019c1e553156c69d48ba0cbfc1bb91a43'
-            '74da3d03fb81e2511140411bc8bad2a893258a2465c5eec5ac955dccddf9621d'
-            '9223be94da6667f0dff0bf7afb032932dd9a151f23af178faa4d1d7f26c58608'
-            'dd0f14f9ccca83424bc2b841346047d16c59d229c1a459fc764e6c67f4fe91ba'
-            '6814b1c02455fc482d7ea340112bcca1cdd4e13ca2c16f156654d7a65dbdcda2'
-            '27e1ea17f40c57f6bac2e46816d0684170818b58ecced7a83efb8e7f0f038af0'
-            'b6286fe9ffd9707d171db5dd53b3c084d7d38402e1a32eb8b9bd455d9a8b5ab6'
-            'ec053954ab9e19b850227048a61e622bd15d6a651fd7498e507e908485374299'
-            '0f778f5a2d20e8710647370e89c793eb27bbf8ef9824558d0154185c91ecd12c'
+        'rmdir.c.patch')
+sha256sums=('fb82998998b2b29965467bc1b69d152e9c307d2cf301c9eafb4555b770ef3fd2'
+            '85153ad597c6101a73a9d1f3f6c35b6b141ddebb99e445ab601ebe95703b35ec'
+            '4869ef24cdd59a931c9b5b173d2e3e9eaa67964bb8dcc34e4e6948f3e7856572'
+            '94e3766dc6c72aeb535d6cb29ad3309ed39225cebf6cbb0d0b1040c45452e12a'
+            '3beb480a0173fe6c4d8643267e5cc7068f1e7ceed1b60f6b28b349a59e93f8b2'
+            'ad261ed5bb2278219bc567d698b439a182ae73f42cde440b5ed31cd9088fdbdb'
+            'caf6b0f8733d581d7fef9ae01c61b3540ecb3c7d235d9beebafd059270ae0cc8'
+            '57ace13145309e73021b94fe4f267b01cc3c03b48b5e07e1772cb38ed8b9173d'
+            '29daa97cd75bc932ebb892d5964fbbc29e2fdacb17cf722df3206afec6a5f2de'
             'cdd916c0dc29e5d958ddef5c3530947244fd740ce7645601bfabae53512323b8'
             'd42648cea552ba5353a32e264686e992263289d5cc86207314dffc54ab514981'
             'cdc234959c6fdb43f000d3bb7d1080b0103f4080f5e67bcfe8ae1aaf477812f0'
             '774061aff612a377714a509918a9e0e0aafce708b87d2d7e06b1bd1f6542fe70'
-            '17e408e3d587551146d85741f932241e0bf60899490bb73195a2bd391510f099'
-            'e0f6a51cbd64a30394d6a22e5e14603766ac924e9b6690adb673517821c2015e'
-            'e67383acf8935a68353f0f1c786161222fbb08c9255cffa3ccb06565e1401cbc'
-            'cd981ed4c8b77ee1551ae5a017dcc9b7891a6078450633eafe528e3984254f40'
-            'e6b3bac73759e231cfa0099be3ca50f7b5a379ecdac18a598999e87d51c8f249'
-            '6ec88f600395da72987fdc3fcd09ac0b992770201a6a7f1a377445a35f0ea52d'
-            'a6ea8efc55de0e26494bf8839ae32d95c36b6956788535a9a8912ad989510f36'
-            '18f01ed2c6ed8acb122adc443fd428c8a37bc6a7d518f4e433e2ee462eebd5eb'
-            '769b294e226877f12d47ac4ff86ab9246da6e547781071c1ee38e60772484c74'
-            'f5b5b6ae3596f6fd617d015ff9c417a35da37c86ae3a49b5b5ce88275ed09f12'
-            '743c2fe91676cd8ce6eb520286abd28d9ad2764180894aad49d5be17dab3ab0c'
-            'b8b573fcb85d59fc11ddef9aebb691b8047d700ea1894784883a1359c6ef94a8'
-            '59e711916c946fc961bb8c3a0da5d367a90ffedd31bbf7cf250e9bc1e1e04744'
+            '7052f21aa16a27081ba1cd426b33560c9c742f0a98238bf251d10aa07ef54d91'
+            '9158702571e716618c4e2c7f2b1bf380131bd39320d8e035d8d9842531843538'
+            '20a3c3c635419f4cbaf3a5f4eed3282af116ba425a18dcde16a7df669eba9855'
+            '210c2824749af41d9ea3f8b934b72256dae4cbe0bdcf4a75a0b61c85f135feca'
+            '4823ee80fc64e31cc389380a45c38d414757da90e525b8cc09cd91e37dc7248d'
+            '8b70cb99339456e308b6ce07c1948e00a9e0e2dac84a290966afacc16628006a'
+            'a639d1fd58a56c56a913f3fba368a528ddaf933662cfc90bd2f598d5d09ff2b8'
+            '8556666663d97b0500384204821624f3a7a03231f45ac8c0951d5f8006df779e'
+            '9181aa7fe3f31a5f66f83f487119614fd1e61cd962c801e448c1a00d7ebc6afb'
+            '0467c9c967793244085cfca3d73324a707316b89087d6d30447c2dd417605a0f'
+            '8ed5e685df7c0638299887caed6cf79ce28dcbf0466ae74bec9446946da90021'
+            '8ad4caf54ad4c8b528a84e1eaf24feac5cc62bedfc3a056a4b05a840a0f690e6'
+            'b8f5bade447e9c5352ff61dc2926de9c5ef7dfd70c879396e22dce42dba1fd56'
             '0298e3d4aca6e7db5d674f318a31cb68257bcba0cac66828b00202e012cbf567'
-            'd7569b8f5aa1816461cf42e8f290ea861157ebb8da936c6fa472593e681737f2'
-            '8a246f04d34253504bae46cf29e3e217c031f987b191de0fb2dafa38437e3809'
-            '210e48732cdad2a2b01cff15771fcf12730bdad3f2a93ef772c03c8b57c74cc7'
-            'e32f030f1f3d42974c3014e8ee3b78084046642d649d496fab31021a1991b2b7'
-            '645dbf18806320f6381cec70ec5c7cd2ee7ccb6c5546f8e169fe31a55f1d419b'
-            '4ee6aaf740d18758de333a38e979791197ae3053f91fefe83871639de525601c'
-            '6a63b915b8f50e05a9a2287241e907f0c2a2b39f8d696c18a3e23267805d6a92'
-            'f29c92c48adae65e86256b4ae5180c77aa6957d90bbc7abb54042c2820b2a26f'
-            'e378b410d1f1750b7751910dffcd525f58be71ab1b4f54a09e1eedd7fa3829f4'
-            '27be199f7d469a44a9b840dac7275968761082d4735cc27326b5bca81bfce2b8')
+            '1f2c1b8b79246a862b7c153b548a78ef20e3bfe1d058d3002c45fc36f3af944d'
+            '1bebfe9869ec3663213eb299b5357acde0631949644c68c6121b24d5f007afcd'
+            '8300d82107ee62b15a06ac3b336707e638f5575041ab81dd43e47a99a976c052'
+            'cf962f0fde71d61e55f488356f8ec80791ef6438a00da69dda2a79bbb4fea7ef'
+            '42742b49cb15df968965de852ac21a2e9f49c68f0492816a5848f9a15e99fd59'
+            '994d2664bfca5c3d9b82f89d96959d65dfaddd5197865861fcc867f761e43a91'
+            'dc96ecd72915e474d2fe1ce882e59d41c9f1a20db92f28c1fe85287e0db8c4a2'
+            'f0f47b222a6b67571d0b7e8aa57bc1e2546a0478fe75fb6718c1cc0bcf2e284d'
+            '4e1f759fee8fc904d1170cd5b6c444403d8bd0753f2168c6d3251109ac5385ad'
+            '6c2d79171ad884515d2e1ccdb880eb1c555a44040d288f689381e243a901cb27')
 groups=('gpkg-dev')
 
 prepare() {
@@ -90,13 +90,13 @@ prepare() {
     patch -Np1 -i ${srcdir}/$i
   done
 
-  for i in shmem-android.h mprotect.c; do
+  for i in shmem-android.h; do
     install -Dm644 "${srcdir}/${i}" "glibc-$pkgver/sysdeps/unix/sysv/linux/${i}"
   done
 
   rm glibc-$pkgver/sysdeps/unix/sysv/linux/*/clone3.S
 
-  mkdir -p glibc-build
+  mkdir -p glibc-build || true
 }
 
 build() {
