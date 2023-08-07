@@ -3,7 +3,7 @@
 
 pkgname=glibc
 pkgver=2.38
-pkgrel=0
+pkgrel=1
 pkgdesc="GNU C Library"
 arch=(any)
 url='https://www.gnu.org/software/libc/'
@@ -45,7 +45,8 @@ source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz
         'arm-arch-syscall.h.patch'
         'x86_64-arch-syscall.h.patch'
         'i386-arch-syscall.h.patch'
-        'rmdir.c.patch')
+        'rmdir.c.patch'
+        'mprotect.c')
 sha256sums=('fb82998998b2b29965467bc1b69d152e9c307d2cf301c9eafb4555b770ef3fd2'
             '85153ad597c6101a73a9d1f3f6c35b6b141ddebb99e445ab601ebe95703b35ec'
             '4869ef24cdd59a931c9b5b173d2e3e9eaa67964bb8dcc34e4e6948f3e7856572'
@@ -82,7 +83,8 @@ sha256sums=('fb82998998b2b29965467bc1b69d152e9c307d2cf301c9eafb4555b770ef3fd2'
             'dc96ecd72915e474d2fe1ce882e59d41c9f1a20db92f28c1fe85287e0db8c4a2'
             'f0f47b222a6b67571d0b7e8aa57bc1e2546a0478fe75fb6718c1cc0bcf2e284d'
             '4e1f759fee8fc904d1170cd5b6c444403d8bd0753f2168c6d3251109ac5385ad'
-            '6c2d79171ad884515d2e1ccdb880eb1c555a44040d288f689381e243a901cb27')
+            '6c2d79171ad884515d2e1ccdb880eb1c555a44040d288f689381e243a901cb27'
+            '8bd6e86fe6651acd0aaa543a5ad36ebd0588827824d330ca3bbba0769f4c8960')
 groups=('gpkg-dev')
 
 prepare() {
@@ -90,7 +92,7 @@ prepare() {
     patch -Np1 -i ${srcdir}/$i
   done
 
-  for i in shmem-android.h; do
+  for i in shmem-android.h mprotect.c; do
     install -Dm644 "${srcdir}/${i}" "glibc-$pkgver/sysdeps/unix/sysv/linux/${i}"
   done
 
