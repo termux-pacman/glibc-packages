@@ -1,0 +1,4 @@
+glibc
+zlib-glibc
+libelf-glibc
+curl-glibc
