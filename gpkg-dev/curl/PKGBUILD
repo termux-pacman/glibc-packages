@@ -3,14 +3,14 @@
 
 pkgbase=curl
 pkgname=(curl-glibc libcurl-compat-glibc)
-pkgver=8.1.2
+pkgver=8.2.1
 pkgrel=0
 pkgdesc='An URL retrieval utility and library'
 arch=(any)
 url='https://curl.haxx.se'
 license=('MIT')
 source=("https://curl.haxx.se/download/curl-${pkgver}.tar.gz")
-sha512sums=('41f4edb9c75870b713a2ecdaae2f8888651f2db3e689b991e70f1ee4e0da86d861eba1a9d24374e7b99deb0fdb218b9fbbd6cd624363d940a27d82b90c0e5c1b')
+sha512sums=('d0a906f4dff4c485e6dae930d9a7530147f4c0a0cbb46a83cb9be9d7bd6b9c320386c8be5bcdd3749f2d468b0daf39d06e8c581bab1fa792fd26da409a575cbd')
 groups=('gpkg-dev')
 
 _configure_options=(
