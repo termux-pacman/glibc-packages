@@ -2,7 +2,7 @@
 # - https://gitlab.archlinux.org/archlinux/packaging/packages/openssl/-/blob/main/PKGBUILD
 
 pkgname=openssl-glibc
-pkgver=3.1.1
+pkgver=3.1.2
 pkgrel=0
 pkgdesc='The Open Source toolkit for Secure Sockets Layer and Transport Layer Security'
 arch=(any)
@@ -12,9 +12,9 @@ makedepends=('perl')
 source=("https://www.openssl.org/source/openssl-${pkgver}.tar.gz"
 	'ca-dir.patch'
         '10-main.conf.patch')
-sha256sums=('b3aa61334233b852b63ddb048df181177c2c659eb9d4376008118f9c08d07674'
+sha256sums=('a0ce69b8b97ea6a35b96875235aa453b966ba3cba8af2de23657d8b6767d6539'
             '326478a21829b79710ce0d8f7437e3be10c542471fef3bdf5f70ac232a5bf9e8'
-            '7d50a1d9df32b6e0f2f0e5dc00418663f22d05f5643cfde34e4fea9bffb4b51b')
+            '79dc32b26bb0fa6e191aecbe0d4cf10bb0b2b3cfbd110ac0874f5e7a4e08af25')
 groups=('gpkg-dev')
 
 prepare() {
