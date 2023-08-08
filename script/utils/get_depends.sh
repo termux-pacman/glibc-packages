@@ -7,11 +7,28 @@ get_depends() {
 			curl "${GPKG_DEV_REPO_URL}/gpkg-dev.json" -o "${GPKG_DEV_REPO_JSON}"
 		fi
 		for i in $(cat DEPENDS); do
-			echo "Installing '$i'"
+			if $(echo "$1" | grep -q "'$i'"); then
+				continue
+			fi
+			if [ -z "$1" ]; then
+				echo "Installing '$i'"
+			else
+				echo "Installing '$i' on request $1"
+			fi
 			local FILENAME=$(cat ${GPKG_DEV_REPO_JSON} | jq -r '."'$i'"."FILENAME"')
 			if [ "$FILENAME" = "null" ]; then
 				error "package '$i' not found"
-			elif [ -f /mnt/${FILENAME} ]; then
+			fi
+			local BASE=$(cat ${GPKG_DEV_REPO_JSON} | jq -r '."'$i'"."BASE"')
+			(
+				cd "${GPKG_DEV_DIR_SOURCE}/$(echo $BASE | sed 's/-glibc//')"
+				if [ -z "$1" ]; then
+					get_depends "'$i'"
+				else
+					get_depends "$1.'$i'"
+				fi
+			)
+			if [ -f /mnt/${FILENAME} ]; then
 				echo "Skip installing '$i'"
 				continue
 			fi
