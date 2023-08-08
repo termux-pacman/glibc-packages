@@ -28,10 +28,6 @@ prepare() {
   # unsupported targets.  This allows the binutils to be built with
   # BPF support enabled.
   patch -Np1 -i "${srcdir}"/gold-warn-unsupported.patch
-
-  if [[ $CARCH == "armv7h" ]]; then
-    ln -s /usr/arm-linux-gnueabihf/lib/libgcc_s.so.1 $GLIBC_PREFIX/lib/libgcc_s.so.1
-  fi
 }
 
 build() {

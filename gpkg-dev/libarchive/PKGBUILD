@@ -15,10 +15,6 @@ groups=('gpkg-dev')
 build() {
   cd "libarchive-${pkgver}"
 
-  if [[ $CARCH == "armv7h" ]]; then
-    ln -s /usr/arm-linux-gnueabihf/lib/libgcc_s.so.1 $GLIBC_PREFIX/lib/libgcc_s.so.1
-  fi
-
   ./configure \
       --host=$GPKG_DEV_TARGET \
       --build=$GPKG_DEV_TARGET \
