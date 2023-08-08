@@ -1,0 +1,8 @@
+glibc
+zstd-glibc
+bzip2-glibc
+lz4-glibc
+acl-glibc
+expat-glibc
+xz-glibc
+zlib-glibc
