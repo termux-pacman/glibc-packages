@@ -2,14 +2,14 @@
 # - https://gitlab.archlinux.org/archlinux/packaging/packages/linux-api-headers/-/blob/main/PKGBUILD
 
 pkgname=linux-api-headers
-pkgver=6.3.8
+pkgver=6.4
 pkgrel=0
 pkgdesc='Kernel headers sanitized for use in userspace'
 arch=(any)
 url='https://www.gnu.org/software/libc'
 license=(GPL2)
 source=(https://www.kernel.org/pub/linux/kernel/v${pkgver:0:1}.x/linux-${pkgver}.tar.xz)
-sha256sums=('4323d421250e2e444c35d36f4aa8ddb56591dedc25c68d359d19c4ef9dd20955')
+sha256sums=('8fa0588f0c2ceca44cac77a0e39ba48c9f00a6b9dc69761c02a5d3efac8da7f3')
 groups=('gpkg-dev')
 
 package() {
