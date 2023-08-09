@@ -1,0 +1,58 @@
+--- glibc-2.38/sysdeps/unix/sysv/linux/clone-internal.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/sysdeps/unix/sysv/linux/clone-internal.c.patch	2023-08-03 16:55:09.661185528 +0300
+@@ -80,21 +80,6 @@
+ __clone3_internal (struct clone_args *cl_args, int (*func) (void *args),
+ 		   void *arg)
+ {
+-#ifdef HAVE_CLONE3_WRAPPER
+-# if __ASSUME_CLONE3
+-  return __clone3 (cl_args, sizeof (*cl_args), func, arg);
+-# else
+-  static int clone3_supported = 1;
+-  if (atomic_load_relaxed (&clone3_supported) == 1)
+-    {
+-      int ret = __clone3 (cl_args, sizeof (*cl_args), func, arg);
+-      if (ret != -1 || errno != ENOSYS)
+-	return ret;
+-
+-      atomic_store_relaxed (&clone3_supported, 0);
+-    }
+-# endif
+-#endif
+   __set_errno (ENOSYS);
+   return -1;
+ }
+@@ -103,17 +88,6 @@
+ __clone_internal (struct clone_args *cl_args,
+ 		  int (*func) (void *arg), void *arg)
+ {
+-#ifdef HAVE_CLONE3_WRAPPER
+-  int saved_errno = errno;
+-  int ret = __clone3_internal (cl_args, func, arg);
+-  if (ret != -1 || errno != ENOSYS)
+-    return ret;
+-
+-  /* NB: Restore errno since errno may be checked against non-zero
+-     return value.  */
+-  __set_errno (saved_errno);
+-#endif
+-
+   return __clone_internal_fallback (cl_args, func, arg);
+ }
+ 
+--- glibc-2.38/sysdeps/unix/sysv/linux/spawni.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/sysdeps/unix/sysv/linux/spawni.c.patch	2023-08-03 17:39:22.694388312 +0300
+@@ -389,13 +389,6 @@
+       .stack = (uintptr_t) stack,
+       .stack_size = stack_size,
+     };
+-#ifdef HAVE_CLONE3_WRAPPER
+-  args.use_clone3 = true;
+-  new_pid = __clone3 (&clone_args, sizeof (clone_args), __spawni_child,
+-		      &args);
+-  /* clone3 was added in 5.3 and CLONE_CLEAR_SIGHAND in 5.5.  */
+-  if (new_pid == -1 && (errno == ENOSYS || errno == EINVAL))
+-#endif
+     {
+       args.use_clone3 = false;
+       new_pid = __clone_internal_fallback (&clone_args, __spawni_child,

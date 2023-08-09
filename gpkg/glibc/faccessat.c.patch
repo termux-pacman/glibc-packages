@@ -1,0 +1,26 @@
+--- glibc-2.38/sysdeps/unix/sysv/linux/faccessat.c	2021-08-02 04:33:43.000000000 +0300
++++ glibc-2.38/sysdeps/unix/sysv/linux/faccessat.c.patch	2022-02-28 16:09:01.163599293 +0300
+@@ -26,16 +26,6 @@
+ int
+ __faccessat (int fd, const char *file, int mode, int flag)
+ {
+-  int ret = INLINE_SYSCALL_CALL (faccessat2, fd, file, mode, flag);
+-#if __ASSUME_FACCESSAT2
+-  return ret;
+-#else
+-  if (ret == 0 || errno != ENOSYS)
+-    return ret;
+-
+-  if (flag & ~(AT_SYMLINK_NOFOLLOW | AT_EACCESS))
+-    return INLINE_SYSCALL_ERROR_RETURN_VALUE (EINVAL);
+-
+   if ((flag == 0 || ((flag & ~AT_EACCESS) == 0 && ! __libc_enable_secure)))
+     return INLINE_SYSCALL (faccessat, 3, fd, file, mode);
+ 
+@@ -71,6 +61,5 @@
+     return 0;
+ 
+   return INLINE_SYSCALL_ERROR_RETURN_VALUE (EACCES);
+-#endif /* !__ASSUME_FACCESSAT2 */
+ }
+ weak_alias (__faccessat, faccessat)

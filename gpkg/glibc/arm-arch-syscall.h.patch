@@ -1,0 +1,89 @@
+--- glibc-2.38/sysdeps/unix/sysv/linux/arm/arch-syscall.h	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/sysdeps/unix/sysv/linux/arm/arch-syscall.h.patch	2023-08-03 18:02:02.376156803 +0300
+@@ -2,7 +2,6 @@
+ #define __NR__llseek 140
+ #define __NR__newselect 142
+ #define __NR__sysctl 149
+-#define __NR_accept 285
+ #define __NR_accept4 366
+ #define __NR_access 33
+ #define __NR_acct 51
+@@ -18,7 +17,6 @@
+ #define __NR_capget 184
+ #define __NR_capset 185
+ #define __NR_chdir 12
+-#define __NR_chmod 15
+ #define __NR_chown 182
+ #define __NR_chown32 212
+ #define __NR_chroot 61
+@@ -27,13 +25,11 @@
+ #define __NR_clock_getres 264
+ #define __NR_clock_getres_time64 406
+ #define __NR_clock_gettime 263
+-#define __NR_clock_gettime64 403
+ #define __NR_clock_nanosleep 265
+ #define __NR_clock_nanosleep_time64 407
+ #define __NR_clock_settime 262
+ #define __NR_clock_settime64 404
+ #define __NR_clone 120
+-#define __NR_clone3 435
+ #define __NR_close 6
+ #define __NR_close_range 436
+ #define __NR_connect 283
+@@ -56,7 +52,6 @@
+ #define __NR_exit 1
+ #define __NR_exit_group 248
+ #define __NR_faccessat 334
+-#define __NR_faccessat2 439
+ #define __NR_fallocate 352
+ #define __NR_fanotify_init 367
+ #define __NR_fanotify_mark 368
+@@ -109,7 +104,6 @@
+ #define __NR_getitimer 105
+ #define __NR_getpeername 287
+ #define __NR_getpgid 132
+-#define __NR_getpgrp 65
+ #define __NR_getpid 20
+ #define __NR_getppid 64
+ #define __NR_getpriority 96
+@@ -253,7 +247,6 @@
+ #define __NR_readlinkat 332
+ #define __NR_readv 145
+ #define __NR_reboot 88
+-#define __NR_recv 291
+ #define __NR_recvfrom 292
+ #define __NR_recvmmsg 365
+ #define __NR_recvmmsg_time64 417
+@@ -265,8 +258,6 @@
+ #define __NR_renameat2 382
+ #define __NR_request_key 310
+ #define __NR_restart_syscall 0
+-#define __NR_rmdir 40
+-#define __NR_rseq 398
+ #define __NR_rt_sigaction 174
+ #define __NR_rt_sigpending 176
+ #define __NR_rt_sigprocmask 175
+@@ -295,7 +286,6 @@
+ #define __NR_semop 298
+ #define __NR_semtimedop 312
+ #define __NR_semtimedop_time64 420
+-#define __NR_send 289
+ #define __NR_sendfile 187
+ #define __NR_sendfile64 239
+ #define __NR_sendmmsg 374
+@@ -303,7 +293,6 @@
+ #define __NR_sendto 290
+ #define __NR_set_mempolicy 321
+ #define __NR_set_mempolicy_home_node 450
+-#define __NR_set_robust_list 338
+ #define __NR_set_tid_address 256
+ #define __NR_set_tls 983045
+ #define __NR_setdomainname 121
+@@ -355,7 +344,6 @@
+ #define __NR_stat64 195
+ #define __NR_statfs 99
+ #define __NR_statfs64 266
+-#define __NR_statx 397
+ #define __NR_swapoff 115
+ #define __NR_swapon 87
+ #define __NR_symlink 83
