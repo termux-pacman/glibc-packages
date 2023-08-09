@@ -1,5 +1,5 @@
---- src/gcc-13.1.0/gcc/configure	2023-04-26 10:11:18.000000000 +0300
-+++ src/gcc-13.1.0/gcc/configure.patch	2023-07-16 13:12:24.569064972 +0300
+--- src/gcc-13.2.0/gcc/configure	2023-04-26 10:11:18.000000000 +0300
++++ src/gcc-13.2.0/gcc/configure.patch	2023-07-16 13:12:24.569064972 +0300
 @@ -3734,9 +3734,6 @@
      gcc_gxx_include_dir='${libsubdir}/include/c++'
    else
