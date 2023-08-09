@@ -20,14 +20,17 @@ get_depends() {
 				error "package '$i' not found"
 			fi
 			local BASE=$(cat ${GPKG_DEV_REPO_JSON} | jq -r '."'$i'"."BASE"')
-			(
-				cd "${GPKG_DEV_DIR_SOURCE}/$(echo $BASE | sed 's/-glibc//')"
-				if [ -z "$1" ]; then
-					get_depends "'$i'"
-				else
-					get_depends "$1.'$i'"
-				fi
-			)
+			BASE="${BASE//-glibc/}"
+			if [ "$BASE" != "$PKGNAME" ]; then
+				(
+					cd "${GPKG_DEV_DIR_SOURCE}/${BASE}"
+					if [ -z "$1" ]; then
+						get_depends "'$i'"
+					else
+						get_depends "$1.'$i'"
+					fi
+				)
+			fi
 			if [ -f /mnt/${FILENAME} ]; then
 				echo "Skip installing '$i'"
 				continue

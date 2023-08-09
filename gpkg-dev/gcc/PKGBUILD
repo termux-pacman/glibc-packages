@@ -2,27 +2,25 @@
 # - https://gitlab.archlinux.org/archlinux/packaging/packages/gcc/-/blob/main/PKGBUILD
 
 pkgname=(gcc-glibc gcc-libs)
-pkgver=13.1.0
-#_commit=9a167ee2f8b9a0859fbab6cfdc276cf1f272effe
-pkgrel=1
+pkgver=13.2.0
+pkgrel=0
 pkgdesc='The GNU Compiler Collection'
 arch=(any)
 url='https://gcc.gnu.org/'
 license=(GPL LGPL FDL)
 options=(!emptydirs !strip staticlibs)
-#source=(git+https://sourceware.org/git/gcc.git#commit=${_commit}
 source=(https://ftp.gnu.org/gnu/gcc/gcc-$pkgver/gcc-$pkgver.tar.xz
         c89 c99
         collect2.cc.patch
         gcc.cc.patch
         set_glibc_dynamic_linker.patch)
 _libdir=data/data/com.termux/files/usr/glibc/lib/gcc/$GPKG_DEV_TARGET/${pkgver%%+*}
-sha256sums=('61d684f0aa5e76ac6585ad8898a2427aade8979ed5e7f85492286c4dfc13ee86'
+sha256sums=('e275e76442a6067341a27f04c5c6b83d8613144004c0413528863dc6b5c743da'
             'd87254ee2c816aee66b00dd5002966cf3fe9aca4969eaf160c47150583357790'
             '9ad6d475acf0b19ca0e420f32867c6a5186ffbae50481ec64a140165f8988b60'
-            '102f7791ace23391eef292efd0ba193cd05421ad02b7b6ca25bc5f9422ec3d96'
-            '4ecd9cd6ad521ba93b6bc5b34687b2883e8246f2fd6e3afdeee91f34e233bac0'
-            '7c4e3f5f31ed59beee30aa40675b339a6d6b05b3d46b98a2f468bb4db95075c4')
+            '8d9f0c6cd1c57e623ba9b054f69185e4fb4717cc3af61c19d191948270042d6c'
+            'e146e388b1b024795b82539f293df322a70e16462f72bf5efc39e41e72140c8b'
+            'cd383a4a1916f4b3102f21c640d6116f697e0ef7cde5f705d83035849c200ec6')
 groups=('gpkg-dev')
 
 prepare() {
