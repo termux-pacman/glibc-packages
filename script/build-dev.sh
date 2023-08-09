@@ -43,7 +43,7 @@ fi
 	cd $PKGNAME
 	chmod a+rwx *
 
-	arch_pkg=$(grep 'arch=(.*)' PKGBUILD | sed 's\arch=(\\; s\)\\')
+	arch_pkg=$(grep 'arch=(.*)' PKGBUILD | sed 's\arch=(\\; s\)\\; s\'"'"'\\g')
 
 	if [ "$arch_pkg" = "any" ] || [ "$arch_pkg" = "$ARCH" ]; then
 		# packages removal check
