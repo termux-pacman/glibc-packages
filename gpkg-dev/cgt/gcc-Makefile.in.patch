@@ -1,5 +1,5 @@
---- src/gcc-13.1.0/gcc/Makefile.in	2023-07-14 18:39:16.751580302 +0300
-+++ src/gcc-13.1.0/gcc/Makefile.in.patch	2023-07-15 22:33:23.067390433 +0300
+--- src/gcc-13.2.0/gcc/Makefile.in	2023-07-14 18:39:16.751580302 +0300
++++ src/gcc-13.2.0/gcc/Makefile.in.patch	2023-07-15 22:33:23.067390433 +0300
 @@ -689,7 +689,7 @@
  # Used in install-cross.
  gcc_tooldir = @gcc_tooldir@

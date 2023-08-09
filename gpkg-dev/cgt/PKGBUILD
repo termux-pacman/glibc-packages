@@ -1,5 +1,5 @@
 pkgname=cgt
-pkgver=13.1.0
+pkgver=13.2.0
 pkgrel=0
 pkgdesc='Cross GCCs for Termux (only for Linux)'
 arch=(x86_64)
@@ -11,12 +11,12 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-$pkgver/gcc-$pkgver.tar.xz
         gcc-Makefile.in.patch
         gcc-configure.patch
         set_glibc_dynamic_linker.patch)
-sha256sums=('61d684f0aa5e76ac6585ad8898a2427aade8979ed5e7f85492286c4dfc13ee86'
-            '102f7791ace23391eef292efd0ba193cd05421ad02b7b6ca25bc5f9422ec3d96'
-            '205bbdd2dee34e9d83a892c1985c25cf2d20089cc0497b74dbff019436148873'
-            'ac3f2b2b225d3464c9c600f2042cf2f115cb5053c611a5f69ad4095f65fa9aaf'
-            '344cb82c63326bab5e7200a0a0f017a00b15c2c440497752fd8946c12c83beb6'
-            '7c4e3f5f31ed59beee30aa40675b339a6d6b05b3d46b98a2f468bb4db95075c4')
+sha256sums=('e275e76442a6067341a27f04c5c6b83d8613144004c0413528863dc6b5c743da'
+            '8d9f0c6cd1c57e623ba9b054f69185e4fb4717cc3af61c19d191948270042d6c'
+            'dee7ec7308e934edce9dc34bb481b4a53009e9aa96d9d926df368ad949650d56'
+            '028a78593192b5dd083626e28b93cb3c943de3dc314a8ef9c2d696358458efdd'
+            '346843fbce4bddca236ca4331ae43c5356ed177689c7760d841d2db2d2643d13'
+            'cd383a4a1916f4b3102f21c640d6116f697e0ef7cde5f705d83035849c200ec6')
 groups=('cgct')
 
 prepare() {
