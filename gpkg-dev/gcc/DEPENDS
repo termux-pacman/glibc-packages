@@ -7,3 +7,7 @@ gcc-libs
 libisl-glibc
 zstd-glibc
 binutils-glibc
+libnghttp2-glibc
+libidn2-glibc
+libpsl-glibc
+libunistring-glibc
