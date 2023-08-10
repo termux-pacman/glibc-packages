@@ -3,7 +3,7 @@
 
 pkgname=binutils-glibc
 pkgver=2.41
-pkgrel=0
+pkgrel=1
 pkgdesc='A set of programs to assemble and manipulate binary and object files'
 arch=(any)
 url='https://www.gnu.org/software/binutils/'
@@ -91,6 +91,14 @@ package() {
   install -Dm644 -t "${pkgdir}"/$GLIBC_PREFIX/share/licenses/${pkgname}/ FSFAP
 
   rm -f "${pkgdir}"/$GLIBC_PREFIX/share/info/dir
+
+  if [ -d $pkgdir/$GLIBC_PREFIX/lib64 ]; then
+    rm -fr $pkgdir/$GLIBC_PREFIX/lib64
+  fi
+
+  if [ -d $pkgdir/$GLIBC_PREFIX/lib32 ]; then
+    rm -fr $pkgdir/$GLIBC_PREFIX/lib32
+  fi
 
   replace_hard_with_symbolic "$pkgdir"
 }
