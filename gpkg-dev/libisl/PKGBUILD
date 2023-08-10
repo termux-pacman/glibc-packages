@@ -3,7 +3,7 @@
 
 pkgname=libisl-glibc
 pkgver=0.26
-pkgrel=0
+pkgrel=1
 pkgdesc='Library for manipulating sets and relations of integer points bounded by linear constraints'
 arch=('any')
 url='https://libisl.sourceforge.io'
@@ -15,7 +15,11 @@ groups=('gpkg-dev')
 
 build() {
   cd "${srcdir}"/isl-${pkgver}
-  ./configure --prefix=$GLIBC_PREFIX
+  ./configure \
+    --host=$GPKG_DEV_TARGET \
+    --build=$GPKG_DEV_TARGET \
+    --target=$GPKG_DEV_TARGET \
+    --prefix=$GLIBC_PREFIX
   make
 }
 
