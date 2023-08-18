@@ -1,13 +1,15 @@
 # The original PKGBUILD was taken from the gitlab.archlinux.org/archlinux/packaging repo:
 # - https://gitlab.archlinux.org/archlinux/packaging/packages/linux-api-headers/-/blob/main/PKGBUILD
 
-pkgname=linux-api-headers
+pkgname=linux-api-headers-glibc
 pkgver=6.4
-pkgrel=0
+pkgrel=1
 pkgdesc='Kernel headers sanitized for use in userspace'
 arch=(any)
 url='https://www.gnu.org/software/libc'
 license=(GPL2)
+conflicts=('linux-api-headers')
+replaces=('linux-api-headers')
 source=(https://www.kernel.org/pub/linux/kernel/v${pkgver:0:1}.x/linux-${pkgver}.tar.xz)
 sha256sums=('8fa0588f0c2ceca44cac77a0e39ba48c9f00a6b9dc69761c02a5d3efac8da7f3')
 groups=('gpkg-dev')
