@@ -1,6 +1,6 @@
 pkgname=cgt
 pkgver=13.2.0
-pkgrel=0
+pkgrel=1
 pkgdesc='Cross GCCs for Termux (only for Linux)'
 arch=(x86_64)
 url='https://gcc.gnu.org/'
@@ -14,7 +14,7 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-$pkgver/gcc-$pkgver.tar.xz
 sha256sums=('e275e76442a6067341a27f04c5c6b83d8613144004c0413528863dc6b5c743da'
             '8d9f0c6cd1c57e623ba9b054f69185e4fb4717cc3af61c19d191948270042d6c'
             'dee7ec7308e934edce9dc34bb481b4a53009e9aa96d9d926df368ad949650d56'
-            '028a78593192b5dd083626e28b93cb3c943de3dc314a8ef9c2d696358458efdd'
+            '1115c633d6fd0d4f6d6eeca50e4d52fd15f0bf52b4158ecb0ea6bedcb85ceb35'
             '346843fbce4bddca236ca4331ae43c5356ed177689c7760d841d2db2d2643d13'
             'cd383a4a1916f4b3102f21c640d6116f697e0ef7cde5f705d83035849c200ec6')
 groups=('cgct')
@@ -43,19 +43,19 @@ build() {
 
 		REPO_URL="${GPKG_DEV_SERVER_URL}/gpkg-dev/${arch_build}"
 		curl "${REPO_URL}/gpkg-dev.json" -o gpkg-dev.json
-		for i in glibc linux-api-headers libxcrypt-glibc; do
+		for i in glibc linux-api-headers-glibc libxcrypt-glibc; do
 			FILENAME=$(cat gpkg-dev.json | jq -r '."'$i'"."FILENAME"')
 			curl "${REPO_URL}/$FILENAME" -o $i.tar.xz
 			tar xJf $i.tar.xz -C / data
 		done
 
 		FLAGS_FOR_TARGET="-I$GLIBC_PREFIX/include -L$GLIBC_PREFIX/lib -Wl,-rpath=$GLIBC_PREFIX/lib"
-		CONFIGFLAG=""
+		CONFIGFLAG="--with-as=${CGCT_PREFIX}/bin/as --with-ld=${CGCT_PREFIX}/bin/ld AR_FOR_TARGET=${CGCT_PREFIX}/bin/ar RANLIB_FOR_TARGET=${CGCT_PREFIX}/bin/ranlib NM_FOR_TARGET=${CGCT_PREFIX}/bin/nm"
 		case "$arch_build" in
-			"aarch64") CONFIGFLAG="--with-arch=armv8-a --enable-fix-cortex-a53-835769 --enable-fix-cortex-a53-843419";;
-			"arm") CONFIGFLAG="--with-arch=armv7-a --with-float=hard --with-fpu=neon";;
-			"x86_64") CONFIGFLAG="--with-arch=x86-64";;
-			"i686") CONFIGFLAG="--with-arch=i686 --with-as=/usr/bin/i686-elf-as --with-ld=/usr/bin/i686-elf-ld AR_FOR_TARGET=/usr/bin/i686-elf-ar RANLIB_FOR_TARGET=/usr/bin/i686-elf-ranlib NM_FOR_TARGET=/usr/bin/i686-elf-nm";;
+			"aarch64") CONFIGFLAG+=" --with-arch=armv8-a --enable-fix-cortex-a53-835769 --enable-fix-cortex-a53-843419";;
+			"arm") CONFIGFLAG+=" --with-arch=armv7-a --with-float=hard --with-fpu=neon";;
+			"x86_64") CONFIGFLAG+=" --with-arch=x86-64";;
+			"i686") CONFIGFLAG+=" --with-arch=i686";;
 		esac
 
 		"$srcdir"/gcc-${pkgver}/configure \
@@ -96,7 +96,7 @@ build() {
 		make
 
 		cd ..
-		rm -fr /data/data
+		rm -fr ${DIR_TERMUX}/files
 	done
 }
 
@@ -106,7 +106,7 @@ package() {
 		CGCT_PREFIX=${DIR_TERMUX}/cgct/${arch_build}
 		cd gcc-${arch_build}
 
-		for i in glibc linux-api-headers libxcrypt-glibc; do
+		for i in glibc linux-api-headers-glibc libxcrypt-glibc; do
 			tar xJf $i.tar.xz -C / data
 		done
 
@@ -127,7 +127,7 @@ package() {
 		rm -fr $pkgdir/${DIR_TERMUX}/files
 
 		cd ..
-		rm -fr /data/data
+		rm -fr ${DIR_TERMUX}/files
 	done
 
 	replace_hard_with_symbolic "$pkgdir"
