@@ -1,6 +1,5 @@
 # Glibc packages for termux
 This repository stores and compiles packages based on the glibc library for termux.
-**Note:** so far, only the `gpkg-dev` repository has been fully developed. The request to add new packages will only be available when the `gpkg` repository is fully developed.
 
 ### Repositories and their description:
  - `gpkg-dev` is a repository that provides glibc packages for testing or for compiling final glibc packages - [more](https://github.com/termux-pacman/glibc-packages/wiki/About-repositories#description).

@@ -1,0 +1,38 @@
+name: "Package request"
+description: "Request to add a new package"
+title: "[Package]: "
+labels: ["package request", "gpkg"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Note that the `gpkg` repo is currently under development, but make sure your requested package is not in the `gpkg-dev` repo.
+  - type: textarea
+    attributes:
+      label: Why is it worth to add this package?
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Home page URL
+  - type: input
+    attributes:
+      label: Source code URL
+      placeholder: Link to Git or source archive
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Packaging policy acknowledgement
+      options:
+        - label: I have read the Termux-Pacman [Package Addition Policy](https://github.com/termux-pacman/glibc-packages/wiki/Package-Addition-Policy) and understand that my request will be denied in case of violation.
+          required: true
+  - type: textarea
+    attributes:
+      label: Additional information
+      description: |
+        Have you tried to compile it on device? If it did not work then provide the error you ran into. Otherwise please share build steps and any patches that you had to apply.
+
+        Does your package have special device requirements such as root permissions, custom kernel or even additional hardware? If yes, then list all details here.
+    validations:
+      required: true
