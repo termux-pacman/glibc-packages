@@ -1,0 +1,7 @@
+build-package.sh
+clean.sh
+
+/packages/
+/scripts/
+/output/
+/termux-packages/

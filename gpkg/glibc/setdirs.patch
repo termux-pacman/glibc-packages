@@ -1,0 +1,708 @@
+diff --git a/dirent/bug-readdir1.c b/dirent/bug-readdir1.c
+index 4c3521db..6cd2fbe9 100644
+--- glibc-2.38/dirent/bug-readdir1.c
++++ glibc-2.38/dirent/bug-readdir1.c
+@@ -14,7 +14,7 @@ main (void)
+   struct dirent* ent;
+ 
+   /* open a dir stream */
+-  dirp = opendir ("/tmp");
++  dirp = opendir ("@TERMUX_PREFIX_CLASSICAL@/tmp");
+   if (dirp == NULL)
+     {
+       if (errno == ENOENT)
+diff --git a/elf/dl-support.c b/elf/dl-support.c
+index 9714f75d..452e0dfc 100644
+--- glibc-2.38/elf/dl-support.c
++++ glibc-2.38/elf/dl-support.c
+@@ -314,7 +314,7 @@ _dl_non_dynamic_init (void)
+   _dl_profile_output = getenv ("LD_PROFILE_OUTPUT");
+   if (_dl_profile_output == NULL || _dl_profile_output[0] == '\0')
+     _dl_profile_output
+-      = &"/var/tmp\0/var/profile"[__libc_enable_secure ? 9 : 0];
++      = &"@TERMUX_PREFIX_CLASSICAL@/var/tmp\0/var/profile"[__libc_enable_secure ? 9 : 0];
+ 
+   if (__libc_enable_secure)
+     {
+diff --git a/elf/rtld.c b/elf/rtld.c
+index b8467f37..1c8d38f6 100644
+--- glibc-2.38/elf/rtld.c
++++ glibc-2.38/elf/rtld.c
+@@ -1872,7 +1872,7 @@ dl_main (const ElfW(Phdr) *phdr,
+      open().  So we do this first.  If it succeeds we do almost twice
+      the work but this does not matter, since it is not for production
+      use.  */
+-  static const char preload_file[] = "/etc/ld.so.preload";
++  static const char preload_file[] = "@TERMUX_PREFIX@/etc/ld.so.preload";
+   if (__glibc_unlikely (__access (preload_file, R_OK) == 0))
+     {
+       /* Read the contents of the file.  */
+@@ -2551,7 +2551,7 @@ process_envvars (struct dl_main_state *state)
+ 
+   /* This is the default place for profiling data file.  */
+   GLRO(dl_profile_output)
+-    = &"/var/tmp\0/var/profile"[__libc_enable_secure ? 9 : 0];
++    = &"@TERMUX_PREFIX_CLASSICAL@/var/tmp\0/var/profile"[__libc_enable_secure ? 9 : 0];
+ 
+   while ((envline = _dl_next_ld_env_entry (&runp)) != NULL)
+     {
+diff --git a/elf/sprof.c b/elf/sprof.c
+index dfca16b7..b3cbe1af 100644
+--- glibc-2.38/elf/sprof.c
++++ glibc-2.38/elf/sprof.c
+@@ -618,7 +618,7 @@ load_shobj (const char *name)
+       *++cp = '\0';
+ 
+       /* First add the debuginfo file name only.  */
+-      static const char usrlibdebug[]= "/usr/lib/debug/";
++      static const char usrlibdebug[]= "@TERMUX_PREFIX@/lib/debug/";
+       char *workbuf = (char *) alloca (sizeof (usrlibdebug)
+ 				       + (cp - realname)
+ 				       + strlen (debuginfo_fname));
+@@ -768,8 +768,8 @@ load_profdata (const char *name, struct shobj *shobj)
+       /* A file with the given name does not exist in the current
+ 	 directory, try it in the default location where the profiling
+ 	 files are created.  */
+-      ext_name = (char *) alloca (strlen (name) + sizeof "/var/tmp/");
+-      stpcpy (stpcpy (ext_name, "/var/tmp/"), name);
++      ext_name = (char *) alloca (strlen (name) + sizeof "@TERMUX_PREFIX_CLASSICAL@/var/tmp/");
++      stpcpy (stpcpy (ext_name, "@TERMUX_PREFIX_CLASSICAL@/var/tmp/"), name);
+       name = ext_name;
+ 
+       fd = open (ext_name, O_RDONLY);
+diff --git a/io/bug-ftw3.c b/io/bug-ftw3.c
+index 19740f49..3fd69a5e 100644
+--- glibc-2.38/io/bug-ftw3.c
++++ glibc-2.38/io/bug-ftw3.c
+@@ -18,8 +18,8 @@ cb (const char *fname, const struct stat *st, int flag)
+ int
+ main (void)
+ {
+-  char tmp[] = "/tmp/ftwXXXXXX";
+-  char tmp2[] = "/tmp/ftwXXXXXX/ftwXXXXXX";
++  char tmp[] = "@TERMUX_PREFIX_CLASSICAL@/tmp/ftwXXXXXX";
++  char tmp2[] = "@TERMUX_PREFIX_CLASSICAL@/tmp/ftwXXXXXX/ftwXXXXXX";
+   char *dname;
+   char *dname2;
+   int r;
+diff --git a/io/bug-ftw4.c b/io/bug-ftw4.c
+index bfbf4544..de1478fb 100644
+--- glibc-2.38/io/bug-ftw4.c
++++ glibc-2.38/io/bug-ftw4.c
+@@ -35,7 +35,7 @@ cb (const char *name, const struct stat64 *st, int type)
+ int
+ main (void)
+ {
+-  char name[32] = "/tmp/ftwXXXXXX", *p;
++  char name[32] = "@TERMUX_PREFIX_CLASSICAL@/tmp/ftwXXXXXX", *p;
+   int ret, i, result = 0, fd, fd1, fd2;
+ 
+   if (mkdtemp (name) == NULL)
+diff --git a/libio/oldiopopen.c b/libio/oldiopopen.c
+index aa5e379c..d66cb7a1 100644
+--- glibc-2.38/libio/oldiopopen.c
++++ glibc-2.38/libio/oldiopopen.c
+@@ -106,7 +106,7 @@ _IO_old_proc_open (FILE *fp, const char *command, const char *mode)
+       for (p = old_proc_file_chain; p; p = p->next)
+ 	__close (_IO_fileno ((FILE *) p));
+ 
+-      execl ("/bin/sh", "sh", "-c", command, (char *) 0);
++      execl ("@TERMUX_PREFIX_CLASSICAL@/bin/sh", "sh", "-c", command, (char *) 0);
+       _exit (127);
+     }
+   __close (child_end);
+diff --git a/libio/stdio.h b/libio/stdio.h
+index ed80420a..97cc0fd2 100644
+--- glibc-2.38/libio/stdio.h
++++ glibc-2.38/libio/stdio.h
+@@ -117,7 +117,7 @@ typedef __fpos64_t fpos64_t;
+ 
+ #if defined __USE_MISC || defined __USE_XOPEN
+ /* Default path prefix for `tempnam' and `tmpnam'.  */
+-# define P_tmpdir	"/tmp"
++# define P_tmpdir	"@TERMUX_PREFIX_CLASSICAL@/tmp"
+ #endif
+ 
+ 
+diff --git a/manual/examples/filecli.c b/manual/examples/filecli.c
+index 1ade5efe..dc05bac5 100644
+--- glibc-2.38/manual/examples/filecli.c
++++ glibc-2.38/manual/examples/filecli.c
+@@ -22,8 +22,8 @@
+ #include <sys/socket.h>
+ #include <sys/un.h>
+ 
+-#define SERVER	"/tmp/serversocket"
+-#define CLIENT	"/tmp/mysocket"
++#define SERVER	"@TERMUX_PREFIX_CLASSICAL@/tmp/serversocket"
++#define CLIENT	"@TERMUX_PREFIX_CLASSICAL@/tmp/mysocket"
+ #define MAXMSG	512
+ #define MESSAGE	"Yow!!! Are we having fun yet?!?"
+ 
+diff --git a/manual/examples/filesrv.c b/manual/examples/filesrv.c
+index 75c6ff87..b959eb8e 100644
+--- glibc-2.38/manual/examples/filesrv.c
++++ glibc-2.38/manual/examples/filesrv.c
+@@ -21,7 +21,7 @@
+ #include <sys/socket.h>
+ #include <sys/un.h>
+ 
+-#define SERVER	"/tmp/serversocket"
++#define SERVER	"@TERMUX_PREFIX_CLASSICAL@/tmp/serversocket"
+ #define MAXMSG	512
+ 
+ int
+diff --git a/manual/examples/ofdlocks.c b/manual/examples/ofdlocks.c
+index 9d777f73..a5ff883b 100644
+--- glibc-2.38/manual/examples/ofdlocks.c
++++ glibc-2.38/manual/examples/ofdlocks.c
+@@ -23,7 +23,7 @@
+ #include <fcntl.h>
+ #include <pthread.h>
+ 
+-#define FILENAME	"/tmp/foo"
++#define FILENAME	"@TERMUX_PREFIX_CLASSICAL@/tmp/foo"
+ #define NUM_THREADS	3
+ #define ITERATIONS	5
+ 
+@@ -39,7 +39,7 @@ thread_start (void *arg)
+     .l_len = 1,
+   };
+ 
+-  fd = open ("/tmp/foo", O_RDWR | O_CREAT, 0666);
++  fd = open ("@TERMUX_PREFIX_CLASSICAL@/tmp/foo", O_RDWR | O_CREAT, 0666);
+ 
+   for (i = 0; i < ITERATIONS; i++)
+     {
+diff --git a/nis/ypclnt.c b/nis/ypclnt.c
+index 19a53a10..e5edbfa8 100644
+--- glibc-2.38/nis/ypclnt.c
++++ glibc-2.38/nis/ypclnt.c
+@@ -33,7 +33,7 @@
+ 
+ /* This should only be defined on systems with a BSD compatible ypbind */
+ #ifndef BINDINGDIR
+-# define BINDINGDIR "/var/yp/binding"
++# define BINDINGDIR "@TERMUX_PREFIX@/var/yp/binding"
+ #endif
+ 
+ struct dom_binding
+diff --git a/nscd/nscd-client.h b/nscd/nscd-client.h
+index 7275ccb6..e40e3580 100644
+--- glibc-2.38/nscd/nscd-client.h
++++ glibc-2.38/nscd/nscd-client.h
+@@ -35,13 +35,13 @@
+ #define NSCD_VERSION 2
+ 
+ /* Path of the file where the PID of the running system is stored.  */
+-#define _PATH_NSCDPID	 "/var/run/nscd/nscd.pid"
++#define _PATH_NSCDPID	 "@TERMUX_PREFIX_CLASSICAL@/var/run/nscd/nscd.pid"
+ 
+ /* Path for the Unix domain socket.  */
+-#define _PATH_NSCDSOCKET "/var/run/nscd/socket"
++#define _PATH_NSCDSOCKET "@TERMUX_PREFIX_CLASSICAL@/var/run/nscd/socket"
+ 
+ /* Path for the configuration file.  */
+-#define _PATH_NSCDCONF	 "/etc/nscd.conf"
++#define _PATH_NSCDCONF	 "@TERMUX_PREFIX@/etc/nscd.conf"
+ 
+ /* Maximum allowed length for the key.  */
+ #define MAXKEYLEN 1024
+diff --git a/posix/annexc.c b/posix/annexc.c
+index ca50ac96..9b92273b 100644
+--- glibc-2.38/posix/annexc.c
++++ glibc-2.38/posix/annexc.c
+@@ -26,7 +26,7 @@
+ 
+ #define HEADER_MAX          256
+ 
+-static char macrofile[] = "/tmp/annexc.XXXXXX";
++static char macrofile[] = "@TERMUX_PREFIX_CLASSICAL@/tmp/annexc.XXXXXX";
+ 
+ /* <aio.h>.  */
+ static const char *const aio_syms[] =
+diff --git a/posix/bug-getopt1.c b/posix/bug-getopt1.c
+index a5a37116..5bd994c9 100644
+--- glibc-2.38/posix/bug-getopt1.c
++++ glibc-2.38/posix/bug-getopt1.c
+@@ -40,7 +40,7 @@ one_test (const char *fmt, int argc, char *argv[], int expected[argc - 1])
+ static int
+ do_test (void)
+ {
+-  char fname[] = "/tmp/bug-getopt1.XXXXXX";
++  char fname[] = "@TERMUX_PREFIX_CLASSICAL@/tmp/bug-getopt1.XXXXXX";
+   int fd = mkstemp (fname);
+   if (fd == -1)
+     {
+diff --git a/posix/bug-getopt2.c b/posix/bug-getopt2.c
+index 8f92f0c6..b2c52acc 100644
+--- glibc-2.38/posix/bug-getopt2.c
++++ glibc-2.38/posix/bug-getopt2.c
+@@ -38,7 +38,7 @@ one_test (const char *fmt, int argc, char *argv[], int expected[argc - 1])
+ static int
+ do_test (void)
+ {
+-  char fname[] = "/tmp/bug-getopt2.XXXXXX";
++  char fname[] = "@TERMUX_PREFIX_CLASSICAL@/tmp/bug-getopt2.XXXXXX";
+   int fd = mkstemp (fname);
+   if (fd == -1)
+     {
+diff --git a/posix/bug-getopt3.c b/posix/bug-getopt3.c
+index 45a8d3ec..42871b5f 100644
+--- glibc-2.38/posix/bug-getopt3.c
++++ glibc-2.38/posix/bug-getopt3.c
+@@ -49,7 +49,7 @@ one_test (const char *fmt, int argc, char *argv[], int n, int expected[n],
+ static int
+ do_test (void)
+ {
+-  char fname[] = "/tmp/bug-getopt3.XXXXXX";
++  char fname[] = "@TERMUX_PREFIX_CLASSICAL@/tmp/bug-getopt3.XXXXXX";
+   int fd = mkstemp (fname);
+   if (fd == -1)
+     {
+diff --git a/posix/bug-getopt4.c b/posix/bug-getopt4.c
+index c5e3c149..5a172c50 100644
+--- glibc-2.38/posix/bug-getopt4.c
++++ glibc-2.38/posix/bug-getopt4.c
+@@ -53,7 +53,7 @@ one_test (const char *fmt, int argc, char *argv[], int n, int expected[n])
+ static int
+ do_test (void)
+ {
+-  char fname[] = "/tmp/bug-getopt4.XXXXXX";
++  char fname[] = "@TERMUX_PREFIX_CLASSICAL@/tmp/bug-getopt4.XXXXXX";
+   int fd = mkstemp (fname);
+   if (fd == -1)
+     {
+diff --git a/posix/bug-getopt5.c b/posix/bug-getopt5.c
+index 4f67d9b2..c942a58e 100644
+--- glibc-2.38/posix/bug-getopt5.c
++++ glibc-2.38/posix/bug-getopt5.c
+@@ -48,7 +48,7 @@ one_test (const char *fmt, int argc, char *argv[], int n, int expected[n])
+ static int
+ do_test (void)
+ {
+-  char fname[] = "/tmp/bug-getopt5.XXXXXX";
++  char fname[] = "@TERMUX_PREFIX_CLASSICAL@/tmp/bug-getopt5.XXXXXX";
+   int fd = mkstemp (fname);
+   if (fd == -1)
+     {
+diff --git a/posix/bug-regex9.c b/posix/bug-regex9.c
+index d74bc9b9..419fdfd4 100644
+--- glibc-2.38/posix/bug-regex9.c
++++ glibc-2.38/posix/bug-regex9.c
+@@ -23,7 +23,7 @@
+ #include <stdlib.h>
+ 
+ 
+-static const char text[] = "#! /bin/sh";
++static const char text[] = "#! @TERMUX_PREFIX_CLASSICAL@/bin/sh";
+ 
+ int
+ main (void)
+diff --git a/resolv/netdb.h b/resolv/netdb.h
+index ace9e482..d88ce5e1 100644
+--- glibc-2.38/resolv/netdb.h
++++ glibc-2.38/resolv/netdb.h
+@@ -40,12 +40,12 @@
+ #include <bits/netdb.h>
+ 
+ /* Absolute file name for network data base files.  */
+-#define	_PATH_HEQUIV		"/etc/hosts.equiv"
++#define	_PATH_HEQUIV		"@TERMUX_PREFIX@/etc/hosts.equiv"
+ #define	_PATH_HOSTS		"/etc/hosts"
+-#define	_PATH_NETWORKS		"/etc/networks"
+-#define	_PATH_NSSWITCH_CONF	"/etc/nsswitch.conf"
+-#define	_PATH_PROTOCOLS		"/etc/protocols"
+-#define	_PATH_SERVICES		"/etc/services"
++#define	_PATH_NETWORKS		"@TERMUX_PREFIX@/etc/networks"
++#define	_PATH_NSSWITCH_CONF	"@TERMUX_PREFIX@/etc/nsswitch.conf"
++#define	_PATH_PROTOCOLS		"@TERMUX_PREFIX@/etc/protocols"
++#define	_PATH_SERVICES		"@TERMUX_PREFIX@/etc/services"
+ 
+ 
+ __BEGIN_DECLS
+diff --git a/resolv/resolv.h b/resolv/resolv.h
+index 3a79ffea..de3ab04e 100644
+--- glibc-2.38/resolv/resolv.h
++++ glibc-2.38/resolv/resolv.h
+@@ -91,7 +91,7 @@
+  */
+ 
+ #ifndef _PATH_RESCONF
+-#define _PATH_RESCONF        "/etc/resolv.conf"
++#define _PATH_RESCONF        "@TERMUX_PREFIX@/etc/resolv.conf"
+ #endif
+ 
+ struct res_sym {
+diff --git a/stdio-common/bug7.c b/stdio-common/bug7.c
+index c9c2ef51..c08a474d 100644
+--- glibc-2.38/stdio-common/bug7.c
++++ glibc-2.38/stdio-common/bug7.c
+@@ -8,7 +8,7 @@ int
+ main (int argc, char *argv[])
+ {
+   int lose = 0;
+-  char filename[] = "/tmp/bug7.XXXXXX";
++  char filename[] = "@TERMUX_PREFIX_CLASSICAL@/tmp/bug7.XXXXXX";
+   FILE *fp;
+ 
+   int fd = mkstemp (filename);
+@@ -36,8 +36,8 @@ main (int argc, char *argv[])
+   {
+     FILE *file1;
+     FILE *file2;
+-    char filename1[] = "/tmp/bug7.XXXXXX";
+-    char filename2[] = "/tmp/bug7.XXXXXX";
++    char filename1[] = "@TERMUX_PREFIX_CLASSICAL@/tmp/bug7.XXXXXX";
++    char filename2[] = "@TERMUX_PREFIX_CLASSICAL@/tmp/bug7.XXXXXX";
+     int ch;
+ 
+     int fd1 = mkstemp (filename1);
+diff --git a/stdio-common/scanf14.c b/stdio-common/scanf14.c
+index 09f47d36..4d6c5b11 100644
+--- glibc-2.38/stdio-common/scanf14.c
++++ glibc-2.38/stdio-common/scanf14.c
+@@ -82,7 +82,7 @@ main (void)
+ 
+   const char *tmpdir = getenv ("TMPDIR");
+   if (tmpdir == NULL || tmpdir[0] == '\0')
+-    tmpdir = "/tmp";
++    tmpdir = "@TERMUX_PREFIX_CLASSICAL@/tmp";
+ 
+   char fname[strlen (tmpdir) + sizeof "/tst-scanf14.XXXXXX"];
+   sprintf (fname, "%s/tst-scanf14.XXXXXX", tmpdir);
+diff --git a/stdio-common/scanf15.c b/stdio-common/scanf15.c
+index acd01e7b..67d2364e 100644
+--- glibc-2.38/stdio-common/scanf15.c
++++ glibc-2.38/stdio-common/scanf15.c
+@@ -65,7 +65,7 @@ main (void)
+ 
+   const char *tmpdir = getenv ("TMPDIR");
+   if (tmpdir == NULL || tmpdir[0] == '\0')
+-    tmpdir = "/tmp";
++    tmpdir = "@TERMUX_PREFIX_CLASSICAL@/tmp";
+ 
+   char fname[strlen (tmpdir) + sizeof "/tst-scanf15.XXXXXX"];
+   sprintf (fname, "%s/tst-scanf15.XXXXXX", tmpdir);
+diff --git a/stdio-common/scanf16.c b/stdio-common/scanf16.c
+index 97d1082d..65e02d0b 100644
+--- glibc-2.38/stdio-common/scanf16.c
++++ glibc-2.38/stdio-common/scanf16.c
+@@ -113,7 +113,7 @@ main (void)
+ 
+   const char *tmpdir = getenv ("TMPDIR");
+   if (tmpdir == NULL || tmpdir[0] == '\0')
+-    tmpdir = "/tmp";
++    tmpdir = "@TERMUX_PREFIX_CLASSICAL@/tmp";
+ 
+   char fname[strlen (tmpdir) + sizeof "/tst-scanf16.XXXXXX"];
+   sprintf (fname, "%s/tst-scanf16.XXXXXX", tmpdir);
+diff --git a/stdio-common/scanf17.c b/stdio-common/scanf17.c
+index 3099689e..e3efec9e 100644
+--- glibc-2.38/stdio-common/scanf17.c
++++ glibc-2.38/stdio-common/scanf17.c
+@@ -96,7 +96,7 @@ main (void)
+ 
+   const char *tmpdir = getenv ("TMPDIR");
+   if (tmpdir == NULL || tmpdir[0] == '\0')
+-    tmpdir = "/tmp";
++    tmpdir = "@TERMUX_PREFIX_CLASSICAL@/tmp";
+ 
+   char fname[strlen (tmpdir) + sizeof "/tst-scanf17.XXXXXX"];
+   sprintf (fname, "%s/tst-scanf17.XXXXXX", tmpdir);
+diff --git a/stdio-common/tstscanf.c b/stdio-common/tstscanf.c
+index 3a4ebf75..e0cb708a 100644
+--- glibc-2.38/stdio-common/tstscanf.c
++++ glibc-2.38/stdio-common/tstscanf.c
+@@ -62,7 +62,7 @@ main (int argc, char **argv)
+ 
+   if (argc == 2 && !strcmp (argv[1], "-opipe"))
+     {
+-      out = popen ("/bin/cat", "w");
++      out = popen ("@TERMUX_PREFIX_CLASSICAL@/bin/cat", "w");
+       if (out == NULL)
+ 	{
+ 	  perror ("popen: /bin/cat");
+@@ -71,7 +71,7 @@ main (int argc, char **argv)
+     }
+   else if (argc == 3 && !strcmp (argv[1], "-ipipe"))
+     {
+-      sprintf (buf, "/bin/cat %s", argv[2]);
++      sprintf (buf, "@TERMUX_PREFIX_CLASSICAL@/bin/cat %s", argv[2]);
+       in = popen (buf, "r");
+       if (in == NULL)
+ 	{
+diff --git a/stdio-common/xbug.c b/stdio-common/xbug.c
+index 06f74aff..65c71415 100644
+--- glibc-2.38/stdio-common/xbug.c
++++ glibc-2.38/stdio-common/xbug.c
+@@ -60,7 +60,7 @@ main(int argc, char *argv[])
+ 
+   unsetenv ("LD_LIBRARY_PATH");
+ 
+-  if (!(input = popen("/bin/cat", "r")))
++  if (!(input = popen("@TERMUX_PREFIX_CLASSICAL@/bin/cat", "r")))
+     fprintf(stderr, "cannot run \n");
+ 
+   ReadFile(&buffer, input);
+diff --git a/stdlib/isomac.c b/stdlib/isomac.c
+index 3a6009d9..8df654af 100644
+--- glibc-2.38/stdlib/isomac.c
++++ glibc-2.38/stdlib/isomac.c
+@@ -77,7 +77,7 @@
+ 
+ #define HEADER_MAX          256
+ 
+-static char macrofile[] = "/tmp/isomac.XXXXXX";
++static char macrofile[] = "@TERMUX_PREFIX_CLASSICAL@/tmp/isomac.XXXXXX";
+ 
+ /* ISO C header names including Amendment 1 (without ".h" suffix).  */
+ static char *header[] =
+diff --git a/support/support_test_main.c b/support/support_test_main.c
+index 94f02dfb..5290519a 100644
+--- glibc-2.38/support/support_test_main.c
++++ glibc-2.38/support/support_test_main.c
+@@ -353,7 +353,7 @@ support_test_main (int argc, char **argv, const struct test_config *config)
+     {
+       test_dir = getenv ("TMPDIR");
+       if (test_dir == NULL || test_dir[0] == '\0')
+-        test_dir = "/tmp";
++        test_dir = "@TERMUX_PREFIX_CLASSICAL@/tmp";
+     }
+   if (support_set_test_dir != NULL)
+     support_set_test_dir (test_dir);
+diff --git a/sysdeps/generic/paths.h b/sysdeps/generic/paths.h
+index 893b4c22..fb12606f 100644
+--- glibc-2.38/sysdeps/generic/paths.h
++++ glibc-2.38/sysdeps/generic/paths.h
+@@ -33,43 +33,43 @@
+ #define	_PATHS_H_
+ 
+ /* Default search path. */
+-#define	_PATH_DEFPATH	"/usr/bin:/bin"
++#define	_PATH_DEFPATH	"@TERMUX_PREFIX@/bin:@TERMUX_PREFIX_CLASSICAL@/bin:/system/bin"
+ /* All standard utilities path. */
+ #define	_PATH_STDPATH \
+-	"/usr/bin:/bin:/usr/sbin:/sbin"
++	"@TERMUX_PREFIX@/bin:@TERMUX_PREFIX_CLASSICAL@/bin:/system/bin"
+ 
+-#define	_PATH_BSHELL	"/bin/sh"
++#define	_PATH_BSHELL	"@TERMUX_PREFIX@/bin/sh"
+ #define	_PATH_CONSOLE	"/dev/console"
+-#define	_PATH_CSHELL	"/bin/csh"
+-#define	_PATH_DEVDB	"/var/run/dev.db"
++#define	_PATH_CSHELL	"@TERMUX_PREFIX@/bin/csh"
++#define	_PATH_DEVDB	"@TERMUX_PREFIX_CLASSICAL@/var/run/dev.db"
+ #define	_PATH_DEVNULL	"/dev/null"
+ #define	_PATH_DRUM	"/dev/drum"
+-#define	_PATH_GSHADOW	"/etc/gshadow"
++#define	_PATH_GSHADOW	"@TERMUX_PREFIX@/etc/gshadow"
+ #define	_PATH_KMEM	"/dev/kmem"
+-#define	_PATH_LASTLOG	"/var/log/lastlog"
+-#define	_PATH_MAILDIR	"/var/mail"
+-#define	_PATH_MAN	"/usr/share/man"
++#define	_PATH_LASTLOG	"@TERMUX_PREFIX_CLASSICAL@/var/glibc/log/lastlog"
++#define	_PATH_MAILDIR	"@TERMUX_PREFIX_CLASSICAL@/var/glibc/mail"
++#define	_PATH_MAN	"@TERMUX_PREFIX@/share/man"
+ #define	_PATH_MEM	"/dev/mem"
+-#define	_PATH_MNTTAB	"/etc/fstab"
+-#define	_PATH_MOUNTED	"/var/run/mtab"
+-#define	_PATH_NOLOGIN	"/etc/nologin"
+-#define	_PATH_PRESERVE	"/var/lib"
+-#define	_PATH_RWHODIR	"/var/spool/rwho"
+-#define	_PATH_SENDMAIL	"/usr/sbin/sendmail"
+-#define	_PATH_SHADOW	"/etc/shadow"
+-#define	_PATH_SHELLS	"/etc/shells"
++#define	_PATH_MNTTAB	"@TERMUX_PREFIX@/etc/fstab"
++#define	_PATH_MOUNTED	"@TERMUX_PREFIX_CLASSICAL@/var/run/mtab"
++#define	_PATH_NOLOGIN	"@TERMUX_PREFIX@/etc/nologin"
++#define	_PATH_PRESERVE	"@TERMUX_PREFIX@/var/lib"
++#define	_PATH_RWHODIR	"@TERMUX_PREFIX@/var/spool/rwho"
++#define	_PATH_SENDMAIL	"@TERMUX_PREFIX@/bin/sendmail"
++#define	_PATH_SHADOW	"@TERMUX_PREFIX@/etc/shadow"
++#define	_PATH_SHELLS	"@TERMUX_PREFIX@/etc/shells"
+ #define	_PATH_TTY	"/dev/tty"
+ #define	_PATH_UNIX	"/vmunix"
+-#define	_PATH_UTMP	"/var/run/utmp"
+-#define	_PATH_UTMP_DB	"/var/run/utmp.db"
+-#define	_PATH_VI	"/usr/bin/vi"
+-#define	_PATH_WTMP	"/var/log/wtmp"
++#define	_PATH_UTMP	"@TERMUX_PREFIX_CLASSICAL@/var/run/utmp"
++#define	_PATH_UTMP_DB	"@TERMUX_PREFIX_CLASSICAL@/var/run/utmp.db"
++#define	_PATH_VI	"@TERMUX_PREFIX@/bin/vi"
++#define	_PATH_WTMP	"@TERMUX_PREFIX@/var/log/wtmp"
+ 
+ /* Provide trailing slash, since mostly used for building pathnames. */
+ #define	_PATH_DEV	"/dev/"
+-#define	_PATH_TMP	"/tmp/"
+-#define	_PATH_VARDB	"/var/db/"
+-#define	_PATH_VARRUN	"/var/run/"
+-#define	_PATH_VARTMP	"/var/tmp/"
++#define	_PATH_TMP	"@TERMUX_PREFIX_CLASSICAL@/tmp/"
++#define	_PATH_VARDB	"@TERMUX_PREFIX@/var/db/"
++#define	_PATH_VARRUN	"@TERMUX_PREFIX_CLASSICAL@/var/run/"
++#define	_PATH_VARTMP	"@TERMUX_PREFIX_CLASSICAL@/var/tmp/"
+ 
+ #endif /* !_PATHS_H_ */
+diff --git a/sysdeps/posix/system.c b/sysdeps/posix/system.c
+index 2335a991..223f6d4f 100644
+--- glibc-2.38/sysdeps/posix/system.c
++++ glibc-2.38/sysdeps/posix/system.c
+@@ -31,7 +31,7 @@
+ #include <not-cancel.h>
+ #include <internal-signals.h>
+ 
+-#define	SHELL_PATH	"/bin/sh"	/* Path of the shell.  */
++#define	SHELL_PATH	"@TERMUX_PREFIX_CLASSICAL@/bin/sh"	/* Path of the shell.  */
+ #define	SHELL_NAME	"sh"		/* Name to give it.  */
+ 
+ 
+diff --git a/sysdeps/posix/tempname.c b/sysdeps/posix/tempname.c
+index f24d9622..987033bd 100644
+--- glibc-2.38/sysdeps/posix/tempname.c
++++ glibc-2.38/sysdeps/posix/tempname.c
+@@ -28,7 +28,7 @@
+ 
+ #include <stdio.h>
+ #ifndef P_tmpdir
+-# define P_tmpdir "/tmp"
++# define P_tmpdir "@TERMUX_PREFIX_CLASSICAL@/tmp"
+ #endif
+ #ifndef TMP_MAX
+ # define TMP_MAX 238328
+@@ -141,8 +141,8 @@ __path_search (char *tmpl, size_t tmpl_len, const char *dir, const char *pfx,
+     {
+       if (direxists (P_tmpdir))
+         dir = P_tmpdir;
+-      else if (strcmp (P_tmpdir, "/tmp") != 0 && direxists ("/tmp"))
+-        dir = "/tmp";
++      else if (strcmp (P_tmpdir, "@TERMUX_PREFIX_CLASSICAL@/tmp") != 0 && direxists ("@TERMUX_PREFIX_CLASSICAL@/tmp"))
++        dir = "@TERMUX_PREFIX_CLASSICAL@/tmp";
+       else
+         {
+           __set_errno (ENOENT);
+diff --git a/sysdeps/unix/confstr.h b/sysdeps/unix/confstr.h
+index 15859c3b..5bddec1a 100644
+--- glibc-2.38/sysdeps/unix/confstr.h
++++ glibc-2.38/sysdeps/unix/confstr.h
+@@ -1 +1 @@
+-#define	CS_PATH	"/bin:/usr/bin"
++#define	CS_PATH	"@TERMUX_PREFIX@/bin:@TERMUX_PREFIX_CLASSICAL@/bin:/system/bin"
+diff --git a/sysdeps/unix/sysv/linux/gentempfd.c b/sysdeps/unix/sysv/linux/gentempfd.c
+index 86b0a914..c5e2de8d 100644
+--- glibc-2.38/sysdeps/unix/sysv/linux/gentempfd.c
++++ glibc-2.38/sysdeps/unix/sysv/linux/gentempfd.c
+@@ -26,8 +26,8 @@ __gen_tempfd (int flags)
+ {
+   int fd = __open (P_tmpdir, O_RDWR | O_TMPFILE | O_EXCL | flags,
+ 		   S_IRUSR | S_IWUSR);
+-  if (fd < 0 && errno == ENOENT && strcmp (P_tmpdir, "/tmp") != 0)
+-    fd = __open ("/tmp", O_RDWR | O_TMPFILE | O_EXCL | flags,
++  if (fd < 0 && errno == ENOENT && strcmp (P_tmpdir, "@TERMUX_PREFIX_CLASSICAL@/tmp") != 0)
++    fd = __open ("@TERMUX_PREFIX_CLASSICAL@/tmp", O_RDWR | O_TMPFILE | O_EXCL | flags,
+ 		 S_IRUSR | S_IWUSR);
+ 
+   return fd;
+diff --git a/sysdeps/unix/sysv/linux/paths.h b/sysdeps/unix/sysv/linux/paths.h
+index 1342ab3a..96629276 100644
+--- glibc-2.38/sysdeps/unix/sysv/linux/paths.h
++++ glibc-2.38/sysdeps/unix/sysv/linux/paths.h
+@@ -33,43 +33,43 @@
+ #define	_PATHS_H_
+ 
+ /* Default search path. */
+-#define	_PATH_DEFPATH	"/usr/bin:/bin"
++#define	_PATH_DEFPATH	"@TERMUX_PREFIX@/bin:@TERMUX_PREFIX_CLASSICAL@/bin:/system/bin"
+ /* All standard utilities path. */
+ #define	_PATH_STDPATH \
+-	"/usr/bin:/bin:/usr/sbin:/sbin"
++	"@TERMUX_PREFIX@/bin:@TERMUX_PREFIX_CLASSICAL@/bin:/system/bin"
+ 
+-#define	_PATH_BSHELL	"/bin/sh"
++#define	_PATH_BSHELL	"@TERMUX_PREFIX@/bin/sh"
+ #define	_PATH_CONSOLE	"/dev/console"
+-#define	_PATH_CSHELL	"/bin/csh"
+-#define	_PATH_DEVDB	"/var/run/dev.db"
++#define	_PATH_CSHELL	"@TERMUX_PREFIX@/bin/csh"
++#define	_PATH_DEVDB	"@TERMUX_PREFIX_CLASSICAL@/var/run/dev.db"
+ #define	_PATH_DEVNULL	"/dev/null"
+ #define	_PATH_DRUM	"/dev/drum"
+-#define	_PATH_GSHADOW	"/etc/gshadow"
++#define	_PATH_GSHADOW	"@TERMUX_PREFIX@/etc/gshadow"
+ #define	_PATH_KLOG	"/proc/kmsg"
+ #define	_PATH_KMEM	"/dev/kmem"
+-#define	_PATH_LASTLOG	"/var/log/lastlog"
+-#define	_PATH_MAILDIR	"/var/mail"
+-#define	_PATH_MAN	"/usr/share/man"
++#define	_PATH_LASTLOG	"@TERMUX_PREFIX@/var/log/lastlog"
++#define	_PATH_MAILDIR	"@TERMUX_PREFIX@/var/mail"
++#define	_PATH_MAN	"@TERMUX_PREFIX@/share/man"
+ #define	_PATH_MEM	"/dev/mem"
+-#define	_PATH_MNTTAB	"/etc/fstab"
+-#define	_PATH_MOUNTED	"/etc/mtab"
+-#define	_PATH_NOLOGIN	"/etc/nologin"
+-#define	_PATH_PRESERVE	"/var/lib"
+-#define	_PATH_RWHODIR	"/var/spool/rwho"
+-#define	_PATH_SENDMAIL	"/usr/sbin/sendmail"
+-#define	_PATH_SHADOW	"/etc/shadow"
+-#define	_PATH_SHELLS	"/etc/shells"
++#define	_PATH_MNTTAB	"@TERMUX_PREFIX@/etc/fstab"
++#define	_PATH_MOUNTED	"@TERMUX_PREFIX@/etc/mtab"
++#define	_PATH_NOLOGIN	"@TERMUX_PREFIX@/etc/nologin"
++#define	_PATH_PRESERVE	"@TERMUX_PREFIX@/var/lib"
++#define	_PATH_RWHODIR	"@TERMUX_PREFIX@/var/spool/rwho"
++#define	_PATH_SENDMAIL	"@TERMUX_PREFIX@/bin/sendmail"
++#define	_PATH_SHADOW	"@TERMUX_PREFIX@/etc/shadow"
++#define	_PATH_SHELLS	"@TERMUX_PREFIX@/etc/shells"
+ #define	_PATH_TTY	"/dev/tty"
+ #define	_PATH_UNIX	"/boot/vmlinux"
+-#define	_PATH_UTMP	"/var/run/utmp"
+-#define	_PATH_VI	"/usr/bin/vi"
+-#define	_PATH_WTMP	"/var/log/wtmp"
++#define	_PATH_UTMP	"@TERMUX_PREFIX_CLASSICAL@/var/run/utmp"
++#define	_PATH_VI	"@TERMUX_PREFIX@/bin/vi"
++#define	_PATH_WTMP	"@TERMUX_PREFIX@/var/log/wtmp"
+ 
+ /* Provide trailing slash, since mostly used for building pathnames. */
+ #define	_PATH_DEV	"/dev/"
+-#define	_PATH_TMP	"/tmp/"
+-#define	_PATH_VARDB	"/var/db/"
+-#define	_PATH_VARRUN	"/var/run/"
+-#define	_PATH_VARTMP	"/var/tmp/"
++#define	_PATH_TMP	"@TERMUX_PREFIX_CLASSICAL@/tmp/"
++#define	_PATH_VARDB	"@TERMUX_PREFIX@/var/db/"
++#define	_PATH_VARRUN	"@TERMUX_PREFIX_CLASSICAL@/var/run/"
++#define	_PATH_VARTMP	"@TERMUX_PREFIX_CLASSICAL@/var/tmp/"
+ 
+ #endif /* !_PATHS_H_ */
+diff --git a/sysdeps/unix/sysv/linux/riscv/dl-cache.h b/sysdeps/unix/sysv/linux/riscv/dl-cache.h
+index 2f82ed4e..a1d39dd6 100644
+--- glibc-2.38/sysdeps/unix/sysv/linux/riscv/dl-cache.h
++++ glibc-2.38/sysdeps/unix/sysv/linux/riscv/dl-cache.h
+@@ -58,7 +58,7 @@
+ 	"/lib32/ilp32",							\
+ 	NULL,								\
+       };								\
+-      const size_t lib_len = sizeof ("/lib") - 1;			\
++      const size_t lib_len = sizeof ("@TERMUX_PREFIX@/lib") - 1;			\
+       size_t len = strlen (dir);					\
+       char path[len + 10];						\
+       const char **ptr;							\
+diff --git a/timezone/tzfile.h b/timezone/tzfile.h
+index ee911044..b48048e1 100644
+--- glibc-2.38/timezone/tzfile.h
++++ glibc-2.38/timezone/tzfile.h
+@@ -22,11 +22,11 @@
+ */
+ 
+ #ifndef TZDIR
+-#define TZDIR	"/usr/share/zoneinfo" /* Time zone object file directory */
++#define TZDIR	"/system/usr/share/zoneinfo" /* Time zone object file directory */
+ #endif /* !defined TZDIR */
+ 
+ #ifndef TZDEFAULT
+-#define TZDEFAULT	"/etc/localtime"
++#define TZDEFAULT	"@TERMUX_PREFIX@/etc/localtime"
+ #endif /* !defined TZDEFAULT */
+ 
+ #ifndef TZDEFRULES

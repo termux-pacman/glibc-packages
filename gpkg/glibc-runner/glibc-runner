@@ -1,0 +1,65 @@
+#!@TERMUX_PREFIX_CLASSICAL@/bin/bash
+
+# version: 1.3
+# This script allows you to:
+# - run glibc-based binaries with ld.so.
+# - configure glibc-based binaries to work in Termux.
+# - start a special shell with access to glibc commands.
+
+if [[ -z "$1" ]]; then
+	echo "Help message from $0-@TERMUX_PKG_VERSION@"
+	echo ""
+	echo "This script allows you to:"
+	echo " - run glibc-based binaries with ld.so."
+	echo " - configure glibc-based binary to work in Termux."
+	echo " - start a special shell with access to glibc commands."
+	echo ""
+	echo "Flags:"
+	echo " --shell - launching a customized shell"
+	echo " --set - binary setup"
+	echo " --help - print help text from ld.so command"
+	echo ""
+	echo "Example: grun [--set] ./binary || grun --shell [gcc -v]"
+	echo "Bug report: https://github.com/termux-pacman/glibc-packages/issues"
+	exit 0
+fi
+
+unset LD_PRELOAD
+export GLIBC_PREFIX="@TERMUX_PREFIX@"
+export PATH=$GLIBC_PREFIX/bin:$PATH
+
+if [ "$1" = "--shell" ]; then
+	if [[ -z "$2" ]]; then
+		exec $SHELL
+	else
+		commands="$@"
+		exec ${commands#* }
+	fi
+elif [ "$1" = "--set" ]; then
+	if [ -z "$2" ]; then
+		echo "Error: binary not specified"
+		exit 1
+	fi
+	if [ ! -f "$2" ]; then
+		echo "Error: binary not found"
+		exit 1
+	fi
+	if $(type patchelf &> /dev/null); then
+		LD_FILE=$(ls $GLIBC_PREFIX/lib/ld-* 2> /dev/null)
+		if [ -n "$LD_FILE" ]; then
+			patchelf --set-rpath $GLIBC_PREFIX/lib \
+				--set-interpreter $LD_FILE \
+				"$2"
+		else
+			echo "Error: interpreter not found in lib directory"
+			exit 1
+		fi
+	else
+		@TERMUX_PREFIX_CLASSICAL@/libexec/termux/command-not-found patchelf
+		exit 1
+	fi
+else
+	exec ld.so $@
+fi
+
+exit $?
