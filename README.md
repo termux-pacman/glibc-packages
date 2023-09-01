@@ -9,6 +9,11 @@ gpkg-dev:
 [gpkg-dev]
 Server = https://service.termux-pacman.dev/gpkg-dev/$arch
 ```
+gpkg:
+```
+[gpkg]
+Server = https://service.termux-pacman.dev/gpkg/$arch
+```
 
 ### Other information:
  - [Old README](/README-old.md)

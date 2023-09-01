@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Note that the `gpkg` repo is currently under development, but make sure your requested package is not in the `gpkg-dev` repo.
+        Before creating a package request, make sure your requested package is not in the `gpkg` repo.
   - type: textarea
     attributes:
       label: Why is it worth to add this package?
