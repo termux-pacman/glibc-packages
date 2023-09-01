@@ -187,7 +187,7 @@ jobs:
         done
 
         if [ ! -z "$packages" ]; then
-          ./scripts/run-docker.sh ./build-package.sh -f -I -a ${{ matrix.target_arch }} --format pacman --library glibc $packages
+          ./scripts/run-docker.sh ./build-package.sh -I -a ${{ matrix.target_arch }} --format pacman --library glibc $packages
         fi
 
     - name: Generate build artifacts
