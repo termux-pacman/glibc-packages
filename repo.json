@@ -11,11 +11,5 @@
     "distribution": "main",
     "component": "main",
     "url": "https://service.termux-pacman.dev/main"
-  },
-  "gpkg-dev": {
-    "name": "gpkg-dev",
-    "distribution": "gpkg-dev",
-    "component": "gpkg-dev",
-    "url": "https://service.termux-pacman.dev/gpkg-dev"
   }
 }
