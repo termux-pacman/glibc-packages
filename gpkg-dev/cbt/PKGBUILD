@@ -1,13 +1,21 @@
 pkgname=cbt
 pkgver=2.41
-pkgrel=0
+pkgrel=1
 pkgdesc='Cross Binutils for Termux (only for Linux)'
 arch=(x86_64)
 url='https://www.gnu.org/software/binutils/'
 license=('GPL3' 'GPL' 'FDL1.3' 'custom:FSFAP')
-source=(https://ftp.gnu.org/gnu/binutils/binutils-$pkgver.tar.xz)
-sha256sums=('ae9a5789e23459e59606e6714723f2d3ffc31c03174191ef0d015bdf06007450')
+source=(https://ftp.gnu.org/gnu/binutils/binutils-$pkgver.tar.xz
+        Makefile.in.patch)
+sha256sums=('ae9a5789e23459e59606e6714723f2d3ffc31c03174191ef0d015bdf06007450'
+            'ff53baf54962329b7045e7d18a4ad5a48095701579130392e7e03b9c693fb3d6')
 groups=('cgct')
+
+prepare() {
+	for i in *.patch; do
+		patch -Np1 -i ${srcdir}/$i
+	done
+}
 
 build() {
 	unset CFLAGS CXXFLAGS AR LD CC CXX
