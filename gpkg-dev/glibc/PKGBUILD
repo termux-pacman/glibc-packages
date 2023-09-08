@@ -3,7 +3,7 @@
 
 pkgname=glibc
 pkgver=2.38
-pkgrel=1
+pkgrel=2
 pkgdesc="GNU C Library"
 arch=(any)
 url='https://www.gnu.org/software/libc/'
@@ -46,7 +46,8 @@ source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz
         'x86_64-arch-syscall.h.patch'
         'i386-arch-syscall.h.patch'
         'rmdir.c.patch'
-        'mprotect.c')
+        'mprotect.c'
+        'Makefile.patch')
 sha256sums=('fb82998998b2b29965467bc1b69d152e9c307d2cf301c9eafb4555b770ef3fd2'
             '85153ad597c6101a73a9d1f3f6c35b6b141ddebb99e445ab601ebe95703b35ec'
             '4869ef24cdd59a931c9b5b173d2e3e9eaa67964bb8dcc34e4e6948f3e7856572'
@@ -79,12 +80,13 @@ sha256sums=('fb82998998b2b29965467bc1b69d152e9c307d2cf301c9eafb4555b770ef3fd2'
             '8300d82107ee62b15a06ac3b336707e638f5575041ab81dd43e47a99a976c052'
             'cf962f0fde71d61e55f488356f8ec80791ef6438a00da69dda2a79bbb4fea7ef'
             '42742b49cb15df968965de852ac21a2e9f49c68f0492816a5848f9a15e99fd59'
-            '994d2664bfca5c3d9b82f89d96959d65dfaddd5197865861fcc867f761e43a91'
-            'dc96ecd72915e474d2fe1ce882e59d41c9f1a20db92f28c1fe85287e0db8c4a2'
-            'f0f47b222a6b67571d0b7e8aa57bc1e2546a0478fe75fb6718c1cc0bcf2e284d'
-            '4e1f759fee8fc904d1170cd5b6c444403d8bd0753f2168c6d3251109ac5385ad'
+            'c3bac40fb6156fea3d95b5fdaf7338163cd91789b4a0bf5c113c4eee7c39f971'
+            '29707ad92df0273c5e2dd70b12440300e6aff4c37e8530b36f45851937e8b9a5'
+            '708665ece353864bb6c32c0e8388c7add57442ee4eecfc22e340e0c9a8b71b5f'
+            '92dff2fbcd675a7d90bb5d7ca4761a044d9b3136f683e784eab8ec342809cb58'
             '6c2d79171ad884515d2e1ccdb880eb1c555a44040d288f689381e243a901cb27'
-            '8bd6e86fe6651acd0aaa543a5ad36ebd0588827824d330ca3bbba0769f4c8960')
+            '8bd6e86fe6651acd0aaa543a5ad36ebd0588827824d330ca3bbba0769f4c8960'
+            '735bc5deb54be47eff146bb60d4104bff44c56b150d0009fc655ca18201e5224')
 groups=('gpkg-dev')
 
 prepare() {
@@ -93,7 +95,7 @@ prepare() {
   done
 
   for i in shmem-android.h mprotect.c; do
-    install -Dm644 "${srcdir}/${i}" "glibc-$pkgver/sysdeps/unix/sysv/linux/${i}"
+    install -Dm644 "${srcdir}/${i}" "glibc-${pkgver}/sysdeps/unix/sysv/linux/${i}"
   done
 
   rm glibc-$pkgver/sysdeps/unix/sysv/linux/*/clone3.S
