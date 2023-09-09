@@ -1,0 +1,11 @@
+--- glibc-2.38/sysdeps/unix/sysv/linux/Makefile	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/sysdeps/unix/sysv/linux/Makefile.patch	2023-09-09 00:40:40.109180943 +0300
+@@ -94,8 +94,6 @@
+   process_vm_writev \
+   pselect32 \
+   readahead \
+-  setfsgid \
+-  setfsuid \
+   signalfd \
+   splice \
+   sysctl \
