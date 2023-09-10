@@ -260,6 +260,13 @@ jobs:
           done
           return 1
         }
+        package__add_prefix_glibc_to_package_name() {
+          if [[ "${1}" = *"-static" ]]; then
+            echo "${1/-static/-glibc-static}"
+          else
+            echo "${1}-glibc"
+          fi
+        }
         sfuf() {
           gpg --batch --pinentry-mode=loopback --passphrase '${{ secrets.PW_GPG_BOT }}' --detach-sign --use-agent -u '${{ secrets.KEY_GPG_BOT }}' --no-armor "$1"
           for format_file in "" ".sig"; do
@@ -273,12 +280,20 @@ jobs:
           dp_file="deleted_${repo}_packages.txt"
           if [[ -f pkgs/$dp_file ]]; then
             path_dp_file=pkgs/${{ github.sha }}_${dp_file}
-            mv pkgs/${dp_file} ${path_dp_file}
+            {
+              for d_pkg in $(cat pkgs/${dp_file}); do
+                if ! package__is_package_name_have_glibc_prefix "${d_pkg}"; then
+                  package__add_prefix_glibc_to_package_name ${d_pkg}
+                else
+                  echo ${d_pkg}
+                fi
+              done
+            } > ${path_dp_file}
             sfuf "${path_dp_file}"
           fi
           for name_pkg in $(cat ./pkgs/built_${repo}_packages.txt); do
             if ! package__is_package_name_have_glibc_prefix "${name_pkg}"; then
-              name_pkg+="-glibc"
+              name_pkg=$(package__add_prefix_glibc_to_package_name $name_pkg)
             fi
             for list_pkg in pkgs/*.pkg.*; do
               dir_pkg_sp=(${list_pkg//// })
