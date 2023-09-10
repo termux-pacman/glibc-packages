@@ -1,5 +1,5 @@
-prefix=/usr
-exec_prefix=/usr
+prefix=@TERMUX_PREFIX@
+exec_prefix=@TERMUX_PREFIX@
 bindir=${exec_prefix}/bin
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include

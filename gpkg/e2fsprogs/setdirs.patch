@@ -1,0 +1,347 @@
+diff --git a/debugfs/debugfs.c b/debugfs/debugfs.c
+index 9b6321d..7e029cc 100644
+--- a/debugfs/debugfs.c
++++ b/debugfs/debugfs.c
+@@ -93,7 +93,7 @@ static int debugfs_setup_tdb(const char *device_name, char *undo_file,
+ 	 */
+ 	tdb_dir = ss_safe_getenv("E2FSPROGS_UNDO_DIR");
+ 	if (!tdb_dir)
+-		tdb_dir = "/var/lib/e2fsprogs";
++		tdb_dir = "@TERMUX_PREFIX@/var/lib/e2fsprogs";
+ 
+ 	if (!strcmp(tdb_dir, "none") || (tdb_dir[0] == 0) ||
+ 	    access(tdb_dir, W_OK))
+diff --git a/debugfs/util.c b/debugfs/util.c
+index 9e88054..9c94244 100644
+--- a/debugfs/util.c
++++ b/debugfs/util.c
+@@ -61,7 +61,7 @@ void reset_getopt(void)
+ }
+ 
+ static const char *pager_search_list[] = { "pager", "more", "less", 0 };
+-static const char *pager_dir_list[] = { "/usr/bin", "/bin", 0 };
++static const char *pager_dir_list[] = { "@TERMUX_PREFIX@/bin", 0 };
+ 
+ static const char *find_pager(char *buf)
+ {
+diff --git a/e2fsck/e2fsck.h b/e2fsck/e2fsck.h
+index 3f2dc30..db43347 100644
+--- a/e2fsck/e2fsck.h
++++ b/e2fsck/e2fsck.h
+@@ -53,7 +53,7 @@
+ #define NLS_CAT_NAME "e2fsprogs"
+ #endif
+ #ifndef LOCALEDIR
+-#define LOCALEDIR "/usr/share/locale"
++#define LOCALEDIR "@TERMUX_PREFIX@/share/locale"
+ #endif
+ #else
+ #define _(a) (a)
+diff --git a/e2fsck/unix.c b/e2fsck/unix.c
+index e5b672a..a3cdbf5 100644
+--- a/e2fsck/unix.c
++++ b/e2fsck/unix.c
+@@ -1333,7 +1333,7 @@ static int e2fsck_setup_tdb(e2fsck_t ctx, io_manager *io_ptr)
+ 	tdb_dir = getenv("E2FSPROGS_UNDO_DIR");
+ 	if (!tdb_dir) {
+ 		profile_get_string(ctx->profile, "defaults",
+-				   "undo_dir", 0, "/var/lib/e2fsprogs",
++				   "undo_dir", 0, "@TERMUX_PREFIX@/var/lib/e2fsprogs",
+ 				   &tdb_dir);
+ 		free_tdb_dir = 1;
+ 	}
+diff --git a/ext2ed/init.c b/ext2ed/init.c
+index 4e58431..4d37d71 100644
+--- a/ext2ed/init.c
++++ b/ext2ed/init.c
+@@ -613,8 +613,8 @@ void check_mounted (char *name)
+ 
+ 	mounted=0;
+ 
+-	if ( (fp=fopen ("/etc/mtab","rt"))==NULL) {
+-		wprintw (command_win,"Error - Failed to open /etc/mtab. Assuming filesystem is mounted.\n");
++	if ( (fp=fopen ("@TERMUX_PREFIX@/etc/mtab","rt"))==NULL) {
++		wprintw (command_win,"Error - Failed to open @TERMUX_PREFIX@/etc/mtab. Assuming filesystem is mounted.\n");
+ 		refresh_command_win ();mounted=1;return;
+ 	};
+ 
+diff --git a/lib/ext2fs/ismounted.c b/lib/ext2fs/ismounted.c
+index a7db1a5..f217788 100644
+--- a/lib/ext2fs/ismounted.c
++++ b/lib/ext2fs/ismounted.c
+@@ -231,7 +231,7 @@ static errcode_t check_mntent(const char *file, int *mount_flags,
+ 	errcode_t	retval;
+ 
+ #ifdef DEBUG
+-	retval = check_mntent_file("/tmp/mtab", file, mount_flags,
++	retval = check_mntent_file("@TERMUX_PREFIX_CLASSICAL@/tmp/mtab", file, mount_flags,
+ 				   mtpt, mtlen);
+ 	if (retval == 0)
+ 		return 0;
+diff --git a/lib/ss/invocation.c b/lib/ss/invocation.c
+index 7d7458a..cd07b74 100644
+--- a/lib/ss/invocation.c
++++ b/lib/ss/invocation.c
+@@ -74,7 +74,7 @@ int ss_create_invocation(const char *subsystem_name, const char *version_string,
+ 	strcpy(new_table->prompt, subsystem_name);
+ 	strcat(new_table->prompt, ":  ");
+ #ifdef silly
+-	new_table->abbrev_info = ss_abbrev_initialize("/etc/passwd", code_ptr);
++	new_table->abbrev_info = ss_abbrev_initialize("/system/etc/passwd", code_ptr);
+ #else
+ 	new_table->abbrev_info = NULL;
+ #endif
+diff --git a/lib/support/nls-enable.h b/lib/support/nls-enable.h
+index 2f62c01..af3c2c0 100644
+--- a/lib/support/nls-enable.h
++++ b/lib/support/nls-enable.h
+@@ -12,7 +12,7 @@
+ #define NLS_CAT_NAME "e2fsprogs"
+ #endif
+ #ifndef LOCALEDIR
+-#define LOCALEDIR "/usr/share/locale"
++#define LOCALEDIR "@TERMUX_PREFIX@/share/locale"
+ #endif
+ #else
+ #define _(a) (a)
+diff --git a/lib/uuid/gen_uuid.c b/lib/uuid/gen_uuid.c
+index 2f02886..ddbdc56 100644
+--- a/lib/uuid/gen_uuid.c
++++ b/lib/uuid/gen_uuid.c
+@@ -313,7 +313,7 @@ static int get_clock(uint32_t *clock_high, uint32_t *clock_low,
+ 
+ 	if (state_fd == -2) {
+ 		save_umask = umask(0);
+-		state_fd = open("/var/lib/libuuid/clock.txt",
++		state_fd = open("@TERMUX_PREFIX@/var/lib/libuuid/clock.txt",
+ 				O_RDWR|O_CREAT, 0660);
+ 		(void) umask(save_umask);
+ 		if (state_fd >= 0) {
+diff --git a/lib/uuid/uuidd.h b/lib/uuid/uuidd.h
+index c71f4b7..cc43afb 100644
+--- a/lib/uuid/uuidd.h
++++ b/lib/uuid/uuidd.h
+@@ -35,10 +35,10 @@
+ #ifndef _UUID_UUIDD_H
+ #define _UUID_UUIDD_H
+ 
+-#define UUIDD_DIR		"/var/lib/libuuid"
++#define UUIDD_DIR		"@TERMUX_PREFIX@/var/lib/libuuid"
+ #define UUIDD_SOCKET_PATH	UUIDD_DIR "/request"
+ #define UUIDD_PIDFILE_PATH	UUIDD_DIR "/uuidd.pid"
+-#define UUIDD_PATH		"/usr/sbin/uuidd"
++#define UUIDD_PATH		"@TERMUX_PREFIX@/bin/uuidd"
+ 
+ #define UUIDD_OP_GETPID			0
+ #define UUIDD_OP_GET_MAXOP		1
+diff --git a/misc/badblocks.c b/misc/badblocks.c
+index 2b5ff6d..b85e3c0 100644
+--- a/misc/badblocks.c
++++ b/misc/badblocks.c
+@@ -1006,7 +1006,7 @@ static void check_mount(char *device_name)
+ 		fprintf(stderr, _("%s is mounted; "), device_name);
+ 		if (force) {
+ 			fputs(_("badblocks forced anyway.  "
+-				"Hope /etc/mtab is incorrect.\n"), stderr);
++				"Hope @TERMUX_PREFIX@/etc/mtab is incorrect.\n"), stderr);
+ 			return;
+ 		}
+ 	abort_badblocks:
+diff --git a/misc/e2initrd_helper.c b/misc/e2initrd_helper.c
+index b39fe15..7ac8beb 100644
+--- a/misc/e2initrd_helper.c
++++ b/misc/e2initrd_helper.c
+@@ -342,9 +342,9 @@ static void get_root_type(ext2_filsys fs)
+ 	struct fs_info fs_info;
+ 	int		ret;
+ 
+-	retval = get_file(fs, "/etc/fstab", &file);
++	retval = get_file(fs, "@TERMUX_PREFIX@/etc/fstab", &file);
+ 	if (retval) {
+-		com_err(program_name, retval, "couldn't open /etc/fstab");
++		com_err(program_name, retval, "couldn't open @TERMUX_PREFIX@/etc/fstab");
+ 		exit(1);
+ 	}
+ 
+diff --git a/misc/e2undo.c b/misc/e2undo.c
+index bc78fb2..b9100f7 100644
+--- a/misc/e2undo.c
++++ b/misc/e2undo.c
+@@ -250,7 +250,7 @@ static int e2undo_setup_tdb(const char *name, io_manager *io_ptr)
+ 	 */
+ 	tdb_dir = getenv("E2FSPROGS_UNDO_DIR");
+ 	if (!tdb_dir)
+-		tdb_dir = "/var/lib/e2fsprogs";
++		tdb_dir = "@TERMUX_PREFIX@/var/lib/e2fsprogs";
+ 
+ 	if (!strcmp(tdb_dir, "none") || (tdb_dir[0] == 0) ||
+ 	    access(tdb_dir, W_OK))
+diff --git a/misc/e4crypt.c b/misc/e4crypt.c
+index 67d25d8..8b83dda 100644
+--- a/misc/e4crypt.c
++++ b/misc/e4crypt.c
+@@ -614,7 +614,7 @@ static void insert_key_into_keyring(const char *keyring, struct salt *salt)
+ 
+ static void get_default_salts(void)
+ {
+-	FILE	*f = setmntent("/etc/mtab", "r");
++	FILE	*f = setmntent("@TERMUX_PREFIX@/etc/mtab", "r");
+ 	struct mntent *mnt;
+ 
+ 	while (f && ((mnt = getmntent(f)) != NULL)) {
+diff --git a/misc/e4defrag.c b/misc/e4defrag.c
+index e3011d7..cfc12e1 100644
+--- a/misc/e4defrag.c
++++ b/misc/e4defrag.c
+@@ -219,7 +219,7 @@ static int get_mount_point(const char *devname, char *mount_point,
+ 
+ 	fp = setmntent(mtab, "r");
+ 	if (fp == NULL) {
+-		perror("Couldn't access /etc/mtab");
++		perror("Couldn't access @TERMUX_PREFIX@/etc/mtab");
+ 		return -1;
+ 	}
+ 
+@@ -286,7 +286,7 @@ static int is_ext4(const char *file, char devname[PATH_MAX + 1])
+ 
+ 	fp = setmntent(mtab, "r");
+ 	if (fp == NULL) {
+-		perror("Couldn't access /etc/mtab");
++		perror("Couldn't access @TERMUX_PREFIX@/etc/mtab");
+ 		return -1;
+ 	}
+ 
+diff --git a/misc/fsck.c b/misc/fsck.c
+index 1769a10..4fd9240 100644
+--- a/misc/fsck.c
++++ b/misc/fsck.c
+@@ -65,7 +65,7 @@
+ #include "blkid/blkid.h"
+ 
+ #ifndef _PATH_MNTTAB
+-#define	_PATH_MNTTAB	"/etc/fstab"
++#define	_PATH_MNTTAB	"@TERMUX_PREFIX@/etc/fstab"
+ #endif
+ 
+ static const char *ignored_types[] = {
+@@ -121,7 +121,7 @@ static char *progname;
+ static char *fstype = NULL;
+ static struct fs_info *filesys_info = NULL, *filesys_last = NULL;
+ static struct fsck_instance *instance_list;
+-static const char *fsck_prefix_path = "/sbin:/sbin/fs.d:/sbin/fs:/etc/fs:/etc";
++static const char *fsck_prefix_path = "@TERMUX_PREFIX@/bin:@TERMUX_PREFIX@/bin/fs.d:@TERMUX_PREFIX@/bin/fs:@TERMUX_PREFIX@/etc/fs:@TERMUX_PREFIX@/etc";
+ static char *fsck_path = 0;
+ static blkid_cache cache = NULL;
+ 
+@@ -368,9 +368,9 @@ static void load_fs_info(const char *filename)
+ 	if (old_fstab && filesys_info) {
+ 		fputs("\007\007\007", stderr);
+ 		fputs(_(
+-		"WARNING: Your /etc/fstab does not contain the fsck passno\n"
++		"WARNING: Your @TERMUX_PREFIX@/etc/fstab does not contain the fsck passno\n"
+ 		"	field.  I will kludge around things for you, but you\n"
+-		"	should fix your /etc/fstab file as soon as you can.\n\n"), stderr);
++		"	should fix your @TERMUX_PREFIX@/etc/fstab file as soon as you can.\n\n"), stderr);
+ 
+ 		for (fs = filesys_info; fs; fs = fs->next) {
+ 			fs->passno = 1;
+@@ -891,7 +891,7 @@ static int ignore(struct fs_info *fs)
+ 	 */
+ 	if (opt_in_list("bind", fs->opts)) {
+ 		fprintf(stderr,
+-			_("%s: skipping bad line in /etc/fstab: bind mount with nonzero fsck pass number\n"),
++			_("%s: skipping bad line in @TERMUX_PREFIX@/etc/fstab: bind mount with nonzero fsck pass number\n"),
+ 			fs->mountpt);
+ 		return 1;
+ 	}
+diff --git a/misc/fuse2fs.c b/misc/fuse2fs.c
+index 0dc77ea..974a9b4 100644
+--- a/misc/fuse2fs.c
++++ b/misc/fuse2fs.c
+@@ -52,7 +52,7 @@
+ #define NLS_CAT_NAME "e2fsprogs"
+ #endif
+ #ifndef LOCALEDIR
+-#define LOCALEDIR "/usr/share/locale"
++#define LOCALEDIR "@TERMUX_PREFIX@/share/locale"
+ #endif
+ #else
+ #define _(a) (a)
+diff --git a/misc/ismounted.c b/misc/ismounted.c
+index 6aa0e04..e0b3cc7 100644
+--- a/misc/ismounted.c
++++ b/misc/ismounted.c
+@@ -197,7 +197,7 @@ int is_mounted(const char *file)
+ 	if (mount_flags)
+ 		return 1;
+ #endif /* __linux__ */
+-	retval = check_mntent_file("/etc/mtab", file, &mount_flags);
++	retval = check_mntent_file("@TERMUX_PREFIX@/etc/mtab", file, &mount_flags);
+ 	if (retval)
+ 		return 0;
+ 	return (mount_flags);
+diff --git a/misc/mke2fs.c b/misc/mke2fs.c
+index 4a9c1b0..d9a87bc 100644
+--- a/misc/mke2fs.c
++++ b/misc/mke2fs.c
+@@ -2812,7 +2812,7 @@ static int mke2fs_setup_tdb(const char *name, io_manager *io_ptr)
+ 	tdb_dir = getenv("E2FSPROGS_UNDO_DIR");
+ 	if (!tdb_dir) {
+ 		profile_get_string(profile, "defaults",
+-				   "undo_dir", 0, "/var/lib/e2fsprogs",
++				   "undo_dir", 0, "@TERMUX_PREFIX@/var/lib/e2fsprogs",
+ 				   &tdb_dir);
+ 		free_tdb_dir = 1;
+ 	}
+diff --git a/misc/tune2fs.c b/misc/tune2fs.c
+index 458f7cf..c601b49 100644
+--- a/misc/tune2fs.c
++++ b/misc/tune2fs.c
+@@ -2964,7 +2964,7 @@ static int tune2fs_setup_tdb(const char *name, io_manager *io_ptr)
+ 	 */
+ 	tdb_dir = getenv("E2FSPROGS_UNDO_DIR");
+ 	if (!tdb_dir)
+-		tdb_dir = "/var/lib/e2fsprogs";
++		tdb_dir = "@TERMUX_PREFIX@/var/lib/e2fsprogs";
+ 
+ 	if (!strcmp(tdb_dir, "none") || (tdb_dir[0] == 0) ||
+ 	    access(tdb_dir, W_OK))
+diff --git a/misc/util.c b/misc/util.c
+index 3e83169..0f365a5 100644
+--- a/misc/util.c
++++ b/misc/util.c
+@@ -139,7 +139,7 @@ void check_mount(const char *device, int force, const char *type)
+ 	if (mount_flags & EXT2_MF_MOUNTED) {
+ 		fprintf(stderr, _("%s is mounted; "), device);
+ 		if (force >= 2) {
+-			fputs(_("mke2fs forced anyway.  Hope /etc/mtab is "
++			fputs(_("mke2fs forced anyway.  Hope @TERMUX_PREFIX@/etc/mtab is "
+ 				"incorrect.\n"), stderr);
+ 			return;
+ 		}
+diff --git a/resize/main.c b/resize/main.c
+index 94f5ec6..f784596 100644
+--- a/resize/main.c
++++ b/resize/main.c
+@@ -198,7 +198,7 @@ static int resize2fs_setup_tdb(const char *device, char *undo_file,
+ 	 */
+ 	tdb_dir = getenv("E2FSPROGS_UNDO_DIR");
+ 	if (!tdb_dir)
+-		tdb_dir = "/var/lib/e2fsprogs";
++		tdb_dir = "@TERMUX_PREFIX@/var/lib/e2fsprogs";
+ 
+ 	if (!strcmp(tdb_dir, "none") || (tdb_dir[0] == 0) ||
+ 	    access(tdb_dir, W_OK))
+diff --git a/resize/resize2fs.h b/resize/resize2fs.h
+index 96a878a..05348de 100644
+--- a/resize/resize2fs.h
++++ b/resize/resize2fs.h
+@@ -51,7 +51,7 @@
+ #define NLS_CAT_NAME "e2fsprogs"
+ #endif
+ #ifndef LOCALEDIR
+-#define LOCALEDIR "/usr/share/locale"
++#define LOCALEDIR "@TERMUX_PREFIX@/share/locale"
+ #endif
+ #else
+ #define _(a) (a)
