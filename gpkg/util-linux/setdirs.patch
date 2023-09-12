@@ -1,0 +1,796 @@
+diff --git a/disk-utils/fsck.c b/disk-utils/fsck.c
+index 1b11e82..798528d 100644
+--- a/disk-utils/fsck.c
++++ b/disk-utils/fsck.c
+@@ -1120,7 +1120,7 @@ static int ignore(struct libmnt_fs *fs)
+ 	 * If this is a bind mount, ignore it.
+ 	 */
+ 	if (opt_in_list("bind", mnt_fs_get_options(fs))) {
+-		warnx(_("%s: skipping bad line in /etc/fstab: "
++		warnx(_("%s: skipping bad line in @TERMUX_PREFIX@/etc/fstab: "
+ 			"bind mount with nonzero fsck pass number"),
+ 			mnt_fs_get_target(fs));
+ 		return 1;
+diff --git a/include/pathnames.h b/include/pathnames.h
+index 56f64c3..877e8c8 100644
+--- a/include/pathnames.h
++++ b/include/pathnames.h
+@@ -19,77 +19,69 @@
+ /* DEFPATHs from <paths.h> don't include /usr/local */
+ #undef _PATH_DEFPATH
+ 
+-#ifdef USE_USRDIR_PATHS_ONLY
+-# define _PATH_DEFPATH	        "/usr/local/bin:/usr/bin"
+-#else
+-# define _PATH_DEFPATH	        "/usr/local/bin:/bin:/usr/bin"
+-#endif
++#define _PATH_DEFPATH	        "@TERMUX_PREFIX@/bin"
+ 
+ #undef _PATH_DEFPATH_ROOT
+ 
+-#ifdef USE_USRDIR_PATHS_ONLY
+-# define _PATH_DEFPATH_ROOT	"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin"
+-#else
+-# define _PATH_DEFPATH_ROOT	"/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
+-#endif
++#define _PATH_DEFPATH_ROOT	"@TERMUX_PREFIX@/bin"
+ 
+ #define	_PATH_HUSHLOGIN		".hushlogin"
+-#define	_PATH_HUSHLOGINS	"/etc/hushlogins"
++#define	_PATH_HUSHLOGINS	"@TERMUX_PREFIX@/etc/hushlogins"
+ 
+-#define _PATH_NOLOGIN_TXT	"/etc/nologin.txt"
++#define _PATH_NOLOGIN_TXT	"@TERMUX_PREFIX@/etc/nologin.txt"
+ 
+ #ifndef _PATH_MAILDIR
+-# define _PATH_MAILDIR		"/var/spool/mail"
++# define _PATH_MAILDIR		"@TERMUX_PREFIX@/var/spool/mail"
+ #endif
+-#define	_PATH_MOTDFILE		"/usr/share/misc/motd:/run/motd:/etc/motd"
++#define	_PATH_MOTDFILE		"@TERMUX_PREFIX@/share/misc/motd:@TERMUX_PREFIX@/run/motd:@TERMUX_PREFIX@/etc/motd"
+ #ifndef _PATH_NOLOGIN
+-# define _PATH_NOLOGIN		"/etc/nologin"
++# define _PATH_NOLOGIN		"@TERMUX_PREFIX@/etc/nologin"
+ #endif
+-#define	_PATH_VAR_NOLOGIN	"/var/run/nologin"
++#define	_PATH_VAR_NOLOGIN	"@TERMUX_PREFIX@/var/run/nologin"
+ 
+ #ifndef _PATH_LOGIN
+-# define _PATH_LOGIN		"/bin/login"
++# define _PATH_LOGIN		"@TERMUX_PREFIX@/bin/login"
+ #endif
+-#define _PATH_SHUTDOWN		"/sbin/shutdown"
+-#define _PATH_POWEROFF		"/sbin/poweroff"
++#define _PATH_SHUTDOWN		"@TERMUX_PREFIX@/bin/shutdown"
++#define _PATH_POWEROFF		"@TERMUX_PREFIX@/bin/poweroff"
+ 
+ #define _PATH_TERMCOLORS_DIRNAME "terminal-colors.d"
+-#define _PATH_TERMCOLORS_DIR	"/etc/" _PATH_TERMCOLORS_DIRNAME
++#define _PATH_TERMCOLORS_DIR	"@TERMUX_PREFIX@/etc/" _PATH_TERMCOLORS_DIRNAME
+ 
+ /* login paths */
+-#define _PATH_PASSWD		"/etc/passwd"
+-#define _PATH_GSHADOW		"/etc/gshadow"
+-#define _PATH_GROUP		"/etc/group"
+-#define _PATH_SHADOW_PASSWD	"/etc/shadow"
+-#define _PATH_SHELLS		"/etc/shells"
++#define _PATH_PASSWD		"/system/etc/passwd"
++#define _PATH_GSHADOW		"/system/etc/gshadow"
++#define _PATH_GROUP		"/system/etc/group"
++#define _PATH_SHADOW_PASSWD	"/system/etc/shadow"
++#define _PATH_SHELLS		"@TERMUX_PREFIX@/etc/shells"
+ 
+ #ifndef _PATH_TMP
+-# define _PATH_TMP		"/tmp/"
++# define _PATH_TMP		"@TERMUX_PREFIX_CLASSICAL@/tmp/"
+ #endif
+ 
+ #ifndef _PATH_BTMP
+-# define _PATH_BTMP		"/var/log/btmp"
++# define _PATH_BTMP		"@TERMUX_PREFIX@/var/log/btmp"
+ #endif
+ 
+ #define _PATH_ISSUE_FILENAME	"issue"
+ #define _PATH_ISSUE_DIRNAME	_PATH_ISSUE_FILENAME ".d"
+ 
+-#define _PATH_ISSUE		"/etc/" _PATH_ISSUE_FILENAME
+-#define _PATH_ISSUEDIR		"/etc/" _PATH_ISSUE_DIRNAME
++#define _PATH_ISSUE		"@TERMUX_PREFIX@/etc/" _PATH_ISSUE_FILENAME
++#define _PATH_ISSUEDIR		"@TERMUX_PREFIX@/etc/" _PATH_ISSUE_DIRNAME
+ 
+-#define _PATH_OS_RELEASE_ETC	"/etc/os-release"
+-#define _PATH_OS_RELEASE_USR	"/usr/lib/os-release"
++#define _PATH_OS_RELEASE_ETC	"@TERMUX_PREFIX@/etc/os-release"
++#define _PATH_OS_RELEASE_USR	"@TERMUX_PREFIX@/lib/os-release"
+ #define _PATH_NUMLOCK_ON	_PATH_RUNSTATEDIR "/numlock-on"
+-#define _PATH_LOGINDEFS		"/etc/login.defs"
++#define _PATH_LOGINDEFS		"@TERMUX_PREFIX@/etc/login.defs"
+ 
+ #define _PATH_SD_UNITSLOAD	_PATH_RUNSTATEDIR "/systemd/systemd-units-load"
+ 
+ /* misc paths */
+-#define _PATH_WORDS             "/usr/share/dict/words"
+-#define _PATH_WORDS_ALT         "/usr/share/dict/web2"
++#define _PATH_WORDS             "@TERMUX_PREFIX@/share/dict/words"
++#define _PATH_WORDS_ALT         "@TERMUX_PREFIX@/share/dict/web2"
+ 
+ /* mount paths */
+-#define _PATH_FILESYSTEMS	"/etc/filesystems"
++#define _PATH_FILESYSTEMS	"@TERMUX_PREFIX@/etc/filesystems"
+ #define _PATH_PROC		"/proc"
+ #define _PATH_PROC_SWAPS	"/proc/swaps"
+ #define _PATH_PROC_FILESYSTEMS	"/proc/filesystems"
+@@ -101,8 +93,8 @@
+ #define _PATH_PROC_CDROMINFO	"/proc/sys/dev/cdrom/info"
+ 
+ /* unshare paths */
+-#define _PATH_SUBUID		"/etc/subuid"
+-#define _PATH_SUBGID		"/etc/subgid"
++#define _PATH_SUBUID		"@TERMUX_PREFIX@/etc/subuid"
++#define _PATH_SUBGID		"@TERMUX_PREFIX@/etc/subgid"
+ #define _PATH_PROC_UIDMAP	"/proc/self/uid_map"
+ #define _PATH_PROC_GIDMAP	"/proc/self/gid_map"
+ #define _PATH_PROC_SETGROUPS	"/proc/self/setgroups"
+@@ -129,7 +121,7 @@
+ # ifdef MOUNTED					/* deprecated */
+ #  define _PATH_MOUNTED		MOUNTED
+ # else
+-#  define _PATH_MOUNTED		"/etc/mtab"
++#  define _PATH_MOUNTED		"@TERMUX_PREFIX@/etc/mtab"
+ # endif
+ #endif
+ 
+@@ -137,7 +129,7 @@
+ # ifdef MNTTAB					/* deprecated */
+ #  define _PATH_MNTTAB		MNTTAB
+ # else
+-#  define _PATH_MNTTAB		"/etc/fstab"
++#  define _PATH_MNTTAB		"@TERMUX_PREFIX@/etc/fstab"
+ # endif
+ #endif
+ 
+@@ -148,26 +140,26 @@
+ # define _PATH_DEV		"/dev/"
+ #endif
+ 
+-#define _PATH_DEV_MAPPER	"/dev/mapper"
++#define _PATH_DEV_MAPPER	"/dev/block/mapper"
+ 
+ #define _PATH_DEV_MEM		"/dev/mem"
+ 
+-#define _PATH_DEV_LOOP		"/dev/loop"
++#define _PATH_DEV_LOOP		"/dev/block/loop"
+ #define _PATH_DEV_LOOPCTL	"/dev/loop-control"
+ 
+ /* udev paths */
+-#define _PATH_DEV_BYLABEL	"/dev/disk/by-label"
+-#define _PATH_DEV_BYUUID	"/dev/disk/by-uuid"
+-#define _PATH_DEV_BYID		"/dev/disk/by-id"
+-#define _PATH_DEV_BYPATH	"/dev/disk/by-path"
+-#define _PATH_DEV_BYPARTLABEL	"/dev/disk/by-partlabel"
+-#define _PATH_DEV_BYPARTUUID	"/dev/disk/by-partuuid"
++#define _PATH_DEV_BYLABEL	"/dev/block/by-label"
++#define _PATH_DEV_BYUUID	"/dev/block/by-uuid"
++#define _PATH_DEV_BYID		"/dev/block/by-id"
++#define _PATH_DEV_BYPATH	"/dev/block/by-path"
++#define _PATH_DEV_BYPARTLABEL	"/dev/block/by-partlabel"
++#define _PATH_DEV_BYPARTUUID	"/dev/block/by-partuuid"
+ 
+ /* hwclock paths */
+ #ifdef CONFIG_ADJTIME_PATH
+ # define _PATH_ADJTIME		CONFIG_ADJTIME_PATH
+ #else
+-# define _PATH_ADJTIME		"/etc/adjtime"
++# define _PATH_ADJTIME		"@TERMUX_PREFIX@/etc/adjtime"
+ #endif
+ 
+ #ifdef __ia64__
+diff --git a/lib/exec_shell.c b/lib/exec_shell.c
+index 6fef6c7..952f8fc 100644
+--- a/lib/exec_shell.c
++++ b/lib/exec_shell.c
+@@ -28,7 +28,7 @@
+ 
+ #include "exec_shell.h"
+ 
+-#define DEFAULT_SHELL "/bin/sh"
++#define DEFAULT_SHELL "@TERMUX_PREFIX@/bin/sh"
+ 
+ void __attribute__((__noreturn__)) exec_shell(void)
+ {
+diff --git a/lib/ismounted.c b/lib/ismounted.c
+index 31be71a..1160491 100644
+--- a/lib/ismounted.c
++++ b/lib/ismounted.c
+@@ -182,7 +182,7 @@ static int check_mntent(const char *file, int *mount_flags,
+ 	int	retval;
+ 
+ #ifdef DEBUG
+-	retval = check_mntent_file("/tmp/mtab", file, mount_flags,
++	retval = check_mntent_file("@TERMUX_PREFIX_CLASSICAL@/tmp/mtab", file, mount_flags,
+ 				   mtpt, mtlen);
+ 	if (retval == 0)
+ 		return 0;
+diff --git a/lib/logindefs.c b/lib/logindefs.c
+index 9563122..ed34dc9 100644
+--- a/lib/logindefs.c
++++ b/lib/logindefs.c
+@@ -260,7 +260,7 @@ static void load_defaults(void)
+ #else
+ 			NULL,
+ #endif
+-			"/etc", "login", "defs", "= \t", "#");
++			"@TERMUX_PREFIX@/etc", "login", "defs", "= \t", "#");
+ 
+ 	if (error)
+ 	  syslog(LOG_NOTICE, _("Error reading login.defs: %s"),
+@@ -293,7 +293,7 @@ void logindefs_load_file(const char *filename)
+ 	free (path);
+ #endif
+ 
+-	xasprintf(&path, "/etc/%s", filename);
++	xasprintf(&path, "@TERMUX_PREFIX@/etc/%s", filename);
+ 
+ 	if (!econf_readFile(&file_l, path, "= \t", "#")) {
+ 	        if (file == NULL)
+diff --git a/lib/loopdev.c b/lib/loopdev.c
+index dd9ead3..c7e0aec 100644
+--- a/lib/loopdev.c
++++ b/lib/loopdev.c
+@@ -126,13 +126,13 @@ int loopcxt_set_device(struct loopdev_cxt *lc, const char *device)
+ 	/* set new */
+ 	if (device) {
+ 		if (*device != '/') {
+-			const char *dir = _PATH_DEV;
++			const char *dir = _PATH_DEV "block/";
+ 
+ 			/* compose device name for /dev/loop<n> or /dev/loop/<n> */
+ 			if (lc->flags & LOOPDEV_FL_DEVSUBDIR) {
+-				if (strlen(device) < 5)
++				if (strlen(device) < 11)
+ 					return -1;
+-				device += 4;
++				device += 10;
+ 				dir = _PATH_DEV_LOOP "/";	/* _PATH_DEV uses tailing slash */
+ 			}
+ 			snprintf(lc->device, sizeof(lc->device), "%s%s",
+diff --git a/libblkid/src/blkidP.h b/libblkid/src/blkidP.h
+index 007cc35..4e7dc96 100644
+--- a/libblkid/src/blkidP.h
++++ b/libblkid/src/blkidP.h
+@@ -304,15 +304,15 @@ struct blkid_struct_cache
+ #define BLKID_BIC_FL_CHANGED	0x0004	/* Cache has changed from disk */
+ 
+ /* config file */
+-#define BLKID_CONFIG_FILE	"/etc/blkid.conf"
++#define BLKID_CONFIG_FILE	"@TERMUX_PREFIX@/etc/blkid.conf"
+ 
+ /* cache file on systemds with /run */
+-#define BLKID_RUNTIME_TOPDIR	"/run"
++#define BLKID_RUNTIME_TOPDIR	"@TERMUX_PREFIX@/run"
+ #define BLKID_RUNTIME_DIR	BLKID_RUNTIME_TOPDIR "/blkid"
+ #define BLKID_CACHE_FILE	BLKID_RUNTIME_DIR "/blkid.tab"
+ 
+ /* old systems */
+-#define BLKID_CACHE_FILE_OLD	"/etc/blkid.tab"
++#define BLKID_CACHE_FILE_OLD	"@TERMUX_PREFIX@/etc/blkid.tab"
+ 
+ #define BLKID_ERR_IO	 5
+ #define BLKID_ERR_SYSFS	 9
+diff --git a/libblkid/src/fuzz.c b/libblkid/src/fuzz.c
+index 772340b..04f673d 100644
+--- a/libblkid/src/fuzz.c
++++ b/libblkid/src/fuzz.c
+@@ -21,7 +21,7 @@ static int process_file(const char *name)
+ 
+ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+     int fd;
+-    char name[] = "/tmp/test-script-fuzz.XXXXXX";
++    char name[] = "@TERMUX_PREFIX_CLASSICAL@/tmp/test-script-fuzz.XXXXXX";
+ 
+     fd = mkostemp(name, O_RDWR|O_CREAT|O_EXCL|O_CLOEXEC);
+     if (fd == -1)
+diff --git a/libfdisk/src/script.c b/libfdisk/src/script.c
+index f537a7d..0c99cf0 100644
+--- a/libfdisk/src/script.c
++++ b/libfdisk/src/script.c
+@@ -1636,7 +1636,7 @@ int fdisk_apply_script(struct fdisk_context *cxt, struct fdisk_script *dp)
+ 
+ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+ {
+-	char name[] = "/tmp/test-script-fuzz.XXXXXX";
++	char name[] = "@TERMUX_PREFIX_CLASSICAL@/tmp/test-script-fuzz.XXXXXX";
+ 	int fd;
+ 	struct fdisk_script *dp;
+ 	struct fdisk_context *cxt;
+diff --git a/libmount/python/tab.c b/libmount/python/tab.c
+index 000bc13..f26aaff 100644
+--- a/libmount/python/tab.c
++++ b/libmount/python/tab.c
+@@ -332,7 +332,7 @@ static PyObject *Table_is_fs_mounted(TableObject *self, PyObject *args, PyObject
+ }
+ 
+ #define Table_parse_file_HELP "parse_file(file)\n\n" \
+-		"Parses whole table (e.g. /etc/mtab) and appends new records to the tab.\n" \
++		"Parses whole table (e.g. @TERMUX_PREFIX@/etc/mtab) and appends new records to the tab.\n" \
+ 		"\n" \
+ 		"The libmount parser ignores broken (syntax error) lines, these lines are\n" \
+ 		"reported to caller by errcb() function (see Tab.parser_errcb).\n" \
+@@ -352,7 +352,7 @@ static PyObject *Table_parse_file(TableObject *self, PyObject* args, PyObject *k
+ }
+ 
+ #define Table_parse_fstab_HELP "parse_fstab([fstab])\n\n" \
+-		"This function parses /etc/fstab and appends new lines to the tab. If the\n" \
++		"This function parses @TERMUX_PREFIX@/etc/fstab and appends new lines to the tab. If the\n" \
+ 		"filename is a directory then Tab.parse_dir() is called.\n" \
+ 		"\n" \
+ 		"See also Tab.parser_errcb.\n" \
+@@ -373,7 +373,7 @@ static PyObject *Table_parse_fstab(TableObject *self, PyObject* args, PyObject *
+ }
+ 
+ #define Table_parse_mtab_HELP "parse_mtab([mtab])\n\n" \
+-		"This function parses /etc/mtab or /proc/self/mountinfo\n" \
++		"This function parses @TERMUX_PREFIX@/etc/mtab or /proc/self/mountinfo\n" \
+ 		"/run/mount/utabs or /proc/mounts.\n" \
+ 		"\n" \
+ 		"See also Tab.parser_errcb().\n" \
+diff --git a/libmount/src/mountP.h b/libmount/src/mountP.h
+index 339e276..d2ee5f9 100644
+--- a/libmount/src/mountP.h
++++ b/libmount/src/mountP.h
+@@ -77,7 +77,7 @@ UL_DEBUG_DECLARE_MASK(libmount);
+ #define MNT_MNTTABDIR_EXT	".fstab"
+ 
+ /* library private paths */
+-#define MNT_RUNTIME_TOPDIR	"/run"
++#define MNT_RUNTIME_TOPDIR	"@TERMUX_PREFIX@/run"
+ /* private userspace mount table */
+ #define MNT_PATH_UTAB		MNT_RUNTIME_TOPDIR "/mount/utab"
+ /* temporary mount target */
+diff --git a/login-utils/last.c b/login-utils/last.c
+index 37c6abe..ddbf35a 100644
+--- a/login-utils/last.c
++++ b/login-utils/last.c
+@@ -925,7 +925,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+ 			.tv_usec = 816074
+ 		}
+ 	};
+-	char name[] = "/tmp/test-last-fuzz.XXXXXX";
++	char name[] = "@TERMUX_PREFIX_CLASSICAL@/tmp/test-last-fuzz.XXXXXX";
+ 	int fd;
+ 
+ 	fd = mkstemp_cloexec(name);
+diff --git a/login-utils/login.c b/login-utils/login.c
+index 74bdf38..437c240 100644
+--- a/login-utils/login.c
++++ b/login-utils/login.c
+@@ -1516,7 +1516,7 @@ int main(int argc, char **argv)
+ 		char *buff;
+ 
+ 		xasprintf(&buff, "exec %s", pwd->pw_shell);
+-		child_argv[child_argc++] = "/bin/sh";
++		child_argv[child_argc++] = "@TERMUX_PREFIX@/bin/sh";
+ 		child_argv[child_argc++] = "-sh";
+ 		child_argv[child_argc++] = "-c";
+ 		child_argv[child_argc++] = buff;
+@@ -1538,7 +1538,7 @@ int main(int argc, char **argv)
+ 
+ 	execvp(child_argv[0], child_argv + 1);
+ 
+-	if (!strcmp(child_argv[0], "/bin/sh"))
++	if (!strcmp(child_argv[0], "@TERMUX_PREFIX@/bin/sh"))
+ 		warn(_("couldn't exec shell script"));
+ 	else
+ 		warn(_("no shell"));
+diff --git a/login-utils/lslogins.c b/login-utils/lslogins.c
+index 76d2812..3d84e8c 100644
+--- a/login-utils/lslogins.c
++++ b/login-utils/lslogins.c
+@@ -1446,7 +1446,7 @@ static void __attribute__((__noreturn__)) usage(void)
+ 
+ 	fputs(USAGE_OPTIONS, out);
+ 	fputs(_(" -a, --acc-expiration     display info about passwords expiration\n"), out);
+-	fputs(_(" -c, --colon-separate     display data in a format similar to /etc/passwd\n"), out);
++	fputs(_(" -c, --colon-separate     display data in a format similar to /system/etc/passwd\n"), out);
+ 	fputs(_(" -e, --export             display in an export-able output format\n"), out);
+ 	fputs(_(" -f, --failed             display data about the users' last failed logins\n"), out);
+ 	fputs(_(" -G, --supp-groups        display information about groups\n"), out);
+diff --git a/login-utils/setpwnam.c b/login-utils/setpwnam.c
+index 3e3c1ab..ff3076d 100644
+--- a/login-utils/setpwnam.c
++++ b/login-utils/setpwnam.c
+@@ -84,7 +84,7 @@ int setpwnam(struct passwd *pwd, const char *prefix)
+ 
+ 	pw_init();
+ 
+-	if ((fp = xfmkstemp(&tmpname, "/etc", prefix)) == NULL)
++	if ((fp = xfmkstemp(&tmpname, "@TERMUX_PREFIX@/etc", prefix)) == NULL)
+ 		return -1;
+ 
+ 	/* ptmp should be owned by root.root or root.wheel */
+diff --git a/login-utils/setpwnam.h b/login-utils/setpwnam.h
+index 9578592..883d4b7 100644
+--- a/login-utils/setpwnam.h
++++ b/login-utils/setpwnam.h
+@@ -22,10 +22,10 @@
+ # define SHADOW_FILE	_PATH_SHADOW_PASSWD
+ # define SGROUP_FILE	_PATH_GSHADOW
+ #else
+-# define PASSWD_FILE	"/tmp/passwd"
+-# define GROUP_FILE	"/tmp/group"
+-# define SHADOW_FILE	"/tmp/shadow"
+-# define SGROUP_FILE	"/tmp/gshadow"
++# define PASSWD_FILE	"@TERMUX_PREFIX_CLASSICAL@/tmp/passwd"
++# define GROUP_FILE	"@TERMUX_PREFIX_CLASSICAL@/tmp/group"
++# define SHADOW_FILE	"@TERMUX_PREFIX_CLASSICAL@/tmp/shadow"
++# define SGROUP_FILE	"@TERMUX_PREFIX_CLASSICAL@/tmp/gshadow"
+ #endif
+ 
+ extern int setpwnam (struct passwd *pwd, const char *prefix);
+diff --git a/login-utils/su-common.c b/login-utils/su-common.c
+index b674920..d0c1472 100644
+--- a/login-utils/su-common.c
++++ b/login-utils/su-common.c
+@@ -99,8 +99,8 @@ UL_DEBUG_DEFINE_MASKNAMES(su) = UL_DEBUG_EMPTY_MASKNAMES;
+ #define _PATH_LOGINDEFS_SU	"default/su"
+ #define _PATH_LOGINDEFS_RUNUSER "default/runuser"
+ #else
+-#define _PATH_LOGINDEFS_SU	"/etc/default/su"
+-#define _PATH_LOGINDEFS_RUNUSER "/etc/default/runuser"
++#define _PATH_LOGINDEFS_SU	"@TERMUX_PREFIX@/etc/default/su"
++#define _PATH_LOGINDEFS_RUNUSER "@TERMUX_PREFIX@/etc/default/runuser"
+ #endif
+ 
+ #define is_pam_failure(_rc)	((_rc) != PAM_SUCCESS)
+@@ -874,9 +874,9 @@ static bool is_restricted_shell(const char *shell)
+ 		return false;
+ 	}
+ #ifdef USE_VENDORDIR
+-	DBG(MISC, ul_debug("%s is restricted shell (not in e.g. vendor shells file, /etc/shells, ...)", shell));
++	DBG(MISC, ul_debug("%s is restricted shell (not in e.g. vendor shells file, @TERMUX_PREFIX@/etc/shells, ...)", shell));
+ #else
+-	DBG(MISC, ul_debug("%s is restricted shell (not in /etc/shells)", shell));
++	DBG(MISC, ul_debug("%s is restricted shell (not in @TERMUX_PREFIX@/etc/shells)", shell));
+ #endif
+ 	return true;
+ }
+@@ -896,7 +896,7 @@ static void usage_common(void)
+ 	fputs(_(" --session-command <command>     pass a single command to the shell with -c\n"
+ 	        "                                   and do not create a new session\n"), stdout);
+ 	fputs(_(" -f, --fast                      pass -f to the shell (for csh or tcsh)\n"), stdout);
+-	fputs(_(" -s, --shell <shell>             run <shell> if /etc/shells allows it\n"), stdout);
++	fputs(_(" -s, --shell <shell>             run <shell> if @TERMUX_PREFIX@/etc/shells allows it\n"), stdout);
+ 	fputs(_(" -P, --pty                       create a new pseudo-terminal\n"), stdout);
+ 
+ 	fputs(USAGE_SEPARATOR, stdout);
+diff --git a/login-utils/sulogin.c b/login-utils/sulogin.c
+index 45a558d..308e853 100644
+--- a/login-utils/sulogin.c
++++ b/login-utils/sulogin.c
+@@ -813,7 +813,7 @@ static void sushell(struct passwd *pwd)
+ 		if (pwd->pw_shell[0])
+ 			su_shell = pwd->pw_shell;
+ 		else
+-			su_shell = "/bin/sh";
++			su_shell = "@TERMUX_PREFIX@/bin/sh";
+ 	}
+ 	if ((p = strrchr(su_shell, '/')) == NULL)
+ 		p = su_shell;
+@@ -863,9 +863,9 @@ static void sushell(struct passwd *pwd)
+ 	execl(su_shell, shell, (char *)NULL);
+ 	warn(_("failed to execute %s"), su_shell);
+ 
+-	xsetenv("SHELL", "/bin/sh", 1);
+-	execl("/bin/sh", profile ? "-sh" : "sh", (char *)NULL);
+-	warn(_("failed to execute %s"), "/bin/sh");
++	xsetenv("SHELL", "@TERMUX_PREFIX@/bin/sh", 1);
++	execl("@TERMUX_PREFIX@/bin/sh", profile ? "-sh" : "sh", (char *)NULL);
++	warn(_("failed to execute %s"), "@TERMUX_PREFIX@/bin/sh");
+ }
+ 
+ static void usage(void)
+diff --git a/login-utils/vipw.c b/login-utils/vipw.c
+index 5049706..958e044 100644
+--- a/login-utils/vipw.c
++++ b/login-utils/vipw.c
+@@ -127,7 +127,7 @@ static FILE * pw_tmpfile(int lockfd)
+ 	char *tmpname = NULL;
+ 	int res;
+ 
+-	if ((fd = xfmkstemp(&tmpname, "/etc", ".vipw")) == NULL) {
++	if ((fd = xfmkstemp(&tmpname, "@TERMUX_PREFIX@/etc", ".vipw")) == NULL) {
+ 		ulckpwdf();
+ 		err(EXIT_FAILURE, _("can't open temporary file"));
+ 	}
+diff --git a/misc-utils/whereis.c b/misc-utils/whereis.c
+index d21b434..108bd15 100644
+--- a/misc-utils/whereis.c
++++ b/misc-utils/whereis.c
+@@ -101,84 +101,18 @@ struct wh_dirlist {
+ };
+ 
+ static const char *bindirs[] = {
+-	"/usr/bin",
+-	"/usr/sbin",
+-	"/bin",
+-	"/sbin",
+-#if defined(MULTIARCHTRIPLET)
+-	"/lib/" MULTIARCHTRIPLET,
+-	"/usr/lib/" MULTIARCHTRIPLET,
+-	"/usr/local/lib/" MULTIARCHTRIPLET,
+-#endif
+-	"/usr/lib",
+-	"/usr/lib32",
+-	"/usr/lib64",
+-	"/etc",
+-	"/usr/etc",
+-	"/lib",
+-	"/lib32",
+-	"/lib64",
+-	"/usr/games",
+-	"/usr/games/bin",
+-	"/usr/games/lib",
+-	"/usr/emacs/etc",
+-	"/usr/lib/emacs/*/etc",
+-	"/usr/TeX/bin",
+-	"/usr/tex/bin",
+-	"/usr/interviews/bin/LINUX",
+-
+-	"/usr/X11R6/bin",
+-	"/usr/X386/bin",
+-	"/usr/bin/X11",
+-	"/usr/X11/bin",
+-	"/usr/X11R5/bin",
+-
+-	"/usr/local/bin",
+-	"/usr/local/sbin",
+-	"/usr/local/etc",
+-	"/usr/local/lib",
+-	"/usr/local/games",
+-	"/usr/local/games/bin",
+-	"/usr/local/emacs/etc",
+-	"/usr/local/TeX/bin",
+-	"/usr/local/tex/bin",
+-	"/usr/local/bin/X11",
+-
+-	"/usr/contrib",
+-	"/usr/hosts",
+-	"/usr/include",
+-
+-	"/usr/g++-include",
+-
+-	"/usr/ucb",
+-	"/usr/old",
+-	"/usr/new",
+-	"/usr/local",
+-	"/usr/libexec",
+-	"/usr/share",
+-
+-	"/opt/*/bin",
++	"@TERMUX_PREFIX@/bin",
+ 	NULL
+ };
+ 
+ static const char *mandirs[] = {
+-	"/usr/man/*",
+-	"/usr/share/man/*",
+-	"/usr/X386/man/*",
+-	"/usr/X11/man/*",
+-	"/usr/TeX/man/*",
+-	"/usr/interviews/man/mann",
+-	"/usr/share/info",
++	"@TERMUX_PREFIX@/man/*",
++	"@TERMUX_PREFIX@/share/info",
+ 	NULL
+ };
+ 
+ static const char *srcdirs[] = {
+-	"/usr/src/*",
+-	"/usr/src/lib/libc/*",
+-	"/usr/src/lib/libc/net/*",
+-	"/usr/src/ucb/pascal",
+-	"/usr/src/ucb/pascal/utilities",
+-	"/usr/src/undoc",
++	"@TERMUX_PREFIX@/src/*",
+ 	NULL
+ };
+ 
+diff --git a/sys-utils/eject.c b/sys-utils/eject.c
+index 6037ddc..b42c189 100644
+--- a/sys-utils/eject.c
++++ b/sys-utils/eject.c
+@@ -152,7 +152,7 @@ static void __attribute__((__noreturn__)) usage(void)
+ 		" -m, --no-unmount            do not unmount device even if it is mounted\n"
+ 		" -M, --no-partitions-unmount do not unmount another partitions\n"
+ 		" -n, --noop                  don't eject, just show device found\n"
+-		" -p, --proc                  use /proc/mounts instead of /etc/mtab\n"
++		" -p, --proc                  use /proc/mounts instead of @TERMUX_PREFIX@/etc/mtab\n"
+ 		" -q, --tape                  eject tape\n"
+ 		" -r, --cdrom                 eject CD-ROM\n"
+ 		" -s, --scsi                  eject SCSI device\n"
+@@ -661,11 +661,11 @@ static void umount_one(const struct eject_control *ctl, const char *name)
+ 		if (drop_permissions() != 0)
+ 			err(EXIT_FAILURE, _("drop permissions failed"));
+ 		if (ctl->p_option)
+-			execl("/bin/umount", "/bin/umount", name, "-n", (char *)NULL);
++			execl("@TERMUX_PREFIX@/bin/umount", "@TERMUX_PREFIX@/bin/umount", name, "-n", (char *)NULL);
+ 		else
+-			execl("/bin/umount", "/bin/umount", name, (char *)NULL);
++			execl("@TERMUX_PREFIX@/bin/umount", "@TERMUX_PREFIX@/bin/umount", name, (char *)NULL);
+ 
+-		errexec("/bin/umount");
++		errexec("@TERMUX_PREFIX@/bin/umount");
+ 
+ 	case -1:
+ 		warn( _("unable to fork"));
+diff --git a/sys-utils/fstrim.c b/sys-utils/fstrim.c
+index 96b7d2d..a97977d 100644
+--- a/sys-utils/fstrim.c
++++ b/sys-utils/fstrim.c
+@@ -294,7 +294,7 @@ static int fstrim_all_from_file(struct fstrim_control *ctl, const char *filename
+ 		return -1;
+ 	}
+ 
+-	if (streq_paths(filename, "/etc/fstab"))
++	if (streq_paths(filename, "@TERMUX_PREFIX@/etc/fstab"))
+ 		fstab = 1;
+ 
+ 	/* de-duplicate by mountpoints */
+@@ -458,7 +458,7 @@ static void __attribute__((__noreturn__)) usage(void)
+ 
+ 	fputs(USAGE_OPTIONS, out);
+ 	fputs(_(" -a, --all                trim mounted filesystems\n"), out);
+-	fputs(_(" -A, --fstab              trim filesystems from /etc/fstab\n"), out);
++	fputs(_(" -A, --fstab              trim filesystems from @TERMUX_PREFIX@/etc/fstab\n"), out);
+ 	fputs(_(" -I, --listed-in <list>   trim filesystems listed in specified files\n"), out);
+ 	fputs(_(" -o, --offset <num>       the offset in bytes to start discarding from\n"), out);
+ 	fputs(_(" -l, --length <num>       the number of bytes to discard\n"), out);
+diff --git a/sys-utils/mount.c b/sys-utils/mount.c
+index dba6fca..fc65790 100644
+--- a/sys-utils/mount.c
++++ b/sys-utils/mount.c
+@@ -498,11 +498,11 @@ static void __attribute__((__noreturn__)) usage(void)
+ 	fputs(_(" -c, --no-canonicalize   don't canonicalize paths\n"), out);
+ 	fputs(_(" -f, --fake              dry run; skip the mount(2) syscall\n"), out);
+ 	fputs(_(" -F, --fork              fork off for each device (use with -a)\n"), out);
+-	fputs(_(" -T, --fstab <path>      alternative file to /etc/fstab\n"), out);
++	fputs(_(" -T, --fstab <path>      alternative file to @TERMUX_PREFIX@/etc/fstab\n"), out);
+ 	fputs(_(" -i, --internal-only     don't call the mount.<type> helpers\n"), out);
+ 	fputs(_(" -l, --show-labels       show also filesystem labels\n"), out);
+ 	fputs(_(" -m, --mkdir[=<mode>]    alias to '-o X-mount.mkdir[=<mode>]'\n"), out);
+-	fputs(_(" -n, --no-mtab           don't write to /etc/mtab\n"), out);
++	fputs(_(" -n, --no-mtab           don't write to @TERMUX_PREFIX@/etc/mtab\n"), out);
+ 	fputs(_("     --options-mode <mode>\n"
+ 		"                         what to do with options loaded from fstab\n"), out);
+ 	fputs(_("     --options-source <source>\n"
+diff --git a/sys-utils/setarch.c b/sys-utils/setarch.c
+index 1a255e4..2f0e6be 100644
+--- a/sys-utils/setarch.c
++++ b/sys-utils/setarch.c
+@@ -471,7 +471,7 @@ int main(int argc, char *argv[])
+ 		/* Don't use ifdef sparc here, we get "Unrecognized architecture"
+ 		 * error message later if necessary */
+ 		if (strcmp(arch, "sparc32bash") == 0) {
+-			shell = "/bin/bash";
++			shell = "@TERMUX_PREFIX@/bin/bash";
+ 			shell_arg = "";
+ 			goto set_arch;
+ 		}
+@@ -594,7 +594,7 @@ set_arch:
+ 		verify_arch_domain(doms, target, arch);
+ 
+ 	if (!argc) {
+-		shell = "/bin/sh";
++		shell = "@TERMUX_PREFIX@/bin/sh";
+ 		shell_arg = "-sh";
+ 	}
+ 	if (verbose) {
+diff --git a/sys-utils/setpriv.c b/sys-utils/setpriv.c
+index ddc2cc6..34cd0d9 100644
+--- a/sys-utils/setpriv.c
++++ b/sys-utils/setpriv.c
+@@ -52,7 +52,7 @@
+ #define SETPRIV_EXIT_PRIVERR 127	/* how we exit when we fail to set privs */
+ 
+ /* The shell to set SHELL env.variable if none is given in the user's passwd entry.  */
+-#define DEFAULT_SHELL "/bin/sh"
++#define DEFAULT_SHELL "@TERMUX_PREFIX@/bin/sh"
+ 
+ static gid_t get_group(const char *s, const char *err);
+ 
+diff --git a/sys-utils/swapon.c b/sys-utils/swapon.c
+index 8735549..54955b8 100644
+--- a/sys-utils/swapon.c
++++ b/sys-utils/swapon.c
+@@ -810,14 +810,14 @@ static void __attribute__((__noreturn__)) usage(void)
+ 	fputs(_("Enable devices and files for paging and swapping.\n"), out);
+ 
+ 	fputs(USAGE_OPTIONS, out);
+-	fputs(_(" -a, --all                enable all swaps from /etc/fstab\n"), out);
++	fputs(_(" -a, --all                enable all swaps from @TERMUX_PREFIX@/etc/fstab\n"), out);
+ 	fputs(_(" -d, --discard[=<policy>] enable swap discards, if supported by device\n"), out);
+ 	fputs(_(" -e, --ifexists           silently skip devices that do not exist\n"), out);
+ 	fputs(_(" -f, --fixpgsz            reinitialize the swap space if necessary\n"), out);
+ 	fputs(_(" -o, --options <list>     comma-separated list of swap options\n"), out);
+ 	fputs(_(" -p, --priority <prio>    specify the priority of the swap device\n"), out);
+ 	fputs(_(" -s, --summary            display summary about used swap devices (DEPRECATED)\n"), out);
+-	fputs(_(" -T, --fstab <path>       alternative file to /etc/fstab\n"), out);
++	fputs(_(" -T, --fstab <path>       alternative file to @TERMUX_PREFIX@/etc/fstab\n"), out);
+ 	fputs(_("     --show[=<columns>]   display summary in definable table\n"), out);
+ 	fputs(_("     --noheadings         don't print table heading (with --show)\n"), out);
+ 	fputs(_("     --raw                use the raw output format (with --show)\n"), out);
+diff --git a/sys-utils/umount.c b/sys-utils/umount.c
+index e579fb7..84d208e 100644
+--- a/sys-utils/umount.c
++++ b/sys-utils/umount.c
+@@ -96,7 +96,7 @@ static void __attribute__((__noreturn__)) usage(void)
+ 	fputs(_("     --fake              dry run; skip the umount(2) syscall\n"), out);
+ 	fputs(_(" -f, --force             force unmount (in case of an unreachable NFS system)\n"), out);
+ 	fputs(_(" -i, --internal-only     don't call the umount.<type> helpers\n"), out);
+-	fputs(_(" -n, --no-mtab           don't write to /etc/mtab\n"), out);
++	fputs(_(" -n, --no-mtab           don't write to @TERMUX_PREFIX@/etc/mtab\n"), out);
+ 	fputs(_(" -l, --lazy              detach the filesystem now, clean up things later\n"), out);
+ 	fputs(_(" -O, --test-opts <list>  limit the set of filesystems (use with -a)\n"), out);
+ 	fputs(_(" -R, --recursive         recursively unmount a target with all its children\n"), out);
+diff --git a/tests/helpers/test_mkfds.c b/tests/helpers/test_mkfds.c
+index 194c175..772f748 100644
+--- a/tests/helpers/test_mkfds.c
++++ b/tests/helpers/test_mkfds.c
+@@ -75,7 +75,7 @@ static void __attribute__((__noreturn__)) usage(FILE *out, int status)
+ 
+ 	fputs("\n", out);
+ 	fputs("Examples:\n", out);
+-	fprintf(out, "Using 3, open /etc/group:\n\n	$ %s ro-regular-file 3 file=/etc/group\n\n",
++	fprintf(out, "Using 3, open /system/etc/group:\n\n	$ %s ro-regular-file 3 file=/system/etc/group\n\n",
+ 		program_invocation_short_name);
+ 	fprintf(out, "Using 3 and 4, make a pipe:\n\n	$ %s pipe-no-fork 3 4\n\n",
+ 		program_invocation_short_name);
+@@ -1901,7 +1901,7 @@ static const struct factory factories[] = {
+ 				.name = "file",
+ 				.type = PTYPE_STRING,
+ 				.desc = "file to be opened",
+-				.defv.string = "/etc/passwd",
++				.defv.string = "/system/etc/passwd",
+ 			},
+ 			{
+ 				.name = "offset",
+@@ -2095,7 +2095,7 @@ static const struct factory factories[] = {
+ 				.name = "path",
+ 				.type = PTYPE_STRING,
+ 				.desc = "path for listening-socket bound to",
+-				.defv.string = "/tmp/test_mkfds-unix-stream",
++				.defv.string = "@TERMUX_PREFIX_CLASSICAL@/tmp/test_mkfds-unix-stream",
+ 			},
+ 			{
+ 				.name = "backlog",
+@@ -2142,7 +2142,7 @@ static const struct factory factories[] = {
+ 				.name = "path",
+ 				.type = PTYPE_STRING,
+ 				.desc = "path for unix non-stream bound to",
+-				.defv.string = "/tmp/test_mkfds-unix-dgram",
++				.defv.string = "@TERMUX_PREFIX_CLASSICAL@/tmp/test_mkfds-unix-dgram",
+ 			},
+ 			{
+ 				.name = "abstract",
+@@ -2171,7 +2171,7 @@ static const struct factory factories[] = {
+ 				.name = "path",
+ 				.type = PTYPE_STRING,
+ 				.desc = "path for unix non-stream bound to",
+-				.defv.string = "/tmp/test_mkfds-unix-in-netns",
++				.defv.string = "@TERMUX_PREFIX_CLASSICAL@/tmp/test_mkfds-unix-in-netns",
+ 			},
+ 			{
+ 				.name = "abstract",
+diff --git a/text-utils/pg.c b/text-utils/pg.c
+index adb3840..6ba0231 100644
+--- a/text-utils/pg.c
++++ b/text-utils/pg.c
+@@ -1364,7 +1364,7 @@ static void pgfile(FILE *f, const char *name)
+ 					{
+ 						const char *sh = getenv("SHELL");
+ 						if (!sh)
+-							sh = "/bin/sh";
++							sh = "@TERMUX_PREFIX@/bin/sh";
+ 						if (!nobuf)
+ 							fclose(fbuf);
+ 						fclose(find);
