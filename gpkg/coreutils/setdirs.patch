@@ -1,0 +1,221 @@
+diff --git a/gnulib-tests/test-freadptr.c b/gnulib-tests/test-freadptr.c
+index 6ffbba4..0372b9a 100644
+--- a/gnulib-tests/test-freadptr.c
++++ b/gnulib-tests/test-freadptr.c
+@@ -47,7 +47,7 @@ main (int argc, char **argv)
+     {
+       /* Normal buffered stdio.  */
+       const char stdin_contents[] =
+-        "#!/bin/sh\n\n${CHECKER} ./test-freadptr${EXEEXT} 5 < \"$srcdir/test-freadptr.sh\" || exit 1\ncat \"$srcdir/test-freadptr.sh\" | ${CHECKER} ./test-freadptr${EXEEXT} 5 || exit 1\nexit 0\n";
++        "#!@TERMUX_PREFIX@/bin/sh\n\n${CHECKER} ./test-freadptr${EXEEXT} 5 < \"$srcdir/test-freadptr.sh\" || exit 1\ncat \"$srcdir/test-freadptr.sh\" | ${CHECKER} ./test-freadptr${EXEEXT} 5 || exit 1\nexit 0\n";
+       const char *expected = stdin_contents + nbytes;
+       size_t available1;
+       size_t available2;
+diff --git a/gnulib-tests/test-freadseek.c b/gnulib-tests/test-freadseek.c
+index 69e203e..bf4910e 100644
+--- a/gnulib-tests/test-freadseek.c
++++ b/gnulib-tests/test-freadseek.c
+@@ -31,7 +31,7 @@ int
+ main (int argc, char **argv)
+ {
+   static const char stdin_contents[] =
+-    "#!/bin/sh\n\n${CHECKER} ./test-freadseek${EXEEXT} 5 19 6 7 18 9 19 < \"$srcdir/test-freadseek.sh\" || exit 1\ncat \"$srcdir/test-freadseek.sh\" | ${CHECKER} ./test-freadseek${EXEEXT} 5 19 6 7 18 9 19 || exit 1\nexit 0\n";
++    "#!@TERMUX_PREFIX@/bin/sh\n\n${CHECKER} ./test-freadseek${EXEEXT} 5 19 6 7 18 9 19 < \"$srcdir/test-freadseek.sh\" || exit 1\ncat \"$srcdir/test-freadseek.sh\" | ${CHECKER} ./test-freadseek${EXEEXT} 5 19 6 7 18 9 19 || exit 1\nexit 0\n";
+   int nbytes1 = atoi (argv[1]);
+   int nbytes2 = atoi (argv[2]);
+   int nbytes3 = atoi (argv[3]);
+diff --git a/gnulib-tests/test-read-file.c b/gnulib-tests/test-read-file.c
+index fa7e31d..a2a5363 100644
+--- a/gnulib-tests/test-read-file.c
++++ b/gnulib-tests/test-read-file.c
+@@ -25,7 +25,7 @@
+ 
+ #include "macros.h"
+ 
+-#define FILE1 "/etc/resolv.conf"
++#define FILE1 "@TERMUX_PREFIX@/etc/resolv.conf"
+ #define FILE2 "/dev/null"
+ 
+ static int
+diff --git a/lib/getusershell.c b/lib/getusershell.c
+index 1d6d9ce..ef606a2 100644
+--- a/lib/getusershell.c
++++ b/lib/getusershell.c
+@@ -26,7 +26,7 @@
+ #ifndef SHELLS_FILE
+ # ifndef __DJGPP__
+ /* File containing a list of nonrestricted shells, one per line. */
+-#  define SHELLS_FILE "/etc/shells"
++#  define SHELLS_FILE "@TERMUX_PREFIX@/etc/shells"
+ # else
+ /* This is a horrible kludge.  Isn't there a better way?  */
+ #  define SHELLS_FILE "/dev/env/DJDIR/etc/shells"
+@@ -56,7 +56,7 @@ static idx_t readname (char **, idx_t *, FILE *);
+ static char const* const default_shells[] =
+ {
+   ADDITIONAL_DEFAULT_SHELLS
+-  "/bin/sh", "/bin/csh", "/usr/bin/sh", "/usr/bin/csh", NULL
++  "@TERMUX_PREFIX@/bin/bash", "@TERMUX_PREFIX@/bin/sh", "@TERMUX_PREFIX@/bin/csh", NULL
+ };
+ 
+ /* Index of the next shell in 'default_shells' to return.
+diff --git a/lib/mountlist.c b/lib/mountlist.c
+index 8b06e7b..b713ac5 100644
+--- a/lib/mountlist.c
++++ b/lib/mountlist.c
+@@ -809,7 +809,7 @@ read_file_system_list (bool need_fs_type)
+ #if defined MOUNTED_FREAD_FSTYP /* (obsolete) SVR3 */
+   {
+     struct mnttab mnt;
+-    char *table = "/etc/mnttab";
++    char *table = "@TERMUX_PREFIX@/etc/mnttab";
+     FILE *fp;
+ 
+     fp = fopen (table, "re");
+@@ -918,7 +918,7 @@ read_file_system_list (bool need_fs_type)
+        for this file name, we should use their macro name instead.
+        (Why not just lock MNTTAB directly?  We don't know.)  */
+ #  ifndef MNTTAB_LOCK
+-#   define MNTTAB_LOCK "/etc/.mnttab.lock"
++#   define MNTTAB_LOCK "@TERMUX_PREFIX@/etc/.mnttab.lock"
+ #  endif
+     lockfd = open (MNTTAB_LOCK, O_RDONLY | O_CLOEXEC);
+     if (0 <= lockfd)
+diff --git a/lib/tmpdir.c b/lib/tmpdir.c
+index 9c96a69..c29d7ee 100644
+--- a/lib/tmpdir.c
++++ b/lib/tmpdir.c
+@@ -35,7 +35,7 @@
+ # ifdef _P_tmpdir /* native Windows */
+ #  define P_tmpdir _P_tmpdir
+ # else
+-#  define P_tmpdir "/tmp"
++#  define P_tmpdir "@TERMUX_PREFIX_CLASSICAL@/tmp"
+ # endif
+ #endif
+ 
+@@ -135,8 +135,8 @@ path_search (char *tmpl, size_t tmpl_len, const char *dir, const char *pfx,
+ #endif
+       if (direxists (P_tmpdir))
+         dir = P_tmpdir;
+-      else if (strcmp (P_tmpdir, "/tmp") != 0 && direxists ("/tmp"))
+-        dir = "/tmp";
++      else if (strcmp (P_tmpdir, "@TERMUX_PREFIX_CLASSICAL@/tmp") != 0 && direxists ("@TERMUX_PREFIX_CLASSICAL@/tmp"))
++        dir = "@TERMUX_PREFIX_CLASSICAL@/tmp";
+       else
+         {
+           __set_errno (ENOENT);
+diff --git a/src/basename.c b/src/basename.c
+index 479815b..40003f8 100644
+--- a/src/basename.c
++++ b/src/basename.c
+@@ -66,7 +66,7 @@ If specified, also remove a trailing SUFFIX.\n\
+       printf (_("\
+ \n\
+ Examples:\n\
+-  %s /usr/bin/sort          -> \"sort\"\n\
++  %s @TERMUX_PREFIX@/bin/sort          -> \"sort\"\n\
+   %s include/stdio.h .h     -> \"stdio\"\n\
+   %s -s .h include/stdio.h  -> \"stdio\"\n\
+   %s -a any/str1 any/str2   -> \"str1\" followed by \"str2\"\n\
+diff --git a/src/chroot.c b/src/chroot.c
+index 6150af5..44d06c5 100644
+--- a/src/chroot.c
++++ b/src/chroot.c
+@@ -206,7 +206,7 @@ Run COMMAND with root directory set to NEWROOT.\n\
+       fputs (VERSION_OPTION_DESCRIPTION, stdout);
+       fputs (_("\
+ \n\
+-If no command is given, run '\"$SHELL\" -i' (default: '/bin/sh -i').\n\
++If no command is given, run '\"$SHELL\" -i' (default: '@TERMUX_PREFIX@/bin/sh -i').\n\
+ "), stdout);
+       emit_exec_status (PROGRAM_NAME);
+       emit_ancillary_info (PROGRAM_NAME);
+@@ -338,7 +338,7 @@ main (int argc, char **argv)
+       /* No command.  Run an interactive shell.  */
+       char *shell = getenv ("SHELL");
+       if (shell == nullptr)
+-        shell = bad_cast ("/bin/sh");
++        shell = bad_cast ("@TERMUX_PREFIX@/bin/sh");
+       argv[0] = shell;
+       argv[1] = bad_cast ("-i");
+       argv[2] = nullptr;
+diff --git a/src/dirname.c b/src/dirname.c
+index 4ee6cd1..1bd350d 100644
+--- a/src/dirname.c
++++ b/src/dirname.c
+@@ -63,7 +63,7 @@ removed; if NAME contains no /'s, output '.' (meaning the current directory).\n\
+       printf (_("\
+ \n\
+ Examples:\n\
+-  %s /usr/bin/          -> \"/usr\"\n\
++  %s @TERMUX_PREFIX@/bin/          -> \"@TERMUX_PREFIX@\"\n\
+   %s dir1/str dir2/str  -> \"dir1\" followed by \"dir2\"\n\
+   %s stdio.h            -> \".\"\n\
+ "),
+diff --git a/src/mktemp.c b/src/mktemp.c
+index 992d4a3..1d9bafe 100644
+--- a/src/mktemp.c
++++ b/src/mktemp.c
+@@ -83,7 +83,7 @@ Files are created u+rw, and directories u+rwx, minus umask restrictions.\n\
+ "), stdout);
+       fputs (_("\
+   -p DIR, --tmpdir[=DIR]  interpret TEMPLATE relative to DIR; if DIR is not\n\
+-                        specified, use $TMPDIR if set, else /tmp.  With\n\
++                        specified, use $TMPDIR if set, else @TERMUX_PREFIX_CLASSICAL@/tmp.  With\n\
+                         this option, TEMPLATE must not be an absolute name;\n\
+                         unlike with -t, TEMPLATE may contain slashes, but\n\
+                         mktemp creates only the final component\n\
+@@ -91,7 +91,7 @@ Files are created u+rw, and directories u+rwx, minus umask restrictions.\n\
+       fputs (_("\
+   -t                  interpret TEMPLATE as a single file name component,\n\
+                         relative to a directory: $TMPDIR, if set; else the\n\
+-                        directory specified via -p; else /tmp [deprecated]\n\
++                        directory specified via -p; else @TERMUX_PREFIX_CLASSICAL@/tmp [deprecated]\n\
+ "), stdout);
+       fputs (HELP_OPTION_DESCRIPTION, stdout);
+       fputs (VERSION_OPTION_DESCRIPTION, stdout);
+@@ -267,7 +267,7 @@ main (int argc, char **argv)
+           else if (dest_dir_arg && *dest_dir_arg)
+             dest_dir = dest_dir_arg;
+           else
+-            dest_dir = "/tmp";
++            dest_dir = "@TERMUX_PREFIX_CLASSICAL@/tmp";
+ 
+           if (last_component (template) != template)
+             error (EXIT_FAILURE, 0,
+@@ -281,7 +281,7 @@ main (int argc, char **argv)
+           else
+             {
+               char *env = getenv ("TMPDIR");
+-              dest_dir = (env && *env ? env : "/tmp");
++              dest_dir = (env && *env ? env : "@TERMUX_PREFIX_CLASSICAL@/tmp");
+             }
+           if (IS_ABSOLUTE_FILE_NAME (template))
+             error (EXIT_FAILURE, 0,
+diff --git a/src/sort.c b/src/sort.c
+index e779845..a423365 100644
+--- a/src/sort.c
++++ b/src/sort.c
+@@ -91,7 +91,7 @@ struct rlimit { size_t rlim_cur; };
+ #define UCHAR_LIM (UCHAR_MAX + 1)
+ 
+ #ifndef DEFAULT_TMPDIR
+-# define DEFAULT_TMPDIR "/tmp"
++# define DEFAULT_TMPDIR "@TERMUX_PREFIX_CLASSICAL@/tmp"
+ #endif
+ 
+ /* Maximum number of lines to merge every time a NODE is taken from
+diff --git a/src/split.c b/src/split.c
+index a32b2d9..8c17b6c 100644
+--- a/src/split.c
++++ b/src/split.c
+@@ -503,7 +503,7 @@ create (char const *name)
+       pid_t child_pid;
+       char const *shell_prog = getenv ("SHELL");
+       if (shell_prog == nullptr)
+-        shell_prog = "/bin/sh";
++        shell_prog = "@TERMUX_PREFIX@/bin/sh";
+       if (setenv ("FILE", name, 1) != 0)
+         error (EXIT_FAILURE, errno,
+                _("failed to set FILE environment variable"));
