@@ -1,0 +1,65 @@
+diff --git a/ext/lsm1/lsm-test/lsmtest_main.c b/ext/lsm1/lsm-test/lsmtest_main.c
+index f4a3ac0..04d7447 100644
+--- a/ext/lsm1/lsm-test/lsmtest_main.c
++++ b/ext/lsm1/lsm-test/lsmtest_main.c
+@@ -695,7 +695,7 @@ int do_speed_test2(int nArg, char **azArg){
+   }
+ 
+ #if 0
+-  pLog = fopen("/tmp/speed.log", "w");
++  pLog = fopen("@TERMUX_PREFIX_CLASSICAL@/tmp/speed.log", "w");
+   tdb_lsm_write_hook(pDb, do_speed_write_hook2, (void *)pLog);
+ #endif
+ 
+@@ -895,7 +895,7 @@ int do_speed_tests(int nArg, char **azArg){
+ 
+       pLsm = configure_lsm_db(pDb);
+ #if 0
+-      pLog = fopen("/tmp/speed.log", "w");
++      pLog = fopen("@TERMUX_PREFIX_CLASSICAL@/tmp/speed.log", "w");
+       tdb_lsm_write_hook(pDb, do_speed_write_hook2, (void *)pLog);
+ #endif
+   
+diff --git a/src/os_unix.c b/src/os_unix.c
+index 59f67d1..04aa8ab 100644
+--- a/src/os_unix.c
++++ b/src/os_unix.c
+@@ -5851,9 +5851,7 @@ static int fillInUnixFile(
+ static const char *azTempDirs[] = {
+   0,
+   0,
+-  "/var/tmp",
+-  "/usr/tmp",
+-  "/tmp",
++  "@TERMUX_PREFIX_CLASSICAL@/tmp",
+   "."
+ };
+ 
+diff --git a/src/os_win.c b/src/os_win.c
+index dc16c08..90b1688 100644
+--- a/src/os_win.c
++++ b/src/os_win.c
+@@ -4799,9 +4799,7 @@ static int winGetTempname(sqlite3_vfs *pVfs, char **pzBuf){
+        0, /* getenv("TMP") */
+        0, /* getenv("TEMP") */
+        0, /* getenv("USERPROFILE") */
+-       "/var/tmp",
+-       "/usr/tmp",
+-       "/tmp",
++       "@TERMUX_PREFIX_CLASSICAL@/tmp",
+        ".",
+        0        /* List terminator */
+     };
+diff --git a/tool/lemon.c b/tool/lemon.c
+index 7804837..63f8e78 100644
+--- a/tool/lemon.c
++++ b/tool/lemon.c
+@@ -3551,7 +3551,7 @@ PRIVATE char *pathsearch(char *argv0, char *name, int modemask)
+     *cp = c;
+   }else{
+     pathlist = getenv("PATH");
+-    if( pathlist==0 ) pathlist = ".:/bin:/usr/bin";
++    if( pathlist==0 ) pathlist = ".:@TERMUX_PREFIX@/bin";
+     pathbuf = (char *) malloc( lemonStrlen(pathlist) + 1 );
+     path = (char *)malloc( lemonStrlen(pathlist)+lemonStrlen(name)+2 );
+     if( (pathbuf != 0) && (path!=0) ){
