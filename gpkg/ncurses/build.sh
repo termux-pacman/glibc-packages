@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux-pacman"
 _PKG_VERSION=6.4
 _DATE_VERSION=20230520
 TERMUX_PKG_VERSION=${_PKG_VERSION}.${_DATE_VERSION}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://invisible-mirror.net/archives/ncurses/current/ncurses-${_PKG_VERSION}-${_DATE_VERSION}.tgz
 TERMUX_PKG_SHA256=a04f69bde2f1b1325d1fb460db7cea28b6da97786ead8ce645daacfb0bcbc004
 TERMUX_PKG_DEPENDS="glibc, gcc-glibc-libs-dev"
