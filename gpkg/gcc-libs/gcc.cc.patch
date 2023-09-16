@@ -1,0 +1,37 @@
+--- gcc-13.2.0/gcc/gcc.cc	2022-05-06 10:30:57.000000000 +0300
++++ gcc-13.2.0/gcc/gcc.cc.patch	2022-07-07 20:25:23.785049059 +0300
+@@ -1593,10 +1593,7 @@
+ /* Default prefixes to attach to command names.  */
+ 
+ #ifndef STANDARD_STARTFILE_PREFIX_1
+-#define STANDARD_STARTFILE_PREFIX_1 "/lib/"
+-#endif
+-#ifndef STANDARD_STARTFILE_PREFIX_2
+-#define STANDARD_STARTFILE_PREFIX_2 "/usr/lib/"
++#define STANDARD_STARTFILE_PREFIX_1 "@TERMUX_PREFIX@/lib/"
+ #endif
+ 
+ #ifdef CROSS_DIRECTORY_STRUCTURE  /* Don't use these prefixes for a cross compiler.  */
+@@ -1633,10 +1630,7 @@
+ static const char *md_exec_prefix = MD_EXEC_PREFIX;
+ static const char *md_startfile_prefix = MD_STARTFILE_PREFIX;
+ static const char *md_startfile_prefix_1 = MD_STARTFILE_PREFIX_1;
+-static const char *const standard_startfile_prefix_1
+-  = STANDARD_STARTFILE_PREFIX_1;
+-static const char *const standard_startfile_prefix_2
+-  = STANDARD_STARTFILE_PREFIX_2;
++static const char *const standard_startfile_prefix_1 = STANDARD_STARTFILE_PREFIX_1;
+ 
+ /* A relative path to be used in finding the location of tools
+    relative to the driver.  */
+@@ -8470,10 +8464,6 @@
+  	add_sysrooted_prefix (&startfile_prefixes,
+ 			      standard_startfile_prefix_1, "BINUTILS",
+ 			      PREFIX_PRIORITY_LAST, 0, 1);
+-      if (*standard_startfile_prefix_2)
+-	add_sysrooted_prefix (&startfile_prefixes,
+-			      standard_startfile_prefix_2, "BINUTILS",
+-			      PREFIX_PRIORITY_LAST, 0, 1);
+     }
+ 
+   /* Process any user specified specs in the order given on the command
