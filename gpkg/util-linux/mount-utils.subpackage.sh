@@ -1,5 +1,5 @@
 TERMUX_SUBPKG_DESCRIPTION="Utilities for (un)mounting filesystems"
-TERMUX_SUBPKG_DEPENDS="libblkid-glibc, libsmartcols-glibc, libmount-glibc, gcc-glibc-libs-dev"
+TERMUX_SUBPKG_DEPENDS="libblkid-glibc, libsmartcols-glibc, libmount-glibc, gcc-libs-glibc"
 TERMUX_SUBPKG_DEPEND_ON_PARENT="no"
 TERMUX_SUBPKG_INCLUDE="
 glibc/bin/findmnt

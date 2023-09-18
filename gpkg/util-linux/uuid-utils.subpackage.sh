@@ -1,5 +1,5 @@
 TERMUX_SUBPKG_DESCRIPTION="Utilities for handling universally unique identifiers"
-TERMUX_SUBPKG_DEPENDS="libsmartcols-glibc, libuuid-glibc, gcc-glibc-libs-dev"
+TERMUX_SUBPKG_DEPENDS="libsmartcols-glibc, libuuid-glibc, gcc-libs-glibc"
 TERMUX_SUBPKG_DEPEND_ON_PARENT="no"
 TERMUX_SUBPKG_INCLUDE="
 glibc/share/man/man3/uuid_copy.3.gz
