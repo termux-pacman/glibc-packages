@@ -10,6 +10,8 @@ TERMUX_PKG_BUILD_DEPENDS="doxygen-glibc"
 TERMUX_PKG_BREAKS="gcc-glibc-libs-dev"
 TERMUX_PKG_REPLACES="gcc-glibc-libs-dev"
 TERMUX_PKG_NO_STATICSPLIT=true
+TERMUX_PKG_SEPARATE_SUB_DEPENDS=true
+TERMUX_PKG_ONLY_INSTALLING=true
 
 termux_step_pre_configure() {
 	sed -i 's@\./fixinc\.sh@-c true@' ${TERMUX_PKG_SRCDIR}/gcc/Makefile.in
