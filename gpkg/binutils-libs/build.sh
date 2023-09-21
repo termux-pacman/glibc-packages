@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="GNU Binutils libraries"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_VERSION=2.41
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/binutils/binutils-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=ae9a5789e23459e59606e6714723f2d3ffc31c03174191ef0d015bdf06007450
 TERMUX_PKG_DEPENDS="glibc, libjansson-glibc, libelf-glibc, zlib-glibc, zstd-glibc"
