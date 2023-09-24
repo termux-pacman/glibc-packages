@@ -4,7 +4,7 @@
 
 git clone https://github.com/termux/termux-packages.git
 
-for i in build-package.sh clean.sh packages scripts; do
+for i in build-package.sh clean.sh packages x11-packages scripts; do
 	cp -r ./termux-packages/${i} ./
 done
 

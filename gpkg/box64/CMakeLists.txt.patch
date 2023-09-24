@@ -1,0 +1,23 @@
+--- box64-0.2.4/CMakeLists.txt	2023-08-19 18:22:35.000000000 +0300
++++ box64-0.2.4/CMakeLists.txt.patch	2023-09-24 14:31:20.336353618 +0300
+@@ -765,14 +765,14 @@
+     RUNTIME DESTINATION bin)
+   if(NOT NO_CONF_INSTALL)
+     configure_file(system/box64.conf.cmake system/box64.conf)
+-    install(FILES ${CMAKE_BINARY_DIR}/system/box64.conf DESTINATION /etc/binfmt.d/)
+-    install(FILES ${CMAKE_SOURCE_DIR}/system/box64.box64rc DESTINATION /etc/)
++    install(FILES ${CMAKE_BINARY_DIR}/system/box64.conf DESTINATION @TERMUX_PREFIX@/etc/binfmt.d/)
++    install(FILES ${CMAKE_SOURCE_DIR}/system/box64.box64rc DESTINATION @TERMUX_PREFIX@/etc/)
+   endif()
+   if(NOT NO_LIB_INSTALL)
+-    install(FILES ${CMAKE_SOURCE_DIR}/x64lib/libstdc++.so.5 DESTINATION /usr/lib/x86_64-linux-gnu/)
+-    install(FILES ${CMAKE_SOURCE_DIR}/x64lib/libstdc++.so.6 DESTINATION /usr/lib/x86_64-linux-gnu/)
+-    install(FILES ${CMAKE_SOURCE_DIR}/x64lib/libgcc_s.so.1 DESTINATION /usr/lib/x86_64-linux-gnu/)
+-    install(FILES ${CMAKE_SOURCE_DIR}/x64lib/libpng12.so.0 DESTINATION /usr/lib/x86_64-linux-gnu/)
++    install(FILES ${CMAKE_SOURCE_DIR}/x64lib/libstdc++.so.5 DESTINATION @TERMUX_PREFIX@/lib/x86_64-linux-gnu/)
++    install(FILES ${CMAKE_SOURCE_DIR}/x64lib/libstdc++.so.6 DESTINATION @TERMUX_PREFIX@/lib/x86_64-linux-gnu/)
++    install(FILES ${CMAKE_SOURCE_DIR}/x64lib/libgcc_s.so.1 DESTINATION @TERMUX_PREFIX@/lib/x86_64-linux-gnu/)
++    install(FILES ${CMAKE_SOURCE_DIR}/x64lib/libpng12.so.0 DESTINATION @TERMUX_PREFIX@/lib/x86_64-linux-gnu/)
+    endif()
+ endif()
+ 
