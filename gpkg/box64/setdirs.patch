@@ -1,0 +1,119 @@
+diff --git a/src/main.c b/src/main.c
+index 14e04d1..b9f676a 100644
+--- box64-0.2.4/src/main.c
++++ box64-0.2.4/src/main.c
+@@ -1023,12 +1023,10 @@ void LoadEnvVars(box64context_t *context)
+     }
+     // check BOX64_LD_LIBRARY_PATH and load it
+     LoadEnvPath(&context->box64_ld_lib, ".:lib:lib64:x86_64:bin64:libs64", "BOX64_LD_LIBRARY_PATH");
+-    if(FileExist("/lib/x86_64-linux-gnu", 0))
+-        AddPath("/lib/x86_64-linux-gnu", &context->box64_ld_lib, 1);
+-    if(FileExist("/usr/lib/x86_64-linux-gnu", 0))
+-        AddPath("/usr/lib/x86_64-linux-gnu", &context->box64_ld_lib, 1);
+-    if(FileExist("/usr/x86_64-linux-gnu/lib", 0))
+-        AddPath("/usr/x86_64-linux-gnu/lib", &context->box64_ld_lib, 1);
++    if(FileExist("@TERMUX_PREFIX@/lib/x86_64-linux-gnu", 0))
++        AddPath("@TERMUX_PREFIX@/lib/x86_64-linux-gnu", &context->box64_ld_lib, 1);
++    if(FileExist("@TERMUX_PREFIX@/x86_64-linux-gnu/lib", 0))
++        AddPath("@TERMUX_PREFIX@/x86_64-linux-gnu/lib", &context->box64_ld_lib, 1);
+     if(getenv("LD_LIBRARY_PATH"))
+         PrependList(&context->box64_ld_lib, getenv("LD_LIBRARY_PATH"), 1);   // in case some of the path are for x86 world
+     if(getenv("BOX64_EMULATED_LIBS")) {
+@@ -1272,8 +1270,8 @@ static void free_contextargv()
+ 
+ static void load_rcfiles()
+ {
+-    if(FileExist("/etc/box64.box64rc", IS_FILE))
+-        LoadRCFile("/etc/box64.box64rc");
++    if(FileExist("@TERMUX_PREFIX@/etc/box64.box64rc", IS_FILE))
++        LoadRCFile("@TERMUX_PREFIX@/etc/box64.box64rc");
+     else
+         LoadRCFile(NULL);   // load default rcfile
+     char* p = getenv("HOME");
+@@ -1297,7 +1295,7 @@ int main(int argc, const char **argv, char **env) {
+         PrintHelp();
+         return 1;
+     }
+-    if(argc>1 && !strcmp(argv[1], "/usr/bin/gdb") && getenv("BOX64_TRACE_FILE"))
++    if(argc>1 && !strcmp(argv[1], "@TERMUX_PREFIX@/bin/gdb") && getenv("BOX64_TRACE_FILE"))
+         exit(0);
+     // uname -m is redirected to box64 -m
+     if(argc==2 && (!strcmp(argv[1], "-m") || !strcmp(argv[1], "-p") || !strcmp(argv[1], "-i")))
+diff --git a/src/steam.c b/src/steam.c
+index 4d48cae..27d94ac 100644
+--- box64-0.2.4/src/steam.c
++++ box64-0.2.4/src/steam.c
+@@ -26,13 +26,13 @@ void pressure_vessel(int argc, const char** argv, int nextarg)
+             } else if(strstr(argv[nextarg], "--env-if-host=STEAM_RUNTIME_LIBRARY_PATH=")==argv[nextarg]) {
+                 // transform RESSURE_VESSEL_APP_LD_LIBRARY_PATH to BOX86_ / BOX64_ LD_LIBRARY_PATH
+                 char tmp[strlen(argv[nextarg])+150];
+-                strcpy(tmp, "BOX86_LD_LIBRARY_PATH=/lib/box86:/usr/lib/box86:/lib/i386-linux-gnu:/usr/lib/i386-linux-gnu:/usr/lib/i686-pc-linux-gnu:/usr/lib32:");
++                strcpy(tmp, "BOX86_LD_LIBRARY_PATH=@TERMUX_PREFIX@/lib/box86:@TERMUX_PREFIX@/lib/i386-linux-gnu:@TERMUX_PREFIX@/lib/i686-pc-linux-gnu:@TERMUX_PREFIX@/lib32:");
+                 strcat(tmp, argv[nextarg]+strlen("--env-if-host=STEAM_RUNTIME_LIBRARY_PATH="));
+                 char *p = strchr(tmp, '=');
+                 *p ='\0'; ++p;
+                 setenv(tmp, p, 1);
+                 printf_log(LOG_DEBUG, "setenv(%s, %s, 1)\n", tmp, p);
+-                strcpy(tmp, "BOX64_LD_LIBRARY_PATH=/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:");
++                strcpy(tmp, "BOX64_LD_LIBRARY_PATH=@TERMUX_PREFIX@/lib/x86_64-linux-gnu:");
+                 strcat(tmp, argv[nextarg]+strlen("--env-if-host=STEAM_RUNTIME_LIBRARY_PATH="));
+                 p = strchr(tmp, '=');
+                 *p ='\0'; ++p;
+@@ -95,4 +95,4 @@ void pressure_vessel(int argc, const char** argv, int nextarg)
+         waitpid(v, &wstatus, 0);
+         exit(0);
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/src/tools/fileutils.c b/src/tools/fileutils.c
+index d6d1556..565354f 100644
+--- box64-0.2.4/src/tools/fileutils.c
++++ box64-0.2.4/src/tools/fileutils.c
+@@ -17,9 +17,9 @@
+ 
+ static const char* x86lib  = "\x7f" "ELF" "\x01" "\x01" "\x01" "\x03" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x02" "\x00" "\x03" "\x00";
+ static const char* x64lib  = "\x7f" "ELF" "\x02" "\x01" "\x01" "\x03" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x02" "\x00" "\x3e" "\x00";
+-static const char* bashsign= "#!/bin/bash";
+-static const char* shsign  = "#!/bin/sh";
+-static const char* bashsign2="#!/usr/bin/env bash";
++static const char* bashsign= "#!@TERMUX_PREFIX@/bin/bash";
++static const char* shsign  = "#!@TERMUX_PREFIX@/bin/sh";
++static const char* bashsign2="#!@TERMUX_PREFIX@/bin/env bash";
+ 
+ int FileExist(const char* filename, int flags)
+ {
+@@ -127,11 +127,8 @@ const char* GetTmpDir() {
+     if ((tmpdir = getenv ("TMPDIR")) != NULL) return tmpdir;
+     if ((tmpdir = getenv ("TEMP")) != NULL)   return tmpdir;
+     if ((tmpdir = getenv ("TMP")) != NULL)    return tmpdir;
+-    if(FileExist("/tmp", 0))                  return "/tmp";
+-    if(FileExist("/var/tmp", 0))              return "/var/tmp";
+-    if(FileExist("/usr/tmp", 0))              return "/usr/tmp";
+ 
+-    return "/tmp";  // meh...
++    return "@TERMUX_PREFIX_CLASSICAL@/tmp";  // meh...
+ }
+ 
+ char* LowerCase(const char* s) {
+diff --git a/src/wrapped/wrappedlibdl.c b/src/wrapped/wrappedlibdl.c
+index 47c47c6..7bdd357 100644
+--- box64-0.2.4/src/wrapped/wrappedlibdl.c
++++ box64-0.2.4/src/wrapped/wrappedlibdl.c
+@@ -95,7 +95,7 @@ void* my_dlopen(x64emu_t* emu, void *filename, int flag)
+             if(sys)
+                 return sys;
+         }
+-        if(!strcmp(rfilename, "/usr/lib/x86_64-linux-gnu/d3d")) {
++        if(!strcmp(rfilename, "@TERMUX_PREFIX@/lib/x86_64-linux-gnu/d3d")) {
+             void* sys = my_dlopen(emu, "d3dadapter9.so.1", flag);
+             if(sys)
+                 return sys;
+diff --git a/system/box64.conf.cmake b/system/box64.conf.cmake
+index 7dbdc5d..340aa0c 100644
+--- box64-0.2.4/system/box64.conf.cmake
++++ box64-0.2.4/system/box64.conf.cmake
+@@ -1,2 +1,2 @@
+-# /etc/binfmt.d/box64.conf
++# @TERMUX_PREFIX@/etc/binfmt.d/box64.conf
+ :x86_64:M::\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x3e\x00:\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff\xff\xfe\xff\xff\xff:${CMAKE_INSTALL_PREFIX}/bin/${BOX64}:

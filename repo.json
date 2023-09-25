@@ -11,5 +11,11 @@
     "distribution": "main",
     "component": "main",
     "url": "https://service.termux-pacman.dev/main"
+  },
+  "x11-packages": {
+    "name": "x11",
+    "distribution": "x11",
+    "component": "x11",
+    "url": "https://service.termux-pacman.dev/x11"
   }
 }

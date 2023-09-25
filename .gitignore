@@ -2,6 +2,7 @@ build-package.sh
 clean.sh
 
 /packages/
+/x11-packages/
 /scripts/
 /output/
 /termux-packages/
