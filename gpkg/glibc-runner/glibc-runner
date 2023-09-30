@@ -1,6 +1,6 @@
 #!@TERMUX_PREFIX_CLASSICAL@/bin/bash
 
-# version: 1.3
+# version: 1.4
 # This script allows you to:
 # - run glibc-based binaries with ld.so.
 # - configure glibc-based binaries to work in Termux.
@@ -19,21 +19,37 @@ if [[ -z "$1" ]]; then
 	echo " --set - binary setup"
 	echo " --help - print help text from ld.so command"
 	echo ""
-	echo "Example: grun [--set] ./binary || grun --shell [gcc -v]"
+	echo "Variables:"
+	echo " WITH_LIBTERMUX_EXEC_GLIBC=[false|true] - enable the termux-exec-glibc library (default: false)"
+	echo ""
+	echo "Example: grun [--set] ./binary || [WITH_LIBTERMUX_EXEC=true|false] grun --shell [gcc -v]"
 	echo "Bug report: https://github.com/termux-pacman/glibc-packages/issues"
 	exit 0
 fi
 
 unset LD_PRELOAD
 export GLIBC_PREFIX="@TERMUX_PREFIX@"
-export PATH=$GLIBC_PREFIX/bin:$PATH
+export LIBTERMUX_EXEC="${GLIBC_PREFIX}/lib/libtermux-exec.so"
+export PATH="${GLIBC_PREFIX}/bin:${PATH}"
+
+if [ -f "${GLIBC_PREFIX}/etc/locale.conf" ]; then
+	source "${GLIBC_PREFIX}/etc/locale.conf"
+fi
+
+if [ "$WITH_LIBTERMUX_EXEC_GLIBC" = "true" ]; then
+	if [ ! -f $LIBTERMUX_EXEC ]; then
+		echo "Error: not found '$LIBTERMUX_EXEC'"
+		exit 1
+	fi
+	export LD_PRELOAD=$LIBTERMUX_EXEC
+fi
 
 if [ "$1" = "--shell" ]; then
 	if [[ -z "$2" ]]; then
 		exec $SHELL
 	else
 		commands="$@"
-		exec ${commands#* }
+		exec bash -c "${commands#* }"
 	fi
 elif [ "$1" = "--set" ]; then
 	if [ -z "$2" ]; then

@@ -6,7 +6,7 @@ diff -uNr libarchive-3.3.3/libarchive/archive_util.c libarchive-3.3.3.mod/libarc
  		tmp = _PATH_TMP;
  #else
 -                tmp = "/tmp";
-+                tmp = "@TERMUX_PREFIX@/tmp";
++                tmp = "@TERMUX_PREFIX_CLASSICAL@/tmp";
  #endif
  	archive_strcpy(temppath, tmp);
  	if (temppath->s[temppath->length-1] != '/')

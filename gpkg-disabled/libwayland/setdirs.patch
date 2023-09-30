@@ -1,0 +1,44 @@
+--- wayland-1.22.0/cursor/os-compatibility.c	2023-04-04 10:58:31.000000000 +0300
++++ wayland-1.22.0/cursor/os-compatibility.c.patch	2023-09-30 09:52:58.113123276 +0300
+@@ -138,8 +138,7 @@
+ 	{
+ 		path = getenv("XDG_RUNTIME_DIR");
+ 		if (!path || path[0] != '/') {
+-			errno = ENOENT;
+-			return -1;
++			path = "@TERMUX_PREFIX_CLASSICAL@/tmp";
+ 		}
+ 
+ 		name_size = strlen(path) + sizeof(template);
+--- wayland-1.22.0/src/wayland-client.c	2023-04-04 10:58:31.000000000 +0300
++++ wayland-1.22.0/src/wayland-client.c.patch	2023-09-30 09:55:33.523123217 +0300
+@@ -1109,11 +1109,7 @@
+ 
+ 	runtime_dir = getenv("XDG_RUNTIME_DIR");
+ 	if (((!runtime_dir || runtime_dir[0] != '/') && !path_is_absolute)) {
+-		wl_log("error: XDG_RUNTIME_DIR is invalid or not set in the environment.\n");
+-		/* to prevent programs reporting
+-		 * "failed to create display: Success" */
+-		errno = ENOENT;
+-		return -1;
++		runtime_dir = "@TERMUX_PREFIX_CLASSICAL@/tmp";
+ 	}
+ 
+ 	fd = wl_os_socket_cloexec(PF_LOCAL, SOCK_STREAM, 0);
+--- wayland-1.22.0/src/wayland-server.c	2023-04-04 10:58:31.000000000 +0300
++++ wayland-1.22.0/src/wayland-server.c.patch	2023-09-30 09:57:22.473123175 +0300
+@@ -1629,13 +1629,7 @@
+ 	if (name[0] != '/') {
+ 		runtime_dir = getenv("XDG_RUNTIME_DIR");
+ 		if (!runtime_dir || runtime_dir[0] != '/') {
+-			wl_log("error: XDG_RUNTIME_DIR is invalid or not set in"
+-			       " the environment\n");
+-
+-			/* to prevent programs reporting
+-			 * "failed to add socket: Success" */
+-			errno = ENOENT;
+-			return -1;
++			runtime_dir = "@TERMUX_PREFIX_CLASSICAL@/tmp";
+ 		}
+ 		separator = "/";
+ 	}
