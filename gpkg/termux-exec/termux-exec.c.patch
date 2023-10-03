@@ -1,0 +1,13 @@
+diff --git a/termux-exec.c b/termux-exec.c
+index 1f8037d..d537213 100644
+--- a/termux-exec.c
++++ b/termux-exec.c
+@@ -118,8 +118,6 @@ int execve(const char* filename, char* const* argv, char* const* envp)
+ 		new_envp[pos] = NULL;
+ 
+ 		envp = (char**)new_envp;
+-		// Not.sure if needed.
+-		environ = (char**)new_envp;
+ 	}
+ 
+ 	// execve(2): "A maximum line length of 127 characters is allowed

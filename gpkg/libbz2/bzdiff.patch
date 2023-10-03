@@ -6,7 +6,7 @@ diff -uNr bzip2-1.0.8/bzdiff bzip2-1.0.8.mod/bzdiff
  	        *.bz2)
  			F=`echo "$2" | sed 's|.*/||;s|.bz2$||'`
 -			tmp=`mktemp "${TMPDIR:-/tmp}"/bzdiff.XXXXXXXXXX` || {
-+			tmp=`mktemp "${TMPDIR:-@TERMUX_PREFIX@/tmp}"/bzdiff.XXXXXXXXXX` || {
++			tmp=`mktemp "${TMPDIR:-@TERMUX_PREFIX_CLASSICAL@/tmp}"/bzdiff.XXXXXXXXXX` || {
  			      echo 'cannot create a temporary file' >&2
  			      exit 1
  			}

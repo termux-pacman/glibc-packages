@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=http://stedolan.github.io/jq/
+TERMUX_PKG_DESCRIPTION="Command-line JSON processor"
+TERMUX_PKG_LICENSE="MIT"
+TERMUX_PKG_MAINTAINER="@termux-pacman"
+TERMUX_PKG_VERSION="1.7"
+TERMUX_PKG_SRCURL=https://github.com/stedolan/jq/releases/download/jq-$TERMUX_PKG_VERSION/jq-$TERMUX_PKG_VERSION.tar.gz
+TERMUX_PKG_SHA256=402a0d6975d946e6f4e484d1a84320414a0ff8eb6cf49d2c11d144d4d344db62
+TERMUX_PKG_DEPENDS="oniguruma-glibc"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="--enable-posix-api"
+TERMUX_PKG_BUILD_IN_SRC=true
