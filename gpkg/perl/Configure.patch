@@ -1,0 +1,10 @@
+--- src/Configure	2023-06-02 04:12:22.000000000 +0300
++++ src/Configure.patch	2023-10-09 10:27:43.280935150 +0300
+@@ -3534,7 +3534,6 @@
+ 			case "$3" in
+ 			*)	osvers="$3" ;;
+ 			esac
+-			$test -f /system/lib/libandroid.so && osname=linux-android
+ 			;;
+ 		MiNT)	osname=mint
+ 			;;
