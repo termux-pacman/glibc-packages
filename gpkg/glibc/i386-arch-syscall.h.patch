@@ -1,5 +1,5 @@
 --- glibc-2.38/sysdeps/unix/sysv/linux/i386/arch-syscall.h	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/i386/arch-syscall.h.patch	2023-09-09 00:41:39.579180920 +0300
++++ glibc-2.38/sysdeps/unix/sysv/linux/i386/arch-syscall.h.patch	2023-10-07 00:01:30.315088193 +0300
 @@ -18,7 +18,6 @@
  #define __NR_capget 184
  #define __NR_capset 185
@@ -8,7 +8,7 @@
  #define __NR_chown 182
  #define __NR_chown32 212
  #define __NR_chroot 61
-@@ -27,13 +26,11 @@
+@@ -27,15 +26,12 @@
  #define __NR_clock_getres 266
  #define __NR_clock_getres_time64 406
  #define __NR_clock_gettime 265
@@ -20,9 +20,11 @@
  #define __NR_clone 120
 -#define __NR_clone3 435
  #define __NR_close 6
- #define __NR_close_range 436
+-#define __NR_close_range 436
  #define __NR_connect 362
-@@ -57,7 +54,6 @@
+ #define __NR_copy_file_range 377
+ #define __NR_creat 8
+@@ -57,7 +53,6 @@
  #define __NR_exit 1
  #define __NR_exit_group 252
  #define __NR_faccessat 307
@@ -30,7 +32,7 @@
  #define __NR_fadvise64 250
  #define __NR_fadvise64_64 272
  #define __NR_fallocate 324
-@@ -115,7 +111,6 @@
+@@ -115,7 +110,6 @@
  #define __NR_getitimer 105
  #define __NR_getpeername 368
  #define __NR_getpgid 132
@@ -38,7 +40,15 @@
  #define __NR_getpid 20
  #define __NR_getpmsg 188
  #define __NR_getppid 64
-@@ -288,8 +283,6 @@
+@@ -239,7 +233,6 @@
+ #define __NR_personality 136
+ #define __NR_pidfd_getfd 438
+ #define __NR_pidfd_open 434
+-#define __NR_pidfd_send_signal 424
+ #define __NR_pipe 42
+ #define __NR_pipe2 331
+ #define __NR_pivot_root 217
+@@ -288,8 +281,6 @@
  #define __NR_renameat2 353
  #define __NR_request_key 287
  #define __NR_restart_syscall 0
@@ -47,7 +57,7 @@
  #define __NR_rt_sigaction 174
  #define __NR_rt_sigpending 176
  #define __NR_rt_sigprocmask 175
-@@ -324,14 +317,9 @@
+@@ -324,14 +315,9 @@
  #define __NR_sendto 369
  #define __NR_set_mempolicy 276
  #define __NR_set_mempolicy_home_node 450
@@ -62,7 +72,7 @@
  #define __NR_setgid 46
  #define __NR_setgid32 214
  #define __NR_setgroups 81
-@@ -380,7 +368,6 @@
+@@ -380,7 +366,6 @@
  #define __NR_stat64 195
  #define __NR_statfs 99
  #define __NR_statfs64 268

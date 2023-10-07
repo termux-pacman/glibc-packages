@@ -1,0 +1,15 @@
+--- src/sysdeps/unix/sysv/linux/sys/pidfd.h	2023-07-31 20:54:16.000000000 +0300
++++ src/sysdeps/unix/sysv/linux/sys/pidfd.h.patch	2023-10-06 17:40:14.819331237 +0300
+@@ -38,12 +38,4 @@
+ extern int pidfd_getfd (int __pidfd, int __targetfd,
+ 			unsigned int __flags) __THROW;
+ 
+-/* Sends the signal SIG to the target process referred by the PIDFD.  If
+-   INFO points to a siginfo_t buffer, it will be populated.
+-
+-   The FLAGS argument is reserved for future use, it must be specified
+-   as 0.  */
+-extern int pidfd_send_signal (int __pidfd, int __sig, siginfo_t *__info,
+-			      unsigned int __flags) __THROW;
+-
+ #endif /* _PIDFD_H  */
