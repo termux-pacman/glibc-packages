@@ -5,6 +5,7 @@ TERMUX_PKG_MAINTAINER="@termux-pacman"
 _PKG_VERSION=6.4
 _DATE_VERSION=20231001
 TERMUX_PKG_VERSION=${_PKG_VERSION}.${_DATE_VERSION}
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://invisible-mirror.net/archives/ncurses/current/ncurses-${_PKG_VERSION}-${_DATE_VERSION}.tgz
 TERMUX_PKG_SHA256=30b8dbe4800b07be5e852e8cb15fa4ffca30e112fa3a8b0e7c25777937d0ae6c
 TERMUX_PKG_DEPENDS="glibc, gcc-libs-glibc"
@@ -29,15 +30,25 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_post_make_install() {
 	for lib in ncurses ncurses++ form panel menu; do
 		printf "INPUT(-l%sw)\n" "${lib}" > $TERMUX_PREFIX/lib/lib${lib}.so
-		ln -sv ${lib}w.pc $TERMUX_PREFIX/lib/pkgconfig/${lib}.pc
+		ln -svf ${lib}w.pc $TERMUX_PREFIX/lib/pkgconfig/${lib}.pc
 	done
 
 	printf 'INPUT(-lncursesw)\n' > $TERMUX_PREFIX/lib/libcursesw.so
-	ln -sv libncurses.so $TERMUX_PREFIX/lib/libcurses.so
+	ln -svf libncurses.so $TERMUX_PREFIX/lib/libcurses.so
 
 	for lib in tic tinfo; do
 		printf "INPUT(libncursesw.so.%s)\n" "${_PKG_VERSION:0:1}" > $TERMUX_PREFIX/lib/lib${lib}.so
-		ln -sv libncursesw.so.${TERMUX_PKG_VERSION:0:1} $TERMUX_PREFIX/lib/lib${lib}.so.${_PKG_VERSION:0:1}
-		ln -sv ncursesw.pc $TERMUX_PREFIX/lib/pkgconfig/${lib}.pc
+		ln -svf libncursesw.so.${TERMUX_PKG_VERSION:0:1} $TERMUX_PREFIX/lib/lib${lib}.so.${_PKG_VERSION:0:1}
+		ln -svf ncursesw.pc $TERMUX_PREFIX/lib/pkgconfig/${lib}.pc
+	done
+}
+
+termux_step_post_massage() {
+	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include" || exit 1
+	mv ncursesw/* .
+	mkdir ncurses
+	for _file in *.h; do
+		ln -s ../$_file ncurses
+		ln -s ../$_file ncursesw
 	done
 }
