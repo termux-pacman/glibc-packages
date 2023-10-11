@@ -1,6 +1,6 @@
 pkgname=cgt
 pkgver=13.2.0
-pkgrel=2
+pkgrel=3
 pkgdesc='Cross GCCs for Termux (only for Linux)'
 arch=(x86_64)
 url='https://gcc.gnu.org/'
@@ -13,7 +13,7 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-$pkgver/gcc-$pkgver.tar.xz
         set_glibc_dynamic_linker.patch)
 sha256sums=('e275e76442a6067341a27f04c5c6b83d8613144004c0413528863dc6b5c743da'
             '8d9f0c6cd1c57e623ba9b054f69185e4fb4717cc3af61c19d191948270042d6c'
-            'dee7ec7308e934edce9dc34bb481b4a53009e9aa96d9d926df368ad949650d56'
+            'e61dc2469a70392923aeac3f9e80c0b0c7ebd372488bc99e6dd0e18c1e3e3360'
             '1115c633d6fd0d4f6d6eeca50e4d52fd15f0bf52b4158ecb0ea6bedcb85ceb35'
             '346843fbce4bddca236ca4331ae43c5356ed177689c7760d841d2db2d2643d13'
             'cd383a4a1916f4b3102f21c640d6116f697e0ef7cde5f705d83035849c200ec6')
@@ -50,12 +50,12 @@ build() {
 		done
 
 		FLAGS_FOR_TARGET="-I$GLIBC_PREFIX/include -L$GLIBC_PREFIX/lib -Wl,-rpath=$GLIBC_PREFIX/lib"
-		CONFIGFLAG="--with-as=${CGCT_PREFIX}/bin/as --with-ld=${CGCT_PREFIX}/bin/ld AR_FOR_TARGET=${CGCT_PREFIX}/bin/ar RANLIB_FOR_TARGET=${CGCT_PREFIX}/bin/ranlib NM_FOR_TARGET=${CGCT_PREFIX}/bin/nm"
+		CONFIGFLAG=""
 		case "$arch_build" in
-			"aarch64") CONFIGFLAG+=" --with-arch=armv8-a --enable-fix-cortex-a53-835769 --enable-fix-cortex-a53-843419";;
-			"arm") CONFIGFLAG+=" --with-arch=armv7-a --with-float=hard --with-fpu=neon";;
-			"x86_64") CONFIGFLAG+=" --with-arch=x86-64";;
-			"i686") CONFIGFLAG+=" --with-arch=i686";;
+			"aarch64") CONFIGFLAG="--with-arch=armv8-a --enable-fix-cortex-a53-835769 --enable-fix-cortex-a53-843419";;
+			"arm") CONFIGFLAG="--with-arch=armv7-a --with-float=hard --with-fpu=neon";;
+			"x86_64") CONFIGFLAG="--with-arch=x86-64";;
+			"i686") CONFIGFLAG="--with-arch=i686";;
 		esac
 
 		"$srcdir"/gcc-${pkgver}/configure \
@@ -92,7 +92,12 @@ build() {
 			--disable-libstdcxx-pch \
 			--disable-libunwind-exceptions \
 			CFLAGS_FOR_TARGET="$FLAGS_FOR_TARGET $CFLAGS" \
-			CXXFLAGS_FOR_TARGET="$FLAGS_FOR_TARGET $CXXFLAGS"
+			CXXFLAGS_FOR_TARGET="$FLAGS_FOR_TARGET $CXXFLAGS" \
+			LD_FOR_TARGET=${CGCT_PREFIX}/bin/ld \
+			AS_FOR_TARGET=${CGCT_PREFIX}/bin/as \
+			AR_FOR_TARGET=${CGCT_PREFIX}/bin/ar \
+			RANLIB_FOR_TARGET=${CGCT_PREFIX}/bin/ranlib \
+			NM_FOR_TARGET=${CGCT_PREFIX}/bin/nm
 		make
 
 		cd ..
@@ -122,9 +127,9 @@ package() {
 			mkdir $pkgdir/${CGCT_PREFIX}/include/c++
 			mv $pkgdir/${CGCT_PREFIX}/include/$pkgver $pkgdir/${CGCT_PREFIX}/include/c++
 		fi
-  		for i in gcc g++; do
-    			ln -s ${target}-${i} $pkgdir/${CGCT_PREFIX}/bin/${i}
-    		done
+		for i in gcc g++; do
+			ln -s ${target}-${i} $pkgdir/${CGCT_PREFIX}/bin/${i}
+		done
 		rm -fr $pkgdir/${CGCT_PREFIX}/share
 		rm -fr $pkgdir/${CGCT_PREFIX}/$target
 		rm -fr $pkgdir/${DIR_TERMUX}/files
