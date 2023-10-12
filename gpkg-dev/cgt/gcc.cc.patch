@@ -1,5 +1,5 @@
---- src/gcc-13.2.0/gcc/gcc.cc	2023-04-26 10:09:40.000000000 +0300
-+++ src/gcc-13.2.0/gcc/gcc.cc.patch	2023-07-14 19:53:28.743169982 +0300
+--- src/gcc-13.2.0/gcc/gcc.cc	2023-07-27 11:13:04.000000000 +0300
++++ src/gcc-13.2.0/gcc/gcc.cc.patch	2023-10-11 09:20:43.668062309 +0300
 @@ -1585,10 +1585,7 @@
  /* Default prefixes to attach to command names.  */
  
@@ -24,7 +24,16 @@
  
  /* A relative path to be used in finding the location of tools
     relative to the driver.  */
-@@ -8409,7 +8403,7 @@
+@@ -4762,6 +4756,8 @@
+      that are lists of directory names with colons.  */
+ 
+   temp = env.get ("COMPILER_PATH");
++  if (!temp)
++    temp = STANDARD_BINDIR_PREFIX;
+   if (temp)
+     {
+       const char *startp, *endp;
+@@ -8409,7 +8405,7 @@
      }
    /* We should eventually get rid of all these and stick to
       startfile_prefix_spec exclusively.  */
@@ -33,7 +42,7 @@
      {
        if (*md_startfile_prefix)
  	add_sysrooted_prefix (&startfile_prefixes, md_startfile_prefix,
-@@ -8430,7 +8424,7 @@
+@@ -8430,7 +8426,7 @@
  	add_sysrooted_prefix (&startfile_prefixes,
  			      standard_startfile_prefix, "BINUTILS",
  			      PREFIX_PRIORITY_LAST, 0, 1);
@@ -42,7 +51,7 @@
  	{
  	  add_prefix (&startfile_prefixes,
  		      concat (gcc_exec_prefix
-@@ -8446,10 +8440,6 @@
+@@ -8446,10 +8442,6 @@
   	add_sysrooted_prefix (&startfile_prefixes,
  			      standard_startfile_prefix_1, "BINUTILS",
  			      PREFIX_PRIORITY_LAST, 0, 1);
