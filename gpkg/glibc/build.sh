@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="GNU C Library"
 TERMUX_PKG_LICENSE="GPL-3.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_VERSION=2.38
-TERMUX_PKG_REVISION=4
+TERMUX_PKG_REVISION=5
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/libc/glibc-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=fb82998998b2b29965467bc1b69d152e9c307d2cf301c9eafb4555b770ef3fd2
 TERMUX_PKG_DEPENDS="linux-api-headers-glibc"
@@ -29,7 +29,14 @@ termux_step_configure() {
 	echo "sbindir=${TERMUX_PREFIX}/bin" >> configparms
 	echo "rootsbindir=${TERMUX_PREFIX}/bin" >> configparms
 
-	unset CFLAGS
+	local _configure_flags=()
+	case $TERMUX_ARCH in
+		"aarch64") _configure_flags+=(--enable-memory-tagging --enable-fortify-source);;
+		"arm") _configure_flags+=(--enable-fortify-source);;
+		"x86_64") _configure_flags+=(--enable-cet);;
+		"i686") _configure_flags+=(--enable-cet --enable-fortify-source);;
+	esac
+
 	${TERMUX_PKG_SRCDIR}/configure \
 		--prefix=$TERMUX_PREFIX \
 		--libdir=${TERMUX_PREFIX}/lib \
@@ -39,13 +46,13 @@ termux_step_configure() {
 		--target=$TERMUX_HOST_PLATFORM \
 		--with-bugurl=https://github.com/termux-pacman/glibc-packages/issues \
 		--enable-bind-now \
-		--enable-cet \
 		--disable-multi-arch \
 		--enable-stack-protector=strong \
 		--enable-systemtap \
+		--disable-nscd \
 		--disable-profile \
-		--disable-crypt \
-		--disable-werror CFLAGS="-O2 -pipe"
+		--disable-werror \
+		"${_configure_flags[@]}"
 }
 
 termux_step_make() {
@@ -53,7 +60,6 @@ termux_step_make() {
 	make -O
 
 	sed -i "/build-programs=/s#no#yes#" configparms
-	echo "CFLAGS=-O2 -pipe" >> configparms
 	make -O
 	make info
 

@@ -63,7 +63,7 @@ static int __is_mmaped(void *addr) {
 					skip = 0;
 					continue;
 				}
-				strncat(maddr, buff, GLOBAL_READ_SIZE);
+				__strncat(maddr, buff, GLOBAL_READ_SIZE);
 			}
 			if (__stuli(strtok(maddr, "-")) == (unsigned long int)addr) {
 				res = 0;
