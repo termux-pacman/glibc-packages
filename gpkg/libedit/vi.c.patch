@@ -1,0 +1,11 @@
+--- libedit-20230828-3.1/src/vi.c	2021-09-10 19:39:30.000000000 +0300
++++ libedit-20230828-3.1/src/vi.c.patch	2023-10-08 22:55:29.445860838 +0300
+@@ -1004,7 +1004,7 @@
+ 	pid_t pid;
+ 	ssize_t st;
+ 	int status;
+-	char tempfile[] = "/tmp/histedit.XXXXXXXXXX";
++	char tempfile[] = "@TERMUX_PREFIX_CLASSICAL@/tmp/histedit.XXXXXXXXXX";
+ 	char *cp = NULL;
+ 	size_t len;
+ 	wchar_t *line = NULL;
