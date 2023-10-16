@@ -1,0 +1,11 @@
+TERMUX_PKG_HOMEPAGE=https://xorg.freedesktop.org/
+TERMUX_PKG_DESCRIPTION="X transport library"
+# Licenses: MIT, HPND
+TERMUX_PKG_LICENSE="custom"
+TERMUX_PKG_LICENSE_FILE="COPYING"
+TERMUX_PKG_MAINTAINER="@termux-pacman"
+TERMUX_PKG_VERSION=1.5.0
+TERMUX_PKG_SRCURL=https://xorg.freedesktop.org/releases/individual/lib/xtrans-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=1ba4b703696bfddbf40bacf25bce4e3efb2a0088878f017a50e9884b0c8fb1bd
+TERMUX_PKG_NO_DEVELSPLIT=true
+TERMUX_PKG_PLATFORM_INDEPENDENT=true
