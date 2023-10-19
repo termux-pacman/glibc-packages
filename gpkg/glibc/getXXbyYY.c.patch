@@ -1,0 +1,25 @@
+--- glibc-2.38/nss/getXXbyYY.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/nss/getXXbyYY.c.patch	2023-10-24 09:26:40.776559808 +0300
+@@ -53,6 +53,10 @@
+ # include <resolv/resolv_context.h>
+ #endif
+ 
++#ifdef ANDROID_SYS
++# include "android_passwd_group.h"
++#endif
++
+ /* To make the real sources a bit prettier.  */
+ #define REENTRANT_NAME APPEND_R (FUNCTION_NAME)
+ #define APPEND_R(name) APPEND_R1 (name)
+@@ -176,6 +180,11 @@
+     __set_h_errno (h_errno_tmp);
+ #endif
+ 
++#ifdef ANDROID_SYS
++  if (result == NULL)
++    result = ANDROID_SYS (ADD_VARIABLES);
++#endif
++
+   return result;
+ }
+ 

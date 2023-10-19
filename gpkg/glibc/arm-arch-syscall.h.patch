@@ -1,5 +1,5 @@
 --- glibc-2.38/sysdeps/unix/sysv/linux/arm/arch-syscall.h	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/arm/arch-syscall.h.patch	2023-10-07 00:01:12.685088200 +0300
++++ glibc-2.38/sysdeps/unix/sysv/linux/arm/arch-syscall.h.patch	2023-10-20 18:47:54.527101247 +0300
 @@ -2,7 +2,6 @@
  #define __NR__llseek 140
  #define __NR__newselect 142
@@ -81,7 +81,7 @@
  #define __NR_sendfile 187
  #define __NR_sendfile64 239
  #define __NR_sendmmsg 374
-@@ -303,14 +291,9 @@
+@@ -303,16 +291,9 @@
  #define __NR_sendto 290
  #define __NR_set_mempolicy 321
  #define __NR_set_mempolicy_home_node 450
@@ -93,14 +93,37 @@
 -#define __NR_setfsgid32 216
 -#define __NR_setfsuid 138
 -#define __NR_setfsuid32 215
- #define __NR_setgid 46
- #define __NR_setgid32 214
+-#define __NR_setgid 46
+-#define __NR_setgid32 214
  #define __NR_setgroups 81
-@@ -355,7 +338,6 @@
+ #define __NR_setgroups32 206
+ #define __NR_sethostname 74
+@@ -322,8 +303,6 @@
+ #define __NR_setpriority 97
+ #define __NR_setregid 71
+ #define __NR_setregid32 204
+-#define __NR_setresgid 170
+-#define __NR_setresgid32 210
+ #define __NR_setresuid 164
+ #define __NR_setresuid32 208
+ #define __NR_setreuid 70
+@@ -332,8 +311,6 @@
+ #define __NR_setsid 66
+ #define __NR_setsockopt 294
+ #define __NR_settimeofday 79
+-#define __NR_setuid 23
+-#define __NR_setuid32 213
+ #define __NR_setxattr 226
+ #define __NR_shmat 305
+ #define __NR_shmctl 308
+@@ -355,10 +332,8 @@
  #define __NR_stat64 195
  #define __NR_statfs 99
  #define __NR_statfs64 266
 -#define __NR_statx 397
  #define __NR_swapoff 115
  #define __NR_swapon 87
- #define __NR_symlink 83
+-#define __NR_symlink 83
+ #define __NR_symlinkat 331
+ #define __NR_sync 36
+ #define __NR_sync_file_range2 341

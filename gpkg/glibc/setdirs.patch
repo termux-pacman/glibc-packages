@@ -20,7 +20,7 @@ index 9714f75d..452e0dfc 100644
    if (_dl_profile_output == NULL || _dl_profile_output[0] == '\0')
      _dl_profile_output
 -      = &"/var/tmp\0/var/profile"[__libc_enable_secure ? 9 : 0];
-+      = &"@TERMUX_PREFIX_CLASSICAL@/var/tmp\0/var/profile"[__libc_enable_secure ? 9 : 0];
++      = &"@TERMUX_PREFIX@/var/tmp\0/var/profile"[__libc_enable_secure ? 9 : 0];
  
    if (__libc_enable_secure)
      {
@@ -42,7 +42,7 @@ index b8467f37..1c8d38f6 100644
    /* This is the default place for profiling data file.  */
    GLRO(dl_profile_output)
 -    = &"/var/tmp\0/var/profile"[__libc_enable_secure ? 9 : 0];
-+    = &"@TERMUX_PREFIX_CLASSICAL@/var/tmp\0/var/profile"[__libc_enable_secure ? 9 : 0];
++    = &"@TERMUX_PREFIX@/var/tmp\0/var/profile"[__libc_enable_secure ? 9 : 0];
  
    while ((envline = _dl_next_ld_env_entry (&runp)) != NULL)
      {
@@ -65,8 +65,8 @@ index dfca16b7..b3cbe1af 100644
  	 files are created.  */
 -      ext_name = (char *) alloca (strlen (name) + sizeof "/var/tmp/");
 -      stpcpy (stpcpy (ext_name, "/var/tmp/"), name);
-+      ext_name = (char *) alloca (strlen (name) + sizeof "@TERMUX_PREFIX_CLASSICAL@/var/tmp/");
-+      stpcpy (stpcpy (ext_name, "@TERMUX_PREFIX_CLASSICAL@/var/tmp/"), name);
++      ext_name = (char *) alloca (strlen (name) + sizeof "@TERMUX_PREFIX@/var/tmp/");
++      stpcpy (stpcpy (ext_name, "@TERMUX_PREFIX@/var/tmp/"), name);
        name = ext_name;
  
        fd = open (ext_name, O_RDONLY);
@@ -196,11 +196,11 @@ index 7275ccb6..e40e3580 100644
  
  /* Path of the file where the PID of the running system is stored.  */
 -#define _PATH_NSCDPID	 "/var/run/nscd/nscd.pid"
-+#define _PATH_NSCDPID	 "@TERMUX_PREFIX_CLASSICAL@/var/run/nscd/nscd.pid"
++#define _PATH_NSCDPID	 "@TERMUX_PREFIX@/var/run/nscd/nscd.pid"
  
  /* Path for the Unix domain socket.  */
 -#define _PATH_NSCDSOCKET "/var/run/nscd/socket"
-+#define _PATH_NSCDSOCKET "@TERMUX_PREFIX_CLASSICAL@/var/run/nscd/socket"
++#define _PATH_NSCDSOCKET "@TERMUX_PREFIX@/var/run/nscd/socket"
  
  /* Path for the configuration file.  */
 -#define _PATH_NSCDCONF	 "/etc/nscd.conf"
@@ -492,7 +492,7 @@ index 893b4c22..fb12606f 100644
 -#define	_PATH_CSHELL	"/bin/csh"
 -#define	_PATH_DEVDB	"/var/run/dev.db"
 +#define	_PATH_CSHELL	"@TERMUX_PREFIX@/bin/csh"
-+#define	_PATH_DEVDB	"@TERMUX_PREFIX_CLASSICAL@/var/run/dev.db"
++#define	_PATH_DEVDB	"@TERMUX_PREFIX@/var/run/dev.db"
  #define	_PATH_DEVNULL	"/dev/null"
  #define	_PATH_DRUM	"/dev/drum"
 -#define	_PATH_GSHADOW	"/etc/gshadow"
@@ -501,8 +501,8 @@ index 893b4c22..fb12606f 100644
 -#define	_PATH_LASTLOG	"/var/log/lastlog"
 -#define	_PATH_MAILDIR	"/var/mail"
 -#define	_PATH_MAN	"/usr/share/man"
-+#define	_PATH_LASTLOG	"@TERMUX_PREFIX_CLASSICAL@/var/glibc/log/lastlog"
-+#define	_PATH_MAILDIR	"@TERMUX_PREFIX_CLASSICAL@/var/glibc/mail"
++#define	_PATH_LASTLOG	"@TERMUX_PREFIX@/var/log/lastlog"
++#define	_PATH_MAILDIR	"@TERMUX_PREFIX@/var/mail"
 +#define	_PATH_MAN	"@TERMUX_PREFIX@/share/man"
  #define	_PATH_MEM	"/dev/mem"
 -#define	_PATH_MNTTAB	"/etc/fstab"
@@ -514,7 +514,7 @@ index 893b4c22..fb12606f 100644
 -#define	_PATH_SHADOW	"/etc/shadow"
 -#define	_PATH_SHELLS	"/etc/shells"
 +#define	_PATH_MNTTAB	"@TERMUX_PREFIX@/etc/fstab"
-+#define	_PATH_MOUNTED	"@TERMUX_PREFIX_CLASSICAL@/var/run/mtab"
++#define	_PATH_MOUNTED	"@TERMUX_PREFIX@/var/run/mtab"
 +#define	_PATH_NOLOGIN	"@TERMUX_PREFIX@/etc/nologin"
 +#define	_PATH_PRESERVE	"@TERMUX_PREFIX@/var/lib"
 +#define	_PATH_RWHODIR	"@TERMUX_PREFIX@/var/spool/rwho"
@@ -527,8 +527,8 @@ index 893b4c22..fb12606f 100644
 -#define	_PATH_UTMP_DB	"/var/run/utmp.db"
 -#define	_PATH_VI	"/usr/bin/vi"
 -#define	_PATH_WTMP	"/var/log/wtmp"
-+#define	_PATH_UTMP	"@TERMUX_PREFIX_CLASSICAL@/var/run/utmp"
-+#define	_PATH_UTMP_DB	"@TERMUX_PREFIX_CLASSICAL@/var/run/utmp.db"
++#define	_PATH_UTMP	"@TERMUX_PREFIX@/var/run/utmp"
++#define	_PATH_UTMP_DB	"@TERMUX_PREFIX@/var/run/utmp.db"
 +#define	_PATH_VI	"@TERMUX_PREFIX@/bin/vi"
 +#define	_PATH_WTMP	"@TERMUX_PREFIX@/var/log/wtmp"
  
@@ -540,8 +540,8 @@ index 893b4c22..fb12606f 100644
 -#define	_PATH_VARTMP	"/var/tmp/"
 +#define	_PATH_TMP	"@TERMUX_PREFIX_CLASSICAL@/tmp/"
 +#define	_PATH_VARDB	"@TERMUX_PREFIX@/var/db/"
-+#define	_PATH_VARRUN	"@TERMUX_PREFIX_CLASSICAL@/var/run/"
-+#define	_PATH_VARTMP	"@TERMUX_PREFIX_CLASSICAL@/var/tmp/"
++#define	_PATH_VARRUN	"@TERMUX_PREFIX@/var/run/"
++#define	_PATH_VARTMP	"@TERMUX_PREFIX@/var/tmp/"
  
  #endif /* !_PATHS_H_ */
 diff --git a/sysdeps/posix/system.c b/sysdeps/posix/system.c
@@ -624,7 +624,7 @@ index 1342ab3a..96629276 100644
 -#define	_PATH_CSHELL	"/bin/csh"
 -#define	_PATH_DEVDB	"/var/run/dev.db"
 +#define	_PATH_CSHELL	"@TERMUX_PREFIX@/bin/csh"
-+#define	_PATH_DEVDB	"@TERMUX_PREFIX_CLASSICAL@/var/run/dev.db"
++#define	_PATH_DEVDB	"@TERMUX_PREFIX@/var/run/dev.db"
  #define	_PATH_DEVNULL	"/dev/null"
  #define	_PATH_DRUM	"/dev/drum"
 -#define	_PATH_GSHADOW	"/etc/gshadow"
@@ -659,7 +659,7 @@ index 1342ab3a..96629276 100644
 -#define	_PATH_UTMP	"/var/run/utmp"
 -#define	_PATH_VI	"/usr/bin/vi"
 -#define	_PATH_WTMP	"/var/log/wtmp"
-+#define	_PATH_UTMP	"@TERMUX_PREFIX_CLASSICAL@/var/run/utmp"
++#define	_PATH_UTMP	"@TERMUX_PREFIX@/var/run/utmp"
 +#define	_PATH_VI	"@TERMUX_PREFIX@/bin/vi"
 +#define	_PATH_WTMP	"@TERMUX_PREFIX@/var/log/wtmp"
  
@@ -671,8 +671,8 @@ index 1342ab3a..96629276 100644
 -#define	_PATH_VARTMP	"/var/tmp/"
 +#define	_PATH_TMP	"@TERMUX_PREFIX_CLASSICAL@/tmp/"
 +#define	_PATH_VARDB	"@TERMUX_PREFIX@/var/db/"
-+#define	_PATH_VARRUN	"@TERMUX_PREFIX_CLASSICAL@/var/run/"
-+#define	_PATH_VARTMP	"@TERMUX_PREFIX_CLASSICAL@/var/tmp/"
++#define	_PATH_VARRUN	"@TERMUX_PREFIX@/var/run/"
++#define	_PATH_VARTMP	"@TERMUX_PREFIX@/var/tmp/"
  
  #endif /* !_PATHS_H_ */
 diff --git a/sysdeps/unix/sysv/linux/riscv/dl-cache.h b/sysdeps/unix/sysv/linux/riscv/dl-cache.h
@@ -706,3 +706,250 @@ index ee911044..b48048e1 100644
  #endif /* !defined TZDEFAULT */
  
  #ifndef TZDEFRULES
+ 
+diff --git a/nss/db-Makefile b/nss/db-Makefile
+index 0dcf764c..d39025b9 100644
+--- a/nss/db-Makefile
++++ b/nss/db-Makefile
+@@ -17,11 +17,11 @@
+ # License along with the GNU C Library; if not, see
+ # <https://www.gnu.org/licenses/>.
+ 
+-DATABASES = $(wildcard /etc/passwd /etc/group /etc/ethers /etc/protocols \
+-		       /etc/rpc /etc/services /etc/shadow /etc/gshadow \
+-		       /etc/netgroup)
++DATABASES = $(wildcard @TERMUX_PREFIX@/etc/passwd @TERMUX_PREFIX@/etc/group @TERMUX_PREFIX@/etc/ethers @TERMUX_PREFIX@/etc/protocols \
++		       @TERMUX_PREFIX@/etc/rpc @TERMUX_PREFIX@/etc/services @TERMUX_PREFIX@/etc/shadow @TERMUX_PREFIX@/etc/gshadow \
++		       @TERMUX_PREFIX@/etc/netgroup)
+ 
+-VAR_DB = /var/db
++VAR_DB = @TERMUX_PREFIX@/var/db
+ 
+ AWK = awk
+ MAKEDB = makedb --quiet
+@@ -29,7 +29,7 @@ MAKEDB = makedb --quiet
+ all: $(patsubst %,$(VAR_DB)/%.db,$(notdir $(DATABASES)))
+ 
+ 
+-$(VAR_DB)/passwd.db: /etc/passwd
++$(VAR_DB)/passwd.db: @TERMUX_PREFIX@/etc/passwd
+ 	@printf %s "$(patsubst %.db,%,$(@F))... "
+ 	@$(AWK) 'BEGIN { FS=":"; OFS=":" } \
+ 		 /^[ \t]*$$/ { next } \
+@@ -39,7 +39,7 @@ $(VAR_DB)/passwd.db: /etc/passwd
+ 	$(MAKEDB) -o $@ -
+ 	@echo "done."
+ 
+-$(VAR_DB)/group.db: /etc/group
++$(VAR_DB)/group.db: @TERMUX_PREFIX@/etc/group
+ 	@printf %s "$(patsubst %.db,%,$(@F))... "
+ 	@$(AWK) 'BEGIN { FS=":"; OFS=":" } \
+ 		 /^[ \t]*$$/ { next } \
+@@ -61,7 +61,7 @@ $(VAR_DB)/group.db: /etc/group
+ 	$(MAKEDB) -o $@ -
+ 	@echo "done."
+ 
+-$(VAR_DB)/ethers.db: /etc/ethers
++$(VAR_DB)/ethers.db: @TERMUX_PREFIX@/etc/ethers
+ 	@printf %s "$(patsubst %.db,%,$(@F))... "
+ 	@$(AWK) '/^[ \t]*$$/ { next } \
+ 		 /^[ \t]*#/ { next } \
+@@ -70,7 +70,7 @@ $(VAR_DB)/ethers.db: /etc/ethers
+ 	$(MAKEDB) -o $@ -
+ 	@echo "done."
+ 
+-$(VAR_DB)/protocols.db: /etc/protocols
++$(VAR_DB)/protocols.db: @TERMUX_PREFIX@/etc/protocols
+ 	@printf %s "$(patsubst %.db,%,$(@F))... "
+ 	@$(AWK) '/^[ \t]*$$/ { next } \
+ 		 /^[ \t]*#/ { next } \
+@@ -81,7 +81,7 @@ $(VAR_DB)/protocols.db: /etc/protocols
+ 	$(MAKEDB) -o $@ -
+ 	@echo "done."
+ 
+-$(VAR_DB)/rpc.db: /etc/rpc
++$(VAR_DB)/rpc.db: @TERMUX_PREFIX@/etc/rpc
+ 	@printf %s "$(patsubst %.db,%,$(@F))... "
+ 	@$(AWK) '/^[ \t]*$$/ { next } \
+ 		 /^[ \t]*#/ { next } \
+@@ -92,7 +92,7 @@ $(VAR_DB)/rpc.db: /etc/rpc
+ 	$(MAKEDB) -o $@ -
+ 	@echo "done."
+ 
+-$(VAR_DB)/services.db: /etc/services
++$(VAR_DB)/services.db: @TERMUX_PREFIX@/etc/services
+ 	@printf %s "$(patsubst %.db,%,$(@F))... "
+ 	@$(AWK) 'BEGIN { FS="[ \t/]+" } \
+ 		 /^[ \t]*$$/ { next } \
+@@ -108,7 +108,7 @@ $(VAR_DB)/services.db: /etc/services
+ 	$(MAKEDB) -o $@ -
+ 	@echo "done."
+ 
+-$(VAR_DB)/shadow.db: /etc/shadow
++$(VAR_DB)/shadow.db: @TERMUX_PREFIX@/etc/shadow
+ 	@printf %s "$(patsubst %.db,%,$(@F))... "
+ 	@$(AWK) 'BEGIN { FS=":"; OFS=":" } \
+ 		 /^[ \t]*$$/ { next } \
+@@ -128,7 +128,7 @@ $(VAR_DB)/shadow.db: /etc/shadow
+ 	  echo; \
+ 	fi
+ 
+-$(VAR_DB)/gshadow.db: /etc/gshadow
++$(VAR_DB)/gshadow.db: @TERMUX_PREFIX@/etc/gshadow
+ 	@printf %s "$(patsubst %.db,%,$(@F))... "
+ 	@$(AWK) 'BEGIN { FS=":"; OFS=":" } \
+ 		 /^[ \t]*$$/ { next } \
+@@ -148,7 +148,7 @@ $(VAR_DB)/gshadow.db: /etc/gshadow
+ 	  echo; \
+ 	fi
+ 
+-$(VAR_DB)/netgroup.db: /etc/netgroup
++$(VAR_DB)/netgroup.db: @TERMUX_PREFIX@/etc/netgroup
+ 	@printf %s "$(patsubst %.db,%,$(@F))... "
+ 	@$(AWK) 'BEGIN { ini=1 } \
+ 		 /^[ \t]*$$/ { next } \
+diff --git a/nss/nss_compat/compat-grp.c b/nss/nss_compat/compat-grp.c
+index 92d099eb..78a17631 100644
+--- a/nss/nss_compat/compat-grp.c
++++ b/nss/nss_compat/compat-grp.c
+@@ -108,7 +108,7 @@ internal_setgrent (ent_t *ent, int stayopen, int needent)
+ 
+   if (ent->stream == NULL)
+     {
+-      ent->stream = __nss_files_fopen ("/etc/group");
++      ent->stream = __nss_files_fopen ("@TERMUX_PREFIX@/etc/group");
+ 
+       if (ent->stream == NULL)
+ 	status = errno == EAGAIN ? NSS_STATUS_TRYAGAIN : NSS_STATUS_UNAVAIL;
+diff --git a/nss/nss_compat/compat-initgroups.c b/nss/nss_compat/compat-initgroups.c
+index 90bcdb97..b25d416f 100644
+--- a/nss/nss_compat/compat-initgroups.c
++++ b/nss/nss_compat/compat-initgroups.c
+@@ -122,7 +122,7 @@ internal_setgrent (ent_t *ent)
+   else
+     ent->blacklist.current = 0;
+ 
+-  ent->stream = __nss_files_fopen ("/etc/group");
++  ent->stream = __nss_files_fopen ("@TERMUX_PREFIX@/etc/group");
+ 
+   if (ent->stream == NULL)
+     status = errno == EAGAIN ? NSS_STATUS_TRYAGAIN : NSS_STATUS_UNAVAIL;
+diff --git a/nss/nss_compat/compat-pwd.c b/nss/nss_compat/compat-pwd.c
+index f9ad9400..7c11f9d4 100644
+--- a/nss/nss_compat/compat-pwd.c
++++ b/nss/nss_compat/compat-pwd.c
+@@ -223,7 +223,7 @@ internal_setpwent (ent_t *ent, int stayopen, int needent)
+ 
+   if (ent->stream == NULL)
+     {
+-      ent->stream = __nss_files_fopen ("/etc/passwd");
++      ent->stream = __nss_files_fopen ("@TERMUX_PREFIX@/etc/passwd");
+ 
+       if (ent->stream == NULL)
+ 	status = errno == EAGAIN ? NSS_STATUS_TRYAGAIN : NSS_STATUS_UNAVAIL;
+diff --git a/nss/nss_compat/compat-spwd.c b/nss/nss_compat/compat-spwd.c
+index c3ce41b1..28d520b9 100644
+--- a/nss/nss_compat/compat-spwd.c
++++ b/nss/nss_compat/compat-spwd.c
+@@ -178,7 +178,7 @@ internal_setspent (ent_t *ent, int stayopen, int needent)
+ 
+   if (ent->stream == NULL)
+     {
+-      ent->stream = __nss_files_fopen ("/etc/shadow");
++      ent->stream = __nss_files_fopen ("@TERMUX_PREFIX@/etc/shadow");
+ 
+       if (ent->stream == NULL)
+ 	status = errno == EAGAIN ? NSS_STATUS_TRYAGAIN : NSS_STATUS_UNAVAIL;
+diff --git a/nss/nss_files/files-init.c b/nss/nss_files/files-init.c
+index d5c2795b..95b8f266 100644
+--- a/nss/nss_files/files-init.c
++++ b/nss/nss_files/files-init.c
+@@ -41,12 +41,12 @@ register_file (void (*cb) (size_t, struct traced_file *),
+ void
+ _nss_files_init (void (*cb) (size_t, struct traced_file *))
+ {
+-  register_file (cb, pwddb, "/etc/passwd", 0);
+-  register_file (cb, grpdb, "/etc/group", 0);
+-  register_file (cb, hstdb, "/etc/hosts", 0);
+-  register_file (cb, hstdb, "/etc/resolv.conf", 1);
+-  register_file (cb, servdb, "/etc/services", 0);
+-  register_file (cb, netgrdb, "/etc/netgroup", 0);
++  register_file (cb, pwddb, "@TERMUX_PREFIX@/etc/passwd", 0);
++  register_file (cb, grpdb, "@TERMUX_PREFIX@/etc/group", 0);
++  register_file (cb, hstdb, "/system/etc/hosts", 0);
++  register_file (cb, hstdb, "@TERMUX_PREFIX@/etc/resolv.conf", 1);
++  register_file (cb, servdb, "@TERMUX_PREFIX@/etc/services", 0);
++  register_file (cb, netgrdb, "@TERMUX_PREFIX@/etc/netgroup", 0);
+ }
+ libc_hidden_def (_nss_files_init)
+ 
+diff --git a/nss/nss_files/files-initgroups.c b/nss/nss_files/files-initgroups.c
+index 929039af..4b3eea49 100644
+--- a/nss/nss_files/files-initgroups.c
++++ b/nss/nss_files/files-initgroups.c
+@@ -33,7 +33,7 @@ _nss_files_initgroups_dyn (const char *user, gid_t group, long int *start,
+ 			   long int *size, gid_t **groupsp, long int limit,
+ 			   int *errnop)
+ {
+-  FILE *stream = __nss_files_fopen ("/etc/group");
++  FILE *stream = __nss_files_fopen ("@TERMUX_PREFIX@/etc/group");
+   if (stream == NULL)
+     {
+       *errnop = errno;
+diff --git a/nss/nss_files/files-XXX.c b/nss/nss_files/files-XXX.c
+index 2ed7184c..fb67afb0 100644
+--- a/nss/nss_files/files-XXX.c
++++ b/nss/nss_files/files-XXX.c
+@@ -39,7 +39,7 @@
+ 
+ #define ENTNAME_r	CONCAT(ENTNAME,_r)
+ 
+-#define DATAFILE	"/etc/" DATABASE
++#define DATAFILE	"@TERMUX_PREFIX@/etc/" DATABASE
+ 
+ #ifdef NEED_H_ERRNO
+ # include <netdb.h>
+diff --git a/nss/nss_files/files-alias.c b/nss/nss_files/files-alias.c
+index 4601cb6c..a2ab1271 100644
+--- a/nss/nss_files/files-alias.c
++++ b/nss/nss_files/files-alias.c
+@@ -42,7 +42,7 @@ internal_setent (FILE **stream)
+ 
+   if (*stream == NULL)
+     {
+-      *stream = __nss_files_fopen ("/etc/aliases");
++      *stream = __nss_files_fopen ("@TERMUX_PREFIX@/etc/aliases");
+ 
+       if (*stream == NULL)
+ 	status = errno == EAGAIN ? NSS_STATUS_TRYAGAIN : NSS_STATUS_UNAVAIL;
+@@ -58,7 +58,7 @@ internal_setent (FILE **stream)
+ enum nss_status
+ _nss_files_setaliasent (void)
+ {
+-  return __nss_files_data_setent (nss_file_aliasent, "/etc/aliases");
++  return __nss_files_data_setent (nss_file_aliasent, "@TERMUX_PREFIX@/etc/aliases");
+ }
+ libc_hidden_def (_nss_files_setaliasent)
+ 
+@@ -338,7 +338,7 @@ _nss_files_getaliasent_r (struct aliasent *result, char *buffer, size_t buflen,
+ 
+   struct nss_files_per_file_data *data;
+   enum nss_status status = __nss_files_data_open (&data, nss_file_aliasent,
+-						  "/etc/aliases", errnop, NULL);
++						  "@TERMUX_PREFIX@/etc/aliases", errnop, NULL);
+   if (status != NSS_STATUS_SUCCESS)
+     return status;
+ 
+diff --git a/nss/nss_files/files-netgrp.c b/nss/nss_files/files-netgrp.c
+index 28ab40da..09dbc877 100644
+--- a/nss/nss_files/files-netgrp.c
++++ b/nss/nss_files/files-netgrp.c
+@@ -27,7 +27,7 @@
+ #include "netgroup.h"
+ #include <nss_files.h>
+ 
+-#define DATAFILE	"/etc/netgroup"
++#define DATAFILE	"@TERMUX_PREFIX@/etc/netgroup"
+ 
+ libc_hidden_proto (_nss_files_endnetgrent)
+ 

@@ -1,0 +1,28 @@
+--- glibc-2.38/grp/getgrgid.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/grp/getgrgid.c.patch	2023-10-24 09:06:25.004991324 +0300
+@@ -24,5 +24,6 @@
+ #define ADD_PARAMS	gid_t gid
+ #define ADD_VARIABLES	gid
+ #define BUFLEN		NSS_BUFLEN_GROUP
++#define ANDROID_SYS	getgrgid_android
+ 
+ #include "../nss/getXXbyYY.c"
+--- glibc-2.38/grp/getgrgid_r.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/grp/getgrgid_r.c.patch	2023-10-24 10:37:06.021493960 +0300
+@@ -27,5 +27,6 @@
+ #define BUFLEN		NSS_BUFLEN_GROUP
+ #define DEEPCOPY_FN	__copy_grp
+ #define MERGE_FN	__merge_grp
++#define ANDROID_SYS	getgrgid_android
+ 
+ #include <nss/getXXbyYY_r.c>
+--- glibc-2.38/nscd/getgrgid_r.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/nscd/getgrgid_r.c.patch	2023-10-24 10:36:56.921493963 +0300
+@@ -27,6 +27,7 @@
+ 
+ #define DEEPCOPY_FN	__copy_grp
+ #define MERGE_FN	__merge_grp
++#define ANDROID_SYS	getgrgid_android
+ 
+ /* We are nscd, so we don't want to be talking to ourselves.  */
+ #undef	USE_NSCD

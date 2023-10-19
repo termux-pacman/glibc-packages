@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="GNU C Library"
 TERMUX_PKG_LICENSE="GPL-3.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_VERSION=2.38
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_REVISION=6
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/libc/glibc-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=fb82998998b2b29965467bc1b69d152e9c307d2cf301c9eafb4555b770ef3fd2
 TERMUX_PKG_DEPENDS="linux-api-headers-glibc"
@@ -21,6 +21,13 @@ termux_step_pre_configure() {
 	done
 
 	rm ${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/*/clone3.S
+
+	for i in android_passwd_group.h android_passwd_group.c android_system_user_ids.h; do
+		cp ${TERMUX_PKG_BUILDER_DIR}/${i} ${TERMUX_PKG_SRCDIR}/nss/
+	done
+	bash ${TERMUX_PKG_BUILDER_DIR}/gen-android-ids.sh ${TERMUX_BASE_DIR} \
+		${TERMUX_PKG_SRCDIR}/nss/android_ids.h \
+		${TERMUX_PKG_BUILDER_DIR}/android_system_user_ids.h
 }
 
 termux_step_configure() {

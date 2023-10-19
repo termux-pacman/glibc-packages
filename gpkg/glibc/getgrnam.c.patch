@@ -1,0 +1,29 @@
+--- glibc-2.38/grp/getgrnam.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/grp/getgrnam.c.patch	2023-10-25 12:46:39.218853501 +0300
+@@ -24,5 +24,6 @@
+ #define ADD_PARAMS	const char *name
+ #define ADD_VARIABLES	name
+ #define BUFLEN		NSS_BUFLEN_GROUP
++#define ANDROID_SYS	getgrnam_android
+ 
+ #include "../nss/getXXbyYY.c"
+--- glibc-2.38/grp/getgrnam_r.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/grp/getgrnam_r.c.patch	2023-10-25 12:47:53.598853472 +0300
+@@ -24,6 +24,7 @@
+ #define DATABASE_NAME	group
+ #define ADD_PARAMS	const char *name
+ #define ADD_VARIABLES	name
++#define ANDROID_SYS	getgrnam_android
+ 
+ #define DEEPCOPY_FN	__copy_grp
+ #define MERGE_FN	__merge_grp
+--- glibc-2.38/nscd/getgrnam_r.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/nscd/getgrnam_r.c.patch	2023-10-25 12:48:59.818853447 +0300
+@@ -23,6 +23,7 @@
+ #define DATABASE_NAME	group
+ #define ADD_PARAMS	const char *name
+ #define ADD_VARIABLES	name
++#define ANDROID_SYS	getgrnam_android
+ 
+ #define DEEPCOPY_FN	__copy_grp
+ #define MERGE_FN	__merge_grp
