@@ -1,0 +1,28 @@
+--- glibc-2.38/nss/getXXbyYY_r.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/nss/getXXbyYY_r.c.patch	2023-10-26 10:23:01.846548826 +0300
+@@ -27,6 +27,9 @@
+ #ifdef NEED__RES
+ # include <resolv/resolv_context.h>
+ #endif
++#ifdef ANDROID_SYS
++# include "android_passwd_group.h"
++#endif
+ /*******************************************************************\
+ |* Here we assume several symbols to be defined:		   *|
+ |*								   *|
+@@ -349,6 +352,15 @@
+ #ifdef HANDLE_DIGITS_DOTS
+ done:
+ #endif
++#ifdef ANDROID_SYS
++  if (status != NSS_STATUS_SUCCESS) {
++    LOOKUP_TYPE *android_buf = ANDROID_SYS (ADD_VARIABLES);
++    if (android_buf != NULL) {
++      *resbuf = *android_buf;
++      status = NSS_STATUS_SUCCESS;
++    }
++  }
++#endif
+   *result = status == NSS_STATUS_SUCCESS ? resbuf : NULL;
+ #ifdef NEED_H_ERRNO
+   if (status == NSS_STATUS_UNAVAIL && !any_service && errno != ENOENT)

@@ -1,0 +1,28 @@
+--- glibc-2.38/pwd/getpwnam.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/pwd/getpwnam.c.patch	2023-10-25 12:42:35.608853594 +0300
+@@ -24,5 +24,6 @@
+ #define ADD_PARAMS	const char *name
+ #define ADD_VARIABLES	name
+ #define BUFLEN		NSS_BUFLEN_PASSWD
++#define ANDROID_SYS	getpwnam_android
+ 
+ #include "../nss/getXXbyYY.c"
+--- glibc-2.38/pwd/getpwnam_r.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/pwd/getpwnam_r.c.patch	2023-10-25 12:43:40.708853569 +0300
+@@ -24,5 +24,6 @@
+ #define ADD_PARAMS	const char *name
+ #define ADD_VARIABLES	name
+ #define BUFLEN		NSS_BUFLEN_PASSWD
++#define ANDROID_SYS	getpwnam_android
+ 
+ #include <nss/getXXbyYY_r.c>
+--- glibc-2.38/nscd/getpwnam_r.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/nscd/getpwnam_r.c.patch	2023-10-25 12:44:19.868853554 +0300
+@@ -23,6 +23,7 @@
+ #define ADD_PARAMS	const char *name
+ #define ADD_VARIABLES	name
+ #define BUFLEN		NSS_BUFLEN_PASSWD
++#define ANDROID_SYS	getpwnam_android
+ 
+ /* We are nscd, so we don't want to be talking to ourselves.  */
+ #undef	USE_NSCD

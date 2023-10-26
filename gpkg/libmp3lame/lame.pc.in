@@ -1,0 +1,11 @@
+prefix=@TERMUX_PREFIX@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: lame
+Description: MP3 encoding library
+Requires:
+Version: @TERMUX_PKG_VERSION@
+Libs: -L${libdir} -lmp3lame
+Cflags: -I${includedir}
