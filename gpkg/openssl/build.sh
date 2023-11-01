@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="Library implementing the SSL and TLS protocols as well a
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_VERSION=3.1.4
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://www.openssl.org/source/openssl-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=840af5366ab9b522bde525826be3ef0fb0af81c6a9ebd84caa600fea1731eee3
-TERMUX_PKG_DEPENDS="ca-certificates, resolv-conf, zlib-glibc, gcc-libs-glibc"
+TERMUX_PKG_DEPENDS="ca-certificates-glibc, resolv-conf, zlib-glibc, gcc-libs-glibc"
 TERMUX_PKG_CONFFILES="glibc/etc/ssl/openssl.cnf"
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -37,5 +38,4 @@ termux_step_make() {
 termux_step_make_install() {
 	make MANDIR=$TERMUX_PREFIX/share/man MANSUFFIX=ssl install_sw install_ssldirs install_man_docs
 	ln -s $TERMUX_PREFIX_CLASSICAL/etc/resolv.conf $TERMUX_PREFIX/etc
-	ln -s $TERMUX_PREFIX_CLASSICAL/etc/tls/cert.pem $TERMUX_PREFIX/etc/ssl/certs/ca-certificates.crt
 }
