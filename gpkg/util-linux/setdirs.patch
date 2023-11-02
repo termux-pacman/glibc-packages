@@ -74,10 +74,10 @@ index 56f64c3..877e8c8 100644
 -#define _PATH_GROUP		"/etc/group"
 -#define _PATH_SHADOW_PASSWD	"/etc/shadow"
 -#define _PATH_SHELLS		"/etc/shells"
-+#define _PATH_PASSWD		"/system/etc/passwd"
-+#define _PATH_GSHADOW		"/system/etc/gshadow"
-+#define _PATH_GROUP		"/system/etc/group"
-+#define _PATH_SHADOW_PASSWD	"/system/etc/shadow"
++#define _PATH_PASSWD		"@TERMUX_PREFIX@/etc/passwd"
++#define _PATH_GSHADOW		"@TERMUX_PREFIX@/etc/gshadow"
++#define _PATH_GROUP		"@TERMUX_PREFIX@/etc/group"
++#define _PATH_SHADOW_PASSWD	"@TERMUX_PREFIX@/etc/shadow"
 +#define _PATH_SHELLS		"@TERMUX_PREFIX@/etc/shells"
  
  #ifndef _PATH_TMP
