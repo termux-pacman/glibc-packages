@@ -3,12 +3,12 @@ TERMUX_PKG_DESCRIPTION="The Python programming language"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=3.11.5
+TERMUX_PKG_VERSION=3.11.6
 _MAJOR_VERSION="${TERMUX_PKG_VERSION%.*}"
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION%rc*}/Python-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=85cd12e9cf1d6d5a45f17f7afe1cebe7ee628d3282281c492e86adf636defa3f
+TERMUX_PKG_SHA256=0fab78fa7f133f4f38210c6260d90d7c0d5c7198446419ce057ec7ac2e6f5f38
 TERMUX_PKG_DEPENDS="libbz2-glibc, libexpat-glibc, gdbm-glibc, libffi-glibc, libnsl-glibc, libxcrypt-glibc, openssl-glibc, zlib-glibc"
-TERMUX_PKG_BUILD_DEPENDS="sqlite-glibc, mpdecimal-glibc"
+TERMUX_PKG_BUILD_DEPENDS="sqlite-glibc, mpdecimal-glibc, llvm-glibc"
 TERMUX_PKG_PROVIDES="python3-glibc"
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -21,9 +21,14 @@ termux_step_pre_configure() {
 }
 
 termux_step_configure() {
+	local _CONF_FLAG=""
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+		_CONF_FLAG="--with-build-python=python$_MAJOR_VERSION"
+	fi
+
 	./configure --prefix=${TERMUX_PREFIX} \
-		--host=${TERMUX_HOST_PLATFORM} \
 		--build=${TERMUX_HOST_PLATFORM} \
+		--host=${TERMUX_HOST_PLATFORM} \
 		--target=${TERMUX_HOST_PLATFORM} \
 		--enable-shared \
 		--with-computed-gotos \
@@ -34,6 +39,7 @@ termux_step_configure() {
 		--with-dbmliborder=gdbm:ndbm \
 		--enable-loadable-sqlite-extensions \
 		--without-ensurepip \
+		${_CONF_FLAG} \
 		LN='ln -s'
 }
 

@@ -1,0 +1,19 @@
+--- Python-3.11.6/configure	2023-10-02 16:29:10.000000000 +0300
++++ Python-3.11.6/configure.patch	2023-11-06 13:19:05.736786585 +0300
+@@ -9199,7 +9199,7 @@
+   sys/loadavg.h sys/lock.h sys/memfd.h sys/mkdev.h sys/mman.h sys/modem.h sys/param.h sys/poll.h \
+   sys/random.h sys/resource.h sys/select.h sys/sendfile.h sys/socket.h sys/soundcard.h sys/stat.h \
+   sys/statvfs.h sys/sys_domain.h sys/syscall.h sys/sysmacros.h sys/termio.h sys/time.h sys/times.h \
+-  sys/types.h sys/uio.h sys/un.h sys/utsname.h sys/wait.h sys/xattr.h sysexits.h syslog.h \
++  sys/types.h sys/uio.h sys/un.h sys/utsname.h sys/wait.h sysexits.h syslog.h \
+   termios.h util.h utime.h utmp.h \
+ 
+ do :
+@@ -15331,7 +15331,6 @@
+ $as_echo "$ac_cv_func_link" >&6; }
+   if test "x$ac_cv_func_link" = xyes; then :
+ 
+-$as_echo "#define HAVE_LINK 1" >>confdefs.h
+ 
+ fi
+ 

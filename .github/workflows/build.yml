@@ -33,7 +33,7 @@ jobs:
         fetch-depth: 1000
 
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2.2.0
+      uses: docker/setup-qemu-action@v3.0.0
 
     - name: Get files from termux-packages repository
       run: ./get-build-package.sh

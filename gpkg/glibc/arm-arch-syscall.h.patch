@@ -1,5 +1,5 @@
 --- glibc-2.38/sysdeps/unix/sysv/linux/arm/arch-syscall.h	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/arm/arch-syscall.h.patch	2023-10-20 18:47:54.527101247 +0300
++++ glibc-2.38/sysdeps/unix/sysv/linux/arm/arch-syscall.h.patch	2023-11-06 12:41:55.249731135 +0300
 @@ -2,7 +2,6 @@
  #define __NR__llseek 140
  #define __NR__newselect 142
@@ -8,15 +8,16 @@
  #define __NR_accept4 366
  #define __NR_access 33
  #define __NR_acct 51
-@@ -18,7 +17,6 @@
+@@ -18,24 +17,18 @@
  #define __NR_capget 184
  #define __NR_capset 185
  #define __NR_chdir 12
 -#define __NR_chmod 15
- #define __NR_chown 182
- #define __NR_chown32 212
+-#define __NR_chown 182
+-#define __NR_chown32 212
  #define __NR_chroot 61
-@@ -27,15 +25,12 @@
+ #define __NR_clock_adjtime 372
+ #define __NR_clock_adjtime64 405
  #define __NR_clock_getres 264
  #define __NR_clock_getres_time64 406
  #define __NR_clock_gettime 263
@@ -32,7 +33,7 @@
  #define __NR_connect 283
  #define __NR_copy_file_range 391
  #define __NR_creat 8
-@@ -56,7 +51,6 @@
+@@ -56,7 +49,6 @@
  #define __NR_exit 1
  #define __NR_exit_group 248
  #define __NR_faccessat 334
@@ -40,7 +41,7 @@
  #define __NR_fallocate 352
  #define __NR_fanotify_init 367
  #define __NR_fanotify_mark 368
-@@ -109,7 +103,6 @@
+@@ -109,7 +101,6 @@
  #define __NR_getitimer 105
  #define __NR_getpeername 287
  #define __NR_getpgid 132
@@ -48,7 +49,15 @@
  #define __NR_getpid 20
  #define __NR_getppid 64
  #define __NR_getpriority 96
-@@ -220,7 +213,6 @@
+@@ -168,7 +159,6 @@
+ #define __NR_lstat 107
+ #define __NR_lstat64 196
+ #define __NR_madvise 220
+-#define __NR_mbind 319
+ #define __NR_membarrier 389
+ #define __NR_memfd_create 385
+ #define __NR_migrate_pages 400
+@@ -220,7 +210,6 @@
  #define __NR_personality 136
  #define __NR_pidfd_getfd 438
  #define __NR_pidfd_open 434
@@ -56,7 +65,7 @@
  #define __NR_pipe 42
  #define __NR_pipe2 359
  #define __NR_pivot_root 218
-@@ -253,7 +245,6 @@
+@@ -253,7 +242,6 @@
  #define __NR_readlinkat 332
  #define __NR_readv 145
  #define __NR_reboot 88
@@ -64,7 +73,7 @@
  #define __NR_recvfrom 292
  #define __NR_recvmmsg 365
  #define __NR_recvmmsg_time64 417
-@@ -265,8 +256,6 @@
+@@ -265,8 +253,6 @@
  #define __NR_renameat2 382
  #define __NR_request_key 310
  #define __NR_restart_syscall 0
@@ -73,7 +82,7 @@
  #define __NR_rt_sigaction 174
  #define __NR_rt_sigpending 176
  #define __NR_rt_sigprocmask 175
-@@ -295,7 +284,6 @@
+@@ -295,7 +281,6 @@
  #define __NR_semop 298
  #define __NR_semtimedop 312
  #define __NR_semtimedop_time64 420
@@ -81,7 +90,7 @@
  #define __NR_sendfile 187
  #define __NR_sendfile64 239
  #define __NR_sendmmsg 374
-@@ -303,16 +291,9 @@
+@@ -303,16 +288,9 @@
  #define __NR_sendto 290
  #define __NR_set_mempolicy 321
  #define __NR_set_mempolicy_home_node 450
@@ -98,7 +107,7 @@
  #define __NR_setgroups 81
  #define __NR_setgroups32 206
  #define __NR_sethostname 74
-@@ -322,8 +303,6 @@
+@@ -322,8 +300,6 @@
  #define __NR_setpriority 97
  #define __NR_setregid 71
  #define __NR_setregid32 204
@@ -107,7 +116,7 @@
  #define __NR_setresuid 164
  #define __NR_setresuid32 208
  #define __NR_setreuid 70
-@@ -332,8 +311,6 @@
+@@ -332,8 +308,6 @@
  #define __NR_setsid 66
  #define __NR_setsockopt 294
  #define __NR_settimeofday 79
@@ -116,7 +125,7 @@
  #define __NR_setxattr 226
  #define __NR_shmat 305
  #define __NR_shmctl 308
-@@ -355,10 +332,8 @@
+@@ -355,10 +329,8 @@
  #define __NR_stat64 195
  #define __NR_statfs 99
  #define __NR_statfs64 266
