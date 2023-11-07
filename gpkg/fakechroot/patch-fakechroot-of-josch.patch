@@ -1,0 +1,1658 @@
+These changes were taken from the following repo:
+https://github.com/josch/fakechroot/tree/debian
+
+diff --git a/NEWS.md b/NEWS.md
+index 77bab5c..f1210bf 100644
+--- a/NEWS.md
++++ b/NEWS.md
+@@ -1,5 +1,12 @@
+ # NEWS
+ 
++## Version 2.20.2
++
++XX Xxx XXXX
++
++* UNRELEASED
++* New `statx(2)` function was added: glibc supports it since 2.28.
++
+ ## Version 2.20.1
+ 
+ 22 Mar 2019
+diff --git a/configure.ac b/configure.ac
+index b00078e..26c0611 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1,5 +1,5 @@
+ AC_PREREQ(2.64)
+-AC_INIT([fakechroot], [2.20.1], [dexter@debian.org], [fakechroot], [https://github.com/dex4er/fakechroot])
++AC_INIT([fakechroot], [2.20.2], [dexter@debian.org], [fakechroot], [https://github.com/dex4er/fakechroot])
+ 
+ AC_CONFIG_SRCDIR([src/libfakechroot.c])
+ AC_CONFIG_AUX_DIR([build-aux])
+@@ -75,6 +75,26 @@ ACX_CHECK_C_ATTRIBUTE_VISIBILITY
+ # Checks for libraries.
+ AC_CHECK_LIB([dl], [dlsym])
+ 
++AH_TEMPLATE([NEW_GLIBC], [glibc >= 2.33])
++AC_MSG_CHECKING([for glibc 2.33+])
++  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
++       #include <sys/stat.h>
++  ]], [[
++#ifdef __GLIBC__
++#if !__GLIBC_PREREQ(2,33)
++#error glibc<2.33
++#endif
++#else
++#error not glibc
++#endif
++  ]])],[
++   AC_DEFINE(NEW_GLIBC,1)
++   AC_MSG_RESULT([yes])
++  ],[
++   AC_DEFINE(NEW_GLIBC,0)
++   AC_MSG_RESULT([no])
++  ])
++
+ # Checks for header files.
+ AC_HEADER_DIRENT
+ AC_HEADER_STDC
+@@ -138,11 +158,13 @@ ACX_CHECK_FTS_NAME_TYPE
+ # Checks for library functions.
+ AC_CHECK_FUNCS(m4_normalize([
+     __chk_fail
++    __fstatat64_time64
+     __fxstat64
+     __fxstatat
+     __fxstatat64
+     __getcwd_chk
+     __getwd_chk
++    __lstat64_time64
+     __lxstat
+     __lxstat64
+     __open
+@@ -155,7 +177,11 @@ AC_CHECK_FUNCS(m4_normalize([
+     __realpath_chk
+     __readlink_chk
+     __readlinkat_chk
++    __stat64_time64
+     __statfs
++    __utime64
++    __utimensat64
++    __utimes64
+     __xmknod
+     __xmknodat
+     __xstat
+@@ -198,6 +224,8 @@ AC_CHECK_FUNCS(m4_normalize([
+     freopen64
+     fstat
+     fstat64
++    fstatat
++    fstatat64
+     fts_children
+     fts_open
+     fts_read
+@@ -277,6 +305,7 @@ AC_CHECK_FUNCS(m4_normalize([
+     statfs64
+     statvfs
+     statvfs64
++    statx
+     stpcpy
+     strchrnul
+     strlcpy
+diff --git a/makerelease.sh b/makerelease.sh
+new file mode 100755
+index 0000000..6a51b78
+--- /dev/null
++++ b/makerelease.sh
+@@ -0,0 +1,26 @@
++#!/bin/sh
++
++name=`grep AC_INIT configure.ac | perl -pe '$_ = (/\[(.*?)\]/g)[0]'`
++version=`grep AC_INIT configure.ac | perl -pe '$_ = (/\[(.*?)\]/g)[1]'`
++
++tarball="$name-$version.tar.gz"
++
++test -f "$tarball" || exit 1
++
++cat > .git/gbp.conf << END
++[import-orig]
++dch = False
++import-msg = New release version %(version)s
++interactive = False
++merge = False
++pristine-tar = False
++symlink-orig = False
++upstream-branch = release
++upstream-tag = %(version)s
++END
++
++set -x
++
++git fetch origin +release:release
++git tag -a -m "Release $version" master/$version
++gbp import-orig "$tarball"
+diff --git a/scripts/ldd.fakechroot.pl b/scripts/ldd.fakechroot.pl
+index b4bb2a8..13a9454 100755
+--- a/scripts/ldd.fakechroot.pl
++++ b/scripts/ldd.fakechroot.pl
+@@ -124,6 +124,38 @@ sub objdump {
+     }
+ }
+ 
++# mips64el, ppc64el and s390x do not list the linker itself
++# if it's missing, obtain it from the .interp section
++#
++# mips64el: /lib64/ld.so.1
++# ppc64el: /lib64/ld64.so.2
++# s390x: /lib/ld64.so.1
++sub elfinterp {
++    my $file = shift;
++    my $res = '';
++    local *PIPE;
++    open PIPE, "objdump -sj .interp '$file' 2>/dev/null |";
++    while (my $line = <PIPE>) {
++        if ( $line !~ /^ [a-f0-9]+ ([a-f0-9][a-f0-9][a-f0-9 ]{6} [a-f0-9 ]{8} [a-f0-9 ]{8} [a-f0-9 ]{8})  /) {
++            next;
++        }
++        $line = $1;
++        $line =~ s/ //g;
++        $line =~ s/(..)/chr(hex($1))/eg;
++        $res .= $line;
++    }
++    close PIPE;
++
++    # remove trailing NUL byte
++    $res =~ s/\000$//;
++
++    # only add if it is missing
++    if ( $res && !exists $Libs{$res} ) {
++        push @Libs, $res;
++        $Libs{$res} = '';
++    }
++}
++
+ 
+ sub load_ldsoconf {
+     my ($file) = @_;
+@@ -191,6 +223,7 @@ MAIN: {
+         }
+ 
+         objdump($file);
++        elfinterp($file_in_chroot);
+ 
+         if ($Dynamic == 0) {
+             print "\tnot a dynamic executable\n";
+diff --git a/src/Makefile.am b/src/Makefile.am
+index d729b0e..55193a9 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -1,9 +1,11 @@
+ pkglib_LTLIBRARIES = libfakechroot.la
+ libfakechroot_la_SOURCES = \
++    __fstatat64_time64.c \
+     __fxstatat.c \
+     __fxstatat64.c \
+     __getcwd_chk.c \
+     __getwd_chk.c \
++    __lstat64_time64.c \
+     __lxstat.c \
+     __lxstat64.c \
+     __lxstat64.h \
+@@ -18,7 +20,11 @@ libfakechroot_la_SOURCES = \
+     __readlinkat_chk.c \
+     __realpath_chk.c \
+     __realpath_chk.h \
++    __stat64_time64.c \
+     __statfs.c \
++    __utime64.c \
++    __utimensat64.c \
++    __utimes64.c \
+     __xmknod.c \
+     __xmknodat.c \
+     __xstat.c \
+@@ -61,6 +67,8 @@ libfakechroot_la_SOURCES = \
+     fopen64.c \
+     freopen.c \
+     freopen64.c \
++    fstatat.c \
++    fstatat64.c \
+     fts.c \
+     fts64.c \
+     ftw.c \
+@@ -118,6 +126,7 @@ libfakechroot_la_SOURCES = \
+     openat64.c \
+     opendir.c \
+     opendir.h \
++    passwd.c \
+     pathconf.c \
+     popen.c \
+     posix_spawn.c \
+@@ -152,6 +161,7 @@ libfakechroot_la_SOURCES = \
+     statfs64.c \
+     statvfs.c \
+     statvfs64.c \
++    statx.c \
+     stpcpy.c \
+     strchrnul.c \
+     strchrnul.h \
+diff --git a/src/__fstatat64_time64.c b/src/__fstatat64_time64.c
+new file mode 100644
+index 0000000..47a401f
+--- /dev/null
++++ b/src/__fstatat64_time64.c
+@@ -0,0 +1,44 @@
++/*
++    libfakechroot -- fake chroot environment
++    Copyright (c) 2010, 2021 Piotr Roszatycki <dexter@debian.org>
++
++    This library is free software; you can redistribute it and/or
++    modify it under the terms of the GNU Lesser General Public
++    License as published by the Free Software Foundation; either
++    version 2.1 of the License, or (at your option) any later version.
++
++    This library is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++    Lesser General Public License for more details.
++
++    You should have received a copy of the GNU Lesser General Public
++    License along with this library; if not, write to the Free Software
++    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
++*/
++
++
++#include <config.h>
++
++#ifdef HAVE___FSTATAT64_TIME64
++
++#define _ATFILE_SOURCE
++#define _POSIX_C_SOURCE 200809L
++#include <sys/stat.h>
++#include <limits.h>
++#include "libfakechroot.h"
++
++struct __stat64_t64;
++
++wrapper(__fstatat64_time64, int, (int dirfd, const char *pathname, struct __stat64_t64 *buf, int flags))
++{
++    char fakechroot_abspath[FAKECHROOT_PATH_MAX];
++    char fakechroot_buf[FAKECHROOT_PATH_MAX];
++    debug("__fstatat64_time64(%d, \"%s\", &buf, %d)", dirfd, pathname, flags);
++    expand_chroot_path_at(dirfd, pathname);
++    return nextcall(__fstatat64_time64)(dirfd, pathname, buf, flags);
++}
++
++#else
++typedef int empty_translation_unit;
++#endif
+diff --git a/src/__lstat64_time64.c b/src/__lstat64_time64.c
+new file mode 100644
+index 0000000..e3e8400
+--- /dev/null
++++ b/src/__lstat64_time64.c
+@@ -0,0 +1,49 @@
++/*
++    libfakechroot -- fake chroot environment
++    Copyright (c) 2010, 2021 Piotr Roszatycki <dexter@debian.org>
++
++    This library is free software; you can redistribute it and/or
++    modify it under the terms of the GNU Lesser General Public
++    License as published by the Free Software Foundation; either
++    version 2.1 of the License, or (at your option) any later version.
++
++    This library is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++    Lesser General Public License for more details.
++
++    You should have received a copy of the GNU Lesser General Public
++    License along with this library; if not, write to the Free Software
++    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
++*/
++
++
++#include <config.h>
++
++#ifdef HAVE___LSTAT64_TIME64
++
++#define _ATFILE_SOURCE
++#define _POSIX_C_SOURCE 200809L
++#include <sys/stat.h>
++#include <limits.h>
++#include "libfakechroot.h"
++
++struct __stat64_t64;
++
++wrapper(__lstat64_time64, int, (const char *filename, struct __stat64_t64 *buf))
++{
++    char fakechroot_abspath[FAKECHROOT_PATH_MAX];
++    char fakechroot_buf[FAKECHROOT_PATH_MAX];
++    char resolved[FAKECHROOT_PATH_MAX];
++    debug("__lstat64_time64(\"%s\", &buf)", filename);
++    if (rel2abs(filename, resolved) == NULL) {
++        return -1;
++    }
++    filename = resolved;
++    expand_chroot_path(filename);
++    return nextcall(__lstat64_time64)(filename, buf);
++}
++
++#else
++typedef int empty_translation_unit;
++#endif
+diff --git a/src/__stat64_time64.c b/src/__stat64_time64.c
+new file mode 100644
+index 0000000..1b65345
+--- /dev/null
++++ b/src/__stat64_time64.c
+@@ -0,0 +1,47 @@
++/*
++    libfakechroot -- fake chroot environment
++    Copyright (c) 2010-2015 Piotr Roszatycki <dexter@debian.org>
++
++    This library is free software; you can redistribute it and/or
++    modify it under the terms of the GNU Lesser General Public
++    License as published by the Free Software Foundation; either
++    version 2.1 of the License, or (at your option) any later version.
++
++    This library is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++    Lesser General Public License for more details.
++
++    You should have received a copy of the GNU Lesser General Public
++    License along with this library; if not, write to the Free Software
++    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
++*/
++
++
++#include <config.h>
++
++#ifdef HAVE___STAT64_TIME64
++
++#define _BSD_SOURCE
++#define _LARGEFILE64_SOURCE
++#define _DEFAULT_SOURCE
++#include <sys/stat.h>
++#include <limits.h>
++#include <stdlib.h>
++
++#include "libfakechroot.h"
++
++struct __stat64_t64;
++
++wrapper(__stat64_time64, int, (const char * file_name, struct __stat64_t64 * buf))
++{
++    char fakechroot_abspath[FAKECHROOT_PATH_MAX];
++    char fakechroot_buf[FAKECHROOT_PATH_MAX];
++    debug("__stat64_time64(\"%s\", &buf)", file_name);
++    expand_chroot_path(file_name);
++    return nextcall(__stat64_time64)(file_name, buf);
++}
++
++#else
++typedef int empty_translation_unit;
++#endif
+diff --git a/src/__utime64.c b/src/__utime64.c
+new file mode 100644
+index 0000000..65d6e83
+--- /dev/null
++++ b/src/__utime64.c
+@@ -0,0 +1,41 @@
++/*
++    libfakechroot -- fake chroot environment
++    Copyright (c) 2010, 2013 Piotr Roszatycki <dexter@debian.org>
++
++    This library is free software; you can redistribute it and/or
++    modify it under the terms of the GNU Lesser General Public
++    License as published by the Free Software Foundation; either
++    version 2.1 of the License, or (at your option) any later version.
++
++    This library is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++    Lesser General Public License for more details.
++
++    You should have received a copy of the GNU Lesser General Public
++    License along with this library; if not, write to the Free Software
++    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
++*/
++
++
++#include <config.h>
++
++#ifdef HAVE___UTIME64
++
++#define _ATFILE_SOURCE
++#define _POSIX_C_SOURCE 200809L
++#include <utime.h>
++#include "libfakechroot.h"
++
++wrapper(__utime64, int, (const char * filename, const struct utimbuf * buf))
++{
++    char fakechroot_abspath[FAKECHROOT_PATH_MAX];
++    char fakechroot_buf[FAKECHROOT_PATH_MAX];
++    debug("__utime64(\"%s\", &buf)", filename);
++    expand_chroot_path(filename);
++    return nextcall(__utime64)(filename, buf);
++}
++
++#else
++typedef int empty_translation_unit;
++#endif
+diff --git a/src/__utimensat64.c b/src/__utimensat64.c
+new file mode 100644
+index 0000000..3973d64
+--- /dev/null
++++ b/src/__utimensat64.c
+@@ -0,0 +1,42 @@
++/*
++    libfakechroot -- fake chroot environment
++    Copyright (c) 2010, 2013 Piotr Roszatycki <dexter@debian.org>
++
++    This library is free software; you can redistribute it and/or
++    modify it under the terms of the GNU Lesser General Public
++    License as published by the Free Software Foundation; either
++    version 2.1 of the License, or (at your option) any later version.
++
++    This library is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++    Lesser General Public License for more details.
++
++    You should have received a copy of the GNU Lesser General Public
++    License along with this library; if not, write to the Free Software
++    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
++*/
++
++
++#include <config.h>
++
++#ifdef HAVE___UTIMENSAT64
++
++#define _ATFILE_SOURCE
++#define _POSIX_C_SOURCE 200809L
++#include <sys/time.h>
++#include "libfakechroot.h"
++
++
++wrapper(__utimensat64, int, (int dirfd, const char * pathname, const struct timespec times [2], int flags))
++{
++    char fakechroot_abspath[FAKECHROOT_PATH_MAX];
++    char fakechroot_buf[FAKECHROOT_PATH_MAX];
++    debug("utimeat(%d, \"%s\", &buf, %d)", dirfd, pathname, flags);
++    expand_chroot_path_at(dirfd, pathname);
++    return nextcall(__utimensat64)(dirfd, pathname, times, flags);
++}
++
++#else
++typedef int empty_translation_unit;
++#endif
+diff --git a/src/__utimes64.c b/src/__utimes64.c
+new file mode 100644
+index 0000000..03e57d1
+--- /dev/null
++++ b/src/__utimes64.c
+@@ -0,0 +1,42 @@
++/*
++    libfakechroot -- fake chroot environment
++    Copyright (c) 2010, 2013 Piotr Roszatycki <dexter@debian.org>
++
++    This library is free software; you can redistribute it and/or
++    modify it under the terms of the GNU Lesser General Public
++    License as published by the Free Software Foundation; either
++    version 2.1 of the License, or (at your option) any later version.
++
++    This library is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++    Lesser General Public License for more details.
++
++    You should have received a copy of the GNU Lesser General Public
++    License along with this library; if not, write to the Free Software
++    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
++*/
++
++
++#include <config.h>
++
++#ifdef HAVE___UTIMES64
++
++#define _ATFILE_SOURCE
++#define _POSIX_C_SOURCE 200809L
++
++#include <sys/time.h>
++#include "libfakechroot.h"
++
++wrapper(__utimes64, int, (const char * filename, UTIMES_TYPE_ARG2(tv)))
++{
++    char fakechroot_abspath[FAKECHROOT_PATH_MAX];
++    char fakechroot_buf[FAKECHROOT_PATH_MAX];
++    debug("__utimes64(\"%s\", &tv)", filename);
++    expand_chroot_path(filename);
++    return nextcall(__utimes64)(filename, tv);
++}
++
++#else
++typedef int empty_translation_unit;
++#endif
+diff --git a/src/dladdr.c b/src/dladdr.c
+index fef3257..3dffdb3 100644
+--- a/src/dladdr.c
++++ b/src/dladdr.c
+@@ -36,11 +36,13 @@ wrapper(dladdr, int, (const void * addr, Dl_info * info))
+ 
+     ret = nextcall(dladdr)(addr, info);
+ 
+-    if (info->dli_fname) {
+-        narrow_chroot_path(info->dli_fname);
+-    }
+-    if (info->dli_sname) {
+-        narrow_chroot_path(info->dli_sname);
++    if (ret != 0) {
++        if (info->dli_fname) {
++            narrow_chroot_path(info->dli_fname);
++        }
++        if (info->dli_sname) {
++            narrow_chroot_path(info->dli_sname);
++        }
+     }
+ 
+     return ret;
+diff --git a/src/fstatat.c b/src/fstatat.c
+new file mode 100644
+index 0000000..ca7578b
+--- /dev/null
++++ b/src/fstatat.c
+@@ -0,0 +1,42 @@
++/*
++    libfakechroot -- fake chroot environment
++    Copyright (c) 2010, 2021 Piotr Roszatycki <dexter@debian.org>
++
++    This library is free software; you can redistribute it and/or
++    modify it under the terms of the GNU Lesser General Public
++    License as published by the Free Software Foundation; either
++    version 2.1 of the License, or (at your option) any later version.
++
++    This library is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++    Lesser General Public License for more details.
++
++    You should have received a copy of the GNU Lesser General Public
++    License along with this library; if not, write to the Free Software
++    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
++*/
++
++
++#include <config.h>
++
++#ifdef HAVE_FSTATAT
++
++#define _ATFILE_SOURCE
++#define _POSIX_C_SOURCE 200809L
++#include <sys/stat.h>
++#include <limits.h>
++#include "libfakechroot.h"
++
++wrapper(fstatat, int, (int dirfd, const char *pathname, struct stat *buf, int flags))
++{
++    char fakechroot_abspath[FAKECHROOT_PATH_MAX];
++    char fakechroot_buf[FAKECHROOT_PATH_MAX];
++    debug("fstatat(%d, \"%s\", &buf, %d)", dirfd, pathname, flags);
++    expand_chroot_path_at(dirfd, pathname);
++    return nextcall(fstatat)(dirfd, pathname, buf, flags);
++}
++
++#else
++typedef int empty_translation_unit;
++#endif
+diff --git a/src/fstatat64.c b/src/fstatat64.c
+new file mode 100644
+index 0000000..1863372
+--- /dev/null
++++ b/src/fstatat64.c
+@@ -0,0 +1,43 @@
++/*
++    libfakechroot -- fake chroot environment
++    Copyright (c) 2010, 2021 Piotr Roszatycki <dexter@debian.org>
++
++    This library is free software; you can redistribute it and/or
++    modify it under the terms of the GNU Lesser General Public
++    License as published by the Free Software Foundation; either
++    version 2.1 of the License, or (at your option) any later version.
++
++    This library is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++    Lesser General Public License for more details.
++
++    You should have received a copy of the GNU Lesser General Public
++    License along with this library; if not, write to the Free Software
++    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
++*/
++
++
++#include <config.h>
++
++#ifdef HAVE_FSTATAT64
++
++#define _ATFILE_SOURCE
++#define _POSIX_C_SOURCE 200809L
++#define _LARGEFILE64_SOURCE
++#include <sys/stat.h>
++#include <limits.h>
++#include "libfakechroot.h"
++
++wrapper(fstatat64, int, (int dirfd, const char *pathname, struct stat64 *buf, int flags))
++{
++    char fakechroot_abspath[FAKECHROOT_PATH_MAX];
++    char fakechroot_buf[FAKECHROOT_PATH_MAX];
++    debug("fstatat64(%d, \"%s\", &buf, %d)", dirfd, pathname, flags);
++    expand_chroot_path_at(dirfd, pathname);
++    return nextcall(fstatat64)(dirfd, pathname, buf, flags);
++}
++
++#else
++typedef int empty_translation_unit;
++#endif
+diff --git a/src/ftw.c b/src/ftw.c
+index 92fc126..a9abc85 100644
+--- a/src/ftw.c
++++ b/src/ftw.c
+@@ -185,7 +185,7 @@ int rpl_lstat (const char *, struct stat *);
+ # define NFTW_NEW_NAME __new_nftw
+ # define INO_T ino_t
+ # define STAT stat
+-# ifdef _LIBC
++# if defined(_LIBC) && !NEW_GLIBC
+ #  define LXSTAT __lxstat
+ #  define XSTAT __xstat
+ #  define FXSTATAT __fxstatat
+diff --git a/src/ftw64.c b/src/ftw64.c
+index 7cc8cdf..cee1f2b 100644
+--- a/src/ftw64.c
++++ b/src/ftw64.c
+@@ -18,6 +18,8 @@
+    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+    02111-1307 USA.  */
+ 
++#include "config.h"
++
+ #define __FTW64_C
+ #define FTW_NAME ftw64
+ #define NFTW_NAME nftw64
+@@ -25,9 +27,15 @@
+ #define NFTW_NEW_NAME __new_nftw64
+ #define INO_T ino64_t
+ #define STAT stat64
+-#define LXSTAT __lxstat64
+-#define XSTAT __xstat64
+-#define FXSTATAT __fxstatat64
++#if NEW_GLIBC
++#  define LXSTAT(V,f,sb) lstat64 (f,sb)
++#  define XSTAT(V,f,sb) stat64 (f,sb)
++#  define FXSTATAT(V,d,f,sb,m) fstatat64 (d, f, sb, m)
++#else
++#  define LXSTAT __lxstat64
++#  define XSTAT __xstat64
++#  define FXSTATAT __fxstatat64
++#endif
+ #define FTW_FUNC_T __ftw64_func_t
+ #define NFTW_FUNC_T __nftw64_func_t
+ 
+diff --git a/src/lckpwdf.c b/src/lckpwdf.c
+index dc0e68b..66a058d 100644
+--- a/src/lckpwdf.c
++++ b/src/lckpwdf.c
+@@ -22,12 +22,37 @@
+ 
+ #ifdef HAVE_LCKPWDF
+ 
++#include <unistd.h>
++#include <fcntl.h>
+ #include "libfakechroot.h"
++#include "open.h"
+ 
+ 
+ wrapper(lckpwdf, int, (void))
+ {
++    char fakechroot_abspath[FAKECHROOT_PATH_MAX];
++    char fakechroot_buf[FAKECHROOT_PATH_MAX];
++
++    int file;
+     debug("lckpwdf()");
++    // lckpwdf will create an empty /etc/.pwd.lock
++    // if that file doesn't exist yet, we create it here as well
++    char* pwdlockfile = "/etc/.pwd.lock";
++    expand_chroot_path(pwdlockfile);
++
++    if ((file = nextcall(open)(pwdlockfile, O_RDONLY)) == 0) {
++        // if the file already exists, don't touch it
++        close(file);
++        return 0;
++    }
++
++    if ((file = nextcall(open)(pwdlockfile, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR)) == -1) {
++        // we ignore any errors (maybe /etc doesn't exist or we don't have the
++        // necessary permissions)
++        return 0;
++    }
++    // the file remains empty
++    close(file);
+     return 0;
+ }
+ 
+diff --git a/src/libfakechroot.h b/src/libfakechroot.h
+index 4cf199f..64ff15f 100644
+--- a/src/libfakechroot.h
++++ b/src/libfakechroot.h
+@@ -200,6 +200,21 @@
+ # endif
+ #endif
+ 
++#ifndef _STAT_VER
++ #if defined (__aarch64__)
++  #define _STAT_VER 0
++ #elif defined (__powerpc__) && __WORDSIZE == 64
++  #define _STAT_VER 1
++ #elif defined (__riscv) && __riscv_xlen==64
++  #define _STAT_VER 0
++ #elif defined (__s390x__)
++  #define _STAT_VER 1
++ #elif defined (__x86_64__)
++  #define _STAT_VER 1
++ #else
++  #define _STAT_VER 3
++ #endif
++#endif
+ 
+ typedef void (*fakechroot_wrapperfn_t)(void);
+ 
+diff --git a/src/lstat.c b/src/lstat.c
+index 3f6d819..fa38323 100644
+--- a/src/lstat.c
++++ b/src/lstat.c
+@@ -20,7 +20,7 @@
+ 
+ #include <config.h>
+ 
+-#ifndef HAVE___LXSTAT
++#if !defined(HAVE___LXSTAT) || NEW_GLIBC
+ 
+ #include <sys/stat.h>
+ #include <unistd.h>
+@@ -28,9 +28,11 @@
+ #include "lstat.h"
+ 
+ 
+-wrapper(lstat, int, (int ver, const char * filename, struct stat * buf))
++wrapper(lstat, int, (const char * filename, struct stat * buf))
+ {
+-    debug("lstat(%d, \"%s\", &buf)", ver, filename);
++    char fakechroot_abspath[FAKECHROOT_PATH_MAX];
++    char fakechroot_buf[FAKECHROOT_PATH_MAX];
++    debug("lstat(\"%s\", &buf)", filename);
+ 
+     if (!fakechroot_localdir(filename)) {
+         if (filename != NULL) {
+@@ -40,7 +42,7 @@ wrapper(lstat, int, (int ver, const char * filename, struct stat * buf))
+         }
+     }
+ 
+-    return lstat_rel(ver, filename, buf);
++    return lstat_rel(filename, buf);
+ }
+ 
+ 
+diff --git a/src/lstat.h b/src/lstat.h
+index 751c1ea..c46a2b9 100644
+--- a/src/lstat.h
++++ b/src/lstat.h
+@@ -24,9 +24,9 @@
+ #include <config.h>
+ #include "libfakechroot.h"
+ 
+-#ifndef HAVE___LXSTAT
++#if !defined(HAVE___LXSTAT) || NEW_GLIBC
+ 
+-wrapper_proto(lstat, int, (int, const char *, struct stat *));
++wrapper_proto(lstat, int, (const char *, struct stat *));
+ 
+ int lstat_rel(const char *, struct stat *);
+ 
+diff --git a/src/lstat64.c b/src/lstat64.c
+index b6212fc..a332d7c 100644
+--- a/src/lstat64.c
++++ b/src/lstat64.c
+@@ -20,7 +20,7 @@
+ 
+ #include <config.h>
+ 
+-#if defined(HAVE_LSTAT64) && !defined(HAVE___LXSTAT64)
++#if defined(HAVE_LSTAT64) && (!defined(HAVE___LXSTAT64) || NEW_GLIBC)
+ 
+ #define _LARGEFILE64_SOURCE
+ #define _BSD_SOURCE
+diff --git a/src/mknod.c b/src/mknod.c
+index 52fd33b..aeb750b 100644
+--- a/src/mknod.c
++++ b/src/mknod.c
+@@ -20,7 +20,7 @@
+ 
+ #include <config.h>
+ 
+-#ifndef HAVE___XMKNOD
++#if !defined(HAVE___XMKNOD) || NEW_GLIBC
+ 
+ #include <sys/stat.h>
+ #include "libfakechroot.h"
+@@ -28,6 +28,8 @@
+ 
+ wrapper(mknod, int, (const char * pathname, mode_t mode, dev_t dev))
+ {
++    char fakechroot_abspath[FAKECHROOT_PATH_MAX];
++    char fakechroot_buf[FAKECHROOT_PATH_MAX];
+     debug("mknod(\"%s\", 0%o, %ld)", pathname, mode, dev);
+     expand_chroot_path(pathname);
+     return nextcall(mknod)(pathname, mode, dev);
+diff --git a/src/mknodat.c b/src/mknodat.c
+index 732a22b..3239b35 100644
+--- a/src/mknodat.c
++++ b/src/mknodat.c
+@@ -20,7 +20,7 @@
+ 
+ #include <config.h>
+ 
+-#if defined(HAVE_MKNODAT) && !defined(HAVE___XMKNODAT)
++#if defined(HAVE_MKNODAT) && (!defined(HAVE___XMKNODAT) || NEW_GLIBC)
+ 
+ #define _ATFILE_SOURCE
+ #include <sys/stat.h>
+diff --git a/src/passwd.c b/src/passwd.c
+new file mode 100644
+index 0000000..d4cee86
+--- /dev/null
++++ b/src/passwd.c
+@@ -0,0 +1,296 @@
++/*
++    libfakechroot -- fake chroot environment
++    Copyright (c) 2010, 2013 Piotr Roszatycki <dexter@debian.org>
++
++    This library is free software; you can redistribute it and/or
++    modify it under the terms of the GNU Lesser General Public
++    License as published by the Free Software Foundation; either
++    version 2.1 of the License, or (at your option) any later version.
++
++    This library is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++    Lesser General Public License for more details.
++
++    You should have received a copy of the GNU Lesser General Public
++    License along with this library; if not, write to the Free Software
++    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
++*/
++
++
++#include <config.h>
++
++/*
++ * Starting with glibc 2.32 the compat nss module for getpwnam calls
++ * __nss_files_fopen (which is a GLIBC_PRIVATE symbol provided by glibc)
++ * instead of fopen (see 299210c1fa67e2dfb564475986fce11cd33db9ad). This
++ * leads to getpwnam calls accessing /etc/passwd from *outside* the chroot
++ * and as a result programs like adduser do not work correctly anymore
++ * under fakechroot.
++ *
++ * Starting with glibc 2.34 the __nss_files_fopen was moved from nss to
++ * libc.so and thus wrapping it with LD_PRELOAD has no affect anymore
++ * (see 6212bb67f4695962748a5981e1b9fea105af74f6).
++ *
++ * So now we also wrap all the functions accessing /etc/passwd, /etc/group
++ * and /etc/shadow. This solution will ignore NIS, LDAP or other local files
++ * as potentially configured in /etc/nsswitch.conf.
++ */
++
++#include <gnu/libc-version.h>
++#if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 32)
++
++#include <stdlib.h>
++#include <stdio.h>
++#include <sys/types.h>
++#include <pwd.h>
++#include <grp.h>
++#include <shadow.h>
++#include "libfakechroot.h"
++
++/* getpwent, setpwent, endpwent, getpwuid, getpwnam */
++
++static FILE *pw_f;
++
++wrapper(getpwent, struct passwd *, (void))
++{
++	if (!pw_f) pw_f = fopen("/etc/passwd", "rbe");
++	if (!pw_f) return 0;
++	return fgetpwent(pw_f);
++}
++
++wrapper (getpwent_r, int, (struct passwd *pwbuf, char *buf, size_t buflen, struct passwd **pwbufp))
++{
++	if (!pw_f) pw_f = fopen("/etc/passwd", "rbe");
++	if (!pw_f) return 0;
++	return fgetpwent_r(pw_f, pwbuf, buf, buflen, pwbufp);
++}
++
++wrapper(setpwent, void, (void))
++{
++	if (pw_f) fclose(pw_f);
++	pw_f = 0;
++}
++
++wrapper(endpwent, void, (void))
++{
++	if (pw_f) fclose(pw_f);
++	pw_f = 0;
++}
++
++wrapper(getpwuid, struct passwd *, (uid_t uid))
++{
++	debug("getpwuid(\"%ul\")", uid);
++	FILE *f = fopen("/etc/passwd", "rbe");
++	if (!f) {
++		return NULL;
++	}
++	struct passwd *res = NULL;
++	while ((res = fgetpwent(f))) {
++		if (res->pw_uid == uid)
++			break;
++	}
++	fclose(f);
++	return res;
++}
++
++wrapper(getpwuid_r, int, (uid_t uid, struct passwd *pwd, char *buf, size_t buflen, struct passwd **result))
++{
++	debug("getpwuid_r(\"%ul\")", uid);
++	FILE *f = fopen("/etc/passwd", "rbe");
++	if (!f) {
++		return errno;
++	}
++	int res;
++	while (!(res = fgetpwent_r(f, pwd, buf, buflen, result))) {
++		if (pwd->pw_uid == uid)
++			break;
++	}
++	fclose(f);
++	return res;
++}
++
++wrapper(getpwnam, struct passwd *, (const char *name))
++{
++	debug("getpwnam(\"%s\")", name);
++	FILE *f = fopen("/etc/passwd", "rbe");
++	if (!f) {
++		return NULL;
++	}
++	struct passwd *res = NULL;
++	while ((res = fgetpwent(f))) {
++		if (name && !strcmp(name, res->pw_name))
++			break;
++	}
++	fclose(f);
++	return res;
++}
++
++wrapper(getpwnam_r, int, (const char *name, struct passwd *pwd, char *buf, size_t buflen, struct passwd **result))
++{
++	debug("getpwnam_r(\"%s\")", name);
++	FILE *f = fopen("/etc/passwd", "rbe");
++	if (!f) {
++		return errno;
++	}
++	int res;
++	while (!(res = fgetpwent_r(f, pwd, buf, buflen, result))) {
++		if (name && !strcmp(name, pwd->pw_name))
++			break;
++	}
++	fclose(f);
++	return res;
++}
++
++/* getgrent, setgrent, endgrent, getgrgid, getgrnam */
++
++static FILE *gr_f;
++
++wrapper(getgrent, struct group *, (void))
++{
++	if (!gr_f) gr_f = fopen("/etc/group", "rbe");
++	if (!gr_f) return 0;
++	return fgetgrent(gr_f);
++}
++
++wrapper (getgrent_r, int, (struct group *gbuf, char *buf, size_t buflen, struct group **gbufp))
++{
++	if (!gr_f) gr_f = fopen("/etc/group", "rbe");
++	if (!gr_f) return 0;
++	return fgetgrent_r(gr_f, gbuf, buf, buflen, gbufp);
++}
++
++wrapper(setgrent, void, (void))
++{
++	if (gr_f) fclose(gr_f);
++	gr_f = 0;
++}
++
++wrapper(endgrent, void, (void))
++{
++	if (gr_f) fclose(gr_f);
++	gr_f = 0;
++}
++
++wrapper(getgrgid, struct group *, (gid_t gid))
++{
++	debug("getgrgid(\"%ul\")", gid);
++	FILE *f = fopen("/etc/group", "rbe");
++	if (!f) {
++		return NULL;
++	}
++	struct group *res = NULL;
++	while ((res = fgetgrent(f))) {
++		if (res->gr_gid == gid)
++			break;
++	}
++	fclose(f);
++	return res;
++}
++
++wrapper(getgrgid_r, int, (gid_t gid, struct group *grp, char *buf, size_t buflen, struct group **result))
++{
++	debug("getgrgid_r(\"%ul\")", gid);
++	FILE *f = fopen("/etc/group", "rbe");
++	if (!f) {
++		return errno;
++	}
++	int res;
++	while (!(res = fgetgrent_r(f, grp, buf, buflen, result))) {
++		if (grp->gr_gid == gid)
++			break;
++	}
++	fclose(f);
++	return res;
++}
++
++wrapper(getgrnam, struct group *, (const char *name))
++{
++	debug("getgrnam(\"%s\")", name);
++	FILE *f = fopen("/etc/group", "rbe");
++	if (!f) {
++		return NULL;
++	}
++	struct group *res = NULL;
++	while ((res = fgetgrent(f))) {
++		if (name && !strcmp(name, res->gr_name))
++			break;
++	}
++	fclose(f);
++	return res;
++}
++
++wrapper(getgrnam_r, int, (const char *name, struct group *grp, char *buf, size_t buflen, struct group **result))
++{
++	debug("getgrnam_r(\"%s\")", name);
++	FILE *f = fopen("/etc/group", "rbe");
++	if (!f) {
++		return errno;
++	}
++	int res;
++	while (!(res = fgetgrent_r(f, grp, buf, buflen, result))) {
++		if (name && !strcmp(name, grp->gr_name))
++			break;
++	}
++	fclose(f);
++	return res;
++}
++
++/* getspent, setspent, endspent, getspnam */
++
++static FILE *sp_f;
++
++wrapper(getspent, struct spwd *, (void))
++{
++	if (!sp_f) sp_f = fopen("/etc/shadow", "rbe");
++	if (!sp_f) return 0;
++	return fgetspent(sp_f);
++}
++
++wrapper(setspent, void, (void))
++{
++	if (sp_f) fclose(sp_f);
++	sp_f = 0;
++}
++
++wrapper(endspent, void, (void))
++{
++	if (sp_f) fclose(sp_f);
++	sp_f = 0;
++}
++
++wrapper(getspnam, struct spwd *, (const char *name))
++{
++	debug("getspnam(\"%s\")", name);
++	FILE *f = fopen("/etc/shadow", "rbe");
++	if (!f) {
++		return NULL;
++	}
++	struct spwd *res = NULL;
++	while ((res = fgetspent(f))) {
++		if (name && !strcmp(name, res->sp_namp))
++			break;
++	}
++	fclose(f);
++	return res;
++}
++
++wrapper(getspnam_r, int, (const char *name, struct spwd *spbuf, char *buf, size_t buflen, struct spwd **spbufp))
++{
++	debug("getspnam_r(\"%s\")", name);
++	FILE *f = fopen("/etc/shadow", "rbe");
++	if (!f) {
++		return errno;
++	}
++	int res;
++	while (!(res = fgetspent_r(f, spbuf, buf, buflen, spbufp))) {
++		if (name && !strcmp(name, spbuf->sp_namp))
++			break;
++	}
++	fclose(f);
++	return res;
++}
++
++#else
++typedef int empty_translation_unit;
++#endif
+diff --git a/src/stat.c b/src/stat.c
+index 7845662..5ef57ba 100644
+--- a/src/stat.c
++++ b/src/stat.c
+@@ -20,7 +20,7 @@
+ 
+ #include <config.h>
+ 
+-#ifndef HAVE___XSTAT
++#if !defined(HAVE___XSTAT) || NEW_GLIBC
+ 
+ #define _BSD_SOURCE
+ #define _DEFAULT_SOURCE
+@@ -33,6 +33,8 @@
+ 
+ wrapper(stat, int, (const char * file_name, struct stat * buf))
+ {
++    char fakechroot_abspath[FAKECHROOT_PATH_MAX];
++    char fakechroot_buf[FAKECHROOT_PATH_MAX];
+     debug("stat(\"%s\", &buf)", file_name);
+     expand_chroot_path(file_name);
+     return nextcall(stat)(file_name, buf);
+diff --git a/src/stat64.c b/src/stat64.c
+index aac9c75..993ce80 100644
+--- a/src/stat64.c
++++ b/src/stat64.c
+@@ -20,7 +20,7 @@
+ 
+ #include <config.h>
+ 
+-#if defined(HAVE_STAT64) && !defined(HAVE___XSTAT64)
++#if defined(HAVE_STAT64) && (!defined(HAVE___XSTAT64) || NEW_GLIBC)
+ 
+ #define _BSD_SOURCE
+ #define _LARGEFILE64_SOURCE
+@@ -34,6 +34,8 @@
+ 
+ wrapper(stat64, int, (const char * file_name, struct stat64 * buf))
+ {
++    char fakechroot_abspath[FAKECHROOT_PATH_MAX];
++    char fakechroot_buf[FAKECHROOT_PATH_MAX];
+     debug("stat64(\"%s\", &buf)", file_name);
+     expand_chroot_path(file_name);
+     return nextcall(stat64)(file_name, buf);
+diff --git a/src/statx.c b/src/statx.c
+new file mode 100644
+index 0000000..524f73e
+--- /dev/null
++++ b/src/statx.c
+@@ -0,0 +1,44 @@
++/*
++    libfakechroot -- fake chroot environment
++    Copyright (c) 2010-2020 Piotr Roszatycki <dexter@debian.org>
++
++    This library is free software; you can redistribute it and/or
++    modify it under the terms of the GNU Lesser General Public
++    License as published by the Free Software Foundation; either
++    version 2.1 of the License, or (at your option) any later version.
++
++    This library is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++    Lesser General Public License for more details.
++
++    You should have received a copy of the GNU Lesser General Public
++    License along with this library; if not, write to the Free Software
++    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
++*/
++
++
++#include <config.h>
++
++#ifdef HAVE_STATX
++
++#define _GNU_SOURCE
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <unistd.h>
++
++#include "libfakechroot.h"
++
++
++wrapper(statx, int, (int dirfd, const char * pathname, int flags, unsigned int mask, struct statx * statxbuf))
++{
++    char fakechroot_abspath[FAKECHROOT_PATH_MAX];
++    char fakechroot_buf[FAKECHROOT_PATH_MAX];
++    debug("statx(%d, \"%s\", %d, %u, &statxbuf)", dirfd, pathname, flags, mask);
++    expand_chroot_path_at(dirfd, pathname);
++    return nextcall(statx)(dirfd, pathname, flags, mask, statxbuf);
++}
++
++#else
++typedef int empty_translation_unit;
++#endif
+diff --git a/src/tmpnam.c b/src/tmpnam.c
+index ce60817..917ee6b 100644
+--- a/src/tmpnam.c
++++ b/src/tmpnam.c
+@@ -42,7 +42,7 @@ wrapper(tmpnam, char *, (char * s))
+ 
+     expand_chroot_path(ptr);
+ 
+-    ptr2 = malloc(strlen(ptr));
++    ptr2 = malloc(strlen(ptr) + 1);
+     if (ptr2 == NULL) return NULL;
+ 
+     strcpy(ptr2, ptr);
+diff --git a/test/Makefile.am b/test/Makefile.am
+index aba2953..d7f98f0 100644
+--- a/test/Makefile.am
++++ b/test/Makefile.am
+@@ -9,6 +9,7 @@ TESTS = \
+     t/cmd-subst.t \
+     t/cp.t \
+     t/dedotdot.t \
++    t/dladdr.t \
+     t/execlp.t \
+     t/execve-elfloader.t \
+     t/execve-null-envp.t \
+@@ -18,15 +19,18 @@ TESTS = \
+     t/host.t \
+     t/java.t \
+     t/jemalloc.t \
++    t/ldd_interp.t \
+     t/mkstemps.t \
+     t/mktemp.t \
+     t/opendir.t \
++    t/passwd.t \
+     t/popen.t \
+     t/posix_spawn.t \
+     t/posix_spawnp.t \
+     t/pwd.t \
+     t/readlink.t \
+     t/realpath.t \
++    t/rm.t \
+     t/socket-af_unix.t \
+     t/statfs.t \
+     t/statvfs.t \
+diff --git a/test/debootstrap.sh b/test/debootstrap.sh
+index 8ec0f1d..8126285 100755
+--- a/test/debootstrap.sh
++++ b/test/debootstrap.sh
+@@ -53,22 +53,22 @@ tarball=`test -d "$DEBOOTSTRAP_CACHE" && cd "$DEBOOTSTRAP_CACHE"; pwd`/$vendor-$
+ 
+ debootstrap_opts="--arch=$arch ${variant:+--variant=$variant}"
+ if [ ! -f $tarball ]; then
+-    FAKECHROOT=true fakeroot $DEBOOTSTRAP --make-tarball=$tarball --include=fakeroot $debootstrap_opts $release $destdir "$@"
++    FAKECHROOT=true $FAKEROOT $DEBOOTSTRAP --make-tarball=$tarball --include=fakeroot $debootstrap_opts $release $destdir "$@"
+ fi
+ 
+ rm -rf $destdir
+ 
+ ls -l $tarball
+ 
+-fakechroot fakeroot $DEBOOTSTRAP --unpack-tarball="$tarball" $debootstrap_opts $release $destdir || cat $destdir/debootstrap/debootstrap.log
++fakechroot $FAKEROOT $DEBOOTSTRAP --unpack-tarball="$tarball" $debootstrap_opts $release $destdir || cat $destdir/debootstrap/debootstrap.log
+ 
+ unset CC CFLAGS LDFLAGS EXTRA_CFLAGS EXTRA_LDFLAGS V
+ 
+-HOME=/root fakechroot fakeroot $CHROOT $destdir apt-get -y --no-install-recommends install build-essential devscripts fakeroot gnupg
++HOME=/root fakechroot $FAKEROOT $CHROOT $destdir apt-get -y --no-install-recommends install build-essential devscripts fakeroot gnupg
+ 
+ run sh -c 'cat /etc/apt/sources.list | sed "s/^deb/deb-src/" >> /etc/apt/sources.list'
+-run fakeroot apt-get -y update
+-run fakeroot apt-get -y --no-install-recommends build-dep hello
++run $FAKEROOT apt-get -y update
++run $FAKEROOT apt-get -y --no-install-recommends build-dep hello
+ run sh -c 'cd /tmp && apt-get -y source hello && cd hello-* && debuild --preserve-env -b -uc -us'
+-run fakeroot sh -c 'dpkg -i /tmp/hello_*.deb'
++run $FAKEROOT sh -c 'dpkg -i /tmp/hello_*.deb'
+ run sh -c 'hello'
+diff --git a/test/src/Makefile.am b/test/src/Makefile.am
+index 7fb3075..594a8e0 100644
+--- a/test/src/Makefile.am
++++ b/test/src/Makefile.am
+@@ -3,6 +3,7 @@ check_PROGRAMS = \
+     test-chroot \
+     test-clearenv \
+     test-dedotdot \
++    test-dladdr \
+     test-execlp \
+     test-execve-null-envp \
+     test-fts \
+@@ -14,6 +15,7 @@ check_PROGRAMS = \
+     test-mkstemps \
+     test-mktemp \
+     test-opendir \
++    test-passwd \
+     test-popen \
+     test-posix_spawn \
+     test-posix_spawnp \
+diff --git a/test/src/test-dladdr.c b/test/src/test-dladdr.c
+new file mode 100644
+index 0000000..5ec8d24
+--- /dev/null
++++ b/test/src/test-dladdr.c
+@@ -0,0 +1,14 @@
++#define _GNU_SOURCE
++#include <dlfcn.h>
++#include <stdlib.h>
++#include <string.h>
++#include <stdio.h>
++
++int main(int argc, char** argv)
++{
++  Dl_info info;
++  memset(&info, 0xfe, sizeof(info)); /* fill with inaccessible address */
++  int ret = dladdr(NULL, &info);
++  printf("%ld\n", ret);
++  return 0;
++}
+diff --git a/test/src/test-passwd.c b/test/src/test-passwd.c
+new file mode 100644
+index 0000000..fb9c8c4
+--- /dev/null
++++ b/test/src/test-passwd.c
+@@ -0,0 +1,28 @@
++#include <stdlib.h>
++#include <stdio.h>
++#include <pwd.h>
++#include <errno.h>
++#include <stdint.h>
++#include <unistd.h>
++
++int main (int argc, char *argv[]) {
++	struct passwd *pwd;
++
++	if (argc != 2) {
++		fprintf(stderr, "Usage: %s username\n", argv[0]);
++		exit(EXIT_FAILURE);
++	}
++
++	pwd = getpwnam(argv[1]);
++	if (pwd == NULL) {
++		if (errno == 0) {
++			printf("Not found\n");
++		} else {
++			perror("getpwnam");
++		}
++		exit(EXIT_FAILURE);
++	}
++
++	printf("%jd\n", (intmax_t)(pwd->pw_uid));
++	exit(EXIT_SUCCESS);
++}
+diff --git a/test/t/dladdr.t b/test/t/dladdr.t
+new file mode 100755
+index 0000000..fc7f939
+--- /dev/null
++++ b/test/t/dladdr.t
+@@ -0,0 +1,14 @@
++#!/bin/sh
++
++srcdir=${srcdir:-.}
++. $srcdir/common.inc.sh
++
++prepare 1
++
++PATH=$srcdir/bin:$PATH
++
++t=`$srcdir/fakechroot.sh $testtree /bin/test-dladdr`
++[ "$t" != "0" ] && not
++ok "dladdr returns" $t
++
++cleanup
+diff --git a/test/t/fakeroot-chroot.t b/test/t/fakeroot-chroot.t
+new file mode 100755
+index 0000000..10d2659
+--- /dev/null
++++ b/test/t/fakeroot-chroot.t
+@@ -0,0 +1,26 @@
++#!/bin/sh
++
++srcdir=${srcdir:-.}
++. $srcdir/common.inc.sh
++
++top_srcdir=${top_srcdir:-..}
++abs_top_srcdir=${abs_top_srcdir:-`cd "$top_srcdir" 2>/dev/null && pwd -P`}
++
++. $top_srcdir/config.sh
++
++command -v fakeroot >/dev/null 2>&1 || skip_all 'fakeroot command is missing (sudo apt-get install fakeroot)'
++t=`fakeroot $ECHO ok 2>&1`
++test "$t" = "ok" || skip_all "fakeroot command failed:" $t
++
++prepare 8
++
++$srcdir/testtree.sh $testtree/testtree2
++test "`cat $testtree/testtree2/CHROOT`" = "$testtree/testtree2" || bail_out "$testtree/testtree"
++
++for testtree2 in testtree2 /testtree2 ./testtree2 /./testtree2 testtree2/. testtree2/./. testtree2/ /testtree2/; do
++    t=`$srcdir/bin/fakechroot $FAKEROOT $CHROOT $testtree /usr/sbin/chroot $testtree2 /bin/cat /CHROOT 2>&1`
++    test "$t" = "testtree-fakeroot-chroot/testtree2" || not
++    ok "$chroot chroot $testtree2:" $t
++done
++
++cleanup
+diff --git a/test/t/ldd_interp.t b/test/t/ldd_interp.t
+new file mode 100755
+index 0000000..7c968bb
+--- /dev/null
++++ b/test/t/ldd_interp.t
+@@ -0,0 +1,26 @@
++#!/bin/sh
++
++srcdir=${srcdir:-.}
++. $srcdir/common.inc.sh
++
++plan 1
++
++pwd=`dirname $0`
++abs_top_srcdir=${abs_top_srcdir:-`cd "$pwd/../.." 2>/dev/null && pwd -P`}
++
++interp_file=$(file /bin/true | sed 's/^.*, interpreter \([^,]\+\), .*$/\1/')
++interp_readelf=$(readelf --string-dump=.interp /bin/true | sed -ne 's/^  \[ \+[0-9]\+\]  //p')
++
++# diag "$interp_file" "$interp_readelf"
++
++test "$interp_file" = "$interp_readelf" || not
++
++# ldd /bin/true | diag
++
++ldd /bin/true | grep --quiet "^[[:space:]]$interp_file (" || not
++
++# "$abs_top_srcdir/scripts/ldd.fakechroot" /bin/true | diag
++
++"$abs_top_srcdir/scripts/ldd.fakechroot" /bin/true | grep --quiet "^[[:space:]]$interp_file (" || not
++
++ok "ldd lists interpreter $interp_file"
+diff --git a/test/t/passwd.t b/test/t/passwd.t
+new file mode 100755
+index 0000000..5c3414e
+--- /dev/null
++++ b/test/t/passwd.t
+@@ -0,0 +1,23 @@
++#!/bin/sh
++
++srcdir=${srcdir:-.}
++. $srcdir/common.inc.sh
++
++prepare 4
++
++for chroot in chroot fakechroot; do
++    if [ $chroot = "chroot" ] && ! is_root; then
++        skip $(( $tap_plan / 2 )) "not root"
++    else
++
++        t=`$srcdir/$chroot.sh $testtree /bin/test-passwd user 2>&1`
++        test "$t" = "1337" || not
++        ok "$chroot uid is" $t
++
++        t=`$srcdir/$chroot.sh $testtree getent group user 2>&1`
++        test "$t" = "user:x:1337:" || not
++        ok "$chroot getent group user is" $t
++    fi
++done
++
++cleanup
+diff --git a/test/t/rm.t b/test/t/rm.t
+new file mode 100755
+index 0000000..9ecf88c
+--- /dev/null
++++ b/test/t/rm.t
+@@ -0,0 +1,25 @@
++#!/bin/sh
++
++srcdir=${srcdir:-.}
++. $srcdir/common.inc.sh
++
++prepare 2
++
++for chroot in chroot fakechroot; do
++
++    if [ $chroot = "chroot" ] && ! is_root; then
++        skip $(( $tap_plan / 2 )) "not root"
++    else
++
++        mkdir -p $testtree/dir-$chroot
++        echo 'something' > $testtree/dir-$chroot/file
++
++        $srcdir/$chroot.sh $testtree /bin/sh -c "rm -r /dir-$chroot"
++        test -e $testtree/dir-$chroot && not
++        ok "$chroot rm -r /dir-$chroot:" $t
++
++    fi
++
++done
++
++cleanup
+diff --git a/test/t/touch.t b/test/t/touch.t
+index fbea316..cc05a2b 100755
+--- a/test/t/touch.t
++++ b/test/t/touch.t
+@@ -3,12 +3,12 @@
+ srcdir=${srcdir:-.}
+ . $srcdir/common.inc.sh
+ 
+-prepare 16
++prepare 24
+ 
+ . $srcdir/touch.inc.sh
+ 
+ if [ -z "$touch" ]; then
+-    skip 16 "touch not found"
++    skip 24 "touch not found"
+ else
+ 
+     for chroot in chroot fakechroot; do
+@@ -37,6 +37,19 @@ else
+ 
+             sleep 1
+ 
++            # with --no-dereference, on 32bit, touch will use __lstat64_time64
++            t=`$srcdir/$chroot.sh $testtree $touch -h -r /tmp/$chroot-touch.txt /tmp/$chroot-touch2.txt 2>&1`
++            test "$t" = "" || not
++            ok "$chroot touch -r" $t
++            test -f $testtree/tmp/$chroot-touch2.txt || not
++            ok "$chroot $chroot-touch2.txt exists"
++            test $testtree/tmp/$chroot-touch2.txt -nt $testtree/tmp/$chroot-touch.txt && not
++            ok "$chroot $chroot-touch2.txt is not newer than touch.txt"
++            test $testtree/tmp/$chroot-touch2.txt -ot $testtree/tmp/$chroot-touch.txt && not
++            ok "$chroot $chroot-touch2.txt is not older than $chroot-touch.txt"
++
++            sleep 1
++
+             t=`$srcdir/$chroot.sh $testtree $touch -m /tmp/$chroot-touch.txt 2>&1`
+             test "$t" = "" || not
+             ok "$chroot touch -m" $t
+diff --git a/test/t/zzdebootstrap.t b/test/t/zzdebootstrap.t
+index e05c052..d5024de 100755
+--- a/test/t/zzdebootstrap.t
++++ b/test/t/zzdebootstrap.t
+@@ -8,7 +8,7 @@ top_srcdir=${top_srcdir:-..}
+ 
+ test -n "$TEST_DEBOOTSTRAP" && ! test "$TEST_DEBOOTSTRAP" = 0 || skip_all 'TEST_DEBOOTSTRAP is false'
+ command -v $DEBOOTSTRAP >/dev/null 2>&1 || skip_all 'debootstrap command is missing (sudo apt-get install debootstrap)'
+-command -v fakeroot     >/dev/null 2>&1 || skip_all 'fakeroot command is missing (sudo apt-get install fakeroot)'
++command -v $FAKEROOT    >/dev/null 2>&1 || skip_all 'fakeroot command is missing (sudo apt-get install fakeroot)'
+ command -v xzcat        >/dev/null 2>&1 || skip_all 'xzcat command is missing (sudo apt-get install xz-utils)'
+ command -v lsb_release  >/dev/null 2>&1 || skip_all 'lsb_release command is missing (sudo apt-get install lsb-release)'
+ 
+diff --git a/test/testtree.sh b/test/testtree.sh
+index ee35fc2..d857a19 100755
+--- a/test/testtree.sh
++++ b/test/testtree.sh
+@@ -32,6 +32,10 @@ do
+     mkdir -p $destdir/$d
+ done
+ 
++echo "user:x:1337:1337:user:/home/user:/bin/bash" > $destdir/etc/passwd
++echo "root:x:0:" > $destdir/etc/group
++echo "user:x:1337:" >> $destdir/etc/group
++
+ for d in \
+     /dev \
+     /proc
+@@ -64,6 +68,7 @@ for p in \
+     '/usr/bin/dirname' \
+     '/usr/bin/env' \
+     '/usr/bin/find' \
++    '/usr/bin/getent' \
+     '/usr/bin/id' \
+     '/usr/bin/ischroot' \
+     '/usr/bin/less' \
+@@ -116,6 +121,7 @@ for p in \
+     'libm.so.*' \
+     'libncurses.so.*' \
+     'libncursesw.so.*' \
++    'libnss_*.so.*' \
+     'libpcre*.so.*' \
+     'libpthread.so.*' \
+     'libreadline.so.*' \
+diff --git a/test/touch.inc.sh b/test/touch.inc.sh
+index 25e0dc0..76c2132 100644
+--- a/test/touch.inc.sh
++++ b/test/touch.inc.sh
+@@ -1,6 +1,6 @@
+-if [ -x testtree/usr/bin/touch ]; then
++if [ -x $testtree/usr/bin/touch ]; then
+     touch=/usr/bin/touch
+-elif [ -x testtree/bin/touch ]; then
++elif [ -x $testtree/bin/touch ]; then
+     touch=/bin/touch
+ else
+     touch=
