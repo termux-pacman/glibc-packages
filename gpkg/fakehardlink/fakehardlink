@@ -1,0 +1,65 @@
+#!@TERMUX_PREFIX@/bin/bash
+
+help_message() {
+	echo "fakehardlink - create fake hard links."
+	echo "Usage:"
+	echo "    fakehardlink [-l|--lib lib]"
+	echo "                 [-s|--short-links]"
+	echo "                 [-d|--dynamic-links]"
+	echo "                 [-h|--help]"
+	echo "                 [-v|--version]"
+	echo "                 [--] [command]"
+	exit 0
+}
+
+error_message() {
+	echo "Error: $1."
+	exit 1
+}
+
+LIBPATH="@TERMUX_PREFIX@/lib"
+LIBFAKEHARDLINK="libfakehardlink.so"
+export LIBFAKEHARDLINK_PATH="${LIBPATH}/${LIBFAKEHARDLINK}"
+export FAKEHARDLINK_DYNAMIC_LINKS=0
+export FAKEHARDLINK_SHORT_LINKS=0
+FAKEHARDLINK_VERSION="@TERMUX_PKG_VERSION@"
+
+while true; do
+	case "$1" in
+		-l|--lib)
+			shift
+			export LIBFAKEHARDLINK_PATH="$1"
+			if [ -z ${LIBFAKEHARDLINK_PATH} ]; then
+				error_message "nothing is specified in the --lib flag"
+			fi
+			shift;;
+		-s|--short-links)
+			shift
+			export FAKEHARDLINK_SHORT_LINKS=1;;
+		-d|--dynamic-links)
+			shift
+			export FAKEHARDLINK_DYNAMIC_LINKS=1;;
+		-h|--help) help_message;;
+		-v|--version)
+			echo "fakehardlink version - ${FAKEHARDLINK_VERSION}"
+			exit 0;;
+		--)
+			shift
+			break;;
+		*) break;;
+	esac
+done
+
+if [ ! -f ${LIBFAKEHARDLINK_PATH} ]; then
+	error_message "library '${LIBFAKEHARDLINK_PATH}' not found"
+fi
+
+if [ -n ${LD_PRELOAD} ]; then
+	LIBFAKEHARDLINK_PATH="${LIBFAKEHARDLINK_PATH}:${LD_PRELOAD}"
+fi
+
+if [[ -z $@ ]]; then
+	LD_PRELOAD="${LIBFAKEHARDLINK_PATH}" exec $SHELL
+else
+	LD_PRELOAD="${LIBFAKEHARDLINK_PATH}" exec $@
+fi
