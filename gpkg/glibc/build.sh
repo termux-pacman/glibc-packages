@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="GNU C Library"
 TERMUX_PKG_LICENSE="GPL-3.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_VERSION=2.38
-TERMUX_PKG_REVISION=7
+TERMUX_PKG_REVISION=8
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/libc/glibc-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=fb82998998b2b29965467bc1b69d152e9c307d2cf301c9eafb4555b770ef3fd2
 TERMUX_PKG_DEPENDS="linux-api-headers-glibc"
@@ -63,10 +63,6 @@ termux_step_configure() {
 }
 
 termux_step_make() {
-	echo "build-programs=no" >> configparms
-	make -O
-
-	sed -i "/build-programs=/s#no#yes#" configparms
 	make -O
 	make info
 
