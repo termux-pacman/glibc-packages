@@ -1,0 +1,12 @@
+--- glibc-2.38/sysdeps/unix/sysv/linux/i386/syscalls.list	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/sysdeps/unix/sysv/linux/i386/syscalls.list.patch	2023-11-15 22:11:16.522925458 +0300
+@@ -1,9 +1,5 @@
+ # File name	Caller	Syscall name	Args	Strong name	Weak names
+ 
+-chown		-	chown32		i:sii	__chown		chown@@GLIBC_2.1
+-lchown		-	lchown32	i:sii	__lchown	lchown@@GLIBC_2.0 chown@GLIBC_2.0
+-fchown		-	fchown32	i:iii	__fchown	fchown
+-
+ getegid		-	getegid32	Ei:	__getegid	getegid
+ geteuid		-	geteuid32	Ei:	__geteuid	geteuid
+ getgid		-	getgid32	Ei:	__getgid	getgid
