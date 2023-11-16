@@ -1,0 +1,11 @@
+--- src/giscanner/shlibs.py	2023-09-16 14:32:07.000000000 +0300
++++ src/giscanner/shlibs.py.patch	2023-12-11 10:29:47.200883716 +0300
+@@ -102,7 +102,7 @@
+         elif platform_system == 'Darwin':
+             args.extend(['otool', '-L', binary.args[0]])
+         else:
+-            args.extend(['ldd', binary.args[0]])
++            args.extend(['@TERMUX_PREFIX@/bin/ldd', binary.args[0]])
+         output = subprocess.check_output(args)
+         if isinstance(output, bytes):
+             output = output.decode("utf-8", "replace")
