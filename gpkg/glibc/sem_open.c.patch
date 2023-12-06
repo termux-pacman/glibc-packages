@@ -1,0 +1,20 @@
+--- src/sysdeps/pthread/sem_open.c	2023-07-31 20:54:16.000000000 +0300
++++ src/sysdeps/pthread/sem_open.c.patch	2023-12-06 23:03:24.669640461 +0300
+@@ -28,7 +28,7 @@
+ 
+ #if !PTHREAD_IN_LIBC
+ /* The private names are not exported from libc.  */
+-# define __link link
++# define __symlink symlink
+ # define __unlink unlink
+ #endif
+ 
+@@ -168,7 +168,7 @@
+ 					 fd, 0)) != MAP_FAILED)
+ 	{
+ 	  /* Create the file.  Don't overwrite an existing file.  */
+-	  if (__link (tmpfname, dirname.name) != 0)
++	  if (__symlink (tmpfname, dirname.name) != 0)
+ 	    {
+ 	      /* Undo the mapping.  */
+ 	      __munmap (result, sizeof (sem_t));
