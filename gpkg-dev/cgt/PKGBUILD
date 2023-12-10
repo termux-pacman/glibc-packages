@@ -1,6 +1,6 @@
 pkgname=cgt
 pkgver=13.2.0
-pkgrel=3
+pkgrel=4
 pkgdesc='Cross GCCs for Termux (only for Linux)'
 arch=(x86_64)
 url='https://gcc.gnu.org/'
@@ -130,6 +130,8 @@ package() {
 		for i in gcc g++; do
 			ln -s ${target}-${i} $pkgdir/${CGCT_PREFIX}/bin/${i}
 		done
+		ln -s gcc $pkgdir/${CGCT_PREFIX}/bin/cc
+		ln -s g++ $pkgdir/${CGCT_PREFIX}/bin/cpp
 		rm -fr $pkgdir/${CGCT_PREFIX}/share
 		rm -fr $pkgdir/${CGCT_PREFIX}/$target
 		rm -fr $pkgdir/${DIR_TERMUX}/files
