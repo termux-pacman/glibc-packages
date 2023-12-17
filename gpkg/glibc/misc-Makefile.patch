@@ -1,0 +1,10 @@
+--- glibc-2.38/misc/Makefile	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/misc/Makefile.patch	2023-12-26 00:08:33.550537534 +0300
+@@ -192,6 +192,7 @@
+   swapon \
+   sync \
+   syncfs \
++  syscallS \
+   syscall \
+   syslog \
+   truncate \

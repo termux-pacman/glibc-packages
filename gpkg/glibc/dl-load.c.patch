@@ -1,0 +1,21 @@
+--- src/elf/dl-load.c	2023-07-31 20:54:16.000000000 +0300
++++ src/elf/dl-load.c.patch	2023-12-25 17:28:25.688056890 +0300
+@@ -1330,15 +1330,15 @@
+ 		  errstring = N_("cannot change memory protections");
+ 		  goto lose_errno;
+ 		}
+-	      __stack_prot |= PROT_READ|PROT_WRITE|PROT_EXEC;
++	      __stack_prot |= PROT_READ|PROT_WRITE;
+ 	      __mprotect ((void *) p, s, PROT_READ);
+ 	    }
+ 	  else
+-	    __stack_prot |= PROT_READ|PROT_WRITE|PROT_EXEC;
++	    __stack_prot |= PROT_READ|PROT_WRITE;
+ 	}
+       else
+ #endif
+-	__stack_prot |= PROT_READ|PROT_WRITE|PROT_EXEC;
++	__stack_prot |= PROT_READ|PROT_WRITE;
+ 
+ #ifdef check_consistency
+       check_consistency ();
