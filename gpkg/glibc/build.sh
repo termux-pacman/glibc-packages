@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="GNU C Library"
 TERMUX_PKG_LICENSE="GPL-3.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_VERSION=2.38
-TERMUX_PKG_REVISION=10
+TERMUX_PKG_REVISION=11
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/libc/glibc-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=fb82998998b2b29965467bc1b69d152e9c307d2cf301c9eafb4555b770ef3fd2
 TERMUX_PKG_DEPENDS="linux-api-headers-glibc"
@@ -16,11 +16,20 @@ termux_step_pre_configure() {
 		termux_error_exit "Compilation is only possible based on glibc"
 	fi
 
-	for i in shmem-android.h mprotect.c; do
+	for i in shmem-android.h mprotect.c ignore-syscall.h; do
 		install -Dm644 "${TERMUX_PKG_BUILDER_DIR}/${i}" "${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/${i}"
 	done
 
 	rm ${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/*/clone3.S
+	rm ${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/x86_64/configure*
+
+	if [ "$TERMUX_ARCH" = "i686" ]; then
+		mv ${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/i386/syscall.S \
+			${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/i386/syscallS.S
+	else
+		mv ${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/${TERMUX_ARCH}/syscall.S \
+			${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/${TERMUX_ARCH}/syscallS.S
+	fi
 
 	for i in android_passwd_group.h android_passwd_group.c android_system_user_ids.h; do
 		cp ${TERMUX_PKG_BUILDER_DIR}/${i} ${TERMUX_PKG_SRCDIR}/nss/

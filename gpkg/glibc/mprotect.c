@@ -17,7 +17,7 @@
 #include <not-cancel.h>
 
 #ifdef SHARED
-# define GLOBAL_READ_SIZE 45
+# define GLOBAL_READ_SIZE 1024
 
 /* - String To Unsigned Long Int
    There are two chairs - one is called "strtoul", the other "stuli"...
@@ -42,42 +42,36 @@ unsigned long int __stuli(char *value) {
 
 static int __is_mmaped(void *addr) {
 	char buff[GLOBAL_READ_SIZE];
-	char *buff2;
-	char maddr[GLOBAL_READ_SIZE*2];
-	memset(maddr, 0, sizeof(maddr));
-
-	int skip = 0;
-	int res = 1;
-
+	char *buff2 = "";
+	char *cont = "";
+	int res = 0;
+	int strlc, strlb;
+	memset(buff, 0, sizeof(buff));
 	int map = __open_nocancel("/proc/self/maps", O_RDONLY|O_CLOEXEC);
 	if (map >= 0) {
-		while (__read_nocancel(map, buff, GLOBAL_READ_SIZE) == GLOBAL_READ_SIZE) {
+		while (__read_nocancel(map, buff, GLOBAL_READ_SIZE) > 0) {
 			buff[GLOBAL_READ_SIZE] = '\0';
-			if (skip == 1)
-				if ((buff2=strrchr(buff, '\n')) != NULL)
-					memcpy(maddr, &buff2[1], strlen(&buff2[1])+1);
-				else
-					continue;
-			if (strrchr(maddr, '-') == NULL) {
-				if (skip == 1) {
-					skip = 0;
-					continue;
-				}
-				__strncat(maddr, buff, GLOBAL_READ_SIZE);
+			strlc = strlen(cont);
+			if (strlc > 0) {
+				buff2 = malloc(sizeof(char)*strlc);
+				memcpy(buff2, cont, strlc);
 			}
-			if (__stuli(strtok(maddr, "-")) == (unsigned long int)addr) {
-				res = 0;
-				break;
-			}
-			memset(maddr, 0, sizeof(maddr));
-			if ((buff2=strrchr(buff, '\n')) != NULL)
-				memcpy(maddr, &buff2[1], strlen(&buff2[1])+1);
-			else
-				skip = 1;
+			cont = malloc(sizeof(char)*(strlc+strlen(buff)));
+			memset(cont, 0, sizeof(cont));
+			strlb = strlen(buff2);
+			if (strlb > 0)
+				memcpy(cont, buff2, strlb);
+			__strncat(cont, buff, GLOBAL_READ_SIZE);
+			memset(buff, 0, sizeof(buff));
 		}
-		__close_nocancel_nostatus(map);
+		char *saveptr;
+		while ((buff2 = strtok_r(cont, "\n", &cont)))
+			if (__stuli(strtok_r(buff2, "-", &saveptr)) == (unsigned long int)addr) {
+				res = 1;
+				break;
+		}
 	}
-
+	__close_nocancel_nostatus(map);
 	return res;
 }
 #endif
@@ -85,18 +79,20 @@ static int __is_mmaped(void *addr) {
 int __mprotect(void *addr, size_t len, int prot) {
 	int res = INLINE_SYSCALL_CALL(mprotect, addr, len, prot);
 #ifdef SHARED
-	if (res == -1 && errno == EACCES && prot & PROT_EXEC && __is_mmaped(addr) == 1) {
+	if (res == -1 && errno == EACCES && prot & PROT_EXEC && !__is_mmaped(addr)) {
 		size_t saddr = strlen(addr)+1;
 		void *caddr;
+		int mmap_flags = MAP_PRIVATE|MAP_ANONYMOUS|MAP_FIXED;
+		if (prot & PROT_GROWSDOWN)
+			mmap_flags |= MAP_GROWSDOWN;
 		if (saddr > 1) {
 			caddr = malloc(saddr);
 			memcpy(caddr, addr, saddr);
 		}
-		mmap(addr, len, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_PRIVATE|MAP_ANONYMOUS|MAP_FIXED, -1, 0);
-		if (saddr > 1) {
+		free(addr);
+		addr = mmap(addr, len, PROT_READ|PROT_WRITE|PROT_EXEC, mmap_flags, -1, 0);
+		if (saddr > 1)
 			memcpy(addr, caddr, saddr);
-			free(caddr);
-		}
 		return INLINE_SYSCALL_CALL(mprotect, addr, len, prot);
 	}
 #endif

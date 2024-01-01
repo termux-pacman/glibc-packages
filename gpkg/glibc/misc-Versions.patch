@@ -1,0 +1,11 @@
+--- glibc-2.38/misc/Versions	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/misc/Versions.patch	2024-01-01 13:56:26.514498144 +0300
+@@ -71,7 +71,7 @@
+     # s*
+     sbrk; select; setdomainname; setfsent; sethostent; sethostid; sethostname;
+     setlogmask; setmntent; setregid; setreuid; setttyent; setusershell; sstk;
+-    stty; sync; syscall; syslog;
++    stty; sync; syscallS; syscall; syslog;
+ 
+     # t*
+     tdelete; tfind; truncate; tsearch; ttyslot; twalk;

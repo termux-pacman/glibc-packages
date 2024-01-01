@@ -1,0 +1,68 @@
+--- glibc-2.38/sysdeps/unix/sysv/linux/aarch64/syscall.S	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/sysdeps/unix/sysv/linux/aarch64/syscall.S.patch	2023-12-25 22:43:44.138402265 +0300
+@@ -26,7 +26,7 @@
+    For kernel entry we need to move the system call nr to x8 then
+    load the remaining arguments to register. */
+ 
+-ENTRY (syscall)
++ENTRY (syscallS)
+ 	uxtw	x8, w0
+ 	mov	x0, x1
+ 	mov	x1, x2
+@@ -41,4 +41,4 @@
+ 	RET
+ 1:
+ 	b	SYSCALL_ERROR
+-PSEUDO_END (syscall)
++PSEUDO_END (syscallS)
+--- glibc-2.38/sysdeps/unix/sysv/linux/arm/syscall.S	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/sysdeps/unix/sysv/linux/arm/syscall.S.patch	2023-12-25 22:45:38.988402221 +0300
+@@ -21,7 +21,7 @@
+    implement syscall().  It won't work reliably with 64-bit arguments
+    (but that is true on many modern platforms).  */
+ 
+-ENTRY (syscall)
++ENTRY (syscallS)
+ 	mov	ip, sp
+ 	push	{r4, r5, r6, r7}
+ 	cfi_adjust_cfa_offset (16)
+@@ -45,4 +45,4 @@
+ 	it	cc
+ 	RETINSTR(cc, lr)
+ 	b	PLTJMP(syscall_error)
+-PSEUDO_END (syscall)
++PSEUDO_END (syscallS)
+--- glibc-2.38/sysdeps/unix/sysv/linux/x86_64/syscall.S	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/sysdeps/unix/sysv/linux/x86_64/syscall.S.patch	2023-12-25 23:00:38.685827592 +0300
+@@ -26,7 +26,7 @@
+ 
+ 
+ 	.text
+-ENTRY (syscall)
++ENTRY (syscallS)
+ 	movq %rdi, %rax		/* Syscall number -> rax.  */
+ 	movq %rsi, %rdi		/* shift arg1 - arg5.  */
+ 	movq %rdx, %rsi
+@@ -39,4 +39,4 @@
+ 	jae SYSCALL_ERROR_LABEL	/* Jump to error handler if error.  */
+ 	ret			/* Return to caller.  */
+ 
+-PSEUDO_END (syscall)
++PSEUDO_END (syscallS)
+--- glibc-2.38/sysdeps/unix/sysv/linux/i386/syscall.S	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.38/sysdeps/unix/sysv/linux/i386/syscall.S.patch	2023-12-25 23:01:40.765827568 +0300
+@@ -21,7 +21,7 @@
+    more information about the value -4095 used below.*/
+ 
+ 	.text
+-ENTRY (syscall)
++ENTRY (syscallS)
+ 
+ 	PUSHARGS_6		/* Save register contents.  */
+ 	_DOARGS_6(44)		/* Load arguments.  */
+@@ -32,4 +32,4 @@
+ 	jae SYSCALL_ERROR_LABEL	/* Jump to error handler if error.  */
+ 	ret			/* Return to caller.  */
+ 
+-PSEUDO_END (syscall)
++PSEUDO_END (syscallS)
