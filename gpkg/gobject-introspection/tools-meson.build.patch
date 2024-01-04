@@ -1,0 +1,15 @@
+--- src/tools/meson.build	2023-11-18 11:38:04.885354934 +0300
++++ src/tools/meson.build.patch	2023-11-18 11:42:40.645354829 +0300
+@@ -9,11 +9,7 @@
+   tools += [['g-ir-doc-tool', 'docmain', 'doc_main']]
+ endif
+ 
+-if cc.get_id() == 'msvc'
+-  python_cmd = '/usr/bin/env ' + python.path()
+-else
+-  python_cmd = '/usr/bin/env python@0@'.format(python.language_version().split('.')[0])
+-endif
++python_cmd = '@TERMUX_PREFIX@/bin/env ' + python.path()
+ 
+ tool_output = []
+ foreach tool : tools

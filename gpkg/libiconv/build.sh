@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="An implementation of iconv()"
 TERMUX_PKG_LICENSE="LGPL-2.1, GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_VERSION=1.17
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/pub/gnu/libiconv/libiconv-$TERMUX_PKG_VERSION.tar.gz
 TERMUX_PKG_SHA256=8f74213b56238c85a50a5329f77e06198771e70dd9a739779f4c02f65d971313
 TERMUX_PKG_DEPENDS="glibc"
@@ -18,6 +19,6 @@ termux_step_post_make_install() {
 	rm -fr $TERMUX_PREFIX/bin/libiconv-d
 
 	mv $TERMUX_PREFIX/include/libiconv-d/{iconv.h,libiconv.h}
-	mv $TERMUX_PREFIX/include/libiconv-d/libiconv.h $TERMUX_PREFIX/include
+	mv $TERMUX_PREFIX/include/libiconv-d/* $TERMUX_PREFIX/include
 	rm -fr $TERMUX_PREFIX/include/libiconv-d
 }

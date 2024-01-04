@@ -1,0 +1,10 @@
+--- src/tests/scanner/meson.build	2023-09-16 14:32:07.000000000 +0300
++++ src/tests/scanner/meson.build.patch	2023-12-11 11:51:03.198213660 +0300
+@@ -170,6 +170,7 @@
+       '--include=GObject-2.0',
+       '--pkg=gobject-2.0',
+       '--library=barapp-1.0',
++      '--library=girepository-1.0',
+       '--accept-unprefixed',
+       '-L', meson.current_build_dir(),
+       '-L', join_paths(build_root, 'girepository'),

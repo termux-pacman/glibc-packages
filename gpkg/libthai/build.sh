@@ -1,0 +1,10 @@
+TERMUX_PKG_HOMEPAGE=https://linux.thai.net/projects/datrie
+TERMUX_PKG_DESCRIPTION="Thai language support library"
+TERMUX_PKG_LICENSE="LGPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux-pacman"
+TERMUX_PKG_VERSION=0.1.29
+TERMUX_PKG_SRCURL=https://linux.thai.net/pub/thailinux/software/libthai/libthai-$TERMUX_PKG_VERSION.tar.xz
+TERMUX_PKG_SHA256=fc80cc7dcb50e11302b417cebd24f2d30a8b987292e77e003267b9100d0f4bcd
+TERMUX_PKG_DEPENDS="libdatrie-glibc"
+TERMUX_PKG_BUILD_DEPENDS="doxygen-glibc"
+TERMUX_PKG_BUILD_IN_SRC=true
