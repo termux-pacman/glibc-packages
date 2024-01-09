@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_SRCURL="git+https://github.com/pulseaudio/pulseaudio"
 TERMUX_PKG_VERSION="16.99.1"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_DEPENDS="libsndfile-glibc, libltdl-glibc, gdbm-glibc, libxcb-glibc, libxtst-glibc, libsm-glibc, libtool-glibc, libcap-glibc, dbus-glibc"
 TERMUX_PKG_BUILD_DEPENDS="gettext-glibc"
 TERMUX_PKG_CONFFILES="glibc/etc/pulse/client.conf, glibc/etc/pulse/daemon.conf, glibc/etc/pulse/default.pa, glibc/etc/pulse/system.pa"
