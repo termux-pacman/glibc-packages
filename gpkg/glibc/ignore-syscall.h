@@ -9,6 +9,8 @@ struct IdSyscalls {
 
 static struct IdSyscalls ListIgnoreSyscall[] = {
 	{ __NR_mbind },
+	{ __NR_get_mempolicy },
+	{ __NR_set_mempolicy },
 	{ 1008 }, // for some reason used in julia
 };
 
