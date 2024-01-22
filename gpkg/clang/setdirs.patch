@@ -1,0 +1,206 @@
+diff --git a/include/clang/Config/config.h.cmake b/include/clang/Config/config.h.cmake
+index a54a26cd..cd0fdd28 100644
+--- a/include/clang/Config/config.h.cmake
++++ b/include/clang/Config/config.h.cmake
+@@ -1,8 +1,6 @@
+ /* This generated file is for internal use. Do not include it from headers. */
+ 
+-#ifdef CLANG_CONFIG_H
+-#error config.h can only be included once
+-#else
++#ifndef CLANG_CONFIG_H
+ #define CLANG_CONFIG_H
+ 
+ /* Bug report URL. */
+diff --git a/lib/Driver/ToolChains/Gnu.cpp b/lib/Driver/ToolChains/Gnu.cpp
+index 40038dce..05d284fe 100644
+--- a/lib/Driver/ToolChains/Gnu.cpp
++++ b/lib/Driver/ToolChains/Gnu.cpp
+@@ -2107,6 +2107,11 @@ void Generic_GCC::GCCInstallationDetector::init(
+     return;
+   }
+ 
++  Version = GCCVersion::Parse(llvm::sys::path::filename(GCCInstallPath));
++  GCCTriple.setTriple(llvm::sys::path::filename(llvm::sys::path::parent_path(GCCInstallPath)));
++  IsValid = true;
++  return;
++
+   // Compute the set of prefixes for our search.
+   SmallVector<std::string, 8> Prefixes;
+   StringRef GCCToolchainDir = getGCCToolchainDir(Args, D.SysRoot);
+@@ -2295,7 +2300,7 @@ void Generic_GCC::GCCInstallationDetector::AddDefaultGCCPrefixes(
+   // They are not needed when the user has correct LLVM_DEFAULT_TARGET_TRIPLE
+   // and always uses the full --target (e.g. --target=aarch64-linux-gnu).  The
+   // lists should shrink over time. Please don't add more elements to *Triples.
+-  static const char *const AArch64LibDirs[] = {"/lib64", "/lib"};
++  static const char *const AArch64LibDirs[] = {"@TERMUX_PREFIX@/lib"};
+   static const char *const AArch64Triples[] = {
+       "aarch64-none-linux-gnu", "aarch64-linux-gnu", "aarch64-redhat-linux",
+       "aarch64-suse-linux"};
+@@ -2303,13 +2308,13 @@ void Generic_GCC::GCCInstallationDetector::AddDefaultGCCPrefixes(
+   static const char *const AArch64beTriples[] = {"aarch64_be-none-linux-gnu",
+                                                  "aarch64_be-linux-gnu"};
+ 
+-  static const char *const ARMLibDirs[] = {"/lib"};
++  static const char *const ARMLibDirs[] = {"@TERMUX_PREFIX@/lib"};
+   static const char *const ARMTriples[] = {"arm-linux-gnueabi"};
+   static const char *const ARMHFTriples[] = {"arm-linux-gnueabihf",
+                                              "armv7hl-redhat-linux-gnueabi",
+                                              "armv6hl-suse-linux-gnueabi",
+                                              "armv7hl-suse-linux-gnueabi"};
+-  static const char *const ARMebLibDirs[] = {"/lib"};
++  static const char *const ARMebLibDirs[] = {"@TERMUX_PREFIX@/lib"};
+   static const char *const ARMebTriples[] = {"armeb-linux-gnueabi"};
+   static const char *const ARMebHFTriples[] = {
+       "armeb-linux-gnueabihf", "armebv7hl-redhat-linux-gnueabi"};
+@@ -2321,7 +2326,7 @@ void Generic_GCC::GCCInstallationDetector::AddDefaultGCCPrefixes(
+   static const char *const CSKYTriples[] = {
+       "csky-linux-gnuabiv2", "csky-linux-uclibcabiv2", "csky-elf-noneabiv2"};
+ 
+-  static const char *const X86_64LibDirs[] = {"/lib64", "/lib"};
++  static const char *const X86_64LibDirs[] = {"@TERMUX_PREFIX@/lib"};
+   static const char *const X86_64Triples[] = {
+       "x86_64-linux-gnu",       "x86_64-unknown-linux-gnu",
+       "x86_64-pc-linux-gnu",    "x86_64-redhat-linux6E",
+@@ -2331,8 +2336,8 @@ void Generic_GCC::GCCInstallationDetector::AddDefaultGCCPrefixes(
+       "x86_64-amazon-linux"};
+   static const char *const X32Triples[] = {"x86_64-linux-gnux32",
+                                            "x86_64-pc-linux-gnux32"};
+-  static const char *const X32LibDirs[] = {"/libx32", "/lib"};
+-  static const char *const X86LibDirs[] = {"/lib32", "/lib"};
++  static const char *const X32LibDirs[] = {"@TERMUX_PREFIX@/lib"};
++  static const char *const X86LibDirs[] = {"@TERMUX_PREFIX@/lib"};
+   static const char *const X86Triples[] = {
+       "i586-linux-gnu",      "i686-linux-gnu",        "i686-pc-linux-gnu",
+       "i386-redhat-linux6E", "i686-redhat-linux",     "i386-redhat-linux",
+@@ -2851,7 +2856,7 @@ bool Generic_GCC::GCCInstallationDetector::ScanGentooGccConfig(
+         }
+       }
+       // Test the path based on the version in /etc/env.d/gcc/config-{tuple}.
+-      std::string basePath = "/usr/lib/gcc/" + ActiveVersion.first.str() + "/"
++      std::string basePath = "@TERMUX_PREFIX@/usr/lib/gcc/" + ActiveVersion.first.str() + "/"
+           + ActiveVersion.second.str();
+       GentooScanPaths.push_back(StringRef(basePath));
+ 
+@@ -3127,9 +3132,7 @@ Generic_GCC::addLibCxxIncludePaths(const llvm::opt::ArgList &DriverArgs,
+   // If this is a development, non-installed, clang, libcxx will
+   // not be found at ../include/c++ but it likely to be found at
+   // one of the following two locations:
+-  if (AddIncludePath(concat(SysRoot, "/usr/local/include")))
+-    return;
+-  if (AddIncludePath(concat(SysRoot, "/usr/include")))
++  if (AddIncludePath(concat(SysRoot, "@TERMUX_PREFIX@/include")))
+     return;
+ }
+ 
+diff --git a/lib/Driver/ToolChains/Gnu.h b/lib/Driver/ToolChains/Gnu.h
+index 6d335c9e..e1259081 100644
+--- a/lib/Driver/ToolChains/Gnu.h
++++ b/lib/Driver/ToolChains/Gnu.h
+@@ -14,6 +14,7 @@
+ #include "ROCm.h"
+ #include "clang/Driver/Tool.h"
+ #include "clang/Driver/ToolChain.h"
++#include "clang/Config/config.h" // for GCC_INSTALL_PREFIX
+ #include <set>
+ 
+ namespace clang {
+@@ -195,8 +196,8 @@ public:
+     const Driver &D;
+ 
+     // FIXME: These might be better as path objects.
+-    std::string GCCInstallPath;
+-    std::string GCCParentLibPath;
++    std::string GCCInstallPath = GCC_INSTALL_PREFIX;
++    std::string GCCParentLibPath = GCCInstallPath + "/../../..";
+ 
+     /// The primary multilib appropriate for the given flags.
+     Multilib SelectedMultilib;
+diff --git a/lib/Driver/ToolChains/Linux.cpp b/lib/Driver/ToolChains/Linux.cpp
+index 1ba222bf..795cce93 100644
+--- a/lib/Driver/ToolChains/Linux.cpp
++++ b/lib/Driver/ToolChains/Linux.cpp
+@@ -301,8 +301,8 @@ Linux::Linux(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
+   }
+   Generic_GCC::AddMultilibPaths(D, SysRoot, OSLibDir, MultiarchTriple, Paths);
+ 
+-  addPathIfExists(D, concat(SysRoot, "/lib", MultiarchTriple), Paths);
+-  addPathIfExists(D, concat(SysRoot, "/lib/..", OSLibDir), Paths);
++  addPathIfExists(D, concat(SysRoot, "@TERMUX_PREFIX@/lib", MultiarchTriple), Paths);
++  addPathIfExists(D, concat(SysRoot, "@TERMUX_PREFIX@/lib/..", OSLibDir), Paths);
+ 
+   if (IsAndroid) {
+     // Android sysroots contain a library directory for each supported OS
+@@ -315,25 +315,23 @@ Linux::Linux(const Driver &D, const llvm::Triple &Triple, const ArgList &Args)
+         Paths);
+   }
+ 
+-  addPathIfExists(D, concat(SysRoot, "/usr/lib", MultiarchTriple), Paths);
++  addPathIfExists(D, concat(SysRoot, "@TERMUX_PREFIX@/lib", MultiarchTriple), Paths);
+   // 64-bit OpenEmbedded sysroots may not have a /usr/lib dir. So they cannot
+   // find /usr/lib64 as it is referenced as /usr/lib/../lib64. So we handle
+   // this here.
+   if (Triple.getVendor() == llvm::Triple::OpenEmbedded &&
+       Triple.isArch64Bit())
+-    addPathIfExists(D, concat(SysRoot, "/usr", OSLibDir), Paths);
++    addPathIfExists(D, concat(SysRoot, "@TERMUX_PREFIX@/", OSLibDir), Paths);
+   else
+-    addPathIfExists(D, concat(SysRoot, "/usr/lib/..", OSLibDir), Paths);
++    addPathIfExists(D, concat(SysRoot, "@TERMUX_PREFIX@/lib/..", OSLibDir), Paths);
+   if (IsRISCV) {
+     StringRef ABIName = tools::riscv::getRISCVABI(Args, Triple);
+-    addPathIfExists(D, concat(SysRoot, "/", OSLibDir, ABIName), Paths);
+-    addPathIfExists(D, concat(SysRoot, "/usr", OSLibDir, ABIName), Paths);
++    addPathIfExists(D, concat(SysRoot, "@TERMUX_PREFIX@/", OSLibDir, ABIName), Paths);
+   }
+ 
+   Generic_GCC::AddMultiarchPaths(D, SysRoot, OSLibDir, Paths);
+ 
+-  addPathIfExists(D, concat(SysRoot, "/lib"), Paths);
+-  addPathIfExists(D, concat(SysRoot, "/usr/lib"), Paths);
++  addPathIfExists(D, concat(SysRoot, "@TERMUX_PREFIX@/lib"), Paths);
+ }
+ 
+ ToolChain::RuntimeLibType Linux::GetDefaultRuntimeLibType() const {
+@@ -605,7 +603,7 @@ std::string Linux::getDynamicLinker(const ArgList &Args) const {
+       (Triple.getVendor() == llvm::Triple::UnknownVendor ||
+        Triple.getVendor() == llvm::Triple::PC))
+     return "/usr/" + Triple.str() + "/lib/" + Loader;
+-  return "/" + LibDir + "/" + Loader;
++  return "@TERMUX_PREFIX@/" + LibDir + "/" + Loader;
+ }
+ 
+ void Linux::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
+@@ -630,7 +628,7 @@ void Linux::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
+     return;
+ 
+   // LOCAL_INCLUDE_DIR
+-  addSystemInclude(DriverArgs, CC1Args, concat(SysRoot, "/usr/local/include"));
++  addSystemInclude(DriverArgs, CC1Args, concat(SysRoot, "@TERMUX_PREFIX@/include"));
+   // TOOL_INCLUDE_DIR
+   AddMultilibIncludeArgs(DriverArgs, CC1Args);
+ 
+@@ -651,10 +649,10 @@ void Linux::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
+   // /usr/include.
+   std::string MultiarchIncludeDir = getMultiarchTriple(D, getTriple(), SysRoot);
+   if (!MultiarchIncludeDir.empty() &&
+-      D.getVFS().exists(concat(SysRoot, "/usr/include", MultiarchIncludeDir)))
++      D.getVFS().exists(concat(SysRoot, "@TERMUX_PREFIX@/include", MultiarchIncludeDir)))
+     addExternCSystemInclude(
+         DriverArgs, CC1Args,
+-        concat(SysRoot, "/usr/include", MultiarchIncludeDir));
++        concat(SysRoot, "@TERMUX_PREFIX@/include", MultiarchIncludeDir));
+ 
+   if (getTriple().getOS() == llvm::Triple::RTEMS)
+     return;
+@@ -662,9 +660,7 @@ void Linux::AddClangSystemIncludeArgs(const ArgList &DriverArgs,
+   // Add an include of '/include' directly. This isn't provided by default by
+   // system GCCs, but is often used with cross-compiling GCCs, and harmless to
+   // add even when Clang is acting as-if it were a system compiler.
+-  addExternCSystemInclude(DriverArgs, CC1Args, concat(SysRoot, "/include"));
+-
+-  addExternCSystemInclude(DriverArgs, CC1Args, concat(SysRoot, "/usr/include"));
++  addExternCSystemInclude(DriverArgs, CC1Args, concat(SysRoot, "@TERMUX_PREFIX@/include"));
+ 
+   if (!DriverArgs.hasArg(options::OPT_nobuiltininc) && getTriple().isMusl())
+     addSystemInclude(DriverArgs, CC1Args, ResourceDirInclude);
