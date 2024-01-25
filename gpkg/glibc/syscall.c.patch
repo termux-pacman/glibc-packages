@@ -1,10 +1,12 @@
---- glibc-2.38/sysdeps/unix/sysv/linux/syscall.c	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/syscall.c.patch	2024-01-01 13:12:45.120508427 +0300
-@@ -18,26 +18,26 @@
+--- src/sysdeps/unix/sysv/linux/syscall.c	2023-07-31 20:54:16.000000000 +0300
++++ src/sysdeps/unix/sysv/linux/syscall.c.patch	2024-01-24 20:02:17.983538698 +0300
+@@ -18,26 +18,28 @@
  
  #include <stdarg.h>
  #include <sysdep.h>
 +#include <ignore-syscall.h>
++
++extern long int syscallS (long int __sysno, ...) __THROW;
  
  long int
  syscall (long int number, ...)
