@@ -18,11 +18,11 @@ jobs:
         target_arch: [aarch64, arm, x86_64, i686]
       fail-fast: false
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
+      uses: docker/setup-qemu-action@v3
     - name: Get list gpkg-dev packages
       run: |
         mkdir -p "pkgs/PKGBUILDs"
@@ -52,7 +52,7 @@ jobs:
           ./script/docker.sh /home/user-build/script/build-dev.sh ${{ matrix.target_arch }} ${i}
         done
         tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz pkgs
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: gpkg-dev-${{ matrix.target_arch }}
         path: "./gpkg-dev-${{ matrix.target_arch }}.tar.xz"
@@ -67,9 +67,9 @@ jobs:
       fail-fast: false
     steps:
     - name: Clone repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Get packages
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         path: ./
     - name: Install aws-cli
