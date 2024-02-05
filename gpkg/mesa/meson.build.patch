@@ -1,0 +1,16 @@
+--- src/meson.build	2024-01-20 12:22:08.339393023 +0300
++++ src/meson.build.patch	2024-01-21 13:39:04.387288980 +0300
+@@ -1742,12 +1742,7 @@
+     # programs, so we need to build all C++ code in mesa without rtti as well to
+     # ensure that linking works. Note that Win32 compilers does handle mismatching RTTI
+     # without issues, so only apply this for other compilers.
+-    if dep_llvm.type_name() == 'internal'
+-      _llvm_rtti = subproject('llvm').get_variable('has_rtti', true)
+-    else
+-      # The CMake finder will return 'ON', the llvm-config will return 'YES'
+-      _llvm_rtti = ['ON', 'YES'].contains(dep_llvm.get_variable(cmake : 'LLVM_ENABLE_RTTI', configtool: 'has-rtti'))
+-    endif
++    _llvm_rtti = true
+     if _rtti != _llvm_rtti
+       if _llvm_rtti
+         error('LLVM was built with RTTI, cannot build Mesa with RTTI disabled. Remove cpp_rtti disable switch or use LLVM built without LLVM_ENABLE_RTTI.')

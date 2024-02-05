@@ -3,12 +3,12 @@ TERMUX_PKG_DESCRIPTION="The GL Vendor-Neutral Dispatch library"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_VERSION="1.7.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://gitlab.freedesktop.org/glvnd/libglvnd/-/archive/v${TERMUX_PKG_VERSION}/libglvnd-v${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=2b6e15b06aafb4c0b6e2348124808cbd9b291c647299eaaba2e3202f51ff2f3d
 TERMUX_PKG_DEPENDS="libxext-glibc"
 TERMUX_PKG_BUILD_DEPENDS="xorgproto-glibc"
-# Currently there is no mesa-glibc
-#TERMUX_PKG_RECOMMENDS="mesa-glibc"
+TERMUX_PKG_RECOMMENDS="mesa-glibc"
 
 termux_step_install_license() {
 	install -Dm600 -t $TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME \

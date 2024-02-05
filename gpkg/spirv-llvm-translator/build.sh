@@ -1,0 +1,15 @@
+TERMUX_PKG_HOMEPAGE=https://github.com/KhronosGroup/SPIRV-LLVM-Translator
+TERMUX_PKG_DESCRIPTION="Tool and a library for bi-directional translation between SPIR-V and LLVM IR"
+TERMUX_PKG_LICENSE="custom"
+TERMUX_PKG_LICENSE_FILE="LICENSE.TXT"
+TERMUX_PKG_MAINTAINER="@termux-pacman"
+TERMUX_PKG_VERSION=17.0.0
+TERMUX_PKG_SRCURL=https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/refs/tags/v${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=eba381e1dd99b4ff6c672a28f52755d1adf2d810a97b51e6074ad4fa67937fb2
+TERMUX_PKG_DEPENDS="libllvm-glibc, spirv-tools-glibc"
+TERMUX_PKG_BUILD_DEPENDS="llvm-glibc"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DLLVM_INCLUDE_TESTS=ON
+-DLLVM_EXTERNAL_LIT=$TERMUX_PREFIX/bin/lit
+-DLLVM_EXTERNAL_SPIRV_HEADERS_SOURCE_DIR=$TERMUX_PREFIX/include/spirv/
+"
