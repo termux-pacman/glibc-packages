@@ -2,15 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://pip.pypa.io/
 TERMUX_PKG_DESCRIPTION="The PyPA recommended tool for installing Python packages"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION="23.3.2"
+TERMUX_PKG_VERSION="24.0"
 TERMUX_PKG_SRCURL=https://github.com/pypa/pip/archive/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=0e534d5c6dba159f0a4e64d55ef4d130222bcb4ac25f62275017eacbfa10a1d5
+TERMUX_PKG_SHA256=ad0dfe75fb28092a8cbe18523391695ceb0c0d65a5c9a969349fcb13b12b84c7
 TERMUX_PKG_DEPENDS="gcc-glibc, make-glibc, pkgconf-glibc, python-glibc (>= 3.11.1-1)"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="gcc-glibc"
 TERMUX_PKG_BREAKS="python-glibc (<< 3.11.1-1)"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, docutils, myst_parser, sphinx_copybutton, sphinx_inline_tabs, sphinxcontrib.towncrier, completion"
+TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, setuptools==67.8, docutils, myst_parser, sphinx_copybutton, sphinx_inline_tabs, sphinxcontrib.towncrier, completion"
 
 termux_step_post_make_install() {
 	( # creating pip documentation

@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://cmake.org/
 TERMUX_PKG_DESCRIPTION="Family of tools designed to build, test and package software"
 TERMUX_PKG_LICENSE="BSD 3-Clause"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=3.28.1
+TERMUX_PKG_VERSION=3.28.3
 TERMUX_PKG_SRCURL=https://www.cmake.org/files/v${TERMUX_PKG_VERSION:0:4}/cmake-${TERMUX_PKG_VERSION}.tar.gz
-TERMUX_PKG_SHA256=15e94f83e647f7d620a140a7a5da76349fc47a1bfed66d0f5cdee8e7344079ad
+TERMUX_PKG_SHA256=72b7570e5c8593de6ac4ab433b73eab18c5fb328880460c86ce32608141ad5c1
 TERMUX_PKG_DEPENDS="libcurl-glibc, libarchive-glibc, jsoncpp-glibc, libuv-glibc, rhash-glibc, cppdap-glibc, libexpat-glibc"
 TERMUX_PKG_RECOMMENDS="gcc-glibc, make-glibc"
 TERMUX_PKG_FORCE_CMAKE=true
@@ -29,5 +29,5 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	# for some reason this library is not used when compiling for x86_64
 	# looks like this is a bug from cgt
-	LDFLAGS+=" -lnghttp2"
+	LDFLAGS+=" -lnghttp2 -lssl -lcrypto"
 }
