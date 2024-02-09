@@ -1,6 +1,6 @@
---- glibc-2.38/sysdeps/unix/sysv/linux/i386/arch-syscall.h	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/i386/arch-syscall.h.patch	2023-11-10 23:47:46.716988212 +0300
-@@ -18,24 +18,18 @@
+--- glibc-2.39/sysdeps/unix/sysv/linux/i386/arch-syscall.h	2024-01-31 03:34:58.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/i386/arch-syscall.h.patch	2024-02-10 14:53:23.020125331 +0300
+@@ -19,24 +19,18 @@
  #define __NR_capget 184
  #define __NR_capset 185
  #define __NR_chdir 12
@@ -25,7 +25,7 @@
  #define __NR_connect 362
  #define __NR_copy_file_range 377
  #define __NR_creat 8
-@@ -57,7 +51,6 @@
+@@ -58,7 +52,6 @@
  #define __NR_exit 1
  #define __NR_exit_group 252
  #define __NR_faccessat 307
@@ -33,15 +33,23 @@
  #define __NR_fadvise64 250
  #define __NR_fadvise64_64 272
  #define __NR_fallocate 324
-@@ -94,7 +87,6 @@
- #define __NR_ftruncate64 194
- #define __NR_futex 240
+@@ -67,7 +60,6 @@
+ #define __NR_fchdir 133
+ #define __NR_fchmod 94
+ #define __NR_fchmodat 306
+-#define __NR_fchmodat2 452
+ #define __NR_fchown 95
+ #define __NR_fchown32 207
+ #define __NR_fchownat 298
+@@ -98,7 +90,6 @@
+ #define __NR_futex_requeue 456
  #define __NR_futex_time64 422
+ #define __NR_futex_wait 455
 -#define __NR_futex_waitv 449
+ #define __NR_futex_wake 454
  #define __NR_futimesat 299
  #define __NR_get_kernel_syms 130
- #define __NR_get_mempolicy 275
-@@ -115,7 +107,6 @@
+@@ -120,7 +111,6 @@
  #define __NR_getitimer 105
  #define __NR_getpeername 368
  #define __NR_getpgid 132
@@ -49,7 +57,7 @@
  #define __NR_getpid 20
  #define __NR_getpmsg 188
  #define __NR_getppid 64
-@@ -239,7 +229,6 @@
+@@ -245,7 +235,6 @@
  #define __NR_personality 136
  #define __NR_pidfd_getfd 438
  #define __NR_pidfd_open 434
@@ -57,7 +65,7 @@
  #define __NR_pipe 42
  #define __NR_pipe2 331
  #define __NR_pivot_root 217
-@@ -288,8 +277,6 @@
+@@ -294,8 +283,6 @@
  #define __NR_renameat2 353
  #define __NR_request_key 287
  #define __NR_restart_syscall 0
@@ -66,7 +74,7 @@
  #define __NR_rt_sigaction 174
  #define __NR_rt_sigpending 176
  #define __NR_rt_sigprocmask 175
-@@ -324,16 +311,9 @@
+@@ -330,16 +317,9 @@
  #define __NR_sendto 369
  #define __NR_set_mempolicy 276
  #define __NR_set_mempolicy_home_node 450
@@ -83,7 +91,7 @@
  #define __NR_setgroups 81
  #define __NR_setgroups32 206
  #define __NR_sethostname 74
-@@ -343,8 +323,6 @@
+@@ -349,8 +329,6 @@
  #define __NR_setpriority 97
  #define __NR_setregid 71
  #define __NR_setregid32 204
@@ -92,7 +100,7 @@
  #define __NR_setresuid 164
  #define __NR_setresuid32 208
  #define __NR_setreuid 70
-@@ -353,8 +331,6 @@
+@@ -359,8 +337,6 @@
  #define __NR_setsid 66
  #define __NR_setsockopt 366
  #define __NR_settimeofday 79
@@ -101,7 +109,7 @@
  #define __NR_setxattr 226
  #define __NR_sgetmask 68
  #define __NR_shmat 397
-@@ -380,12 +356,10 @@
+@@ -386,12 +362,10 @@
  #define __NR_stat64 195
  #define __NR_statfs 99
  #define __NR_statfs64 268

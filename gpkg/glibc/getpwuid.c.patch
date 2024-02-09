@@ -1,5 +1,5 @@
---- glibc-2.38/pwd/getpwuid.c	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/pwd/getpwuid.c.patch	2023-10-24 09:08:43.494991271 +0300
+--- glibc-2.39/nss/getpwuid.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.39/nss/getpwuid.c.patch	2023-10-24 09:08:43.494991271 +0300
 @@ -24,5 +24,6 @@
  #define ADD_PARAMS	uid_t uid
  #define ADD_VARIABLES	uid
@@ -7,8 +7,8 @@
 +#define ANDROID_SYS	getpwuid_android
  
  #include "../nss/getXXbyYY.c"
---- glibc-2.38/pwd/getpwuid_r.c	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/pwd/getpwuid_r.c.patch	2023-10-24 10:40:09.191493890 +0300
+--- glibc-2.39/nss/getpwuid_r.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.39/nss/getpwuid_r.c.patch	2023-10-24 10:40:09.191493890 +0300
 @@ -24,5 +24,6 @@
  #define ADD_PARAMS	uid_t uid
  #define ADD_VARIABLES	uid
@@ -16,8 +16,8 @@
 +#define ANDROID_SYS	getpwuid_android
  
  #include <nss/getXXbyYY_r.c>
---- glibc-2.38/nscd/getpwuid_r.c	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/nscd/getpwuid_r.c.patch	2023-10-24 11:20:31.865395540 +0300
+--- glibc-2.39/nscd/getpwuid_r.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.39/nscd/getpwuid_r.c.patch	2023-10-24 11:20:31.865395540 +0300
 @@ -23,6 +23,7 @@
  #define ADD_PARAMS	uid_t uid
  #define ADD_VARIABLES	uid

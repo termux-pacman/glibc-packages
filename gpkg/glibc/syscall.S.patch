@@ -1,5 +1,5 @@
---- glibc-2.38/sysdeps/unix/sysv/linux/aarch64/syscall.S	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/aarch64/syscall.S.patch	2023-12-25 22:43:44.138402265 +0300
+--- glibc-2.39/sysdeps/unix/sysv/linux/aarch64/syscall.S	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/aarch64/syscall.S.patch	2023-12-25 22:43:44.138402265 +0300
 @@ -26,7 +26,7 @@
     For kernel entry we need to move the system call nr to x8 then
     load the remaining arguments to register. */
@@ -15,8 +15,8 @@
  	b	SYSCALL_ERROR
 -PSEUDO_END (syscall)
 +PSEUDO_END (syscallS)
---- glibc-2.38/sysdeps/unix/sysv/linux/arm/syscall.S	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/arm/syscall.S.patch	2023-12-25 22:45:38.988402221 +0300
+--- glibc-2.39/sysdeps/unix/sysv/linux/arm/syscall.S	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/arm/syscall.S.patch	2023-12-25 22:45:38.988402221 +0300
 @@ -21,7 +21,7 @@
     implement syscall().  It won't work reliably with 64-bit arguments
     (but that is true on many modern platforms).  */
@@ -32,8 +32,8 @@
  	b	PLTJMP(syscall_error)
 -PSEUDO_END (syscall)
 +PSEUDO_END (syscallS)
---- glibc-2.38/sysdeps/unix/sysv/linux/x86_64/syscall.S	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/x86_64/syscall.S.patch	2023-12-25 23:00:38.685827592 +0300
+--- glibc-2.39/sysdeps/unix/sysv/linux/x86_64/syscall.S	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/x86_64/syscall.S.patch	2023-12-25 23:00:38.685827592 +0300
 @@ -26,7 +26,7 @@
  
  
@@ -49,8 +49,8 @@
  
 -PSEUDO_END (syscall)
 +PSEUDO_END (syscallS)
---- glibc-2.38/sysdeps/unix/sysv/linux/i386/syscall.S	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/i386/syscall.S.patch	2023-12-25 23:01:40.765827568 +0300
+--- glibc-2.39/sysdeps/unix/sysv/linux/i386/syscall.S	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/i386/syscall.S.patch	2023-12-25 23:01:40.765827568 +0300
 @@ -21,7 +21,7 @@
     more information about the value -4095 used below.*/
  

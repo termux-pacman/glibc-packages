@@ -11,24 +11,20 @@ index 4c3521db..06b6faa7 100644
    if (dirp == NULL)
      {
        if (errno == ENOENT)
-diff --git a/elf/dl-support.c b/elf/dl-support.c
-index 44a54dea..2cfeee80 100644
---- a/elf/dl-support.c
-+++ b/elf/dl-support.c
-@@ -304,7 +304,7 @@ _dl_non_dynamic_init (void)
-   _dl_profile_output = getenv ("LD_PROFILE_OUTPUT");
-   if (_dl_profile_output == NULL || _dl_profile_output[0] == '\0')
-     _dl_profile_output
--      = &"/var/tmp\0/var/profile"[__libc_enable_secure ? 9 : 0];
-+      = &"@TERMUX_PREFIX@/var/tmp\0/var/profile"[__libc_enable_secure ? 9 : 0];
- 
-   if (__libc_enable_secure)
-     {
 diff --git a/elf/rtld.c b/elf/rtld.c
 index a91e2a44..382a12f8 100644
 --- a/elf/rtld.c
 +++ b/elf/rtld.c
-@@ -1865,7 +1865,7 @@ dl_main (const ElfW(Phdr) *phdr,
+@@ -360,7 +360,7 @@
+     ._dl_fpu_control = _FPU_DEFAULT,
+     ._dl_pagesize = EXEC_PAGESIZE,
+     ._dl_inhibit_cache = 0,
+-    ._dl_profile_output = "/var/tmp",
++    ._dl_profile_output = "@TERMUX_PREFIX@/var/tmp",
+
+     /* Function pointers.  */
+     ._dl_debug_printf = _dl_debug_printf,
+@@ -1862,7 +1862,7 @@ dl_main (const ElfW(Phdr) *phdr,
       open().  So we do this first.  If it succeeds we do almost twice
       the work but this does not matter, since it is not for production
       use.  */
@@ -37,15 +33,6 @@ index a91e2a44..382a12f8 100644
    if (__glibc_unlikely (__access (preload_file, R_OK) == 0))
      {
        /* Read the contents of the file.  */
-@@ -2542,7 +2542,7 @@ process_envvars (struct dl_main_state *state)
- 
-   /* This is the default place for profiling data file.  */
-   GLRO(dl_profile_output)
--    = &"/var/tmp\0/var/profile"[__libc_enable_secure ? 9 : 0];
-+    = &"@TERMUX_PREFIX@/var/tmp\0/var/profile"[__libc_enable_secure ? 9 : 0];
- 
-   while ((envline = _dl_next_ld_env_entry (&runp)) != NULL)
-     {
 diff --git a/elf/sprof.c b/elf/sprof.c
 index 3eaa4758..9a44ac2c 100644
 --- a/elf/sprof.c

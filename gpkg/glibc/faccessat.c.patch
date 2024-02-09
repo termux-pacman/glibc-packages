@@ -1,5 +1,5 @@
---- glibc-2.38/sysdeps/unix/sysv/linux/faccessat.c	2021-08-02 04:33:43.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/faccessat.c.patch	2022-02-28 16:09:01.163599293 +0300
+--- glibc-2.39/sysdeps/unix/sysv/linux/faccessat.c	2021-08-02 04:33:43.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/faccessat.c.patch	2022-02-28 16:09:01.163599293 +0300
 @@ -26,16 +26,6 @@
  int
  __faccessat (int fd, const char *file, int mode, int flag)

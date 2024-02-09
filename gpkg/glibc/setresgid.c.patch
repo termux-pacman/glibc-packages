@@ -1,5 +1,5 @@
---- glibc-2.38/sysdeps/unix/sysv/linux/setresgid.c	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/setresgid.c.patch	2023-10-20 13:46:15.746169098 +0300
+--- glibc-2.39/sysdeps/unix/sysv/linux/setresgid.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/setresgid.c.patch	2023-10-20 13:46:15.746169098 +0300
 @@ -23,11 +23,7 @@
  int
  __setresgid (gid_t rgid, gid_t egid, gid_t sgid)

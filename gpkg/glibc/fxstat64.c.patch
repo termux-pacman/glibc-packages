@@ -1,5 +1,5 @@
---- glibc-2.38/sysdeps/unix/sysv/linux/fxstat64.c	2022-07-30 01:03:09.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/fxstat64.c.patch	2022-10-07 22:35:03.954262517 +0300
+--- glibc-2.39/sysdeps/unix/sysv/linux/fxstat64.c	2022-07-30 01:03:09.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/fxstat64.c.patch	2022-10-07 22:35:03.954262517 +0300
 @@ -50,14 +50,6 @@
    if (vers == _STAT_VER_KERNEL || vers == _STAT_VER_LINUX)
      return INLINE_SYSCALL_CALL (fstat, fd, buf);

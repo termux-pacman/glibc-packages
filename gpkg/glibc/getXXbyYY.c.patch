@@ -1,5 +1,5 @@
---- glibc-2.38/nss/getXXbyYY.c	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/nss/getXXbyYY.c.patch	2023-10-24 09:26:40.776559808 +0300
+--- glibc-2.39/nss/getXXbyYY.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.39/nss/getXXbyYY.c.patch	2023-10-24 09:26:40.776559808 +0300
 @@ -53,6 +53,10 @@
  # include <resolv/resolv_context.h>
  #endif

@@ -1,5 +1,5 @@
---- glibc-2.38/sysdeps/unix/sysv/linux/tst-rseq.h	2022-02-03 05:27:54.000000000 +0000
-+++ glibc-2.38/sysdeps/unix/sysv/linux/tst-rseq.h.patch	2022-06-17 10:35:31.250507272 +0000
+--- glibc-2.39/sysdeps/unix/sysv/linux/tst-rseq.h	2022-02-03 05:27:54.000000000 +0000
++++ glibc-2.39/sysdeps/unix/sysv/linux/tst-rseq.h.patch	2022-06-17 10:35:31.250507272 +0000
 @@ -30,20 +30,9 @@
    return THREAD_GETMEM_VOLATILE (THREAD_SELF, rseq_area.cpu_id) >= 0;
  }

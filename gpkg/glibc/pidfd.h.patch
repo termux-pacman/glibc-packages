@@ -1,6 +1,6 @@
---- src/sysdeps/unix/sysv/linux/sys/pidfd.h	2023-07-31 20:54:16.000000000 +0300
-+++ src/sysdeps/unix/sysv/linux/sys/pidfd.h.patch	2023-10-06 17:40:14.819331237 +0300
-@@ -38,12 +38,4 @@
+--- src/sysdeps/unix/sysv/linux/sys/pidfd.h	2024-01-31 03:34:58.000000000 +0300
++++ src/sysdeps/unix/sysv/linux/sys/pidfd.h.patch	2024-02-09 09:12:20.984952519 +0300
+@@ -38,14 +38,6 @@
  extern int pidfd_getfd (int __pidfd, int __targetfd,
  			unsigned int __flags) __THROW;
  
@@ -12,4 +12,6 @@
 -extern int pidfd_send_signal (int __pidfd, int __sig, siginfo_t *__info,
 -			      unsigned int __flags) __THROW;
 -
- #endif /* _PIDFD_H  */
+ /* Query the process ID (PID) from process descriptor FD.  Return the PID
+    or -1 in case of an error.  */
+ extern pid_t pidfd_getpid (int __fd) __THROW;

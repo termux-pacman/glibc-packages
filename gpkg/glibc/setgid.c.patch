@@ -1,5 +1,5 @@
---- glibc-2.38/sysdeps/unix/sysv/linux/setgid.c	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/setgid.c.patch	2023-10-20 18:56:19.607101054 +0300
+--- glibc-2.39/sysdeps/unix/sysv/linux/setgid.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/setgid.c.patch	2023-10-20 18:56:19.607101054 +0300
 @@ -23,11 +23,7 @@
  int
  __setgid (gid_t gid)

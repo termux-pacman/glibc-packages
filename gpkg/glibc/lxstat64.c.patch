@@ -1,5 +1,5 @@
---- glibc-2.38/sysdeps/unix/sysv/linux/lxstat64.c	2022-07-30 01:03:09.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/lxstat64.c.patch	2022-10-07 22:27:46.944262684 +0300
+--- glibc-2.39/sysdeps/unix/sysv/linux/lxstat64.c	2022-07-30 01:03:09.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/lxstat64.c.patch	2022-10-07 22:27:46.944262684 +0300
 @@ -53,18 +53,6 @@
    if (vers == _STAT_VER_KERNEL)
      return INLINE_SYSCALL_CALL (newfstatat, AT_FDCWD, name, buf,
