@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/libc/
 TERMUX_PKG_DESCRIPTION="GNU C Library"
 TERMUX_PKG_LICENSE="GPL-3.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=2.38
-TERMUX_PKG_REVISION=13
+TERMUX_PKG_VERSION=2.39
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/libc/glibc-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=fb82998998b2b29965467bc1b69d152e9c307d2cf301c9eafb4555b770ef3fd2
+TERMUX_PKG_SHA256=f77bd47cf8170c57365ae7bf86696c118adb3b120d3259c64c502d3dc1e2d926
 TERMUX_PKG_DEPENDS="linux-api-headers-glibc"
 TERMUX_PKG_RECOMMENDS="glibc-runner"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -50,7 +49,7 @@ termux_step_configure() {
 		"aarch64") _configure_flags+=(--enable-memory-tagging --enable-fortify-source);;
 		"arm") _configure_flags+=(--enable-fortify-source);;
 		"x86_64") _configure_flags+=(--enable-cet);;
-		"i686") _configure_flags+=(--enable-cet --enable-fortify-source);;
+		"i686") _configure_flags+=(--enable-fortify-source);;
 	esac
 
 	${TERMUX_PKG_SRCDIR}/configure \
@@ -68,6 +67,7 @@ termux_step_configure() {
 		--disable-nscd \
 		--disable-profile \
 		--disable-werror \
+		--disable-default-pie \
 		"${_configure_flags[@]}"
 }
 

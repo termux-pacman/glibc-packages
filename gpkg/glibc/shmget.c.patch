@@ -1,5 +1,5 @@
---- glibc-2.38/sysdeps/unix/sysv/linux/shmget.c	2023-02-01 06:27:45.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/shmget.c.patch	2023-06-08 12:46:33.199174236 +0300
+--- glibc-2.39/sysdeps/unix/sysv/linux/shmget.c	2023-02-01 06:27:45.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/shmget.c.patch	2023-06-08 12:46:33.199174236 +0300
 @@ -19,16 +19,151 @@
  #include <stddef.h>
  #include <ipc_priv.h>

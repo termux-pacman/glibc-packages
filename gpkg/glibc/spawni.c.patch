@@ -1,5 +1,5 @@
---- glibc-2.38/sysdeps/unix/sysv/linux/spawni.c	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/spawni.c.patch	2023-10-07 00:31:27.595087508 +0300
+--- glibc-2.39/sysdeps/unix/sysv/linux/spawni.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/spawni.c.patch	2023-10-07 00:31:27.595087508 +0300
 @@ -264,7 +264,7 @@
  	    case spawn_do_closefrom:
  	      {

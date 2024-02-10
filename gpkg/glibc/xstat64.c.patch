@@ -1,5 +1,5 @@
---- glibc-2.38/sysdeps/unix/sysv/linux/xstat64.c	2022-07-30 01:03:09.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/xstat64.c.patch	2022-10-07 22:26:06.884262722 +0300
+--- glibc-2.39/sysdeps/unix/sysv/linux/xstat64.c	2022-07-30 01:03:09.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/xstat64.c.patch	2022-10-07 22:26:06.884262722 +0300
 @@ -52,17 +52,6 @@
    /* New kABIs which uses generic 64-bit Linux ABI, e.g. aarch64, riscv64.  */
    if (vers == _STAT_VER_KERNEL)

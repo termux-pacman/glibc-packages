@@ -1,5 +1,5 @@
---- glibc-2.38/sysdeps/unix/sysv/linux/i386/syscalls.list	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/i386/syscalls.list.patch	2023-11-15 22:11:16.522925458 +0300
+--- glibc-2.39/sysdeps/unix/sysv/linux/i386/syscalls.list	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/i386/syscalls.list.patch	2023-11-15 22:11:16.522925458 +0300
 @@ -1,9 +1,5 @@
  # File name	Caller	Syscall name	Args	Strong name	Weak names
  

@@ -1,5 +1,5 @@
---- glibc-2.38/sysdeps/unix/sysv/linux/clone-internal.c	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/clone-internal.c.patch	2023-08-03 16:55:09.661185528 +0300
+--- glibc-2.39/sysdeps/unix/sysv/linux/clone-internal.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/clone-internal.c.patch	2023-08-03 16:55:09.661185528 +0300
 @@ -80,21 +80,6 @@
  __clone3_internal (struct clone_args *cl_args, int (*func) (void *args),
  		   void *arg)
@@ -40,8 +40,8 @@
    return __clone_internal_fallback (cl_args, func, arg);
  }
  
---- glibc-2.38/sysdeps/unix/sysv/linux/spawni.c	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/spawni.c.patch	2023-08-03 17:39:22.694388312 +0300
+--- glibc-2.39/sysdeps/unix/sysv/linux/spawni.c	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/spawni.c.patch	2023-08-03 17:39:22.694388312 +0300
 @@ -389,13 +389,6 @@
        .stack = (uintptr_t) stack,
        .stack_size = stack_size,

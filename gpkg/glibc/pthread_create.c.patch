@@ -1,5 +1,5 @@
---- glibc-2.38/nptl/pthread_create.c	2021-08-02 01:33:43.000000000 +0000
-+++ glibc-2.38/nptl/pthread_create.c.path	2022-01-20 08:16:09.293375256 +0000
+--- glibc-2.39/nptl/pthread_create.c	2021-08-02 01:33:43.000000000 +0000
++++ glibc-2.39/nptl/pthread_create.c.path	2022-01-20 08:16:09.293375256 +0000
 @@ -366,16 +366,6 @@
    /* Initialize pointers to locale data.  */
    __ctype_init ();

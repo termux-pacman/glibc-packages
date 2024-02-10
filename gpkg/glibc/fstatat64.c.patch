@@ -1,14 +1,10 @@
---- glibc-2.38/sysdeps/unix/sysv/linux/fstatat64.c	2022-07-30 01:03:09.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/fstatat64.c.patch	2022-10-07 22:37:40.624262457 +0300
-@@ -40,48 +40,7 @@
+--- glibc-2.39/sysdeps/unix/sysv/linux/fstatat64.c	2024-01-31 03:34:58.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/fstatat64.c.patch	2024-02-09 11:13:53.292656710 +0300
+@@ -38,43 +38,6 @@
                  "__blkcnt_t and __blkcnt64_t must match");
  #endif
  
--#if (__WORDSIZE == 32 \
--     && (!defined __SYSCALL_WORDSIZE || __SYSCALL_WORDSIZE == 32)) \
--     || defined STAT_HAS_TIME32 \
--     || (!defined __NR_newfstatat && !defined __NR_fstatat64)
--# define FSTATAT_USE_STATX 1
+-#if FSTATAT_USE_STATX
 -
 -static inline int
 -fstatat64_time64_statx (int fd, const char *file, struct __stat64_t64 *buf,
@@ -43,10 +39,21 @@
 -
 -  return r;
 -}
--#else
--# define FSTATAT_USE_STATX 0
 -#endif
-+#define FSTATAT_USE_STATX 0
- 
+-
  /* Only statx supports 64-bit timestamps for 32-bit architectures with
     __ASSUME_STATX, so there is no point in building the fallback.  */
+ #if !FSTATAT_USE_STATX || (FSTATAT_USE_STATX && !defined __ASSUME_STATX)
+@@ -147,11 +110,7 @@
+   int r;
+ 
+ #if FSTATAT_USE_STATX
+-  r = fstatat64_time64_statx (fd, file, buf, flag);
+-# ifndef __ASSUME_STATX
+-  if (r == -ENOSYS)
+-    r = fstatat64_time64_stat (fd, file, buf, flag);
+-# endif
++  r = fstatat64_time64_stat (fd, file, buf, flag);
+ #else
+   r = fstatat64_time64_stat (fd, file, buf, flag);
+ #endif

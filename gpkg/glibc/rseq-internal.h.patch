@@ -1,5 +1,5 @@
---- glibc-2.38/sysdeps/unix/sysv/linux/rseq-internal.h	2022-02-03 05:27:54.000000000 +0000
-+++ glibc-2.38/sysdeps/unix/sysv/linux/rseq-internal.h.patch	2022-06-17 12:19:02.380504902 +0000
+--- glibc-2.39/sysdeps/unix/sysv/linux/rseq-internal.h	2022-02-03 05:27:54.000000000 +0000
++++ glibc-2.39/sysdeps/unix/sysv/linux/rseq-internal.h.patch	2022-06-17 12:19:02.380504902 +0000
 @@ -25,28 +25,11 @@
  #include <stdio.h>
  #include <sys/rseq.h>

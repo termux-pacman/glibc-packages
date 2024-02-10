@@ -1,5 +1,5 @@
---- glibc-2.38/posix/unistd.h	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/posix/unistd.h.patch	2023-12-26 11:16:26.077614803 +0300
+--- glibc-2.39/posix/unistd.h	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.39/posix/unistd.h.patch	2023-12-26 11:16:26.077614803 +0300
 @@ -1088,6 +1088,7 @@
  
     In Mach, all system calls take normal arguments and always return an

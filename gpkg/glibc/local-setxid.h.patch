@@ -1,5 +1,5 @@
---- glibc-2.38/sysdeps/unix/sysv/linux/local-setxid.h	2023-07-31 20:54:16.000000000 +0300
-+++ glibc-2.38/sysdeps/unix/sysv/linux/local-setxid.h.patch	2023-10-20 12:25:43.428519924 +0300
+--- glibc-2.39/sysdeps/unix/sysv/linux/local-setxid.h	2023-07-31 20:54:16.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/local-setxid.h.patch	2023-10-20 12:25:43.428519924 +0300
 @@ -1,6 +1,7 @@
  /* SETxID functions which only have to change the local thread and
     none of the possible other threads.  */
