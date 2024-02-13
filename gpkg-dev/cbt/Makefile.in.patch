@@ -1,5 +1,5 @@
---- src/binutils-2.41/Makefile.in	2023-07-03 02:00:00.000000000 +0300
-+++ src/binutils-2.41/Makefile.in.patch	2023-09-06 15:46:46.143120361 +0300
+--- src/binutils-2.42/Makefile.in	2023-07-03 02:00:00.000000000 +0300
++++ src/binutils-2.42/Makefile.in.patch	2023-09-06 15:46:46.143120361 +0300
 @@ -23004,6 +23004,7 @@
  	  --srcdir=$${topdir}/$$module_srcdir \
  	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
