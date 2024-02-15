@@ -2,7 +2,9 @@
 
 # Script that installs build-package.sh to compile glibc packages
 
-git clone https://github.com/termux/termux-packages.git
+BRANCH="master"
+
+git clone --depth 1 -b ${BRANCH} --single-branch https://github.com/termux/termux-packages.git
 
 for i in build-package.sh clean.sh packages x11-packages scripts; do
 	cp -r ./termux-packages/${i} ./
