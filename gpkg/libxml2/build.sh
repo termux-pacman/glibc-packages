@@ -14,3 +14,4 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-threads
 "
 TERMUX_PKG_DEPENDS="libicu-glibc, ncurses-glibc, readline-glibc, zlib-glibc, liblzma-glibc"
+TERMUX_PKG_SEPARATE_SUB_DEPENDS=true
