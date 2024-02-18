@@ -1,15 +1,15 @@
 We are using `install_symlink` which was introduced a version later.
---- a/meson.build	2023-06-02 15:36:19.536995471 +0300
-+++ b/meson.build	2023-06-02 15:37:27.388995445 +0300
+--- src/meson.build     2024-02-14 23:55:00.000000000 +0300
++++ src/meson.build.patch       2024-02-17 08:32:53.127999633 +0300
 @@ -23,7 +23,7 @@
    ['c', 'cpp'],
    version : files('VERSION'),
    license : 'MIT',
 -  meson_version : '>= 0.60',
 +  meson_version : '>= 0.61',
-   default_options : ['buildtype=debugoptimized', 'b_ndebug=if-release', 'c_std=c11', 'cpp_std=c++17', 'rust_std=2021']
- )
- 
+   default_options : [
+     'buildtype=debugoptimized',
+     'b_ndebug=if-release',
 No, it isn't. Hardlinks won't work on Android.
 --- a/src/gallium/targets/dri/meson.build     2024-01-10 23:39:55.000000000 +0300
 +++ b/src/gallium/targets/dri/meson.build.patch       2024-01-11 14:21:53.100387236 +0300

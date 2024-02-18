@@ -1,0 +1,13 @@
+Not possible to use due to selinux
+More details - https://github.com/termux/termux-packages/issues/1359
+--- src/sysdeps/unix/sysv/linux/tcsetattr.c	2024-01-31 03:34:58.000000000 +0300
++++ src/sysdeps/unix/sysv/linux/tcsetattr.c.patch	2024-02-17 12:07:10.419415489 +0300
+@@ -55,7 +55,7 @@
+       cmd = TCSETSW;
+       break;
+     case TCSAFLUSH:
+-      cmd = TCSETSF;
++      cmd = TCSETS;
+       break;
+     default:
+       return INLINE_SYSCALL_ERROR_RETURN_VALUE (EINVAL);
