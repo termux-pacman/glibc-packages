@@ -96,8 +96,8 @@ _glibc-runner_debug() {
 		case ${DEBUG_LEVEL_STRACE} in
 			1) FLAGS_STRACE="";;
 			2) FLAGS_STRACE="-f";;
-			3) FLAGS_STRACE="-f -s 2400";;
-			4) FLAGS_STRACE="-f -s 2400 -o ${PATH_RESULT_STRACE_DEBUG:=$(pwd)/glibc-runner-debug-strace-$(date +%Y%m%d%H%M%S).log}";;
+			3) FLAGS_STRACE="-f -s 10000";;
+			4) FLAGS_STRACE="-f -s 10000 -o ${PATH_RESULT_STRACE_DEBUG:=$(pwd)/glibc-runner-debug-strace-$(date +%Y%m%d%H%M%S).log}";;
 		esac
 		echo "strace ${FLAGS_STRACE}"
 	fi
@@ -209,11 +209,7 @@ while (($# >= 1)); do
 		-t|--teg) ENABLE_LIBTERMUX_EXEC_GLIBC=true;;
 		-c|--configure) GLIBC_RUNNER_RUN_CONFIGURE=true;;
 		-f|--findlib) GLIBC_RUNNER_RUN_FINDLIB=true;;
-		-n|--no-linker)
-			if [ "${GLIBC_RUNNER_RUN_SHELL}" = "true" ]; then
-				_glibc-runner_message "there is no point in using the '--no-linker' flag since the shell will be launched"
-			fi
-			DISABLE_DYNAMIC_LINKER=true;;
+		-n|--no-linker) DISABLE_DYNAMIC_LINKER=true;;
 		-d|--debug)
 			if [ "${GLIBC_RUNNER_RUN_SHELL}" = "true" ] && ((DEBUG_LEVEL_STRACE > 0)); then
 				_glibc-runner_error "debug is already enabled inside the glibc-runner shell"
@@ -226,7 +222,10 @@ while (($# >= 1)); do
 			fi
 			GLIBC_RUNNER_RUN_DEBUG=true;;
 		*)
-			if [ "$GLIBC_RUNNER_RUN_SHELL" = "true" ]; then
+			if [ "$GLIBC_RUNNER_RUN_SHELL" = "true" ] || [ "$DISABLE_DYNAMIC_LINKER" = "true" ]; then
+				if [ "$GLIBC_RUNNER_RUN_SHELL" = "true" ]; then
+					_glibc-runner_message "there is no point in using the '--no-linker' flag since the shell will be launched"
+				fi
 				break
 			fi
 			if [ -f "$1" ]; then
@@ -244,7 +243,7 @@ fi
 
 if [ "${GLIBC_RUNNER_RUN_DEBUG}" = "true" ]; then
 	_glibc-runner_check_program "strace"
-	if [[ "$DEBUG_LEVEL_STRACE" =~ ^[0-4]+$ ]]; then
+	if ! [[ "$DEBUG_LEVEL_STRACE" =~ ^[0-4]+$ ]]; then
 		_glibc-runner_error "DEBUG_LEVEL_STRACE value has an unidentified level, it can only be from 0 to 4"
 	fi
 fi
