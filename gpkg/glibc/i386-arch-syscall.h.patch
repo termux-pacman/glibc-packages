@@ -1,5 +1,5 @@
 --- glibc-2.39/sysdeps/unix/sysv/linux/i386/arch-syscall.h	2024-01-31 03:34:58.000000000 +0300
-+++ glibc-2.39/sysdeps/unix/sysv/linux/i386/arch-syscall.h.patch	2024-02-10 14:53:23.020125331 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/i386/arch-syscall.h.patch	2024-02-26 11:20:38.725488196 +0300
 @@ -19,24 +19,18 @@
  #define __NR_capget 184
  #define __NR_capset 185
@@ -57,7 +57,15 @@
  #define __NR_getpid 20
  #define __NR_getpmsg 188
  #define __NR_getppid 64
-@@ -245,7 +235,6 @@
+@@ -168,7 +158,6 @@
+ #define __NR_keyctl 288
+ #define __NR_kill 37
+ #define __NR_landlock_add_rule 445
+-#define __NR_landlock_create_ruleset 444
+ #define __NR_landlock_restrict_self 446
+ #define __NR_lchown 16
+ #define __NR_lchown32 198
+@@ -245,7 +234,6 @@
  #define __NR_personality 136
  #define __NR_pidfd_getfd 438
  #define __NR_pidfd_open 434
@@ -65,7 +73,7 @@
  #define __NR_pipe 42
  #define __NR_pipe2 331
  #define __NR_pivot_root 217
-@@ -294,8 +283,6 @@
+@@ -294,8 +282,6 @@
  #define __NR_renameat2 353
  #define __NR_request_key 287
  #define __NR_restart_syscall 0
@@ -74,7 +82,7 @@
  #define __NR_rt_sigaction 174
  #define __NR_rt_sigpending 176
  #define __NR_rt_sigprocmask 175
-@@ -330,16 +317,9 @@
+@@ -330,16 +316,9 @@
  #define __NR_sendto 369
  #define __NR_set_mempolicy 276
  #define __NR_set_mempolicy_home_node 450
@@ -91,7 +99,7 @@
  #define __NR_setgroups 81
  #define __NR_setgroups32 206
  #define __NR_sethostname 74
-@@ -349,8 +329,6 @@
+@@ -349,8 +328,6 @@
  #define __NR_setpriority 97
  #define __NR_setregid 71
  #define __NR_setregid32 204
@@ -100,7 +108,7 @@
  #define __NR_setresuid 164
  #define __NR_setresuid32 208
  #define __NR_setreuid 70
-@@ -359,8 +337,6 @@
+@@ -359,8 +336,6 @@
  #define __NR_setsid 66
  #define __NR_setsockopt 366
  #define __NR_settimeofday 79
@@ -109,7 +117,7 @@
  #define __NR_setxattr 226
  #define __NR_sgetmask 68
  #define __NR_shmat 397
-@@ -386,12 +362,10 @@
+@@ -386,12 +361,10 @@
  #define __NR_stat64 195
  #define __NR_statfs 99
  #define __NR_statfs64 268
