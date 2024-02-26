@@ -49,10 +49,14 @@ _glibc-runner_set_up_teg() {
 _glibc-runner_set_up_binary() {
 	_glibc-runner_check_program "patchelf"
 	local LD_FILE=$(ls $GLIBC_PREFIX/lib/ld-* 2> /dev/null)
+	local LD_RPATH="${GLIBC_PREFIX}/lib"
+	if [ "$GLIBC_RUNNER_RUN_FINDLIB" = "true" ] && [ -n "$LD_LIBRARY_PATH" ]; then
+		LD_RPATH="$LD_LIBRARY_PATH"
+	fi
 	if [ -z "$LD_FILE" ]; then
 		_glibc-runner_error "interpreter not found in '$GLIBC_PREFIX/lib' directory"
 	fi
-	patchelf --set-rpath $GLIBC_PREFIX/lib \
+	patchelf --set-rpath $LD_RPATH \
 		--set-interpreter $LD_FILE \
 		"$1"
 }
@@ -223,7 +227,7 @@ while (($# >= 1)); do
 			GLIBC_RUNNER_RUN_DEBUG=true;;
 		*)
 			if [ "$GLIBC_RUNNER_RUN_SHELL" = "true" ] || [ "$DISABLE_DYNAMIC_LINKER" = "true" ]; then
-				if [ "$GLIBC_RUNNER_RUN_SHELL" = "true" ]; then
+				if [ "$GLIBC_RUNNER_RUN_SHELL" = "true" ] && [ "$DISABLE_DYNAMIC_LINKER" = "true" ]; then
 					_glibc-runner_message "there is no point in using the '--no-linker' flag since the shell will be launched"
 				fi
 				break
@@ -250,11 +254,11 @@ fi
 
 if [ "${GLIBC_RUNNER_RUN_CONFIGURE}" = "true" ] || [ "${GLIBC_RUNNER_RUN_FINDLIB}" = "true" ]; then
 	_glibc-runner_check_binary "$1"
-	if [ "${GLIBC_RUNNER_RUN_CONFIGURE}" = "true" ]; then
-		_glibc-runner_set_up_binary "$1"
-	fi
 	if [ "${GLIBC_RUNNER_RUN_FINDLIB}" = "true" ]; then
 		_glibc-runner_findlib "$1"
+	fi
+	if [ "${GLIBC_RUNNER_RUN_CONFIGURE}" = "true" ]; then
+		_glibc-runner_set_up_binary "$1"
 	fi
 fi
 
@@ -268,7 +272,7 @@ else
 	if [ -n "$1" ]; then
 		if [ "${DISABLE_DYNAMIC_LINKER}" = "true" ]; then
 			exec $(_glibc-runner_debug) $@
-		else
+		elif [ "${GLIBC_RUNNER_RUN_CONFIGURE}" = "false" ]; then
 			exec $(_glibc-runner_debug) ld.so $@
 		fi
 	fi
