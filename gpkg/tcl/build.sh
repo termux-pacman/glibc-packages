@@ -3,10 +3,9 @@ TERMUX_PKG_DESCRIPTION="Powerful but easy to learn dynamic programming language"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="../license.terms"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=8.6.13
-TERMUX_PKG_REVISION=2
+TERMUX_PKG_VERSION=8.6.14
 TERMUX_PKG_SRCURL=https://downloads.sourceforge.net/project/tcl/Tcl/${TERMUX_PKG_VERSION}/tcl${TERMUX_PKG_VERSION}-src.tar.gz
-TERMUX_PKG_SHA256=43a1fae7412f61ff11de2cfd05d28cfc3a73762f354a417c62370a54e2caf066
+TERMUX_PKG_SHA256=5880225babf7954c58d4fb0f5cf6279104ce1cd6aa9b71e9a6322540e1c4de66
 TERMUX_PKG_DEPENDS="zlib-glibc, gcc-libs-glibc"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -38,14 +37,14 @@ termux_step_post_make_install() {
 		-e "s#'{$TERMUX_PREFIX/lib} '#'$TERMUX_PREFIX/lib/tcl$_tclver'#" \
 		-i $TERMUX_PREFIX/lib/tclConfig.sh
 
-	local tdbcver=tdbc1.1.5
+	local tdbcver=tdbc1.1.7
 	sed -e "s#$TERMUX_PKG_BUILDDIR/pkgs/$tdbcver#$TERMUX_PREFIX/lib/$tdbcver#" \
 		-e "s#$TERMUX_PKG_BUILDDIR/pkgs/$tdbcver/generic#$TERMUX_PREFIX/include#" \
 		-e "s#$TERMUX_PKG_BUILDDIR/pkgs/$tdbcver/library#$TERMUX_PREFIX/lib/tcl${TERMUX_PKG_VERSION%.*}#" \
 		-e "s#$TERMUX_PKG_BUILDDIR/pkgs/$tdbcver#$TERMUX_PREFIX/include#" \
 		-i $TERMUX_PREFIX/lib/$tdbcver/tdbcConfig.sh
 
-	local itclver=itcl4.2.3
+	local itclver=itcl4.2.4
 	sed -e "s#$TERMUX_PKG_BUILDDIR/pkgs/$itclver#$TERMUX_PREFIX/lib/$itclver#" \
 		-e "s#$TERMUX_PKG_BUILDDIR/pkgs/$itclver/generic#$TERMUX_PREFIX/include#" \
 		-e "s#$TERMUX_PKG_BUILDDIR/pkgs/$itclver#$TERMUX_PREFIX/include#" \
