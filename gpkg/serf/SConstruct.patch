@@ -1,0 +1,11 @@
+--- src/SConstruct	2023-05-18 12:33:55.000000000 +0300
++++ src/SConstruct.patch	2024-02-29 22:10:44.267041427 +0300
+@@ -164,7 +164,7 @@
+ env = Environment(variables=opts,
+                   tools=('default', 'textfile',),
+                   CPPPATH=['.', ],
+-                  )
++                  ENV = {'PATH' : os.environ['PATH']})
+ 
+ env.Append(BUILDERS = {
+     'GenDef' : 
