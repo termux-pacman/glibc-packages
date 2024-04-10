@@ -1,4 +1,4 @@
-#!@TERMUX_PREFIX_CLASSICAL@/bin/sh
+#!@TERMUX_PREFIX@/bin/sh
 
 set -e
 
