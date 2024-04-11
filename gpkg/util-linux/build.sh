@@ -9,10 +9,11 @@ Documentation/licenses/COPYING.BSD-3-Clause
 Documentation/licenses/COPYING.BSD-4-Clause-UC
 Documentation/licenses/COPYING.ISC"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=2.39.3
-TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/utils/util-linux/v${TERMUX_PKG_VERSION:0:4}/util-linux-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=7b6605e48d1a49f43cc4b4cfc59f313d0dd5402fa40b96810bd572e167dfed0f
+TERMUX_PKG_VERSION=2.40
+TERMUX_PKG_SRCURL=https://github.com/util-linux/util-linux/archive/refs/tags/v2.40.zip
+TERMUX_PKG_SHA256=9ed02b0ba40948f1127fc2b9f6fb0444e23f6f49e760cfd25735d7b861387f5d
 TERMUX_PKG_DEPENDS="libcap-ng-glibc, ncurses-glibc, zlib-glibc, libpam-glibc, libsmartcols-glibc, bash-glibc"
+TERMUX_PKG_BUILD_DEPENDS="python-glibc"
 TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dlibuser=disabled
@@ -32,7 +33,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dbuild-su=disabled
 -Dbuild-lsmem=disabled
 -Dbuild-chmem=disabled
--Dbuild-python=disabled
+-Dpython=$TERMUX_PREFIX/bin/python
 "
 
 termux_step_configure() {

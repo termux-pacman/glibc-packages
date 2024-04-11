@@ -1,8 +1,8 @@
 diff --git a/disk-utils/fsck.c b/disk-utils/fsck.c
-index 1b11e82..798528d 100644
+index c63ce1c..fa8c93c 100644
 --- a/disk-utils/fsck.c
 +++ b/disk-utils/fsck.c
-@@ -1120,7 +1120,7 @@ static int ignore(struct libmnt_fs *fs)
+@@ -1124,7 +1124,7 @@ static int ignore(struct libmnt_fs *fs)
  	 * If this is a bind mount, ignore it.
  	 */
  	if (opt_in_list("bind", mnt_fs_get_options(fs))) {
@@ -12,7 +12,7 @@ index 1b11e82..798528d 100644
  			mnt_fs_get_target(fs));
  		return 1;
 diff --git a/include/pathnames.h b/include/pathnames.h
-index 56f64c3..877e8c8 100644
+index 81fa405..2db093d 100644
 --- a/include/pathnames.h
 +++ b/include/pathnames.h
 @@ -19,77 +19,69 @@
@@ -131,7 +131,7 @@ index 56f64c3..877e8c8 100644
  #define _PATH_PROC_UIDMAP	"/proc/self/uid_map"
  #define _PATH_PROC_GIDMAP	"/proc/self/gid_map"
  #define _PATH_PROC_SETGROUPS	"/proc/self/setgroups"
-@@ -129,7 +121,7 @@
+@@ -130,7 +122,7 @@
  # ifdef MOUNTED					/* deprecated */
  #  define _PATH_MOUNTED		MOUNTED
  # else
@@ -140,7 +140,7 @@ index 56f64c3..877e8c8 100644
  # endif
  #endif
  
-@@ -137,7 +129,7 @@
+@@ -138,7 +130,7 @@
  # ifdef MNTTAB					/* deprecated */
  #  define _PATH_MNTTAB		MNTTAB
  # else
@@ -149,7 +149,7 @@ index 56f64c3..877e8c8 100644
  # endif
  #endif
  
-@@ -148,26 +140,26 @@
+@@ -149,26 +141,26 @@
  # define _PATH_DEV		"/dev/"
  #endif
  
@@ -186,7 +186,7 @@ index 56f64c3..877e8c8 100644
  
  #ifdef __ia64__
 diff --git a/lib/exec_shell.c b/lib/exec_shell.c
-index 6fef6c7..952f8fc 100644
+index 96d3e95..46840a5 100644
 --- a/lib/exec_shell.c
 +++ b/lib/exec_shell.c
 @@ -28,7 +28,7 @@
@@ -234,10 +234,10 @@ index 9563122..ed34dc9 100644
  	if (!econf_readFile(&file_l, path, "= \t", "#")) {
  	        if (file == NULL)
 diff --git a/lib/loopdev.c b/lib/loopdev.c
-index dd9ead3..c7e0aec 100644
+index c72fb2c..41ef586 100644
 --- a/lib/loopdev.c
 +++ b/lib/loopdev.c
-@@ -126,13 +126,13 @@ int loopcxt_set_device(struct loopdev_cxt *lc, const char *device)
+@@ -128,13 +128,13 @@ int loopcxt_set_device(struct loopdev_cxt *lc, const char *device)
  	/* set new */
  	if (device) {
  		if (*device != '/') {
@@ -255,10 +255,10 @@ index dd9ead3..c7e0aec 100644
  			}
  			snprintf(lc->device, sizeof(lc->device), "%s%s",
 diff --git a/libblkid/src/blkidP.h b/libblkid/src/blkidP.h
-index 007cc35..4e7dc96 100644
+index ea7d81b..556356e 100644
 --- a/libblkid/src/blkidP.h
 +++ b/libblkid/src/blkidP.h
-@@ -304,15 +304,15 @@ struct blkid_struct_cache
+@@ -307,15 +307,15 @@ struct blkid_struct_cache
  #define BLKID_BIC_FL_CHANGED	0x0004	/* Cache has changed from disk */
  
  /* config file */
@@ -291,7 +291,7 @@ index 772340b..04f673d 100644
      fd = mkostemp(name, O_RDWR|O_CREAT|O_EXCL|O_CLOEXEC);
      if (fd == -1)
 diff --git a/libfdisk/src/script.c b/libfdisk/src/script.c
-index f537a7d..0c99cf0 100644
+index e357fad..82f707c 100644
 --- a/libfdisk/src/script.c
 +++ b/libfdisk/src/script.c
 @@ -1636,7 +1636,7 @@ int fdisk_apply_script(struct fdisk_context *cxt, struct fdisk_script *dp)
@@ -304,7 +304,7 @@ index f537a7d..0c99cf0 100644
  	struct fdisk_script *dp;
  	struct fdisk_context *cxt;
 diff --git a/libmount/python/tab.c b/libmount/python/tab.c
-index 000bc13..f26aaff 100644
+index d33a1fe..b852108 100644
 --- a/libmount/python/tab.c
 +++ b/libmount/python/tab.c
 @@ -332,7 +332,7 @@ static PyObject *Table_is_fs_mounted(TableObject *self, PyObject *args, PyObject
@@ -335,7 +335,7 @@ index 000bc13..f26aaff 100644
  		"\n" \
  		"See also Tab.parser_errcb().\n" \
 diff --git a/libmount/src/mountP.h b/libmount/src/mountP.h
-index 339e276..d2ee5f9 100644
+index fcc40bf..6917a4f 100644
 --- a/libmount/src/mountP.h
 +++ b/libmount/src/mountP.h
 @@ -77,7 +77,7 @@ UL_DEBUG_DECLARE_MASK(libmount);
@@ -348,10 +348,10 @@ index 339e276..d2ee5f9 100644
  #define MNT_PATH_UTAB		MNT_RUNTIME_TOPDIR "/mount/utab"
  /* temporary mount target */
 diff --git a/login-utils/last.c b/login-utils/last.c
-index 37c6abe..ddbf35a 100644
+index f5a9fec..f279efc 100644
 --- a/login-utils/last.c
 +++ b/login-utils/last.c
-@@ -925,7 +925,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+@@ -935,7 +935,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
  			.tv_usec = 816074
  		}
  	};
@@ -361,10 +361,10 @@ index 37c6abe..ddbf35a 100644
  
  	fd = mkstemp_cloexec(name);
 diff --git a/login-utils/login.c b/login-utils/login.c
-index 74bdf38..437c240 100644
+index c8544f6..5940bdb 100644
 --- a/login-utils/login.c
 +++ b/login-utils/login.c
-@@ -1516,7 +1516,7 @@ int main(int argc, char **argv)
+@@ -1551,7 +1551,7 @@ int main(int argc, char **argv)
  		char *buff;
  
  		xasprintf(&buff, "exec %s", pwd->pw_shell);
@@ -373,17 +373,8 @@ index 74bdf38..437c240 100644
  		child_argv[child_argc++] = "-sh";
  		child_argv[child_argc++] = "-c";
  		child_argv[child_argc++] = buff;
-@@ -1538,7 +1538,7 @@ int main(int argc, char **argv)
- 
- 	execvp(child_argv[0], child_argv + 1);
- 
--	if (!strcmp(child_argv[0], "/bin/sh"))
-+	if (!strcmp(child_argv[0], "@TERMUX_PREFIX@/bin/sh"))
- 		warn(_("couldn't exec shell script"));
- 	else
- 		warn(_("no shell"));
 diff --git a/login-utils/lslogins.c b/login-utils/lslogins.c
-index 76d2812..3d84e8c 100644
+index 217f3f3..35665ba 100644
 --- a/login-utils/lslogins.c
 +++ b/login-utils/lslogins.c
 @@ -1446,7 +1446,7 @@ static void __attribute__((__noreturn__)) usage(void)
@@ -428,10 +419,10 @@ index 9578592..883d4b7 100644
  
  extern int setpwnam (struct passwd *pwd, const char *prefix);
 diff --git a/login-utils/su-common.c b/login-utils/su-common.c
-index b674920..d0c1472 100644
+index 9bc0231..53d069c 100644
 --- a/login-utils/su-common.c
 +++ b/login-utils/su-common.c
-@@ -99,8 +99,8 @@ UL_DEBUG_DEFINE_MASKNAMES(su) = UL_DEBUG_EMPTY_MASKNAMES;
+@@ -100,8 +100,8 @@ UL_DEBUG_DEFINE_MASKNAMES(su) = UL_DEBUG_EMPTY_MASKNAMES;
  #define _PATH_LOGINDEFS_SU	"default/su"
  #define _PATH_LOGINDEFS_RUNUSER "default/runuser"
  #else
@@ -442,7 +433,7 @@ index b674920..d0c1472 100644
  #endif
  
  #define is_pam_failure(_rc)	((_rc) != PAM_SUCCESS)
-@@ -874,9 +874,9 @@ static bool is_restricted_shell(const char *shell)
+@@ -877,9 +877,9 @@ static bool is_restricted_shell(const char *shell)
  		return false;
  	}
  #ifdef USE_VENDORDIR
@@ -454,20 +445,20 @@ index b674920..d0c1472 100644
  #endif
  	return true;
  }
-@@ -896,7 +896,7 @@ static void usage_common(void)
+@@ -899,7 +899,7 @@ static void usage_common(void)
  	fputs(_(" --session-command <command>     pass a single command to the shell with -c\n"
  	        "                                   and do not create a new session\n"), stdout);
  	fputs(_(" -f, --fast                      pass -f to the shell (for csh or tcsh)\n"), stdout);
 -	fputs(_(" -s, --shell <shell>             run <shell> if /etc/shells allows it\n"), stdout);
 +	fputs(_(" -s, --shell <shell>             run <shell> if @TERMUX_PREFIX@/etc/shells allows it\n"), stdout);
  	fputs(_(" -P, --pty                       create a new pseudo-terminal\n"), stdout);
+ 	fputs(_(" -T, --no-pty                    do not create a new pseudo-terminal (bad security!)\n"), stdout);
  
- 	fputs(USAGE_SEPARATOR, stdout);
 diff --git a/login-utils/sulogin.c b/login-utils/sulogin.c
-index 45a558d..308e853 100644
+index 2682c30..64cafd4 100644
 --- a/login-utils/sulogin.c
 +++ b/login-utils/sulogin.c
-@@ -813,7 +813,7 @@ static void sushell(struct passwd *pwd)
+@@ -890,7 +890,7 @@ static void sushell(struct passwd *pwd, struct console *con)
  		if (pwd->pw_shell[0])
  			su_shell = pwd->pw_shell;
  		else
@@ -476,7 +467,7 @@ index 45a558d..308e853 100644
  	}
  	if ((p = strrchr(su_shell, '/')) == NULL)
  		p = su_shell;
-@@ -863,9 +863,9 @@ static void sushell(struct passwd *pwd)
+@@ -939,9 +939,9 @@ static void sushell(struct passwd *pwd, struct console *con)
  	execl(su_shell, shell, (char *)NULL);
  	warn(_("failed to execute %s"), su_shell);
  
@@ -488,9 +479,9 @@ index 45a558d..308e853 100644
 +	warn(_("failed to execute %s"), "@TERMUX_PREFIX@/bin/sh");
  }
  
- static void usage(void)
+ #ifdef HAVE_LIBSELINUX
 diff --git a/login-utils/vipw.c b/login-utils/vipw.c
-index 5049706..958e044 100644
+index 0c4565b..4c4cc76 100644
 --- a/login-utils/vipw.c
 +++ b/login-utils/vipw.c
 @@ -127,7 +127,7 @@ static FILE * pw_tmpfile(int lockfd)
@@ -502,8 +493,43 @@ index 5049706..958e044 100644
  		ulckpwdf();
  		err(EXIT_FAILURE, _("can't open temporary file"));
  	}
+diff --git a/meson.build b/meson.build
+index bc33570..fb3408c 100644
+--- a/meson.build
++++ b/meson.build
+@@ -29,8 +29,8 @@ sbindir = join_paths(prefixdir, get_option('sbindir'))
+ sysconfstaticdir = join_paths(prefixdir, 'lib')
+ docdir = join_paths(prefixdir, get_option('datadir'), 'doc', 'util-linux')
+ mandir = join_paths(prefixdir, get_option('mandir'))
+-runstatedir = '/run'
+-localstatedir = '/var'
++runstatedir = '@TERMUX_PREFIX@/run'
++localstatedir = '@TERMUX_PREFIX@/var'
+ execprefixdir = prefixdir
+ sysconfdir = join_paths(prefixdir, get_option('sysconfdir'))
+ usrbin_exec_dir = join_paths(execprefixdir, bindir)
+@@ -72,8 +72,8 @@ conf.set('docdir', docdir)
+ conf.set_quoted('_PATH_SYSCONFSTATICDIR', sysconfstaticdir)
+ conf.set_quoted('_PATH_RUNSTATEDIR', runstatedir)
+ conf.set_quoted('_PATH_LOCALSTATEDIR', localstatedir)
+-conf.set_quoted('CONFIG_ADJTIME_PATH', '/etc/adjtime')
+-conf.set_quoted('ADJTIME_PATH', '/etc/adjtime') # yes, both are used :(
++conf.set_quoted('CONFIG_ADJTIME_PATH', '@TERMUX_PREFIX@/etc/adjtime')
++conf.set_quoted('ADJTIME_PATH', '@TERMUX_PREFIX@/etc/adjtime') # yes, both are used :(
+ 
+ conf.set_quoted('_PATH_VENDORDIR', vendordir)
+ conf.set('USE_VENDORDIR', vendordir == '' ? false : 1)
+@@ -3662,7 +3662,7 @@ if asciidoctor.found()
+ 	  '-b', 'manpage',
+ 	  '-a', 'VERSION=' + meson.project_version(),
+ 	  '-a', 'release-version=' + meson.project_version(),
+-	  '-a', 'ADJTIME_PATH=/etc/adjtime',
++	  '-a', 'ADJTIME_PATH=@TERMUX_PREFIX@/etc/adjtime',
+ 	  '-a', 'package-docdir=' + docdir,
+ 	  '--base-dir=' + meson.current_source_dir(),
+           '--destination-dir=' + meson.current_build_dir(),
 diff --git a/misc-utils/whereis.c b/misc-utils/whereis.c
-index d21b434..108bd15 100644
+index c11efa5..97f1729 100644
 --- a/misc-utils/whereis.c
 +++ b/misc-utils/whereis.c
 @@ -101,84 +101,18 @@ struct wh_dirlist {
@@ -596,7 +622,7 @@ index d21b434..108bd15 100644
  };
  
 diff --git a/sys-utils/eject.c b/sys-utils/eject.c
-index 6037ddc..b42c189 100644
+index 166d591..c76d1a4 100644
 --- a/sys-utils/eject.c
 +++ b/sys-utils/eject.c
 @@ -152,7 +152,7 @@ static void __attribute__((__noreturn__)) usage(void)
@@ -624,7 +650,7 @@ index 6037ddc..b42c189 100644
  	case -1:
  		warn( _("unable to fork"));
 diff --git a/sys-utils/fstrim.c b/sys-utils/fstrim.c
-index 96b7d2d..a97977d 100644
+index 446217e..a59a8d4 100644
 --- a/sys-utils/fstrim.c
 +++ b/sys-utils/fstrim.c
 @@ -294,7 +294,7 @@ static int fstrim_all_from_file(struct fstrim_control *ctl, const char *filename
@@ -646,10 +672,10 @@ index 96b7d2d..a97977d 100644
  	fputs(_(" -o, --offset <num>       the offset in bytes to start discarding from\n"), out);
  	fputs(_(" -l, --length <num>       the number of bytes to discard\n"), out);
 diff --git a/sys-utils/mount.c b/sys-utils/mount.c
-index dba6fca..fc65790 100644
+index 50e66de..0d9358a 100644
 --- a/sys-utils/mount.c
 +++ b/sys-utils/mount.c
-@@ -498,11 +498,11 @@ static void __attribute__((__noreturn__)) usage(void)
+@@ -490,7 +490,7 @@ static void __attribute__((__noreturn__)) usage(void)
  	fputs(_(" -c, --no-canonicalize   don't canonicalize paths\n"), out);
  	fputs(_(" -f, --fake              dry run; skip the mount(2) syscall\n"), out);
  	fputs(_(" -F, --fork              fork off for each device (use with -a)\n"), out);
@@ -657,6 +683,10 @@ index dba6fca..fc65790 100644
 +	fputs(_(" -T, --fstab <path>      alternative file to @TERMUX_PREFIX@/etc/fstab\n"), out);
  	fputs(_(" -i, --internal-only     don't call the mount.<type> helpers\n"), out);
  	fputs(_(" -l, --show-labels       show also filesystem labels\n"), out);
+ 	fputs(_("     --map-groups <inner>:<outer>:<count>\n"
+@@ -500,7 +500,7 @@ static void __attribute__((__noreturn__)) usage(void)
+ 	fputs(_("     --map-users /proc/<pid>/ns/user\n"
+ 		"                         specify the user namespace for an ID-mapped mount\n"), out);
  	fputs(_(" -m, --mkdir[=<mode>]    alias to '-o X-mount.mkdir[=<mode>]'\n"), out);
 -	fputs(_(" -n, --no-mtab           don't write to /etc/mtab\n"), out);
 +	fputs(_(" -n, --no-mtab           don't write to @TERMUX_PREFIX@/etc/mtab\n"), out);
@@ -664,10 +694,10 @@ index dba6fca..fc65790 100644
  		"                         what to do with options loaded from fstab\n"), out);
  	fputs(_("     --options-source <source>\n"
 diff --git a/sys-utils/setarch.c b/sys-utils/setarch.c
-index 1a255e4..2f0e6be 100644
+index 227bc6b..07c6275 100644
 --- a/sys-utils/setarch.c
 +++ b/sys-utils/setarch.c
-@@ -471,7 +471,7 @@ int main(int argc, char *argv[])
+@@ -477,7 +477,7 @@ int main(int argc, char *argv[])
  		/* Don't use ifdef sparc here, we get "Unrecognized architecture"
  		 * error message later if necessary */
  		if (strcmp(arch, "sparc32bash") == 0) {
@@ -676,7 +706,7 @@ index 1a255e4..2f0e6be 100644
  			shell_arg = "";
  			goto set_arch;
  		}
-@@ -594,7 +594,7 @@ set_arch:
+@@ -600,7 +600,7 @@ set_arch:
  		verify_arch_domain(doms, target, arch);
  
  	if (!argc) {
@@ -686,10 +716,10 @@ index 1a255e4..2f0e6be 100644
  	}
  	if (verbose) {
 diff --git a/sys-utils/setpriv.c b/sys-utils/setpriv.c
-index ddc2cc6..34cd0d9 100644
+index 74d3fbe..4a49cfe 100644
 --- a/sys-utils/setpriv.c
 +++ b/sys-utils/setpriv.c
-@@ -52,7 +52,7 @@
+@@ -53,7 +53,7 @@
  #define SETPRIV_EXIT_PRIVERR 127	/* how we exit when we fail to set privs */
  
  /* The shell to set SHELL env.variable if none is given in the user's passwd entry.  */
@@ -699,10 +729,10 @@ index ddc2cc6..34cd0d9 100644
  static gid_t get_group(const char *s, const char *err);
  
 diff --git a/sys-utils/swapon.c b/sys-utils/swapon.c
-index 8735549..54955b8 100644
+index ce499c1..9aa8f66 100644
 --- a/sys-utils/swapon.c
 +++ b/sys-utils/swapon.c
-@@ -810,14 +810,14 @@ static void __attribute__((__noreturn__)) usage(void)
+@@ -823,14 +823,14 @@ static void __attribute__((__noreturn__)) usage(void)
  	fputs(_("Enable devices and files for paging and swapping.\n"), out);
  
  	fputs(USAGE_OPTIONS, out);
@@ -720,7 +750,7 @@ index 8735549..54955b8 100644
  	fputs(_("     --noheadings         don't print table heading (with --show)\n"), out);
  	fputs(_("     --raw                use the raw output format (with --show)\n"), out);
 diff --git a/sys-utils/umount.c b/sys-utils/umount.c
-index e579fb7..84d208e 100644
+index 17e668c..6f90976 100644
 --- a/sys-utils/umount.c
 +++ b/sys-utils/umount.c
 @@ -96,7 +96,7 @@ static void __attribute__((__noreturn__)) usage(void)
@@ -733,10 +763,10 @@ index e579fb7..84d208e 100644
  	fputs(_(" -O, --test-opts <list>  limit the set of filesystems (use with -a)\n"), out);
  	fputs(_(" -R, --recursive         recursively unmount a target with all its children\n"), out);
 diff --git a/tests/helpers/test_mkfds.c b/tests/helpers/test_mkfds.c
-index 194c175..772f748 100644
+index 39427ba..4825bf8 100644
 --- a/tests/helpers/test_mkfds.c
 +++ b/tests/helpers/test_mkfds.c
-@@ -75,7 +75,7 @@ static void __attribute__((__noreturn__)) usage(FILE *out, int status)
+@@ -96,7 +96,7 @@ static void __attribute__((__noreturn__)) usage(FILE *out, int status)
  
  	fputs("\n", out);
  	fputs("Examples:\n", out);
@@ -745,7 +775,7 @@ index 194c175..772f748 100644
  		program_invocation_short_name);
  	fprintf(out, "Using 3 and 4, make a pipe:\n\n	$ %s pipe-no-fork 3 4\n\n",
  		program_invocation_short_name);
-@@ -1901,7 +1901,7 @@ static const struct factory factories[] = {
+@@ -3277,7 +3277,7 @@ static const struct factory factories[] = {
  				.name = "file",
  				.type = PTYPE_STRING,
  				.desc = "file to be opened",
@@ -754,7 +784,7 @@ index 194c175..772f748 100644
  			},
  			{
  				.name = "offset",
-@@ -2095,7 +2095,7 @@ static const struct factory factories[] = {
+@@ -3543,7 +3543,7 @@ static const struct factory factories[] = {
  				.name = "path",
  				.type = PTYPE_STRING,
  				.desc = "path for listening-socket bound to",
@@ -763,7 +793,7 @@ index 194c175..772f748 100644
  			},
  			{
  				.name = "backlog",
-@@ -2142,7 +2142,7 @@ static const struct factory factories[] = {
+@@ -3590,7 +3590,7 @@ static const struct factory factories[] = {
  				.name = "path",
  				.type = PTYPE_STRING,
  				.desc = "path for unix non-stream bound to",
@@ -772,7 +802,7 @@ index 194c175..772f748 100644
  			},
  			{
  				.name = "abstract",
-@@ -2171,7 +2171,7 @@ static const struct factory factories[] = {
+@@ -3619,7 +3619,7 @@ static const struct factory factories[] = {
  				.name = "path",
  				.type = PTYPE_STRING,
  				.desc = "path for unix non-stream bound to",
@@ -782,7 +812,7 @@ index 194c175..772f748 100644
  			{
  				.name = "abstract",
 diff --git a/text-utils/pg.c b/text-utils/pg.c
-index adb3840..6ba0231 100644
+index 30ed046..93111ba 100644
 --- a/text-utils/pg.c
 +++ b/text-utils/pg.c
 @@ -1364,7 +1364,7 @@ static void pgfile(FILE *f, const char *name)
