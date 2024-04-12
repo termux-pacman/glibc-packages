@@ -3,16 +3,20 @@ TERMUX_PKG_DESCRIPTION="Library providing core building blocks for libraries and
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_VERSION="2.80.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.gnome.org/pub/gnome/sources/glib/${TERMUX_PKG_VERSION%.*}/glib-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=8228a92f92a412160b139ae68b6345bd28f24434a7b5af150ebe21ff587a561d
 TERMUX_PKG_DEPENDS="libffi-glibc, pcre2-glibc, util-linux-glibc, zlib-glibc, openssl-glibc, libunwind-glibc"
-TERMUX_PKG_PYTHON_COMMON_DEPS="pygments, itstool, packaging"
+TERMUX_PKG_BUILD_DEPENDS="gobject-introspection-glibc"
+TERMUX_PKG_PYTHON_COMMON_DEPS="pygments, itstool, packaging, gi-docgen"
+TERMUX_PKG_ACCEPT_PKG_IN_DEP=true
+# -D sysprof=enabled
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --default-library both
--Druntime_dir=$TERMUX_PREFIX/var/run
+-D runtime_dir=$TERMUX_PREFIX/var/run
 -D glib_debug=disabled
 -D documentation=true
--D introspection=disabled
+-D introspection=enabled
 -D man-pages=enabled
 -D selinux=disabled
 "
@@ -20,6 +24,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	CFLAGS+=" -g3 -ffat-lto-objects"
 	CXXFLAGS+=" -g3 -ffat-lto-objects"
+	LDFLAGS+=" -lmount"
 }
 
 termux_step_create_debscripts() {
