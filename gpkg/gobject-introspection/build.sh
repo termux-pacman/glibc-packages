@@ -15,7 +15,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	CPPFLAGS+="-I$TERMUX_PREFIX/include/python${TERMUX_PYTHON_VERSION} -I$TERMUX_PREFIX/include/python${TERMUX_PYTHON_VERSION}/cpython"
-	LDFLAGS+=" -lmount"
 }
 
 termux_step_post_make_install() {

@@ -24,7 +24,6 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_pre_configure() {
 	CFLAGS+=" -g3 -ffat-lto-objects"
 	CXXFLAGS+=" -g3 -ffat-lto-objects"
-	LDFLAGS+=" -lmount"
 }
 
 termux_step_create_debscripts() {

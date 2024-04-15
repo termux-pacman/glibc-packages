@@ -41,7 +41,6 @@ termux_step_configure() {
 	fi
 
 	export PATH=$TERMUX_PKG_BUILDDIR/bin:$PATH
-	LDFLAGS+=" -lm"
 
 	cmake ${TERMUX_PKG_SRCDIR} \
 		-G Ninja \

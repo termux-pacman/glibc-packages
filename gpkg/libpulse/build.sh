@@ -19,7 +19,3 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 # Maxython: I need to learn how the audio driver works in Android in order to configure glibc
-
-termux_step_pre_configure() {
-	LDFLAGS+=" -lm"
-}

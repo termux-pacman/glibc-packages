@@ -16,7 +16,3 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-messages
 --with-pic
 "
-
-termux_step_pre_configure() {
-	LDFLAGS+=" -lbrotlicommon"
-}

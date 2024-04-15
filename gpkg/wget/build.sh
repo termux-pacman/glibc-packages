@@ -13,7 +13,3 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --enable-nls
 --with-ssl=openssl
 "
-
-termux_step_pre_configure() {
-	LDFLAGS+=" -lbrotlicommon"
-}
