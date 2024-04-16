@@ -37,28 +37,6 @@ index fa7e31d..a2a5363 100644
  #define FILE2 "/dev/null"
  
  static int
-diff --git a/lib/getusershell.c b/lib/getusershell.c
-index 1d6d9ce..ef606a2 100644
---- a/lib/getusershell.c
-+++ b/lib/getusershell.c
-@@ -26,7 +26,7 @@
- #ifndef SHELLS_FILE
- # ifndef __DJGPP__
- /* File containing a list of nonrestricted shells, one per line. */
--#  define SHELLS_FILE "/etc/shells"
-+#  define SHELLS_FILE "@TERMUX_PREFIX@/etc/shells"
- # else
- /* This is a horrible kludge.  Isn't there a better way?  */
- #  define SHELLS_FILE "/dev/env/DJDIR/etc/shells"
-@@ -56,7 +56,7 @@ static idx_t readname (char **, idx_t *, FILE *);
- static char const* const default_shells[] =
- {
-   ADDITIONAL_DEFAULT_SHELLS
--  "/bin/sh", "/bin/csh", "/usr/bin/sh", "/usr/bin/csh", NULL
-+  "@TERMUX_PREFIX@/bin/bash", "@TERMUX_PREFIX@/bin/sh", "@TERMUX_PREFIX@/bin/csh", NULL
- };
- 
- /* Index of the next shell in 'default_shells' to return.
 diff --git a/lib/mountlist.c b/lib/mountlist.c
 index 8b06e7b..b713ac5 100644
 --- a/lib/mountlist.c
