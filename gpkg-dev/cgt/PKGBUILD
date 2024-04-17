@@ -1,6 +1,6 @@
 pkgname=cgt
 pkgver=13.2.0
-pkgrel=4
+pkgrel=5
 pkgdesc='Cross GCCs for Termux (only for Linux)'
 arch=(x86_64)
 url='https://gcc.gnu.org/'
@@ -10,14 +10,19 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-$pkgver/gcc-$pkgver.tar.xz
         gcc.cc.patch
         gcc-Makefile.in.patch
         gcc-configure.patch
+	config.sub.patch
+	configure.patch
         set_glibc_dynamic_linker.patch)
 sha256sums=('e275e76442a6067341a27f04c5c6b83d8613144004c0413528863dc6b5c743da'
             '8d9f0c6cd1c57e623ba9b054f69185e4fb4717cc3af61c19d191948270042d6c'
             'e61dc2469a70392923aeac3f9e80c0b0c7ebd372488bc99e6dd0e18c1e3e3360'
             '1115c633d6fd0d4f6d6eeca50e4d52fd15f0bf52b4158ecb0ea6bedcb85ceb35'
             '346843fbce4bddca236ca4331ae43c5356ed177689c7760d841d2db2d2643d13'
+            '74020f17b5543f75353254f206c7567deef8453e71802ebc9d4bdbb09740a02a'
+            '0eb6079c420a46b54ce9ef7c601a9766e5c85244757b837000979c41d541a315'
             'cd383a4a1916f4b3102f21c640d6116f697e0ef7cde5f705d83035849c200ec6')
 groups=('cgct')
+
 
 prepare() {
 	for i in *.patch; do
@@ -28,6 +33,9 @@ prepare() {
 	sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
 	sed -i '/m64=/s/lib64/lib/' gcc/config/i386/t-linux64
 	sed -i '/lp64=/s/lib64/lib/' gcc/config/aarch64/t-aarch64-linux
+	for i in sys_lib_search_path_spec sys_lib_dlsearch_path_spec; do
+		sed -i "s|${i}=.*|${i}='${GLIBC_PREFIX}/lib'|g" */configure $(find -name libtool.m4)
+	done
 }
 
 build() {
@@ -59,7 +67,7 @@ build() {
 		esac
 
 		"$srcdir"/gcc-${pkgver}/configure \
-			--host=${CHOST} \
+			--host=cgct \
 			--build=${CHOST} \
 			--target=${target} \
 			--prefix=${CGCT_PREFIX} \
@@ -97,7 +105,11 @@ build() {
 			AS_FOR_TARGET=${CGCT_PREFIX}/bin/as \
 			AR_FOR_TARGET=${CGCT_PREFIX}/bin/ar \
 			RANLIB_FOR_TARGET=${CGCT_PREFIX}/bin/ranlib \
-			NM_FOR_TARGET=${CGCT_PREFIX}/bin/nm
+			NM_FOR_TARGET=${CGCT_PREFIX}/bin/nm \
+			CC=x86_64-linux-gnu-gcc \
+			CXX=x86_64-linux-gnu-g++ \
+			AR=ar \
+			LD=ld
 		make
 
 		cd ..
