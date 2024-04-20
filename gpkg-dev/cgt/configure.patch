@@ -1,0 +1,209 @@
+--- src/gcc-13.2.0/configure	2023-07-27 11:13:03.000000000 +0300
++++ src/gcc-13.2.0/configure.patch	2024-04-17 19:47:43.249004152 +0300
+@@ -17498,7 +17498,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target ar" >&5
+ $as_echo_n "checking where to find the target ar... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$AR_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $AR_FOR_TARGET`
+@@ -17540,7 +17540,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target as" >&5
+ $as_echo_n "checking where to find the target as... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$AS_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $AS_FOR_TARGET`
+@@ -17582,7 +17582,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target cc" >&5
+ $as_echo_n "checking where to find the target cc... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$CC_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $CC_FOR_TARGET`
+@@ -17624,7 +17624,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target c++" >&5
+ $as_echo_n "checking where to find the target c++... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$CXX_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $CXX_FOR_TARGET`
+@@ -17669,7 +17669,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target c++ for libstdc++" >&5
+ $as_echo_n "checking where to find the target c++ for libstdc++... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$RAW_CXX_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $RAW_CXX_FOR_TARGET`
+@@ -17714,7 +17714,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target dlltool" >&5
+ $as_echo_n "checking where to find the target dlltool... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$DLLTOOL_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $DLLTOOL_FOR_TARGET`
+@@ -17756,7 +17756,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target dsymutil" >&5
+ $as_echo_n "checking where to find the target dsymutil... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$DSYMUTIL_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $DSYMUTIL_FOR_TARGET`
+@@ -17787,7 +17787,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target gcc" >&5
+ $as_echo_n "checking where to find the target gcc... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$GCC_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $GCC_FOR_TARGET`
+@@ -17829,7 +17829,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target gfortran" >&5
+ $as_echo_n "checking where to find the target gfortran... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$GFORTRAN_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $GFORTRAN_FOR_TARGET`
+@@ -17874,7 +17874,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target gccgo" >&5
+ $as_echo_n "checking where to find the target gccgo... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$GOC_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $GOC_FOR_TARGET`
+@@ -17919,7 +17919,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target gdc" >&5
+ $as_echo_n "checking where to find the target gdc... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$GDC_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $GDC_FOR_TARGET`
+@@ -17964,7 +17964,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target gm2" >&5
+ $as_echo_n "checking where to find the target gm2... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$GM2_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $GM2_FOR_TARGET`
+@@ -18009,7 +18009,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target ld" >&5
+ $as_echo_n "checking where to find the target ld... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$LD_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $LD_FOR_TARGET`
+@@ -18051,7 +18051,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target lipo" >&5
+ $as_echo_n "checking where to find the target lipo... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$LIPO_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $LIPO_FOR_TARGET`
+@@ -18082,7 +18082,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target nm" >&5
+ $as_echo_n "checking where to find the target nm... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$NM_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $NM_FOR_TARGET`
+@@ -18124,7 +18124,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target objcopy" >&5
+ $as_echo_n "checking where to find the target objcopy... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$OBJCOPY_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $OBJCOPY_FOR_TARGET`
+@@ -18166,7 +18166,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target objdump" >&5
+ $as_echo_n "checking where to find the target objdump... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$OBJDUMP_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $OBJDUMP_FOR_TARGET`
+@@ -18208,7 +18208,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target otool" >&5
+ $as_echo_n "checking where to find the target otool... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$OTOOL_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $OTOOL_FOR_TARGET`
+@@ -18239,7 +18239,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target ranlib" >&5
+ $as_echo_n "checking where to find the target ranlib... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$RANLIB_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $RANLIB_FOR_TARGET`
+@@ -18281,7 +18281,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target readelf" >&5
+ $as_echo_n "checking where to find the target readelf... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$READELF_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $READELF_FOR_TARGET`
+@@ -18323,7 +18323,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target strip" >&5
+ $as_echo_n "checking where to find the target strip... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$STRIP_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $STRIP_FOR_TARGET`
+@@ -18365,7 +18365,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target windres" >&5
+ $as_echo_n "checking where to find the target windres... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$WINDRES_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $WINDRES_FOR_TARGET`
+@@ -18407,7 +18407,7 @@
+ 
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target windmc" >&5
+ $as_echo_n "checking where to find the target windmc... " >&6; }
+-if test "x${build}" != "x${host}" ; then
++if false ; then
+   if expr "x$WINDMC_FOR_TARGET" : "x/" > /dev/null; then
+     # We already found the complete path
+     ac_dir=`dirname $WINDMC_FOR_TARGET`
