@@ -1,0 +1,42 @@
+--- src/binutils-2.42/config.sub	2024-01-29 03:00:00.000000000 +0300
++++ src/binutils-2.42/config.sub.patch	2024-04-19 23:10:18.910726002 +0300
+@@ -648,6 +648,10 @@
+ 				basic_machine=ymp-cray
+ 				basic_os=unicos
+ 				;;
++			cgct)
++				basic_machine=x86_64-pc
++				basic_os=cgct
++				;;
+ 			*)
+ 				basic_machine=$1
+ 				basic_os=
+@@ -1321,6 +1325,10 @@
+ 		kernel=linux
+ 		os=`echo "$basic_os" | sed -e 's|linux|gnu|'`
+ 		;;
++	cgct)
++		kernel=linux
++		os=cgct
++		;;
+ 	managarm*)
+ 		kernel=managarm
+ 		os=`echo "$basic_os" | sed -e 's|managarm|mlibc|'`
+@@ -1766,7 +1774,7 @@
+ 	     | onefs* | tirtos* | phoenix* | fuchsia* | redox* | bme* \
+ 	     | midnightbsd* | amdhsa* | unleashed* | emscripten* | wasi* \
+ 	     | nsk* | powerunix* | genode* | zvmoe* | qnx* | emx* | zephyr* \
+-	     | fiwix* | mlibc* | cos* | mbr* )
++	     | fiwix* | mlibc* | cos* | mbr* | cgct )
+ 		;;
+ 	# This one is extra strict with allowed versions
+ 	sco3.2v2 | sco3.2v[4-9]* | sco5v6*)
+@@ -1819,7 +1827,7 @@
+ # (given a valid OS), if there is a kernel.
+ case $kernel-$os-$obj in
+ 	linux-gnu*- | linux-dietlibc*- | linux-android*- | linux-newlib*- \
+-		   | linux-musl*- | linux-relibc*- | linux-uclibc*- | linux-mlibc*- )
++		   | linux-musl*- | linux-relibc*- | linux-uclibc*- | linux-mlibc*- | linux-cgct- )
+ 		;;
+ 	uclinux-uclibc*- )
+ 		;;
