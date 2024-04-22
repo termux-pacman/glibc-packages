@@ -1,0 +1,73 @@
+pkgname=glibc-cgct
+pkgver=2.39
+pkgrel=0
+pkgdesc="GNU C Library for CGCT (only for Linux)"
+arch=(x86_64)
+url='https://www.gnu.org/software/libc/'
+license=('GPL' 'LGPL')
+source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz
+	dl-support.c.patch
+	setup-cgct)
+sha256sums=('f77bd47cf8170c57365ae7bf86696c118adb3b120d3259c64c502d3dc1e2d926'
+            '031810779c82960246095d800774a2074e6006f847cc6159a7bc33d12eb62984'
+            '0c7376ccfddf46b46eba503685a905840cedb1ebd6f04d3c1935edb08e74c1ec')
+groups=('cgct')
+
+prepare() {
+	for i in *.patch; do
+		patch -Np1 -i ${srcdir}/$i
+	done
+
+	mkdir -p glibc-build || true
+}
+
+build() {
+	cd glibc-build
+
+	unset CFLAGS CXXFLAGS AR LD CC CXX
+	CGCT_PREFIX=${DIR_TERMUX}/cgct
+
+	echo "slibdir=$CGCT_PREFIX/lib" > configparms
+	echo "rtlddir=$CGCT_PREFIX/lib" >> configparms
+	echo "sbindir=$CGCT_PREFIX/bin" >> configparms
+	echo "rootsbindir=$CGCT_PREFIX/bin" >> configparms
+
+	../glibc-$pkgver/configure \
+		--prefix=$CGCT_PREFIX \
+		--libdir=${CGCT_PREFIX}/lib \
+		--libexecdir=${CGCT_PREFIX}/lib \
+		--host=${CHOST} \
+		--build=${CHOST} \
+		--target=${CHOST} \
+		--with-bugurl=https://github.com/termux-pacman/glibc-packages/issues \
+		--enable-bind-now \
+		--disable-multi-arch \
+		--enable-stack-protector=strong \
+		--enable-systemtap \
+		--disable-nscd \
+		--disable-profile \
+		--disable-werror \
+		--disable-default-pie \
+		--enable-cet
+
+	make -O
+}
+
+package() {
+	CGCT_PREFIX=${DIR_TERMUX}/cgct
+
+	make -C glibc-build install_root="$pkgdir" install
+	rm -f "$pkgdir"/$CGCT_PREFIX/etc/ld.so.{cache,conf}
+	rm -f "$pkgdir"/$CGCT_PREFIX/bin/{tzselect,zdump,zic}
+
+	cd glibc-$pkgver
+
+	install -m644 nscd/nscd.conf "$pkgdir/$CGCT_PREFIX/etc/nscd.conf"
+	install -m644 posix/gai.conf "$pkgdir"/$CGCT_PREFIX/etc/gai.conf
+
+	rm -fr "$pkgdir"/$CGCT_PREFIX/{include,var}
+
+	install -m755 "$srcdir/setup-cgct" "$pkgdir/$CGCT_PREFIX/bin"
+
+	replace_hard_with_symbolic "$pkgdir"
+}

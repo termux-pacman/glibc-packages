@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+export CGCT_DIR="/data/data/com.termux/cgct"
+
+_setup_cgct_error() {
+	echo "Error: ${1}"
+	exit 1
+}
+
+[ ! -d "${CGCT_DIR}" ] && _setup_cgct_error "cgct was not found, are you sure you installed it?"
+
+RPATH_LIBS="${CGCT_DIR}/lib"
+if [ -n "${1}" ]; then
+	RPATH_LIBS+=":${1}"
+fi
+
+LD_LIB=$(ls ${CGCT_DIR}/lib/ld-* 2> /dev/null)
+[ -z "$LD_LIB" ] && _setup_cgct_error "interpreter not found in lib directory"
+
+! type patchelf &> /dev/null && _setup_cgct_error "patchelf not found"
+
+[ ! -f "${CGCT_DIR}/bin/ldconfig" ] && _setup_cgct_error "ldconfig from glibc-cgct not found"
+
+echo "Setting up CGCT..."
+
+for f in $(find "${CGCT_DIR}"/{aarch64,arm,x86_64,i686}/{bin,lib/gcc} -type f -exec grep -IL . "{}" \; | grep -v -e '\.a' -e '\.o' -e '\.so'); do
+	patchelf --set-rpath "$RPATH_LIBS" --set-interpreter "$LD_LIB" "$f"
+	echo "Configured '${f}'"
+done
+
+echo -e "${RPATH_LIBS//:/\\n}" > "${CGCT_DIR}"/etc/ld.so.conf
+
+"${CGCT_DIR}"/bin/ldconfig
