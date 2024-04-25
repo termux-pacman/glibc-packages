@@ -25,9 +25,3 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DBUILD_CursesDialog=ON
 -DCMake_ENABLE_DEBUGGER=ON
 "
-
-termux_step_pre_configure() {
-	# for some reason this library is not used when compiling for x86_64
-	# looks like this is a bug from cgt
-	LDFLAGS+=" -lnghttp2 -lssl -lcrypto"
-}

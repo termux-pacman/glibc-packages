@@ -7,7 +7,6 @@ TERMUX_PKG_SRCURL=https://github.com/curl/curl/releases/download/curl-${TERMUX_P
 TERMUX_PKG_SHA256=6fea2aac6a4610fbd0400afb0bcddbe7258a64c63f1f68e5855ebc0c659710cd
 TERMUX_PKG_DEPENDS="libnghttp2-glibc, libssh2-glibc, openssl-glibc (>= 3.0.3), krb5-glibc, brotli-glibc, libpsl-glibc"
 TERMUX_PKG_ESSENTIAL=true
-TERMUX_PKG_EXTRA_MAKE_ARGS="LDFLAGS='-lbrotlidec'"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --with-ca-bundle=$TERMUX_PREFIX/etc/ssl/certs/ca-certificates.crt
 --with-ca-path=$TERMUX_PREFIX/etc/ssl/certs

@@ -46,6 +46,5 @@ termux_step_pre_configure() {
 		arm|aarch64) TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dvulkan-drivers=swrast,panfrost,freedreno -Dfreedreno-kmds=msm,kgsl";;
 		*) TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dvulkan-drivers=swrast,panfrost";;
 	esac
-	LDFLAGS+=" -ltinfo -lm"
 	export LLVM_CONFIG=$TERMUX_PREFIX/bin/llvm-config
 }

@@ -11,7 +11,3 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -DENABLE_EXTERNAL_LIBS=ON
 -DENABLE_MPEG=ON
 "
-
-termux_step_pre_configure() {
-	CFLAGS+=" -lm"
-}
