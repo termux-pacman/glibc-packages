@@ -1,0 +1,11 @@
+--- src/meson.build	2024-03-29 17:32:00.000000000 +0300
++++ src/meson.build.patch	2024-04-27 20:15:14.957962249 +0300
+@@ -4,7 +4,7 @@
+   default_options: [
+     'cpp_eh=none',          # Just to support msvc, we are passing -fno-exceptions also anyway
+     # 'cpp_rtti=false',     # Do NOT enable, wraps inherit it and ICU needs RTTI
+-    'cpp_std=c++11',
++    'cpp_std=c++17',
+     'wrap_mode=nofallback', # Use --wrap-mode=default to revert, https://github.com/harfbuzz/harfbuzz/pull/2548
+   ],
+ )
