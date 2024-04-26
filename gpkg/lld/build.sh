@@ -3,16 +3,16 @@ TERMUX_PKG_DESCRIPTION="Linker from the LLVM project"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_LICENSE_FILE="LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=18.1.3
+TERMUX_PKG_VERSION=18.1.4
 _SOURCE=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION
 TERMUX_PKG_SRCURL=($_SOURCE/lld-$TERMUX_PKG_VERSION.src.tar.xz
 		$_SOURCE/llvm-$TERMUX_PKG_VERSION.src.tar.xz
 		$_SOURCE/libunwind-$TERMUX_PKG_VERSION.src.tar.xz
                 $_SOURCE/cmake-$TERMUX_PKG_VERSION.src.tar.xz)
-TERMUX_PKG_SHA256=(ea4c325c272ef1022c6517335e0c55d6331cbb00c3b67634b9df1bce011d486e
-                fa6db8951f5ef576ac6bad43d5e1ed83962754538c998fbfa0397cd4521abc00
-                1a7eb28b289accc65a8fcd280a03a7ef75a927d2f1a2fa7c9c2839824469ee89
-		acfecb615d41c5b1a0a31e15324994ca06f7a3f37d8958d719b20de0d217b71b)
+TERMUX_PKG_SHA256=(bdfd737b899cccfae7cf5fe8a109e7c87844168855d14374aadf33d99493f9f9
+                954df1e7a7768ec0c9804da75e5332d68bcc7396c475faf6ed77e7150e4bcdcd
+                9e754cec4d3aeebc8ce697c08948ad4fcd37dfe34e51099acf944d09385d7ff3
+		1acdd829b77f658ba4473757178f9960abcb6ac8d2c700b0772a952b3c9306ba)
 TERMUX_PKG_DEPENDS="libllvm-glibc, gcc-libs-glibc, zlib-glibc, zstd-glibc"
 TERMUX_PKG_BUILD_DEPENDS="llvm-glibc"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -35,7 +35,7 @@ termux_step_post_get_source() {
 		rm -fr $TERMUX_TOPDIR/$TERMUX_PKG_NAME/${i}
 		mv $TERMUX_PKG_SRCDIR/$i-$TERMUX_PKG_VERSION.src $TERMUX_TOPDIR/$TERMUX_PKG_NAME
 		mv $TERMUX_TOPDIR/$TERMUX_PKG_NAME/$i-$TERMUX_PKG_VERSION.src $TERMUX_TOPDIR/$TERMUX_PKG_NAME/$i
-        done
+	done
 }
 
 termux_step_pre_configure() {
