@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_LICENSE_FILE="LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_VERSION=18.1.4
+TERMUX_PKG_REVISION=1
 _SOURCE=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION
 TERMUX_PKG_SRCURL=($_SOURCE/compiler-rt-$TERMUX_PKG_VERSION.src.tar.xz
 		$_SOURCE/cmake-$TERMUX_PKG_VERSION.src.tar.xz)
