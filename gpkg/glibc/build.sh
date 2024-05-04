@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="GNU C Library"
 TERMUX_PKG_LICENSE="GPL-3.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_VERSION=2.39
-TERMUX_PKG_REVISION=3
+TERMUX_PKG_REVISION=4
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/libc/glibc-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=f77bd47cf8170c57365ae7bf86696c118adb3b120d3259c64c502d3dc1e2d926
 TERMUX_PKG_DEPENDS="linux-api-headers-glibc"
@@ -16,7 +16,7 @@ termux_step_pre_configure() {
 		termux_error_exit "Compilation is only possible based on glibc"
 	fi
 
-	for i in shmem-android.h shmat.c  shmctl.c  shmdt.c  shmget.c mprotect.c ignore-syscall.h; do
+	for i in shmem-android.h shmat.c  shmctl.c  shmdt.c  shmget.c mprotect.c syscall.c fake-syscall.h; do
 		install -Dm644 "${TERMUX_PKG_BUILDER_DIR}/${i}" "${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/${i}"
 	done
 
@@ -37,6 +37,16 @@ termux_step_pre_configure() {
 	bash ${TERMUX_PKG_BUILDER_DIR}/gen-android-ids.sh ${TERMUX_BASE_DIR} \
 		${TERMUX_PKG_SRCDIR}/nss/android_ids.h \
 		${TERMUX_PKG_BUILDER_DIR}/android_system_user_ids.h
+
+	# `disabled-syscalls` - a file that contains a list of system calls that should be disabled
+	for i in aarch64 arm i386 x86_64/64; do
+		{
+			for j in $(awk '{printf "__NR_" $1 " "}' ${TERMUX_PKG_BUILDER_DIR}/disabled-syscalls); do
+				grep "#define ${j} " ${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/${i}/arch-syscall.h || true
+				sed -i "/#define ${j} /d" ${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/${i}/arch-syscall.h
+			done
+		} >> ${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/${i}/disabled-syscall.h
+	done
 }
 
 termux_step_configure() {
