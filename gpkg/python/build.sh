@@ -3,13 +3,14 @@ TERMUX_PKG_DESCRIPTION="The Python programming language"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=3.11.8
+TERMUX_PKG_VERSION=3.11.9
 _MAJOR_VERSION="${TERMUX_PKG_VERSION%.*}"
 TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION%rc*}/Python-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=9e06008c8901924395bc1da303eac567a729ae012baa182ab39269f650383bb3
+TERMUX_PKG_SHA256=9b1e896523fc510691126c864406d9360a3d1e986acbda59cda57b5abda45b87
 TERMUX_PKG_DEPENDS="libbz2-glibc, libexpat-glibc, gdbm-glibc, libffi-glibc, libnsl-glibc, libxcrypt-glibc, openssl-glibc, zlib-glibc"
 TERMUX_PKG_BUILD_DEPENDS="sqlite-glibc, mpdecimal-glibc, llvm-glibc"
 TERMUX_PKG_PROVIDES="python3-glibc"
+TERMUX_PKG_RM_AFTER_INSTALL="glibc/lib/python${_MAJOR_VERSION}/site-packages/*/"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
