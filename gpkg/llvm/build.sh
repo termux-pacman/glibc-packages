@@ -3,15 +3,14 @@ TERMUX_PKG_DESCRIPTION="Compiler infrastructure"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_LICENSE_FILE="LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=18.1.4
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION=18.1.5
 _SOURCE=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION
 TERMUX_PKG_SRCURL=($_SOURCE/llvm-$TERMUX_PKG_VERSION.src.tar.xz
 		$_SOURCE/cmake-$TERMUX_PKG_VERSION.src.tar.xz
 		$_SOURCE/third-party-$TERMUX_PKG_VERSION.src.tar.xz)
-TERMUX_PKG_SHA256=(954df1e7a7768ec0c9804da75e5332d68bcc7396c475faf6ed77e7150e4bcdcd
-		1acdd829b77f658ba4473757178f9960abcb6ac8d2c700b0772a952b3c9306ba
-		270c2f49625c98d53fa1c17a1d4da412c93e729c3a0468304a6915b19dcd8448)
+TERMUX_PKG_SHA256=(8a134e58cb98061b6b8f312fe9c174a646fa0c8691b5511c43795dc980dfd226
+		dfe1eb2d464168eefdfda72bbaaf1ec9b8314f5a6e68652b49699e7cb618304d
+		c7f60186a8e140d50f02f4cf426d800991cf37b99f5d40503cecb417291a25ed)
 TERMUX_PKG_DEPENDS="libllvm-glibc, perl-glibc"
 TERMUX_PKG_BUILD_DEPENDS="binutils-libs-glibc"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -71,6 +70,4 @@ termux_step_post_make_install() {
 		cd ${TERMUX_PKG_SRCDIR}/utils/lit
 		python3 setup.py install --prefix=$TERMUX_PREFIX -O1
 	)
-	install -d $TERMUX_PREFIX/lib/bfd-plugins
-	ln -s ../LLVMgold.so $TERMUX_PREFIX/lib/bfd-plugins/LLVMgold.so
 }
