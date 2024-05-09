@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Object-relational SQL database"
 TERMUX_PKG_LICENSE="PostgreSQL"
 TERMUX_PKG_LICENSE_FILE="COPYRIGHT"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION="16.2"
+TERMUX_PKG_VERSION="16.3"
 TERMUX_PKG_SRCURL=https://ftp.postgresql.org/pub/source/v$TERMUX_PKG_VERSION/postgresql-$TERMUX_PKG_VERSION.tar.bz2
-TERMUX_PKG_SHA256=446e88294dbc2c9085ab4b7061a646fa604b4bec03521d5ea671c2e5ad9b2952
+TERMUX_PKG_SHA256=331963d5d3dc4caf4216a049fa40b66d6bcb8c730615859411b9518764e60585
 TERMUX_PKG_DEPENDS="krb5-glibc, openssl-glibc, readline-glibc, zlib-glibc, libxml2-glibc, libpam-glibc, libicu-glibc, libllvm-glibc, libxslt-glibc, liblz4-glibc, zstd-glibc"
 TERMUX_PKG_BUILD_DEPENDS="perl-glibc, python-glibc, clang-glibc"
 #--with-ldap

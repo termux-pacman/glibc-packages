@@ -3,13 +3,13 @@ TERMUX_PKG_DESCRIPTION="An open-source implementation of the OpenGL specificatio
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="docs/license.rst"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION="24.0.6"
+TERMUX_PKG_VERSION="24.0.7"
 TERMUX_PKG_SRCURL="https://archive.mesa3d.org/mesa-${TERMUX_PKG_VERSION}.tar.xz"
-TERMUX_PKG_SHA256="8b7a92dbe6468c18f2383700135b5fe9de836cdf0cc8fd7dbae3c7110237d604"
+TERMUX_PKG_SHA256="7454425f1ed4a6f1b5b107e1672b30c88b22ea0efea000ae2c7d96db93f6c26a"
 TERMUX_PKG_DEPENDS="libglvnd-glibc, gcc-libs-glibc, libdrm-glibc, libllvm-glibc, libexpat-glibc, zlib-glibc, zstd-glibc, libx11-glibc, libxcb-glibc, libxext-glibc, libxfixes-glibc, libxshmfence-glibc, libxxf86vm-glibc, libwayland-glibc, libvdpau-glibc, libomxil-bellagio-glibc, libva-glibc, libxml2-glibc, libelf-glibc, libbz2-glibc, libclc-glibc"
 TERMUX_PKG_SUGGESTS="mesa-dev-glibc"
 TERMUX_PKG_BUILD_DEPENDS="llvm-glibc, libwayland-protocols-glibc, xorgproto-glibc, glslang-glibc"
-TERMUX_PKG_PYTHON_COMMON_DEPS="mako"
+TERMUX_PKG_PYTHON_COMMON_DEPS="mako, setuptools"
 # disabling libunwind, microsoft-clc and valgrind will improve performance
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -18,7 +18,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -D dri3=enabled
 -D egl=enabled
 -D gallium-opencl=icd
--D gallium-drivers=freedreno,swrast,virgl,zink,r600,radeonsi,nouveau,lima,panfrost
+-D gallium-drivers=freedreno,swrast,virgl,zink,r600,radeonsi,nouveau,lima,panfrost,kmsro
 -D gallium-extra-hud=true
 -D gallium-nine=true
 -D gallium-va=enabled
@@ -50,4 +50,5 @@ termux_step_pre_configure() {
 	export LLVM_CONFIG=$TERMUX_PREFIX/bin/llvm-config
 	echo "${TERMUX_PKG_VERSION}.termux-glibc-${TERMUX_PKG_REVISION:=0}" > ${TERMUX_PKG_SRCDIR}/VERSION
 	rm ${TERMUX_PKG_SRCDIR}/subprojects/lua.wrap
+	#sed -i "s|\"/dev/|\"${TERMUX_PREFIX}/dev/|g" $(grep -s -r -l '"/dev/')
 }

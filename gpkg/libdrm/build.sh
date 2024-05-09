@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="Userspace interface to kernel DRM services"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_VERSION="2.4.120"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://dri.freedesktop.org/libdrm/libdrm-${TERMUX_PKG_VERSION}.tar.xz
 TERMUX_PKG_SHA256=3bf55363f76c7250946441ab51d3a6cc0ae518055c0ff017324ab76cdefb327a
 TERMUX_PKG_DEPENDS="libpciaccess-glibc"
@@ -13,8 +14,9 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 "
 
 termux_step_pre_configure() {
-	if [ "$TERMUX_ARCH" = "arm" ]; then
-		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Domap=enabled -Dexynos=enabled -Dtegra=enabled -Detnaviv=enabled"
+	#sed -i "s|\"/dev/|\"${TERMUX_PREFIX}/dev/|g" $(grep -s -r -l '"/dev/')
+	if [ "$TERMUX_ARCH" = "aarch64" ] || [ "$TERMUX_ARCH" = "arm" ]; then
+		TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Domap=enabled -Dexynos=enabled -Dtegra=enabled -Detnaviv=enabled -Dfreedreno-kgsl=true"
 	fi
 }
 
