@@ -1,4 +1,8 @@
 # Glibc packages for termux
+![GitHub repo size](https://img.shields.io/github/repo-size/termux-pacman/glibc-packages)
+![Build-gpkg last build status](https://github.com/termux-pacman/glibc-packages/workflows/Build%20gpkg/badge.svg)
+![Build-gpkg-dev last build status](https://github.com/termux-pacman/glibc-packages/workflows/build-dev/badge.svg)
+
 This repository stores and compiles packages based on the glibc library for termux.
 
 More information in the [Wiki section](https://github.com/termux-pacman/glibc-packages/wiki).
@@ -24,5 +28,4 @@ Server = https://service.termux-pacman.dev/gpkg/$arch
  - Security level: full (db and packages are protected by signature)
  - Signature: termux-pacman organization gpg key
  - Powered by aws
- - Mirrors: does not exist
  - Organization maintaining: [termux-pacman](https://github.com/termux-pacman)
