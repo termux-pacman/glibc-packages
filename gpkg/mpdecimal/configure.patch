@@ -1,11 +1,11 @@
---- src/configure	2023-10-07 21:14:22.595827945 +0300
-+++ src/configure.patch	2023-10-07 21:20:05.875827814 +0300
-@@ -2695,7 +2695,7 @@
-         LIBNAME="libmpdec.so"
-         LIBSONAME="libmpdec.so.3"
-         LIBSHARED="libmpdec.so.2.5.1"
--        CONFIGURE_LDFLAGS="-shared -Wl,-soname,$LIBSONAME"
-+        CONFIGURE_LDFLAGS="-shared -soname $LIBSONAME"
-         ;;
+--- src/configure	2024-05-14 09:51:56.647059636 +0300
++++ src/configure.patch	2024-05-14 09:54:59.447059566 +0300
+@@ -2876,7 +2876,7 @@
+     LIBNAME="libmpdec.so"
+     LIBSONAME="libmpdec.so.4"
+     LIBSHARED="libmpdec.so.4.0.0"
+-    CONFIGURE_LDFLAGS="-shared $FPIC -Wl,-soname,$LIBSONAME"
++    CONFIGURE_LDFLAGS="-shared $FPIC -soname $LIBSONAME"
+     ;;
  esac
  
