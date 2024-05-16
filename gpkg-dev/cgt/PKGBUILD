@@ -1,6 +1,6 @@
 pkgname=cgt
-pkgver=13.2.0
-pkgrel=5
+pkgver=14.1.0
+pkgrel=0
 pkgdesc='Cross GCCs for Termux (only for Linux)'
 arch=(x86_64)
 url='https://gcc.gnu.org/'
@@ -9,18 +9,18 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-$pkgver/gcc-$pkgver.tar.xz
         collect2.cc.patch
         gcc.cc.patch
         gcc-Makefile.in.patch
-        gcc-configure.patch
+	gcc-configure.patch
 	config.sub.patch
 	configure.patch
         set_glibc_dynamic_linker.patch)
-sha256sums=('e275e76442a6067341a27f04c5c6b83d8613144004c0413528863dc6b5c743da'
-            '8d9f0c6cd1c57e623ba9b054f69185e4fb4717cc3af61c19d191948270042d6c'
-            'e61dc2469a70392923aeac3f9e80c0b0c7ebd372488bc99e6dd0e18c1e3e3360'
-            '1115c633d6fd0d4f6d6eeca50e4d52fd15f0bf52b4158ecb0ea6bedcb85ceb35'
-            '346843fbce4bddca236ca4331ae43c5356ed177689c7760d841d2db2d2643d13'
-            '74020f17b5543f75353254f206c7567deef8453e71802ebc9d4bdbb09740a02a'
-            '0eb6079c420a46b54ce9ef7c601a9766e5c85244757b837000979c41d541a315'
-            'cd383a4a1916f4b3102f21c640d6116f697e0ef7cde5f705d83035849c200ec6')
+sha256sums=('e283c654987afe3de9d8080bc0bd79534b5ca0d681a73a11ff2b5d3767426840'
+            '81ea5884481df93191dffde2a0d86ba097812210d38e557b1f8cde9dc6c73c44'
+            '05b53d39f1c0bf88874f34ff5c20ab2d1a0c16dc6f79f1ded5dcd5201d4a9d71'
+            'cb20c4f93f7f2f60c26d5548e642404a8df5b0ee1d1c5988379612fac527011f'
+            '89529c2ad7b8f25a1a1a7b4129b8a58d3b80e254026d85800bb20f60431a5a03'
+            'fb1a2b9d2eb649153431e7bc81d4382c667338b9c461e4e4697d7db754041b68'
+            'fc725f6e77dedc0e6cd3d55ef33e93f0b7c5b25b6d5cf1d42311357f6abf1047'
+            'dedc2709e53ed48772586695792ba3cd4f7ee185c671df56539e06ec3fe1dae2')
 groups=('cgct')
 
 
@@ -49,10 +49,11 @@ build() {
 		mkdir gcc-${arch_build}
 		cd gcc-${arch_build}
 
-		REPO_URL="${GPKG_DEV_SERVER_URL}/gpkg-dev/${arch_build}"
-		curl "${REPO_URL}/gpkg-dev.json" -o gpkg-dev.json
+		REPO_NAME="gpkg"
+		REPO_URL="${GPKG_DEV_SERVER_URL}/${REPO_NAME}/${arch_build}"
+		curl "${REPO_URL}/${REPO_NAME}.json" -o ${REPO_NAME}.json
 		for i in glibc linux-api-headers-glibc libxcrypt-glibc; do
-			FILENAME=$(cat gpkg-dev.json | jq -r '."'$i'"."FILENAME"')
+			FILENAME=$(cat ${REPO_NAME}.json | jq -r '."'$i'"."FILENAME"')
 			curl "${REPO_URL}/$FILENAME" -o $i.tar.xz
 			tar xJf $i.tar.xz -C / data
 		done
@@ -106,10 +107,14 @@ build() {
 			AR_FOR_TARGET=${CGCT_PREFIX}/bin/ar \
 			RANLIB_FOR_TARGET=${CGCT_PREFIX}/bin/ranlib \
 			NM_FOR_TARGET=${CGCT_PREFIX}/bin/nm \
+			OBJCOPY_FOR_TARGET=${CGCT_PREFIX}/bin/objcopy \
+			OBJDUMP_FOR_TARGET=${CGCT_PREFIX}/bin/objdump \
 			CC=x86_64-linux-gnu-gcc \
 			CXX=x86_64-linux-gnu-g++ \
 			AR=ar \
-			LD=ld
+			LD=ld \
+			OBJCOPY=objcopy \
+			OBJDUMP=objdump
 		make
 
 		cd ..

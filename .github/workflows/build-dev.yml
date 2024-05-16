@@ -49,6 +49,13 @@ jobs:
     - name: Build gpkg-dev packages
       run: |
         for i in $(cat "pkgs/gpkg-dev-need.txt"); do
+          if grep -q ${i} ./script/cgct-pkgs.list; then
+            sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost
+            ./script/docker.sh pacman -Rcns arm-linux-gnueabihf-gcc arm-linux-gnueabihf-binutils \
+                                            arm-linux-gnueabihf-linux-api-headers arm-linux-gnueabihf-glibc \
+                                            i686-elf-binutils aarch64-linux-gnu-gcc ruby rsync \
+                                            gtest elfutils gperf python-setuptools publicsuffix-list --noconfirm
+          fi
           ./script/docker.sh /home/user-build/script/build-dev.sh ${{ matrix.target_arch }} ${i}
         done
         tar cJf gpkg-dev-${{ matrix.target_arch }}.tar.xz pkgs
