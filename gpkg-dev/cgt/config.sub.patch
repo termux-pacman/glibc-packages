@@ -1,5 +1,5 @@
---- src/gcc-13.2.0/config.sub	2024-04-17 12:59:33.770464867 +0300
-+++ src/gcc-13.2.0/config.sub.patch	2024-04-17 13:10:53.190464608 +0300
+--- src/gcc-14.1.0/config.sub	2024-04-17 12:59:33.770464867 +0300
++++ src/gcc-14.1.0/config.sub.patch	2024-04-17 13:10:53.190464608 +0300
 @@ -647,6 +647,10 @@
  				basic_machine=ymp-cray
  				basic_os=unicos

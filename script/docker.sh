@@ -29,6 +29,7 @@ if ! $(docker container ls | grep -q builder); then
 		-v "${PWD}/${DIR_SCRIPT}:${GPKG_DEV_DIR_SCRIPT}" \
 		${GPKG_DEV_IMAGE}:${arch}
 	docker exec builder pacman -Syu --noconfirm
+	yes | docker exec builder pacman -Scc
 	docker exec builder sed -i 's/.pkg.tar.zst/.pkg.tar.xz/' /etc/makepkg.conf
 fi
 

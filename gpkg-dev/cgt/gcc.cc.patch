@@ -1,5 +1,5 @@
---- src/gcc-13.2.0/gcc/gcc.cc	2023-07-27 11:13:04.000000000 +0300
-+++ src/gcc-13.2.0/gcc/gcc.cc.patch	2023-10-11 09:20:43.668062309 +0300
+--- src/gcc-14.1.0/gcc/gcc.cc	2023-07-27 11:13:04.000000000 +0300
++++ src/gcc-14.1.0/gcc/gcc.cc.patch	2023-10-11 09:20:43.668062309 +0300
 @@ -1585,10 +1585,7 @@
  /* Default prefixes to attach to command names.  */
  

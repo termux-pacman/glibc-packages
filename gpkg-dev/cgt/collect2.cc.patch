@@ -1,5 +1,5 @@
---- src/gcc-13.2.0/gcc/collect2.cc	2022-05-06 10:30:56.000000000 +0300
-+++ src/gcc-13.2.0/gcc/collect2.cc.patch	2022-07-07 16:22:05.983834993 +0300
+--- src/gcc-14.1.0/gcc/collect2.cc	2022-05-06 10:30:56.000000000 +0300
++++ src/gcc-14.1.0/gcc/collect2.cc.patch	2022-07-07 16:22:05.983834993 +0300
 @@ -1188,8 +1188,7 @@
    prefix_from_env ("LIBPATH", &libpath_lib_dirs);
    /* Add to this list also two standard directories where
