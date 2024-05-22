@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://git-scm.com/
 TERMUX_PKG_DESCRIPTION="Fast, scalable, distributed revision control system"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION="2.45.0"
+TERMUX_PKG_VERSION="2.45.1"
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/pub/software/scm/git/git-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=0aac200bd06476e7df1ff026eb123c6827bc10fe69d2823b4bf2ebebe5953429
+TERMUX_PKG_SHA256=e64d340a8e627ae22cfb8bcc651cca0b497cf1e9fdf523735544ff4a732f12bf
 TERMUX_PKG_DEPENDS="libcurl-glibc, libexpat-glibc, libiconv-glibc, openssl-glibc, pcre2-glibc, zlib-glibc, less-glibc"
 TERMUX_PKG_SUGGESTS="perl-glibc"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -14,7 +14,6 @@ PERL_PATH=$TERMUX_PREFIX/bin/perl
 PYTHON_PATH=$TERMUX_PREFIX/bin/python
 prefix=$TERMUX_PREFIX
 gitexecdir=$TERMUX_PREFIX/libexec/git-core
-perllibdir=$($TERMUX_PREFIX/bin/perl -MConfig -wle 'print $Config{installvendorlib}')
 INSTALL_SYMLINKS=1
 NO_INSTALL_HARDLINKS=1
 MAN_BOLD_LITERAL=1
@@ -26,7 +25,7 @@ _make() {
 }
 
 termux_step_configure() {
-	return
+	TERMUX_PKG_EXTRA_MAKE_ARGS+=" perllibdir=$($TERMUX_PREFIX/bin/perl -MConfig -wle 'print $Config{installvendorlib}')"
 }
 
 termux_step_make() {
