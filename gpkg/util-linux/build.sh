@@ -9,9 +9,9 @@ Documentation/licenses/COPYING.BSD-3-Clause
 Documentation/licenses/COPYING.BSD-4-Clause-UC
 Documentation/licenses/COPYING.ISC"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=2.40
-TERMUX_PKG_SRCURL=https://github.com/util-linux/util-linux/archive/refs/tags/v2.40.zip
-TERMUX_PKG_SHA256=9ed02b0ba40948f1127fc2b9f6fb0444e23f6f49e760cfd25735d7b861387f5d
+TERMUX_PKG_VERSION=2.40.1
+TERMUX_PKG_SRCURL=https://github.com/util-linux/util-linux/archive/refs/tags/v${TERMUX_PKG_VERSION}.zip
+TERMUX_PKG_SHA256=473a78ad760a979a849b16a42a0ed4e54bcd630f6bc3f5f0be54943233c0d0b9
 TERMUX_PKG_DEPENDS="libcap-ng-glibc, ncurses-glibc, zlib-glibc, libpam-glibc, libsmartcols-glibc, bash-glibc"
 TERMUX_PKG_BUILD_DEPENDS="python-glibc"
 TERMUX_PKG_ESSENTIAL=true

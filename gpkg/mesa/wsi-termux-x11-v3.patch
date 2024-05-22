@@ -203,7 +203,7 @@ index b53d485ef3a..da6afac2376 100644
 +   };
 +   const VkMemoryDedicatedAllocateInfo memory_dedicated_info = {
 +      .sType = VK_STRUCTURE_TYPE_MEMORY_DEDICATED_ALLOCATE_INFO,
-+      .pNext = (image->dma_buf_fd < 0) ? &memory_wsi_info : &memory_import_info,
++      .pNext = (image->dma_buf_fd < 0) ? (void*)&memory_wsi_info : (void*)&memory_import_info,
 +      .image = image->image,
 +      .buffer = VK_NULL_HANDLE,
 +   };
