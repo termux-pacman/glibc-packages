@@ -1,8 +1,6 @@
 #include <stdarg.h>
 #include <sysdep.h>
-#include <fake-syscall.h>
-
-extern long int syscallS (long int __sysno, ...) __THROW;
+#include <fakesyscall.h>
 
 long int
 syscall (long int number, ...)
@@ -17,8 +15,9 @@ syscall (long int number, ...)
   long int a5 = va_arg (args, long int);
   va_end (args);
 
-  for (int i=0; i<CountFakeSyscalls; ++i)
-    if (FakeSyscalls[i].id == number)
-      return FakeSyscalls[i].func(a0, a1, a2, a3, a4, a5);
-  return syscallS (number, a0, a1, a2, a3, a4, a5);
+  switch (number) {
+    DISABLED_SYSCALL_WITH_FAKESYSCALL
+    default:
+      return syscallS (number, a0, a1, a2, a3, a4, a5);
+  }
 }

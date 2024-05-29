@@ -1,0 +1,16 @@
+--- glibc-2.39/sysdeps/unix/sysv/linux/open_by_handle_at.c	2024-01-31 03:34:58.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/open_by_handle_at.c.patch	2024-08-27 19:59:51.486857761 +0300
+@@ -20,9 +20,12 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sysdep-cancel.h>
++#include <unistd.h>
++#include <arch-syscall.h>
++#include <disabled-syscall.h>
+ 
+ int
+ open_by_handle_at (int mount_fd, struct file_handle *handle, int flags)
+ {
+-  return SYSCALL_CANCEL (open_by_handle_at, mount_fd, handle, flags);
++  return syscall (__NR_open_by_handle_at, mount_fd, handle, flags);
+ }
