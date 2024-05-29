@@ -1,0 +1,221 @@
+diff --git a/sysdeps/unix/sysv/linux/local-setxid.h b/sysdeps/unix/sysv/linux/local-setxid.h
+index 97d787d9..79792f6f 100644
+--- a/sysdeps/unix/sysv/linux/local-setxid.h
++++ b/sysdeps/unix/sysv/linux/local-setxid.h
+@@ -1,16 +1,18 @@
+ /* SETxID functions which only have to change the local thread and
+    none of the possible other threads.  */
+-#include <sysdep.h>
++#include <unistd.h>
++#include <arch-syscall.h>
++#include <disabled-syscall.h>
+ 
+ #ifdef __NR_setresuid32
+-# define local_seteuid(id) INLINE_SYSCALL (setresuid32, 3, -1, id, -1)
++# define local_seteuid(id) syscall (__NR_setresuid32, 3, -1, id, -1)
+ #else
+-# define local_seteuid(id) INLINE_SYSCALL (setresuid, 3, -1, id, -1)
++# define local_seteuid(id) syscall (__NR_setresuid, 3, -1, id, -1)
+ #endif
+ 
+ 
+ #ifdef __NR_setresgid32
+-# define local_setegid(id) INLINE_SYSCALL (setresgid32, 3, -1, id, -1)
++# define local_setegid(id) syscall (__NR_setresgid32, 3, -1, id, -1)
+ #else
+-# define local_setegid(id) INLINE_SYSCALL (setresgid, 3, -1, id, -1)
++# define local_setegid(id) syscall (__NR_setresgid, 3, -1, id, -1)
+ #endif
+diff --git a/sysdeps/unix/sysv/linux/setegid.c b/sysdeps/unix/sysv/linux/setegid.c
+index 4a608532..f1140ed1 100644
+--- a/sysdeps/unix/sysv/linux/setegid.c
++++ b/sysdeps/unix/sysv/linux/setegid.c
+@@ -18,6 +18,8 @@
+ #include <errno.h>
+ #include <unistd.h>
+ #include <setxid.h>
++#include <arch-syscall.h>
++#include <disabled-syscall.h>
+ 
+ 
+ int
+@@ -29,9 +31,9 @@ setegid (gid_t gid)
+     return INLINE_SYSCALL_ERROR_RETURN_VALUE (EINVAL);
+ 
+ #ifdef __NR_setresgid32
+-  result = INLINE_SETXID_SYSCALL (setresgid32, 3, -1, gid, -1);
++  result = syscall (__NR_setresgid32, 3, -1, gid, -1);
+ #else
+-  result = INLINE_SETXID_SYSCALL (setresgid, 3, -1, gid, -1);
++  result = syscall (__NR_setresgid, 3, -1, gid, -1);
+ #endif
+ 
+   return result;
+diff --git a/sysdeps/unix/sysv/linux/seteuid.c b/sysdeps/unix/sysv/linux/seteuid.c
+index 64d3c84f..ae816280 100644
+--- a/sysdeps/unix/sysv/linux/seteuid.c
++++ b/sysdeps/unix/sysv/linux/seteuid.c
+@@ -18,6 +18,8 @@
+ #include <errno.h>
+ #include <unistd.h>
+ #include <setxid.h>
++#include <arch-syscall.h>
++#include <disabled-syscall.h>
+ 
+ 
+ int
+@@ -29,9 +31,9 @@ seteuid (uid_t uid)
+     return INLINE_SYSCALL_ERROR_RETURN_VALUE (EINVAL);
+ 
+ #ifdef __NR_setresuid32
+-  result = INLINE_SETXID_SYSCALL (setresuid32, 3, -1, uid, -1);
++  result = syscall (__NR_setresuid32, 3, -1, uid, -1);
+ #else
+-  result = INLINE_SETXID_SYSCALL (setresuid, 3, -1, uid, -1);
++  result = syscall (__NR_setresuid, 3, -1, uid, -1);
+ #endif
+ 
+   return result;
+diff --git a/sysdeps/unix/sysv/linux/setgid.c b/sysdeps/unix/sysv/linux/setgid.c
+index 51d4df8a..a43cb2e7 100644
+--- a/sysdeps/unix/sysv/linux/setgid.c
++++ b/sysdeps/unix/sysv/linux/setgid.c
+@@ -18,15 +18,17 @@
+ #include <errno.h>
+ #include <unistd.h>
+ #include <setxid.h>
++#include <arch-syscall.h>
++#include <disabled-syscall.h>
+ 
+ 
+ int
+ __setgid (gid_t gid)
+ {
+ #ifdef __NR_setgid32
+-  return INLINE_SETXID_SYSCALL (setgid32, 1, gid);
++  return syscall (__NR_setgid32, 1, gid);
+ #else
+-  return INLINE_SETXID_SYSCALL (setgid, 1, gid);
++  return syscall (__NR_setgid, 1, gid);
+ #endif
+ }
+ #ifndef __setgid
+diff --git a/sysdeps/unix/sysv/linux/setregid.c b/sysdeps/unix/sysv/linux/setregid.c
+index 2e89677a..09b3d9e4 100644
+--- a/sysdeps/unix/sysv/linux/setregid.c
++++ b/sysdeps/unix/sysv/linux/setregid.c
+@@ -18,15 +18,17 @@
+ #include <errno.h>
+ #include <unistd.h>
+ #include <setxid.h>
++#include <arch-syscall.h>
++#include <disabled-syscall.h>
+ 
+ 
+ int
+ __setregid (gid_t rgid, gid_t egid)
+ {
+ #ifdef __NR_setregid32
+-  return INLINE_SETXID_SYSCALL (setregid32, 2, rgid, egid);
++  return syscall (__NR_setregid32, 2, rgid, egid);
+ #else
+-  return INLINE_SETXID_SYSCALL (setregid, 2, rgid, egid);
++  return syscall (__NR_setregid, 2, rgid, egid);
+ #endif
+ }
+ #ifndef __setregid
+diff --git a/sysdeps/unix/sysv/linux/setresgid.c b/sysdeps/unix/sysv/linux/setresgid.c
+index 6b44503c..0ea2c8e6 100644
+--- a/sysdeps/unix/sysv/linux/setresgid.c
++++ b/sysdeps/unix/sysv/linux/setresgid.c
+@@ -18,15 +18,17 @@
+ #include <errno.h>
+ #include <unistd.h>
+ #include <setxid.h>
++#include <arch-syscall.h>
++#include <disabled-syscall.h>
+ 
+ 
+ int
+ __setresgid (gid_t rgid, gid_t egid, gid_t sgid)
+ {
+ #ifdef __NR_setresgid32
+-  return INLINE_SETXID_SYSCALL (setresgid32, 3, rgid, egid, sgid);
++  return syscall (__NR_setresgid32, 3, rgid, egid, sgid);
+ #else
+-  return INLINE_SETXID_SYSCALL (setresgid, 3, rgid, egid, sgid);
++  return syscall (__NR_setresgid, 3, rgid, egid, sgid);
+ #endif
+ }
+ libc_hidden_def (__setresgid)
+diff --git a/sysdeps/unix/sysv/linux/setresuid.c b/sysdeps/unix/sysv/linux/setresuid.c
+index 3339779a..efd462a3 100644
+--- a/sysdeps/unix/sysv/linux/setresuid.c
++++ b/sysdeps/unix/sysv/linux/setresuid.c
+@@ -18,15 +18,17 @@
+ #include <errno.h>
+ #include <unistd.h>
+ #include <setxid.h>
++#include <arch-syscall.h>
++#include <disabled-syscall.h>
+ 
+ 
+ int
+ __setresuid (uid_t ruid, uid_t euid, uid_t suid)
+ {
+ #ifdef __NR_setresuid32
+-  return INLINE_SETXID_SYSCALL (setresuid32, 3, ruid, euid, suid);
++  return syscall (__NR_setresuid32, 3, ruid, euid, suid);
+ #else
+-  return INLINE_SETXID_SYSCALL (setresuid, 3, ruid, euid, suid);
++  return syscall (__NR_setresuid, 3, ruid, euid, suid);
+ #endif
+ }
+ libc_hidden_def (__setresuid)
+diff --git a/sysdeps/unix/sysv/linux/setreuid.c b/sysdeps/unix/sysv/linux/setreuid.c
+index a3889b3f..e0d5b36d 100644
+--- a/sysdeps/unix/sysv/linux/setreuid.c
++++ b/sysdeps/unix/sysv/linux/setreuid.c
+@@ -18,15 +18,17 @@
+ #include <errno.h>
+ #include <unistd.h>
+ #include <setxid.h>
++#include <arch-syscall.h>
++#include <disabled-syscall.h>
+ 
+ 
+ int
+ __setreuid (uid_t ruid, uid_t euid)
+ {
+ #ifdef __NR_setreuid32
+-  return INLINE_SETXID_SYSCALL (setreuid32, 2, ruid, euid);
++  return syscall (__NR_setreuid32, 2, ruid, euid);
+ #else
+-  return INLINE_SETXID_SYSCALL (setreuid, 2, ruid, euid);
++  return syscall (__NR_setreuid, 2, ruid, euid);
+ #endif
+ }
+ #ifndef __setreuid
+diff --git a/sysdeps/unix/sysv/linux/setuid.c b/sysdeps/unix/sysv/linux/setuid.c
+index 39d5e0cf..2de7f5a0 100644
+--- a/sysdeps/unix/sysv/linux/setuid.c
++++ b/sysdeps/unix/sysv/linux/setuid.c
+@@ -18,14 +18,16 @@
+ #include <errno.h>
+ #include <unistd.h>
+ #include <setxid.h>
++#include <arch-syscall.h>
++#include <disabled-syscall.h>
+ 
+ int
+ __setuid (uid_t uid)
+ {
+ #ifdef __NR_setuid32
+-  return INLINE_SETXID_SYSCALL (setuid32, 1, uid);
++  return syscall (__NR_setuid32, 1, uid);
+ #else
+-  return INLINE_SETXID_SYSCALL (setuid, 1, uid);
++  return syscall (__NR_setuid, 1, uid);
+ #endif
+ }
+ #ifndef __setuid
