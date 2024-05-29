@@ -2,8 +2,6 @@
 #include <sysdep.h>
 #include <fake-syscall.h>
 
-extern long int syscallS (long int __sysno, ...) __THROW;
-
 long int
 syscall (long int number, ...)
 {
