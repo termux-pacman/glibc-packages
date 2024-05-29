@@ -1,0 +1,21 @@
+--- glibc-2.41/posix/Makefile	2025-01-28 20:31:33.000000000 +0300
++++ glibc-2.41/posix/Makefile.patch	2025-05-30 19:02:34.973934765 +0300
+@@ -747,12 +747,17 @@
+ 	$(common-objpfx)malloc/mtrace $(objpfx)tst-glob-tilde.mtrace > $@; \
+ 	$(evaluate-test)
+ 
++ifeq (${TERMUX_ARCH},${TERMUX_REAL_ARCH})
++LIBBIT=
++else
++LIBBIT=32
++endif
+ $(inst_libexecdir)/getconf: $(inst_bindir)/getconf \
+ 			    $(objpfx)getconf.speclist FORCE
+ 	$(addprefix $(..)./scripts/mkinstalldirs ,\
+ 		    $(filter-out $(wildcard $@),$@))
+ 	while read spec; do \
+-	  ln -f $< $@/$$spec.new || $(INSTALL_PROGRAM) $< $@/$$spec.new; \
++	  ln -sfr $<$(LIBBIT) $@/$$spec.new; \
+ 	  mv -f $@/$$spec.new $@/$$spec; \
+ 	done < $(objpfx)getconf.speclist
+ 

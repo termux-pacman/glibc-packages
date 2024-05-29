@@ -1,0 +1,19 @@
+--- src/Makefile	2025-03-24 17:02:41.000000000 +0300
++++ src/Makefile.patch	2025-05-05 01:32:13.597026250 +0300
+@@ -1343,13 +1343,13 @@
+ # Kernel headers
+ 
+ #Default location for installed headers
+-export INSTALL_HDR_PATH = $(objtree)/usr
++export INSTALL_HDR_PATH = $(objtree)/usr/include
+ 
+-quiet_cmd_headers_install = INSTALL $(INSTALL_HDR_PATH)/include
++quiet_cmd_headers_install = INSTALL $(INSTALL_HDR_PATH)
+       cmd_headers_install = \
+ 	mkdir -p $(INSTALL_HDR_PATH); \
+ 	rsync -mrl --include='*/' --include='*\.h' --exclude='*' \
+-	usr/include $(INSTALL_HDR_PATH)
++	usr/include/ $(INSTALL_HDR_PATH)
+ 
+ PHONY += headers_install
+ headers_install: headers
