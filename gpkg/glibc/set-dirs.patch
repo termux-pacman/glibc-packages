@@ -1,3 +1,15 @@
+diff --git a/bits/syslog-path.h b/bits/syslog-path.h
+index b948672e..9ba1efff 100644
+--- a/bits/syslog-path.h
++++ b/bits/syslog-path.h
+@@ -23,6 +23,6 @@
+ #ifndef _BITS_SYSLOG_PATH_H
+ #define _BITS_SYSLOG_PATH_H 1
+ 
+-#define	_PATH_LOG	"/dev/log"
++#define	_PATH_LOG	"/dev/socket/logdw"
+ 
+ #endif /* bits/syslog-path.h */
 diff --git a/dirent/bug-readdir1.c b/dirent/bug-readdir1.c
 index 4c3521db..06b6faa7 100644
 --- a/dirent/bug-readdir1.c
@@ -11,20 +23,33 @@ index 4c3521db..06b6faa7 100644
    if (dirp == NULL)
      {
        if (errno == ENOENT)
+diff --git a/elf/ldconfig.c b/elf/ldconfig.c
+index 1432187e..f29a8b66 100644
+--- a/elf/ldconfig.c
++++ b/elf/ldconfig.c
+@@ -48,7 +48,7 @@
+ #include <dl-procinfo.h>
+ 
+ #ifndef LD_SO_CONF
+-# define LD_SO_CONF SYSCONFDIR "/ld.so.conf"
++# define LD_SO_CONF SYSCONFDIR "/" LD_SO ".conf"
+ #endif
+ 
+ /* Get libc version number.  */
 diff --git a/elf/rtld.c b/elf/rtld.c
-index a91e2a44..382a12f8 100644
+index 00bec153..bc37ac08 100644
 --- a/elf/rtld.c
 +++ b/elf/rtld.c
-@@ -360,7 +360,7 @@
+@@ -360,7 +360,7 @@ struct rtld_global_ro _rtld_global_ro attribute_relro =
      ._dl_fpu_control = _FPU_DEFAULT,
      ._dl_pagesize = EXEC_PAGESIZE,
      ._dl_inhibit_cache = 0,
 -    ._dl_profile_output = "/var/tmp",
 +    ._dl_profile_output = "@TERMUX_PREFIX@/var/tmp",
-
+ 
      /* Function pointers.  */
      ._dl_debug_printf = _dl_debug_printf,
-@@ -1862,7 +1862,7 @@ dl_main (const ElfW(Phdr) *phdr,
+@@ -1822,7 +1822,7 @@ dl_main (const ElfW(Phdr) *phdr,
       open().  So we do this first.  If it succeeds we do almost twice
       the work but this does not matter, since it is not for production
       use.  */
@@ -34,7 +59,7 @@ index a91e2a44..382a12f8 100644
      {
        /* Read the contents of the file.  */
 diff --git a/elf/sprof.c b/elf/sprof.c
-index 3eaa4758..9a44ac2c 100644
+index 4baff86d..2e948526 100644
 --- a/elf/sprof.c
 +++ b/elf/sprof.c
 @@ -618,7 +618,7 @@ load_shobj (const char *name)
@@ -57,8 +82,21 @@ index 3eaa4758..9a44ac2c 100644
        name = ext_name;
  
        fd = open (ext_name, O_RDONLY);
+diff --git a/hesiod/hesiod.c b/hesiod/hesiod.c
+index fe61d0d5..9f8f7a8a 100644
+--- a/hesiod/hesiod.c
++++ b/hesiod/hesiod.c
+@@ -60,7 +60,7 @@
+ #include "hesiod.h"
+ #include "hesiod_p.h"
+ 
+-#define _PATH_HESIOD_CONF "/etc/hesiod.conf"
++#define _PATH_HESIOD_CONF "@TERMUX_PREFIX@/etc/hesiod.conf"
+ 
+ /* Forward */
+ 
 diff --git a/include/shm-directory.h b/include/shm-directory.h
-index 79256131..02f73070 100644
+index 1c0f9fcc..2f5517f2 100644
 --- a/include/shm-directory.h
 +++ b/include/shm-directory.h
 @@ -23,7 +23,7 @@
@@ -86,7 +124,7 @@ index 19740f49..214af2b0 100644
    char *dname2;
    int r;
 diff --git a/io/bug-ftw4.c b/io/bug-ftw4.c
-index bfbf4544..93971f99 100644
+index 4e3e3cd5..98420206 100644
 --- a/io/bug-ftw4.c
 +++ b/io/bug-ftw4.c
 @@ -35,7 +35,7 @@ cb (const char *name, const struct stat64 *st, int type)
@@ -99,7 +137,7 @@ index bfbf4544..93971f99 100644
  
    if (mkdtemp (name) == NULL)
 diff --git a/libio/oldiopopen.c b/libio/oldiopopen.c
-index b3eccc13..e88a4c66 100644
+index f024c4b7..c7a08fe4 100644
 --- a/libio/oldiopopen.c
 +++ b/libio/oldiopopen.c
 @@ -106,7 +106,7 @@ _IO_old_proc_open (FILE *fp, const char *command, const char *mode)
@@ -107,15 +145,15 @@ index b3eccc13..e88a4c66 100644
  	__close (_IO_fileno ((FILE *) p));
  
 -      execl ("/bin/sh", "sh", "-c", command, (char *) 0);
-+      execl ("@TERMUX_PREFIX_CLASSICAL@/bin/sh", "sh", "-c", command, (char *) 0);
++      execl ("@TERMUX_PREFIX@/bin/sh", "sh", "-c", command, (char *) 0);
        _exit (127);
      }
    __close (child_end);
 diff --git a/libio/stdio.h b/libio/stdio.h
-index 4cf9f1c0..a0e0e0a5 100644
+index 602f53a9..2b6e665a 100644
 --- a/libio/stdio.h
 +++ b/libio/stdio.h
-@@ -117,7 +117,7 @@ typedef __fpos64_t fpos64_t;
+@@ -118,7 +118,7 @@ typedef __fpos64_t fpos64_t;
  
  #if defined __USE_MISC || defined __USE_XOPEN
  /* Default path prefix for `tempnam' and `tmpnam'.  */
@@ -125,7 +163,7 @@ index 4cf9f1c0..a0e0e0a5 100644
  
  #define L_tmpnam 20
 diff --git a/manual/examples/filecli.c b/manual/examples/filecli.c
-index 1ade5efe..0d7eecf2 100644
+index f6ce1174..9ca9ac0a 100644
 --- a/manual/examples/filecli.c
 +++ b/manual/examples/filecli.c
 @@ -22,8 +22,8 @@
@@ -140,7 +178,7 @@ index 1ade5efe..0d7eecf2 100644
  #define MESSAGE	"Yow!!! Are we having fun yet?!?"
  
 diff --git a/manual/examples/filesrv.c b/manual/examples/filesrv.c
-index 75c6ff87..f0ede166 100644
+index 09c80c59..74c0c728 100644
 --- a/manual/examples/filesrv.c
 +++ b/manual/examples/filesrv.c
 @@ -21,7 +21,7 @@
@@ -153,7 +191,7 @@ index 75c6ff87..f0ede166 100644
  
  int
 diff --git a/manual/examples/ofdlocks.c b/manual/examples/ofdlocks.c
-index 9d777f73..f85b6f5e 100644
+index 08a978ad..74dc9223 100644
 --- a/manual/examples/ofdlocks.c
 +++ b/manual/examples/ofdlocks.c
 @@ -23,7 +23,7 @@
@@ -175,7 +213,7 @@ index 9d777f73..f85b6f5e 100644
    for (i = 0; i < ITERATIONS; i++)
      {
 diff --git a/nis/ypclnt.c b/nis/ypclnt.c
-index 19a53a10..416985a4 100644
+index b3e987b6..5845cfef 100644
 --- a/nis/ypclnt.c
 +++ b/nis/ypclnt.c
 @@ -33,7 +33,7 @@
@@ -188,7 +226,7 @@ index 19a53a10..416985a4 100644
  
  struct dom_binding
 diff --git a/nscd/nscd-client.h b/nscd/nscd-client.h
-index 5588ade9..ff08ae36 100644
+index 2520e65f..f08c3fb7 100644
 --- a/nscd/nscd-client.h
 +++ b/nscd/nscd-client.h
 @@ -35,13 +35,13 @@
@@ -208,8 +246,21 @@ index 5588ade9..ff08ae36 100644
  
  /* Maximum allowed length for the key.  */
  #define MAXKEYLEN 1024
+diff --git a/nss/bug-erange.c b/nss/bug-erange.c
+index b709418b..0aff48d1 100644
+--- a/nss/bug-erange.c
++++ b/nss/bug-erange.c
+@@ -37,7 +37,7 @@ main (void)
+     {
+       printf ("gethostbyname_r failed: %s (errno: %m)\n", strerror (res));
+ 
+-      if (access ("/etc/resolv.conf", R_OK))
++      if (access ("@TERMUX_PREFIX@/etc/resolv.conf", R_OK))
+ 	{
+ 	  puts ("DNS probably not set up");
+ 	  return 0;
 diff --git a/nss/db-Makefile b/nss/db-Makefile
-index 0dcf764c..d39025b9 100644
+index 99d2b4c2..a873953e 100644
 --- a/nss/db-Makefile
 +++ b/nss/db-Makefile
 @@ -17,11 +17,11 @@
@@ -309,8 +360,34 @@ index 0dcf764c..d39025b9 100644
  	@printf %s "$(patsubst %.db,%,$(@F))... "
  	@$(AWK) 'BEGIN { ini=1 } \
  		 /^[ \t]*$$/ { next } \
+diff --git a/nss/getaddrinfo.c b/nss/getaddrinfo.c
+index 21e899ff..f31298a7 100644
+--- a/nss/getaddrinfo.c
++++ b/nss/getaddrinfo.c
+@@ -1726,7 +1726,7 @@ in6aicmp (const void *p1, const void *p2)
+ 
+ 
+ /* Name of the config file for RFC 3484 sorting (for now).  */
+-#define GAICONF_FNAME "/etc/gai.conf"
++#define GAICONF_FNAME "@TERMUX_PREFIX@/etc/gai.conf"
+ 
+ 
+ /* Non-zero if we are supposed to reload the config file automatically
+diff --git a/nss/lckpwdf.c b/nss/lckpwdf.c
+index 0e72cdc8..b77450e9 100644
+--- a/nss/lckpwdf.c
++++ b/nss/lckpwdf.c
+@@ -29,7 +29,7 @@
+ 
+ 
+ /* Name of the lock file.  */
+-#define PWD_LOCKFILE "/etc/.pwd.lock"
++#define PWD_LOCKFILE "@TERMUX_PREFIX@/etc/.pwd.lock"
+ 
+ /* How long to wait for getting the lock before returning with an
+    error.  */
 diff --git a/nss/nss_compat/compat-grp.c b/nss/nss_compat/compat-grp.c
-index 92d099eb..78a17631 100644
+index 86a46d06..03252716 100644
 --- a/nss/nss_compat/compat-grp.c
 +++ b/nss/nss_compat/compat-grp.c
 @@ -108,7 +108,7 @@ internal_setgrent (ent_t *ent, int stayopen, int needent)
@@ -323,7 +400,7 @@ index 92d099eb..78a17631 100644
        if (ent->stream == NULL)
  	status = errno == EAGAIN ? NSS_STATUS_TRYAGAIN : NSS_STATUS_UNAVAIL;
 diff --git a/nss/nss_compat/compat-initgroups.c b/nss/nss_compat/compat-initgroups.c
-index 90bcdb97..b25d416f 100644
+index faff0e09..e270d5e7 100644
 --- a/nss/nss_compat/compat-initgroups.c
 +++ b/nss/nss_compat/compat-initgroups.c
 @@ -122,7 +122,7 @@ internal_setgrent (ent_t *ent)
@@ -336,7 +413,7 @@ index 90bcdb97..b25d416f 100644
    if (ent->stream == NULL)
      status = errno == EAGAIN ? NSS_STATUS_TRYAGAIN : NSS_STATUS_UNAVAIL;
 diff --git a/nss/nss_compat/compat-pwd.c b/nss/nss_compat/compat-pwd.c
-index f9ad9400..7c11f9d4 100644
+index 7da6dc99..8270d898 100644
 --- a/nss/nss_compat/compat-pwd.c
 +++ b/nss/nss_compat/compat-pwd.c
 @@ -223,7 +223,7 @@ internal_setpwent (ent_t *ent, int stayopen, int needent)
@@ -349,7 +426,7 @@ index f9ad9400..7c11f9d4 100644
        if (ent->stream == NULL)
  	status = errno == EAGAIN ? NSS_STATUS_TRYAGAIN : NSS_STATUS_UNAVAIL;
 diff --git a/nss/nss_compat/compat-spwd.c b/nss/nss_compat/compat-spwd.c
-index c3ce41b1..28d520b9 100644
+index 77844382..798dcf2f 100644
 --- a/nss/nss_compat/compat-spwd.c
 +++ b/nss/nss_compat/compat-spwd.c
 @@ -178,7 +178,7 @@ internal_setspent (ent_t *ent, int stayopen, int needent)
@@ -362,7 +439,7 @@ index c3ce41b1..28d520b9 100644
        if (ent->stream == NULL)
  	status = errno == EAGAIN ? NSS_STATUS_TRYAGAIN : NSS_STATUS_UNAVAIL;
 diff --git a/nss/nss_files/files-XXX.c b/nss/nss_files/files-XXX.c
-index 2ed7184c..fb67afb0 100644
+index 8baa8aa6..d05ca45f 100644
 --- a/nss/nss_files/files-XXX.c
 +++ b/nss/nss_files/files-XXX.c
 @@ -39,7 +39,7 @@
@@ -375,7 +452,7 @@ index 2ed7184c..fb67afb0 100644
  #ifdef NEED_H_ERRNO
  # include <netdb.h>
 diff --git a/nss/nss_files/files-alias.c b/nss/nss_files/files-alias.c
-index 4601cb6c..a2ab1271 100644
+index 29744901..bea9d474 100644
 --- a/nss/nss_files/files-alias.c
 +++ b/nss/nss_files/files-alias.c
 @@ -42,7 +42,7 @@ internal_setent (FILE **stream)
@@ -406,7 +483,7 @@ index 4601cb6c..a2ab1271 100644
      return status;
  
 diff --git a/nss/nss_files/files-init.c b/nss/nss_files/files-init.c
-index d5c2795b..95b8f266 100644
+index c282299f..159330d4 100644
 --- a/nss/nss_files/files-init.c
 +++ b/nss/nss_files/files-init.c
 @@ -41,12 +41,12 @@ register_file (void (*cb) (size_t, struct traced_file *),
@@ -429,7 +506,7 @@ index d5c2795b..95b8f266 100644
  libc_hidden_def (_nss_files_init)
  
 diff --git a/nss/nss_files/files-initgroups.c b/nss/nss_files/files-initgroups.c
-index 929039af..4b3eea49 100644
+index 64078a8e..c8a54ca6 100644
 --- a/nss/nss_files/files-initgroups.c
 +++ b/nss/nss_files/files-initgroups.c
 @@ -33,7 +33,7 @@ _nss_files_initgroups_dyn (const char *user, gid_t group, long int *start,
@@ -442,7 +519,7 @@ index 929039af..4b3eea49 100644
      {
        *errnop = errno;
 diff --git a/nss/nss_files/files-netgrp.c b/nss/nss_files/files-netgrp.c
-index 28ab40da..09dbc877 100644
+index 843ec19b..d3337651 100644
 --- a/nss/nss_files/files-netgrp.c
 +++ b/nss/nss_files/files-netgrp.c
 @@ -27,7 +27,7 @@
@@ -455,7 +532,7 @@ index 28ab40da..09dbc877 100644
  libc_hidden_proto (_nss_files_endnetgrent)
  
 diff --git a/posix/annexc.c b/posix/annexc.c
-index ca50ac96..6dc33aad 100644
+index 9c02ab5c..43acd34a 100644
 --- a/posix/annexc.c
 +++ b/posix/annexc.c
 @@ -26,7 +26,7 @@
@@ -533,7 +610,7 @@ index 4f67d9b2..11645956 100644
    if (fd == -1)
      {
 diff --git a/posix/bug-regex9.c b/posix/bug-regex9.c
-index d74bc9b9..3d1327f1 100644
+index 68f591de..99e1ca80 100644
 --- a/posix/bug-regex9.c
 +++ b/posix/bug-regex9.c
 @@ -23,7 +23,7 @@
@@ -541,12 +618,12 @@ index d74bc9b9..3d1327f1 100644
  
  
 -static const char text[] = "#! /bin/sh";
-+static const char text[] = "#! @TERMUX_PREFIX_CLASSICAL@/bin/sh";
++static const char text[] = "#! @TERMUX_PREFIX@/bin/sh";
  
  int
  main (void)
 diff --git a/resolv/netdb.h b/resolv/netdb.h
-index ace9e482..75e9c00c 100644
+index 5b5a8878..6d4c92bb 100644
 --- a/resolv/netdb.h
 +++ b/resolv/netdb.h
 @@ -40,12 +40,12 @@
@@ -554,12 +631,13 @@ index ace9e482..75e9c00c 100644
  
  /* Absolute file name for network data base files.  */
 -#define	_PATH_HEQUIV		"/etc/hosts.equiv"
-+#define	_PATH_HEQUIV		"@TERMUX_PREFIX@/etc/hosts.equiv"
- #define	_PATH_HOSTS		"/etc/hosts"
+-#define	_PATH_HOSTS		"/etc/hosts"
 -#define	_PATH_NETWORKS		"/etc/networks"
 -#define	_PATH_NSSWITCH_CONF	"/etc/nsswitch.conf"
 -#define	_PATH_PROTOCOLS		"/etc/protocols"
 -#define	_PATH_SERVICES		"/etc/services"
++#define	_PATH_HEQUIV		"@TERMUX_PREFIX@/etc/hosts.equiv"
++#define	_PATH_HOSTS		"@TERMUX_PREFIX@/etc/hosts"
 +#define	_PATH_NETWORKS		"@TERMUX_PREFIX@/etc/networks"
 +#define	_PATH_NSSWITCH_CONF	"@TERMUX_PREFIX@/etc/nsswitch.conf"
 +#define	_PATH_PROTOCOLS		"@TERMUX_PREFIX@/etc/protocols"
@@ -567,8 +645,21 @@ index ace9e482..75e9c00c 100644
  
  
  __BEGIN_DECLS
+diff --git a/resolv/res_hconf.c b/resolv/res_hconf.c
+index 186af816..d2e09c5b 100644
+--- a/resolv/res_hconf.c
++++ b/resolv/res_hconf.c
+@@ -48,7 +48,7 @@
+ # define fgets_unlocked __fgets_unlocked
+ #endif
+ 
+-#define _PATH_HOSTCONF	"/etc/host.conf"
++#define _PATH_HOSTCONF	"@TERMUX_PREFIX@/etc/host.conf"
+ 
+ /* Environment vars that all user to override default behavior:  */
+ #define ENV_HOSTCONF	"RESOLV_HOST_CONF"
 diff --git a/resolv/resolv.h b/resolv/resolv.h
-index f40d6c58..a982e162 100644
+index b8a0f66a..b7974333 100644
 --- a/resolv/resolv.h
 +++ b/resolv/resolv.h
 @@ -91,7 +91,7 @@
@@ -605,7 +696,7 @@ index c9c2ef51..053f7227 100644
  
      int fd1 = mkstemp (filename1);
 diff --git a/stdio-common/scanf14.c b/stdio-common/scanf14.c
-index 09f47d36..6dbd23f4 100644
+index d942e213..4e49e7f3 100644
 --- a/stdio-common/scanf14.c
 +++ b/stdio-common/scanf14.c
 @@ -82,7 +82,7 @@ main (void)
@@ -618,7 +709,7 @@ index 09f47d36..6dbd23f4 100644
    char fname[strlen (tmpdir) + sizeof "/tst-scanf14.XXXXXX"];
    sprintf (fname, "%s/tst-scanf14.XXXXXX", tmpdir);
 diff --git a/stdio-common/scanf15.c b/stdio-common/scanf15.c
-index acd01e7b..488d624c 100644
+index b620e23a..dc28b45d 100644
 --- a/stdio-common/scanf15.c
 +++ b/stdio-common/scanf15.c
 @@ -65,7 +65,7 @@ main (void)
@@ -631,7 +722,7 @@ index acd01e7b..488d624c 100644
    char fname[strlen (tmpdir) + sizeof "/tst-scanf15.XXXXXX"];
    sprintf (fname, "%s/tst-scanf15.XXXXXX", tmpdir);
 diff --git a/stdio-common/scanf16.c b/stdio-common/scanf16.c
-index 97d1082d..a163a7d3 100644
+index 17e77702..0d5f5187 100644
 --- a/stdio-common/scanf16.c
 +++ b/stdio-common/scanf16.c
 @@ -113,7 +113,7 @@ main (void)
@@ -644,7 +735,7 @@ index 97d1082d..a163a7d3 100644
    char fname[strlen (tmpdir) + sizeof "/tst-scanf16.XXXXXX"];
    sprintf (fname, "%s/tst-scanf16.XXXXXX", tmpdir);
 diff --git a/stdio-common/scanf17.c b/stdio-common/scanf17.c
-index 3099689e..439039a6 100644
+index 2589de10..44cc26a7 100644
 --- a/stdio-common/scanf17.c
 +++ b/stdio-common/scanf17.c
 @@ -96,7 +96,7 @@ main (void)
@@ -656,8 +747,58 @@ index 3099689e..439039a6 100644
  
    char fname[strlen (tmpdir) + sizeof "/tst-scanf17.XXXXXX"];
    sprintf (fname, "%s/tst-scanf17.XXXXXX", tmpdir);
+diff --git a/stdio-common/scanf18.c b/stdio-common/scanf18.c
+index faf25556..0804e188 100644
+--- a/stdio-common/scanf18.c
++++ b/stdio-common/scanf18.c
+@@ -88,7 +88,7 @@ main (void)
+ 
+   const char *tmpdir = getenv ("TMPDIR");
+   if (tmpdir == NULL || tmpdir[0] == '\0')
+-    tmpdir = "/tmp";
++    tmpdir = "@TERMUX_PREFIX_CLASSICAL@/tmp";
+ 
+   char fname[strlen (tmpdir) + sizeof "/tst-scanf14.XXXXXX"];
+   sprintf (fname, "%s/tst-scanf14.XXXXXX", tmpdir);
+diff --git a/stdio-common/scanf19.c b/stdio-common/scanf19.c
+index 1905d32e..eebdb1e1 100644
+--- a/stdio-common/scanf19.c
++++ b/stdio-common/scanf19.c
+@@ -118,7 +118,7 @@ main (void)
+ 
+   const char *tmpdir = getenv ("TMPDIR");
+   if (tmpdir == NULL || tmpdir[0] == '\0')
+-    tmpdir = "/tmp";
++    tmpdir = "@TERMUX_PREFIX_CLASSICAL@/tmp";
+ 
+   char fname[strlen (tmpdir) + sizeof "/tst-scanf16.XXXXXX"];
+   sprintf (fname, "%s/tst-scanf16.XXXXXX", tmpdir);
+diff --git a/stdio-common/tmpdir.c b/stdio-common/tmpdir.c
+index 53debf06..66bdcf2b 100644
+--- a/stdio-common/tmpdir.c
++++ b/stdio-common/tmpdir.c
+@@ -34,7 +34,7 @@
+ # ifdef _P_tmpdir /* native Windows */
+ #  define P_tmpdir _P_tmpdir
+ # else
+-#  define P_tmpdir "/tmp"
++#  define P_tmpdir "@TERMUX_PREFIX_CLASSICAL@/tmp"
+ # endif
+ #endif
+ 
+@@ -133,8 +133,8 @@ __path_search (char *tmpl, size_t tmpl_len, const char *dir, const char *pfx,
+ #endif
+       if (direxists (P_tmpdir))
+         dir = P_tmpdir;
+-      else if (strcmp (P_tmpdir, "/tmp") != 0 && direxists ("/tmp"))
+-        dir = "/tmp";
++      else if (strcmp (P_tmpdir, "@TERMUX_PREFIX_CLASSICAL@/tmp") != 0 && direxists ("@TERMUX_PREFIX_CLASSICAL@/tmp"))
++        dir = "@TERMUX_PREFIX_CLASSICAL@/tmp";
+       else
+         {
+           __set_errno (ENOENT);
 diff --git a/stdio-common/tstscanf.c b/stdio-common/tstscanf.c
-index 7e92df47..7ffbea37 100644
+index bb3e55db..bb7aaf51 100644
 --- a/stdio-common/tstscanf.c
 +++ b/stdio-common/tstscanf.c
 @@ -62,7 +62,7 @@ main (int argc, char **argv)
@@ -665,7 +806,7 @@ index 7e92df47..7ffbea37 100644
    if (argc == 2 && !strcmp (argv[1], "-opipe"))
      {
 -      out = popen ("/bin/cat", "w");
-+      out = popen ("@TERMUX_PREFIX_CLASSICAL@/bin/cat", "w");
++      out = popen ("@TERMUX_PREFIX@/bin/cat", "w");
        if (out == NULL)
  	{
  	  perror ("popen: /bin/cat");
@@ -674,12 +815,12 @@ index 7e92df47..7ffbea37 100644
    else if (argc == 3 && !strcmp (argv[1], "-ipipe"))
      {
 -      sprintf (buf, "/bin/cat %s", argv[2]);
-+      sprintf (buf, "@TERMUX_PREFIX_CLASSICAL@/bin/cat %s", argv[2]);
++      sprintf (buf, "@TERMUX_PREFIX@/bin/cat %s", argv[2]);
        in = popen (buf, "r");
        if (in == NULL)
  	{
 diff --git a/stdio-common/xbug.c b/stdio-common/xbug.c
-index 06f74aff..c80db63e 100644
+index 06f74aff..034f510c 100644
 --- a/stdio-common/xbug.c
 +++ b/stdio-common/xbug.c
 @@ -60,7 +60,7 @@ main(int argc, char *argv[])
@@ -687,12 +828,12 @@ index 06f74aff..c80db63e 100644
    unsetenv ("LD_LIBRARY_PATH");
  
 -  if (!(input = popen("/bin/cat", "r")))
-+  if (!(input = popen("@TERMUX_PREFIX_CLASSICAL@/bin/cat", "r")))
++  if (!(input = popen("@TERMUX_PREFIX@/bin/cat", "r")))
      fprintf(stderr, "cannot run \n");
  
    ReadFile(&buffer, input);
 diff --git a/stdlib/isomac.c b/stdlib/isomac.c
-index a371bb25..6e2b588b 100644
+index dc48aa62..76b2ecac 100644
 --- a/stdlib/isomac.c
 +++ b/stdlib/isomac.c
 @@ -74,7 +74,7 @@
@@ -704,11 +845,24 @@ index a371bb25..6e2b588b 100644
  
  /* ISO C header names including Amendment 1 (without ".h" suffix).  */
  static char *header[] =
+diff --git a/support/support_fuse.c b/support/support_fuse.c
+index a70a74c8..95c8c1d3 100644
+--- a/support/support_fuse.c
++++ b/support/support_fuse.c
+@@ -671,7 +671,7 @@ init (void)
+   /* The test_dir test driver variable is not yet set at this point.  */
+   const char *tmpdir = getenv ("TMPDIR");
+   if (tmpdir == NULL || tmpdir[0] == '\0')
+-    tmpdir = "/tmp";
++    tmpdir = "@TERMUX_PREFIX_CLASSICAL@/tmp";
+ 
+   char *prefix = xasprintf ("%s/glibc-tst-fuse.", tmpdir);
+   support_fuse_mountpoints = support_fuse_mkdir (prefix);
 diff --git a/support/support_test_main.c b/support/support_test_main.c
-index c20c19e7..f2b33978 100644
+index bd6c728f..a3edd8e0 100644
 --- a/support/support_test_main.c
 +++ b/support/support_test_main.c
-@@ -353,7 +353,7 @@ support_test_main (int argc, char **argv, const struct test_config *config)
+@@ -351,7 +351,7 @@ support_test_main (int argc, char **argv, const struct test_config *config)
      {
        test_dir = getenv ("TMPDIR");
        if (test_dir == NULL || test_dir[0] == '\0')
@@ -717,6 +871,44 @@ index c20c19e7..f2b33978 100644
      }
    if (support_set_test_dir != NULL)
      support_set_test_dir (test_dir);
+diff --git a/sysdeps/generic/dl-cache.h b/sysdeps/generic/dl-cache.h
+index 0ee65713..549fca17 100644
+--- a/sysdeps/generic/dl-cache.h
++++ b/sysdeps/generic/dl-cache.h
+@@ -34,8 +34,14 @@
+   ((flags) == 1 || (flags) == _DL_CACHE_DEFAULT_ID)
+ #endif
+ 
++#ifdef MULTILIB_GLIBC
++# define LD_SO "ld32.so"
++#else
++# define LD_SO "ld.so"
++#endif
++
+ #ifndef LD_SO_CACHE
+-# define LD_SO_CACHE SYSCONFDIR "/ld.so.cache"
++# define LD_SO_CACHE SYSCONFDIR "/" LD_SO ".cache"
+ #endif
+ 
+ #ifndef add_system_dir
+diff --git a/sysdeps/generic/ldconfig.h b/sysdeps/generic/ldconfig.h
+index 7bc87886..6533b0a5 100644
+--- a/sysdeps/generic/ldconfig.h
++++ b/sysdeps/generic/ldconfig.h
+@@ -48,7 +48,12 @@
+ #define FLAG_LARCH_FLOAT_ABI_DOUBLE	0x1200
+ 
+ /* Name of auxiliary cache.  */
+-#define _PATH_LDCONFIG_AUX_CACHE "/var/cache/ldconfig/aux-cache"
++#ifdef MULTILIB_GLIBC
++# define _LDCONFIG_NAME "ldconfig32"
++#else
++# define _LDCONFIG_NAME "ldconfig"
++#endif
++#define _PATH_LDCONFIG_AUX_CACHE "@TERMUX_PREFIX@/var/cache/" _LDCONFIG_NAME "/aux-cache"
+ 
+ /* Declared in cache.c.  */
+ extern void print_cache (const char *cache_name);
 diff --git a/sysdeps/generic/paths.h b/sysdeps/generic/paths.h
 index 893b4c22..6c38ca05 100644
 --- a/sysdeps/generic/paths.h
@@ -791,7 +983,7 @@ index 893b4c22..6c38ca05 100644
  
  #endif /* !_PATHS_H_ */
 diff --git a/sysdeps/posix/system.c b/sysdeps/posix/system.c
-index 488b9516..6287b0ea 100644
+index 2c33569f..6fa00b4a 100644
 --- a/sysdeps/posix/system.c
 +++ b/sysdeps/posix/system.c
 @@ -31,7 +31,7 @@
@@ -799,34 +991,10 @@ index 488b9516..6287b0ea 100644
  #include <internal-signals.h>
  
 -#define	SHELL_PATH	"/bin/sh"	/* Path of the shell.  */
-+#define	SHELL_PATH	"@TERMUX_PREFIX_CLASSICAL@/bin/sh"	/* Path of the shell.  */
++#define	SHELL_PATH	"@TERMUX_PREFIX@/bin/sh"	/* Path of the shell.  */
  #define	SHELL_NAME	"sh"		/* Name to give it.  */
  
  
-diff --git a/sysdeps/posix/tempname.c b/sysdeps/posix/tempname.c
-index f24d9622..b744a541 100644
---- a/sysdeps/posix/tempname.c
-+++ b/sysdeps/posix/tempname.c
-@@ -28,7 +28,7 @@
- 
- #include <stdio.h>
- #ifndef P_tmpdir
--# define P_tmpdir "/tmp"
-+# define P_tmpdir "@TERMUX_PREFIX_CLASSICAL@/tmp"
- #endif
- #ifndef TMP_MAX
- # define TMP_MAX 238328
-@@ -141,8 +141,8 @@ __path_search (char *tmpl, size_t tmpl_len, const char *dir, const char *pfx,
-     {
-       if (direxists (P_tmpdir))
-         dir = P_tmpdir;
--      else if (strcmp (P_tmpdir, "/tmp") != 0 && direxists ("/tmp"))
--        dir = "/tmp";
-+      else if (strcmp (P_tmpdir, "@TERMUX_PREFIX_CLASSICAL@/tmp") != 0 && direxists ("@TERMUX_PREFIX_CLASSICAL@/tmp"))
-+        dir = "@TERMUX_PREFIX_CLASSICAL@/tmp";
-       else
-         {
-           __set_errno (ENOENT);
 diff --git a/sysdeps/unix/confstr.h b/sysdeps/unix/confstr.h
 index 15859c3b..3bc390f5 100644
 --- a/sysdeps/unix/confstr.h
@@ -835,7 +1003,7 @@ index 15859c3b..3bc390f5 100644
 -#define	CS_PATH	"/bin:/usr/bin"
 +#define	CS_PATH	"@TERMUX_PREFIX@/bin:@TERMUX_PREFIX_CLASSICAL@/bin:/system/bin"
 diff --git a/sysdeps/unix/sysv/linux/gentempfd.c b/sysdeps/unix/sysv/linux/gentempfd.c
-index 86b0a914..b3054e55 100644
+index 1cdadc1f..c3efd981 100644
 --- a/sysdeps/unix/sysv/linux/gentempfd.c
 +++ b/sysdeps/unix/sysv/linux/gentempfd.c
 @@ -26,8 +26,8 @@ __gen_tempfd (int flags)
@@ -922,7 +1090,7 @@ index 1342ab3a..357120b4 100644
  
  #endif /* !_PATHS_H_ */
 diff --git a/sysdeps/unix/sysv/linux/riscv/dl-cache.h b/sysdeps/unix/sysv/linux/riscv/dl-cache.h
-index 2f82ed4e..29aa8ff8 100644
+index 6e096792..ae22233b 100644
 --- a/sysdeps/unix/sysv/linux/riscv/dl-cache.h
 +++ b/sysdeps/unix/sysv/linux/riscv/dl-cache.h
 @@ -58,7 +58,7 @@
@@ -934,21 +1102,3 @@ index 2f82ed4e..29aa8ff8 100644
        size_t len = strlen (dir);					\
        char path[len + 10];						\
        const char **ptr;							\
-diff --git a/timezone/tzfile.h b/timezone/tzfile.h
-index ee911044..eebfcc09 100644
---- a/timezone/tzfile.h
-+++ b/timezone/tzfile.h
-@@ -22,11 +22,11 @@
- */
- 
- #ifndef TZDIR
--#define TZDIR	"/usr/share/zoneinfo" /* Time zone object file directory */
-+#define TZDIR	"/system/usr/share/zoneinfo" /* Time zone object file directory */
- #endif /* !defined TZDIR */
- 
- #ifndef TZDEFAULT
--#define TZDEFAULT	"/etc/localtime"
-+#define TZDEFAULT	"@TERMUX_PREFIX@/etc/localtime"
- #endif /* !defined TZDEFAULT */
- 
- #ifndef TZDEFRULES

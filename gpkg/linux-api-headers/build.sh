@@ -2,27 +2,22 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/libc/
 TERMUX_PKG_DESCRIPTION="Kernel headers sanitized for use in userspace"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=6.13
+TERMUX_PKG_VERSION=6.14
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/kernel/v${TERMUX_PKG_VERSION:0:1}.x/linux-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=e79dcc6eb86695c6babfb07c2861912b635d5075c6cd1cd0567d1ea155f80d6e
-
-_target_arch="x86"
-case "${TERMUX_ARCH}" in
-	"aarch64") _target_arch="arm64";;
-	"arm") _target_arch="arm";;
-esac
+TERMUX_PKG_SHA256=a294b683e7b161bb0517bb32ec7ed1d2ea7603dfbabad135170ed12d00c47670
+TERMUX_PKG_BUILD_MULTILIB=true
 
 termux_step_make() {
-	make -C $TERMUX_PKG_SRCDIR ARCH=${_target_arch} CROSS_COMPILE="${TERMUX_HOST_PLATFORM}-" mrproper
+	(
+		if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+			unset CFLAGS CXXFLAGS CC CXX AR RANLIB NM CXXFILT
+			export PATH="/usr/bin"
+		fi
+		make -C "${TERMUX_PKG_SRCDIR}" ARCH="${LINUX_ARCH}" mrproper
+	)
 }
 
 termux_step_make_install() {
-	make -C $TERMUX_PKG_SRCDIR INSTALL_HDR_PATH="$TERMUX_PREFIX" ARCH=${_target_arch} HOSTCC=${CC} HOSTCXX=${CXX} headers_install
-	rm -r $TERMUX_PREFIX/include/drm
-
-	if [ "$TERMUX_ARCH" = "aarch64" ]; then
-		make -C $TERMUX_PKG_SRCDIR INSTALL_HDR_PATH="$TERMUX_PKG_BUILDDIR" ARCH=arm HOSTCC=${CC} HOSTCXX=${CXX} headers_install
-		mkdir -p $TERMUX_PREFIX/include32
-		cp -r $TERMUX_PKG_BUILDDIR/include/asm $TERMUX_PREFIX/include32
-	fi
+	make -C "${TERMUX_PKG_SRCDIR}" INSTALL_HDR_PATH="${TERMUX__PREFIX__INCLUDE_DIR}" ARCH="${LINUX_ARCH}" headers_install
+	rm -r "${TERMUX__PREFIX__INCLUDE_DIR}/drm"
 }

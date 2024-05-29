@@ -1,0 +1,11 @@
+--- glibc-2.41/sysdeps/unix/sysv/linux/dl-execstack.c	2025-01-28 20:31:33.000000000 +0300
++++ glibc-2.41/sysdeps/unix/sysv/linux/dl-execstack.c.patch	2025-05-13 12:59:44.276706112 +0300
+@@ -26,7 +26,7 @@
+ 		    & -(intptr_t) GLRO(dl_pagesize));
+ 
+   if (__mprotect ((void *) page, GLRO(dl_pagesize),
+-		  PROT_READ | PROT_WRITE | PROT_EXEC
++		  PROT_READ | PROT_WRITE
+ #if _STACK_GROWS_DOWN
+ 		  | PROT_GROWSDOWN
+ #elif _STACK_GROWS_UP
