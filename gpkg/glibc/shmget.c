@@ -7,8 +7,7 @@
 /* Return an identifier for an shared memory segment of at least size SIZE
    which is associated with KEY.  */
 
-int shmget(key_t key, size_t size, int flags)
-{
+int shmget(key_t key, size_t size, int flags) {
 	(void) flags;
 
 	ashv_check_pid();

@@ -1,0 +1,199 @@
+diff --git a/include/sys/stat.h b/include/sys/stat.h
+index 4a29e842..9659abf3 100644
+--- a/include/sys/stat.h
++++ b/include/sys/stat.h
+@@ -62,6 +62,9 @@ extern int __fstatat64_time64 (int dirfd, const char *pathname,
+ 			       struct __stat64_t64 *buf, int flags);
+ hidden_proto (__fstatat64_time64);
+ # endif
++extern int fstatat64_time64_stat (int fd, const char *file,
++				  struct __stat64_t64 *buf, int flag);
++hidden_proto (fstatat64_time64_stat);
+ 
+ extern int __chmod (const char *__file, __mode_t __mode);
+ libc_hidden_proto (__chmod)
+diff --git a/io/Makefile b/io/Makefile
+index 54d950d5..e033c9ba 100644
+--- a/io/Makefile
++++ b/io/Makefile
+@@ -136,6 +136,7 @@ routines := \
+   statfs64 \
+   statvfs \
+   statvfs64 \
++  statx_generic \
+   statx \
+   symlink \
+   symlinkat \
+diff --git a/io/bits/statx-generic.h b/io/bits/statx-generic.h
+index 58598560..0ab6c84e 100644
+--- a/io/bits/statx-generic.h
++++ b/io/bits/statx-generic.h
+@@ -58,6 +58,9 @@
+ __BEGIN_DECLS
+ 
+ /* Fill *BUF with information about PATH in DIRFD.  */
++extern int statx_generic (int __dirfd, const char *__restrict __path, int __flags,
++           unsigned int __mask, struct statx *__restrict __buf)
++  __THROW __nonnull ((2, 5));
+ int statx (int __dirfd, const char *__restrict __path, int __flags,
+            unsigned int __mask, struct statx *__restrict __buf)
+   __THROW __nonnull ((2, 5));
+diff --git a/io/statx.c b/io/statx.c
+index c1ba8823..71d03fa3 100644
+--- a/io/statx.c
++++ b/io/statx.c
+@@ -19,8 +19,6 @@
+ #include <errno.h>
+ #include <sys/stat.h>
+ 
+-#include "statx_generic.c"
+-
+ int
+ statx (int fd, const char *path, int flags,
+        unsigned int mask, struct statx *buf)
+diff --git a/io/statx_generic.c b/io/statx_generic.c
+index 93faf122..3d5db73d 100644
+--- a/io/statx_generic.c
++++ b/io/statx_generic.c
+@@ -29,7 +29,7 @@
+ #undef statx
+ 
+ static inline struct statx_timestamp
+-statx_convert_timestamp (struct timespec tv)
++statx_convert_timestamp (struct __timespec64 tv)
+ {
+   return (struct statx_timestamp) { tv.tv_sec, tv.tv_nsec };
+ }
+@@ -38,7 +38,7 @@ statx_convert_timestamp (struct timespec tv)
+    POSIX-mandated attributes even if the underlying file system does
+    not actually support it (for example, GID and UID on file systems
+    without UNIX-style permissions).  */
+-static __attribute__ ((unused)) int
++__attribute__ ((unused)) int
+ statx_generic (int fd, const char *path, int flags,
+                unsigned int mask, struct statx *buf)
+ {
+@@ -56,8 +56,8 @@ statx_generic (int fd, const char *path, int flags,
+       return -1;
+     }
+ 
+-  struct stat64 st;
+-  int ret = __fstatat64 (fd, path, &st, flags & ~clear_flags);
++  struct __stat64_t64 st;
++  int ret = fstatat64_time64_stat (fd, path, &st, flags & ~clear_flags);
+   if (ret != 0)
+     return ret;
+ 
+diff --git a/sysdeps/unix/sysv/linux/fstatat64.c b/sysdeps/unix/sysv/linux/fstatat64.c
+index da496177..ed03abc3 100644
+--- a/sysdeps/unix/sysv/linux/fstatat64.c
++++ b/sysdeps/unix/sysv/linux/fstatat64.c
+@@ -47,7 +47,7 @@ fstatat64_time64_statx (int fd, const char *file, struct __stat64_t64 *buf,
+   /* 32-bit kABI with default 64-bit time_t, e.g. arc, riscv32.   Also
+      64-bit time_t support is done through statx syscall.  */
+   struct statx tmp;
+-  int r = INTERNAL_SYSCALL_CALL (statx, fd, file, AT_NO_AUTOMOUNT | flag,
++  int r = statx (fd, file, AT_NO_AUTOMOUNT | flag,
+ 				 STATX_BASIC_STATS, &tmp);
+   if (r != 0)
+     return r;
+@@ -77,8 +77,7 @@ fstatat64_time64_statx (int fd, const char *file, struct __stat64_t64 *buf,
+ 
+ /* Only statx supports 64-bit timestamps for 32-bit architectures with
+    __ASSUME_STATX, so there is no point in building the fallback.  */
+-#if !FSTATAT_USE_STATX || (FSTATAT_USE_STATX && !defined __ASSUME_STATX)
+-static inline int
++inline int
+ fstatat64_time64_stat (int fd, const char *file, struct __stat64_t64 *buf,
+ 		       int flag)
+ {
+@@ -138,7 +137,6 @@ fstatat64_time64_stat (int fd, const char *file, struct __stat64_t64 *buf,
+ 
+   return r;
+ }
+-#endif
+ 
+ int
+ __fstatat64_time64 (int fd, const char *file, struct __stat64_t64 *buf,
+diff --git a/sysdeps/unix/sysv/linux/fxstat64.c b/sysdeps/unix/sysv/linux/fxstat64.c
+index 230374cb..7e5a13c2 100644
+--- a/sysdeps/unix/sysv/linux/fxstat64.c
++++ b/sysdeps/unix/sysv/linux/fxstat64.c
+@@ -53,7 +53,7 @@ ___fxstat64 (int vers, int fd, struct stat64 *buf)
+ # else
+   /* New 32-bit kABIs with only 64-bit time_t support, e.g. arc, riscv32.  */
+   struct statx tmp;
+-  int r = INLINE_SYSCALL_CALL (statx, fd, "", AT_EMPTY_PATH,
++  int r = statx (fd, "", AT_EMPTY_PATH,
+ 			       STATX_BASIC_STATS, &tmp);
+   if (r == 0)
+     __cp_stat64_statx (buf, &tmp);
+diff --git a/sysdeps/unix/sysv/linux/fxstatat64.c b/sysdeps/unix/sysv/linux/fxstatat64.c
+index 5255ca05..2ffc4716 100644
+--- a/sysdeps/unix/sysv/linux/fxstatat64.c
++++ b/sysdeps/unix/sysv/linux/fxstatat64.c
+@@ -49,7 +49,7 @@ __fxstatat64 (int vers, int fd, const char *file, struct stat64 *st, int flag)
+   if (vers == _STAT_VER_KERNEL)
+     {
+       struct statx tmp;
+-      int r = INLINE_SYSCALL_CALL (statx, fd, file, AT_NO_AUTOMOUNT | flag,
++      int r = statx (fd, file, AT_NO_AUTOMOUNT | flag,
+ 				   STATX_BASIC_STATS, &tmp);
+       if (r == 0)
+ 	__cp_stat64_statx (st, &tmp);
+diff --git a/sysdeps/unix/sysv/linux/lxstat64.c b/sysdeps/unix/sysv/linux/lxstat64.c
+index 16ad8b82..770ad245 100644
+--- a/sysdeps/unix/sysv/linux/lxstat64.c
++++ b/sysdeps/unix/sysv/linux/lxstat64.c
+@@ -58,7 +58,7 @@ ___lxstat64 (int vers, const char *name, struct stat64 *buf)
+   if (vers == _STAT_VER_KERNEL)
+     {
+       struct statx tmp;
+-      int r = INLINE_SYSCALL_CALL (statx, AT_FDCWD, name,
++      int r = statx (AT_FDCWD, name,
+ 				   AT_NO_AUTOMOUNT | AT_SYMLINK_NOFOLLOW,
+ 				   STATX_BASIC_STATS, &tmp);
+       if (r == 0)
+diff --git a/sysdeps/unix/sysv/linux/statx.c b/sysdeps/unix/sysv/linux/statx.c
+index a6295a15..4baf6dca 100644
+--- a/sysdeps/unix/sysv/linux/statx.c
++++ b/sysdeps/unix/sysv/linux/statx.c
+@@ -18,21 +18,13 @@
+ 
+ #include <errno.h>
+ #include <sys/stat.h>
+-#include <sysdep.h>
+-#include "statx_generic.c"
++#include <unistd.h>
++#include <arch-syscall.h>
++#include <disabled-syscall.h>
+ 
+ int
+ statx (int fd, const char *path, int flags,
+        unsigned int mask, struct statx *buf)
+ {
+-  int ret = INLINE_SYSCALL_CALL (statx, fd, path, flags, mask, buf);
+-#ifdef __ASSUME_STATX
+-  return ret;
+-#else
+-  if (ret == 0 || errno != ENOSYS)
+-    /* Preserve non-error/non-ENOSYS return values.  */
+-    return ret;
+-  else
+-    return statx_generic (fd, path, flags, mask, buf);
+-#endif
++  return syscall (__NR_statx, fd, path, flags, mask, buf);
+ }
+diff --git a/sysdeps/unix/sysv/linux/xstat64.c b/sysdeps/unix/sysv/linux/xstat64.c
+index aa631521..6769e589 100644
+--- a/sysdeps/unix/sysv/linux/xstat64.c
++++ b/sysdeps/unix/sysv/linux/xstat64.c
+@@ -57,7 +57,7 @@ ___xstat64 (int vers, const char *name, struct stat64 *buf)
+   if (vers == _STAT_VER_KERNEL)
+     {
+       struct statx tmp;
+-      int r = INLINE_SYSCALL_CALL (statx, AT_FDCWD, name, AT_NO_AUTOMOUNT,
++      int r = statx (AT_FDCWD, name, AT_NO_AUTOMOUNT,
+ 				   STATX_BASIC_STATS, &tmp);
+       if (r == 0)
+ 	__cp_stat64_statx (buf, &tmp);

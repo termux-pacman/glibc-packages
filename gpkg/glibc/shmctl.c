@@ -11,8 +11,7 @@
 # define shmid_ds shmid64_ds
 #endif
 
-int shmctl(int shmid, int cmd, struct shmid_ds *buf)
-{
+int shmctl(int shmid, int cmd, struct shmid_ds *buf) {
 	ashv_check_pid();
 
 	if (cmd == IPC_RMID) {
