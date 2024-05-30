@@ -54,12 +54,12 @@ diff --git a/tool/lemon.c b/tool/lemon.c
 index 7804837..63f8e78 100644
 --- a/tool/lemon.c
 +++ b/tool/lemon.c
-@@ -3551,7 +3551,7 @@ PRIVATE char *pathsearch(char *argv0, char *name, int modemask)
+@@ -3634,7 +3634,7 @@ PRIVATE char *pathsearch(char *argv0, char *name, int modemask)
      *cp = c;
    }else{
      pathlist = getenv("PATH");
 -    if( pathlist==0 ) pathlist = ".:/bin:/usr/bin";
 +    if( pathlist==0 ) pathlist = ".:@TERMUX_PREFIX@/bin";
-     pathbuf = (char *) malloc( lemonStrlen(pathlist) + 1 );
-     path = (char *)malloc( lemonStrlen(pathlist)+lemonStrlen(name)+2 );
+     pathbuf = (char *) lemon_malloc( lemonStrlen(pathlist) + 1 );
+     path = (char *)lemon_malloc( lemonStrlen(pathlist)+lemonStrlen(name)+2 );
      if( (pathbuf != 0) && (path!=0) ){
