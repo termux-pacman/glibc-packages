@@ -2,12 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://invisible-island.net/ncurses/ncurses.html
 TERMUX_PKG_DESCRIPTION="System V Release 4.0 curses emulation library"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-_PKG_VERSION=6.4
-_DATE_VERSION=20231001
+_PKG_VERSION=6.5
+_DATE_VERSION=20240601
 TERMUX_PKG_VERSION=${_PKG_VERSION}.${_DATE_VERSION}
-TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://invisible-mirror.net/archives/ncurses/current/ncurses-${_PKG_VERSION}-${_DATE_VERSION}.tgz
-TERMUX_PKG_SHA256=30b8dbe4800b07be5e852e8cb15fa4ffca30e112fa3a8b0e7c25777937d0ae6c
+TERMUX_PKG_SHA256=4ea1c804f8a66994555dd6b087c13bebcfe4634541f78d197577c3eef24acca3
 TERMUX_PKG_DEPENDS="glibc, gcc-libs-glibc"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -41,14 +40,11 @@ termux_step_post_make_install() {
 		ln -svf libncursesw.so.${TERMUX_PKG_VERSION:0:1} $TERMUX_PREFIX/lib/lib${lib}.so.${_PKG_VERSION:0:1}
 		ln -svf ncursesw.pc $TERMUX_PREFIX/lib/pkgconfig/${lib}.pc
 	done
-}
 
-termux_step_post_massage() {
-	cd "$TERMUX_PKG_MASSAGEDIR/$TERMUX_PREFIX/include" || exit 1
-	mv ncursesw/* .
-	mkdir ncurses
-	for _file in *.h; do
-		ln -s ../$_file ncurses
-		ln -s ../$_file ncursesw
+	mkdir $TERMUX_PREFIX/include/ncurses
+	for i in $TERMUX_PREFIX/include/ncursesw/*; do
+		mv ${i} $TERMUX_PREFIX/include
+		ln -s ../${i##*/} $TERMUX_PREFIX/include/ncurses
+		ln -s ../${i##*/} $TERMUX_PREFIX/include/ncursesw
 	done
 }
