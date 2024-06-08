@@ -1,36 +1,31 @@
-diff --git a/src/main.c b/src/main.c
-index db33d9a..1870884 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -1161,12 +1161,10 @@ void LoadEnvVars(box64context_t *context)
-     // check BOX64_LD_LIBRARY_PATH and load it
-     LoadEnvPath(&context->box64_ld_lib, ".:lib:lib64:x86_64:bin64:libs64", "BOX64_LD_LIBRARY_PATH");
-     #ifndef TERMUX
--    if(FileExist("/lib/x86_64-linux-gnu", 0))
--        AddPath("/lib/x86_64-linux-gnu", &context->box64_ld_lib, 1);
--    if(FileExist("/usr/lib/x86_64-linux-gnu", 0))
--        AddPath("/usr/lib/x86_64-linux-gnu", &context->box64_ld_lib, 1);
--    if(FileExist("/usr/x86_64-linux-gnu/lib", 0))
--        AddPath("/usr/x86_64-linux-gnu/lib", &context->box64_ld_lib, 1);
-+    if(FileExist("@TERMUX_PREFIX@/lib/x86_64-linux-gnu", 0))
-+        AddPath("@TERMUX_PREFIX@/lib/x86_64-linux-gnu", &context->box64_ld_lib, 1);
-+    if(FileExist("@TERMUX_PREFIX@/x86_64-linux-gnu/lib", 0))
-+        AddPath("@TERMUX_PREFIX@/x86_64-linux-gnu/lib", &context->box64_ld_lib, 1);
-     #else
-     //TODO: Add Termux Library Path - Lily
-     if(FileExist("/data/data/com.termux/files/usr/lib/x86_64-linux-gnu", 0))
-@@ -1426,8 +1424,8 @@ static void free_contextargv()
- static void load_rcfiles()
- {
-     #ifndef TERMUX
--    if(FileExist("/etc/box64.box64rc", IS_FILE))
--        LoadRCFile("/etc/box64.box64rc");
-+    if(FileExist("@TERMUX_PREFIX@/etc/box64.box64rc", IS_FILE))
-+        LoadRCFile("@TERMUX_PREFIX@/etc/box64.box64rc");
-     #else
-     if(FileExist("/data/data/com.termux/files/usr/etc/box64.box64rc", IS_FILE))
-         LoadRCFile("/data/data/com.termux/files/usr/etc/box64.box64rc");
-@@ -1459,7 +1457,7 @@ int main(int argc, const char **argv, char **env) {
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7f9e5d6..a0fd4b4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -944,15 +944,15 @@ if(NOT _x86 AND NOT _x86_64)
+   if(NOT NO_CONF_INSTALL)
+     configure_file(system/box64.conf.cmake system/box64.conf)
+ 	  if(NOT TERMUX)
+-    		install(FILES ${CMAKE_BINARY_DIR}/system/box64.conf DESTINATION /etc/binfmt.d/)
+-    		install(FILES ${CMAKE_SOURCE_DIR}/system/box64.box64rc DESTINATION /etc/)
++    		install(FILES ${CMAKE_BINARY_DIR}/system/box64.conf DESTINATION @TERMUX_PREFIX@/etc/binfmt.d/)
++    		install(FILES ${CMAKE_SOURCE_DIR}/system/box64.box64rc DESTINATION @TERMUX_PREFIX@/etc/)
+ 	  else()
+ 		install(FILES ${CMAKE_BINARY_DIR}/system/box64.conf DESTINATION ${TERMUX_PATH}/usr/etc/binfmt.d/)
+ 		install(FILES ${CMAKE_SOURCE_DIR}/system/box64.box64rc DESTINATION ${TERMUX_PATH}/usr/etc/)
+ 	  endif()
+ 
+   endif()
+-  set(INSTALL_PATH "/usr/lib/x86_64-linux-gnu/")
++  set(INSTALL_PATH "@TERMUX_PREFIX@/lib/x86_64-linux-gnu/")
+   if(NOT NO_LIB_INSTALL)
+ 	if(NOT TERMUX)
+     		install(FILES ${CMAKE_SOURCE_DIR}/x64lib/libstdc++.so.5 DESTINATION ${INSTALL_PATH})
+diff --git a/src/core.c b/src/core.c
+index b1a552b..b9d924a 100644
+--- a/src/core.c
++++ b/src/core.c
+@@ -1658,7 +1658,7 @@ int initialize(int argc, const char **argv, char** env, x64emu_t** emulator, elf
          printf("See 'box64 --help' for more information.\n");
          exit(0);
      }
@@ -40,10 +35,10 @@ index db33d9a..1870884 100644
      // uname -m is redirected to box64 -m
      if(argc==2 && (!strcmp(argv[1], "-m") || !strcmp(argv[1], "-p") || !strcmp(argv[1], "-i")))
 diff --git a/src/steam.c b/src/steam.c
-index b221b54..d0af6e4 100644
+index 52461a3..0e14ad7 100644
 --- a/src/steam.c
 +++ b/src/steam.c
-@@ -41,13 +41,13 @@ void pressure_vessel(int argc, const char** argv, int nextarg, const char* prog)
+@@ -39,13 +39,13 @@ void pressure_vessel(int argc, const char** argv, int nextarg, const char* prog)
                  if(is_usr) {
                      // transform RESSURE_VESSEL_APP_LD_LIBRARY_PATH to BOX86_ / BOX64_ LD_LIBRARY_PATH
                      char tmp[strlen(argv[nextarg])+150];
@@ -59,32 +54,40 @@ index b221b54..d0af6e4 100644
                      strcat(tmp, argv[nextarg]+strlen("--env-if-host=STEAM_RUNTIME_LIBRARY_PATH="));
                      p = strchr(tmp, '=');
                      *p ='\0'; ++p;
-@@ -173,4 +173,4 @@ void pressure_vessel(int argc, const char** argv, int nextarg, const char* prog)
-         //waitpid(v, &wstatus, 0);
-         exit(0);
-     }
--}
-\ No newline at end of file
-+}
+@@ -81,14 +81,8 @@ void pressure_vessel(int argc, const char** argv, int nextarg, const char* prog)
+         strcat(sniper, "/files");  // this is the sniper root
+         // do LD_LIBRARY_PATH
+         {
+-            const char* usrsbinldconfig = "/usr/sbin/ldconfig";
+-            const char* sbinldconfig = "/sbin/ldconfig";
+             const char* ldconfig = "ldconfig";
+             const char* ldcmd = ldconfig;
+-            if(FileExist(usrsbinldconfig, IS_FILE))
+-                ldcmd = usrsbinldconfig;
+-            else if(FileExist(sbinldconfig, IS_FILE))
+-                ldcmd = sbinldconfig;
+             char tmp[MAX_PATH*4] = {0};
+             // prepare folders, using ldconfig
+             snprintf(tmp, sizeof(tmp), "%s -i -n %s/lib/x86_64-linux-gnu", ldcmd, sniper);
 diff --git a/src/tools/fileutils.c b/src/tools/fileutils.c
-index d6d1556..f272a9c 100644
+index 327f798..79d22c8 100644
 --- a/src/tools/fileutils.c
 +++ b/src/tools/fileutils.c
-@@ -127,11 +127,8 @@ const char* GetTmpDir() {
-     if ((tmpdir = getenv ("TMPDIR")) != NULL) return tmpdir;
-     if ((tmpdir = getenv ("TEMP")) != NULL)   return tmpdir;
-     if ((tmpdir = getenv ("TMP")) != NULL)    return tmpdir;
--    if(FileExist("/tmp", 0))                  return "/tmp";
--    if(FileExist("/var/tmp", 0))              return "/var/tmp";
--    if(FileExist("/usr/tmp", 0))              return "/usr/tmp";
+@@ -17,9 +17,9 @@
  
--    return "/tmp";  // meh...
-+    return "@TERMUX_PREFIX_CLASSICAL@/tmp";  // meh...
- }
+ static const char* x86lib  = "\x7f" "ELF" "\x01" "\x01" "\x01" "\x03" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x02" "\x00" "\x03" "\x00";
+ static const char* x64lib  = "\x7f" "ELF" "\x02" "\x01" "\x01" "\x03" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x02" "\x00" "\x3e" "\x00";
+-static const char* bashsign= "#!/bin/bash";
+-static const char* shsign  = "#!/bin/sh";
+-static const char* bashsign2="#!/usr/bin/env bash";
++static const char* bashsign= "#!@TERMUX_PREFIX@/bin/bash";
++static const char* shsign  = "#!@TERMUX_PREFIX@/bin/sh";
++static const char* bashsign2="#!@TERMUX_PREFIX@/bin/env bash";
  
- char* LowerCase(const char* s) {
+ int FileExist(const char* filename, int flags)
+ {
 diff --git a/src/wrapped/wrappedd3dadapter9.c b/src/wrapped/wrappedd3dadapter9.c
-index 3701bba..50161fb 100644
+index de962ee..67a786f 100644
 --- a/src/wrapped/wrappedd3dadapter9.c
 +++ b/src/wrapped/wrappedd3dadapter9.c
 @@ -98,7 +98,7 @@ static int my_GetDirect3D(x64emu_t* emu, void* This, void*** ppD3D9);
@@ -97,10 +100,10 @@ index 3701bba..50161fb 100644
  typedef void* (*pFp_t)(void*);
  
 diff --git a/src/wrapped/wrappedlibdl.c b/src/wrapped/wrappedlibdl.c
-index 217ae01..d83d1f5 100644
+index 2725285..fd94673 100644
 --- a/src/wrapped/wrappedlibdl.c
 +++ b/src/wrapped/wrappedlibdl.c
-@@ -99,7 +99,7 @@ void* my_dlopen(x64emu_t* emu, void *filename, int flag)
+@@ -101,7 +101,7 @@ void* my_dlopen(x64emu_t* emu, void *filename, int flag)
              if(sys)
                  return sys;
          }

@@ -1,8 +1,16 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 6c99937..adb29ff 100755
+index f093c18..eac861f 100755
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -770,8 +770,8 @@ if(NOT _x86 AND NOT _x86_64)
+@@ -75,7 +75,6 @@ else()
+     set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE} CACHE INTERNAL "The Python3 executable" FORCE)
+ endif()
+ 
+-cmake_host_system_information(RESULT CMAKE_HOST_SYSTEM_PROCESSOR QUERY OS_PLATFORM)
+ string(COMPARE EQUAL "${CMAKE_HOST_SYSTEM_PROCESSOR}" "i686"  _x86)
+ string(COMPARE EQUAL "${CMAKE_HOST_SYSTEM_PROCESSOR}" "x86_64"  _x86_64)
+ string(COMPARE EQUAL "${CMAKE_HOST_SYSTEM_PROCESSOR}" "aarch64"  _aarch64)
+@@ -781,8 +780,8 @@ if(NOT _x86 AND NOT _x86_64)
    if(NOT NO_CONF_INSTALL)
      configure_file(system/box86.conf.cmake system/box86.conf)
      	if(NOT TERMUX)
@@ -13,7 +21,7 @@ index 6c99937..adb29ff 100755
  	else()
  		#install(FILES ${CMAKE_BINARY_DIR}/system/box86.conf DESTINATION ${TERMUX_PATH}/usr/etc/binfmt.d/)
  		install(FILES ${CMAKE_SOURCE_DIR}/system/box86.box86rc DESTINATION ${TERMUX_PATH}/usr/etc/)
-@@ -779,11 +779,11 @@ if(NOT _x86 AND NOT _x86_64)
+@@ -790,11 +789,11 @@ if(NOT _x86 AND NOT _x86_64)
    endif()
    if(NOT NO_LIB_INSTALL)
      if(NOT TERMUX)
@@ -31,10 +39,10 @@ index 6c99937..adb29ff 100755
  
  	    install(FILES ${CMAKE_SOURCE_DIR}/x86lib/libstdc++.so.6 DESTINATION ${TERMUX_PATH}/usr/lib/i386-linux-gnu/)
 diff --git a/src/main.c b/src/main.c
-index cf3f35a..e9d59ec 100644
+index 8009c47..66d9953 100644
 --- a/src/main.c
 +++ b/src/main.c
-@@ -958,20 +958,14 @@ void LoadEnvVars(box86context_t *context)
+@@ -952,20 +952,14 @@ void LoadEnvVars(box86context_t *context)
      //TODO: add relative path to box86 location
  #endif
  #ifndef TERMUX
@@ -63,18 +71,18 @@ index cf3f35a..e9d59ec 100644
  #else
      if(FileExist("/data/data/com.termux/files/usr/lib/i386-linux-gnu", 0))
          AddPath("/data/data/com.termux/files/usr/lib/i386-linux-gnu", &context->box86_ld_lib, 1);
-@@ -1188,8 +1182,8 @@ void endBox86()
- static void load_rcfiles()
- {
+@@ -1208,8 +1202,8 @@ static void load_rcfiles()
+ 	LoadRCFile(rcpath);
+         
      #ifndef TERMUX
--    if(FileExist("/etc/box86.box86rc", IS_FILE))
+-    else if(FileExist("/etc/box86.box86rc", IS_FILE))
 -        LoadRCFile("/etc/box86.box86rc");
-+    if(FileExist("@TERMUX_PREFIX@/etc/box86.box86rc", IS_FILE))
++    else if(FileExist("@TERMUX_PREFIX@/etc/box86.box86rc", IS_FILE))
 +        LoadRCFile("@TERMUX_PREFIX@/etc/box86.box86rc");
      #else
-     if(FileExist("/data/data/com.termux/files/usr/etc/box86.box86rc", IS_FILE))
+     else if(FileExist("/data/data/com.termux/files/usr/etc/box86.box86rc", IS_FILE))
          LoadRCFile("/data/data/com.termux/files/usr/etc/box86.box86rc");
-@@ -1268,7 +1262,7 @@ int main(int argc, const char **argv, char **env)
+@@ -1290,7 +1284,7 @@ int main(int argc, const char **argv, char **env)
          printf("See 'box86 --help' for more information.\n");
          exit(0);
      }
@@ -84,9 +92,22 @@ index cf3f35a..e9d59ec 100644
      // uname -m is redirected to box86 -m
      if(argc==2 && (!strcmp(argv[1], "-m") || !strcmp(argv[1], "-p") || !strcmp(argv[1], "-i")))
 diff --git a/src/tools/fileutils.c b/src/tools/fileutils.c
-index ee7a1a2..f46a7f3 100755
+index ee7a1a2..562de78 100755
 --- a/src/tools/fileutils.c
 +++ b/src/tools/fileutils.c
+@@ -17,9 +17,9 @@
+ 
+ static const char* x86lib  = "\x7f" "ELF" "\x01" "\x01" "\x01" "\x03" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x02" "\x00" "\x03" "\x00";
+ static const char* x64lib  = "\x7f" "ELF" "\x02" "\x01" "\x01" "\x03" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x02" "\x00" "\x3e" "\x00";
+-static const char* bashsign= "#!/bin/bash";
+-static const char* shsign  = "#!/bin/sh";
+-static const char* bashsign2="#!/usr/bin/env bash";
++static const char* bashsign= "#!@TERMUX_PREFIX@/bin/bash";
++static const char* shsign  = "#!@TERMUX_PREFIX@/bin/sh";
++static const char* bashsign2="#!@TERMUX_PREFIX@/bin/env bash";
+ 
+ int FileExist(const char* filename, int flags)
+ {
 @@ -126,11 +126,8 @@ const char* GetTmpDir() {
      if ((tmpdir = getenv ("TMPDIR")) != NULL) return tmpdir;
      if ((tmpdir = getenv ("TEMP")) != NULL)   return tmpdir;
@@ -113,8 +134,21 @@ index 7b13da1..0ed698f 100644
  
  typedef void* (*pFp_t)(void*);
  
+diff --git a/src/wrapped/wrappedlibc.c b/src/wrapped/wrappedlibc.c
+index 4abb88f..f2b49c0 100755
+--- a/src/wrapped/wrappedlibc.c
++++ b/src/wrapped/wrappedlibc.c
+@@ -2634,7 +2634,7 @@ EXPORT void* my_getpwuid(x86emu_t* emu, uint32_t uid)
+         fakepwd.pw_gid = 0;
+         fakepwd.pw_gecos = strdup("root");
+         fakepwd.pw_dir = getenv("HOME");
+-        fakepwd.pw_shell = strdup("/bin/bash");
++        fakepwd.pw_shell = strdup("@TERMUX_PREFIX@/bin/bash");
+     }
+ 
+     return ret ? ret : (void*)&fakepwd;
 diff --git a/src/wrapped/wrappedlibdl.c b/src/wrapped/wrappedlibdl.c
-index 4a9aff7..c0e0029 100755
+index 3e519bb..6c85caf 100755
 --- a/src/wrapped/wrappedlibdl.c
 +++ b/src/wrapped/wrappedlibdl.c
 @@ -100,7 +100,7 @@ void* my_dlopen(x86emu_t* emu, void *filename, int flag)
