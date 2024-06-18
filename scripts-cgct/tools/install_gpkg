@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+# Installing glibc-packages from the server
+
+set -e
+
+ARCH="$1"
+PKG="$2"
+REPO="gpkg"
+
+error() {
+	echo "Error: $1"
+	exit 1
+}
+
+if [ -z "$ARCH" ] || [ -z "$PKG" ]; then
+	error "you must specify the architecture and package name"
+fi
+
+if [[ ! "$ARCH" =~ ^(aarch64|arm|i686|x86_64)$ ]]; then
+	error "you specified an unsupported architecture"
+fi
+
+REPO_URL="${SERVER_URL}/${REPO}/${ARCH}"
+
+if [ ! -f "./${REPO}.json" ]; then
+	echo "Installing ${REPO}.json..."
+	curl "${REPO_URL}/${REPO}.json" -o "./${REPO}.json"
+fi
+
+FILENAME=$(jq -r '."'${PKG}'"."FILENAME"' "./${REPO}.json")
+
+if [ -z "$FILENAME" ]; then
+	error "package \"${PKG}\" not found"
+fi
+
+if [ ! -f "$FILENAME" ]; then
+	echo "Installing \"${PKG}\" package (${FILENAME})..."
+	curl "${REPO_URL}/${FILENAME}" -o "./${FILENAME}"
+fi
+
+echo "Unpacking \"${PKG}\" package..."
+if [ ! -d "${DIR_TERMUX}/files" ]; then
+	sudo mkdir -p "${DIR_TERMUX}/files"
+	sudo chown $(id -u) "${DIR_TERMUX}/files"
+	sudo chgrp $(id -g) "${DIR_TERMUX}/files"
+fi
+tar xJf "./${FILENAME}" -C / data --keep-old-files
+
+echo "Done"

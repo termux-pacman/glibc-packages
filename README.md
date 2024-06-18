@@ -1,7 +1,7 @@
 # Glibc packages for termux
 ![GitHub repo size](https://img.shields.io/github/repo-size/termux-pacman/glibc-packages)
 ![Build-gpkg last build status](https://github.com/termux-pacman/glibc-packages/workflows/Build%20gpkg/badge.svg)
-![Build-gpkg-dev last build status](https://github.com/termux-pacman/glibc-packages/workflows/build-dev/badge.svg)
+![Build-cgct last build status](https://github.com/termux-pacman/glibc-packages/workflows/Build%20cgct/badge.svg)
 
 This repository stores and compiles packages based on the glibc library for termux.
 
@@ -11,11 +11,6 @@ More information in the [Wiki section](https://github.com/termux-pacman/glibc-pa
 Read [CONTRIBUTING.md](/CONTRIBUTING.md) for more details.
 
 ### Code for connecting repository:
-gpkg-dev:
-```
-[gpkg-dev]
-Server = https://service.termux-pacman.dev/gpkg-dev/$arch
-```
 gpkg:
 ```
 [gpkg]
