@@ -3,7 +3,7 @@ name: Build gpkg
 on:
   push:
     branches:
-    - main
+    - maio
     paths:
     - 'gpkg/**'
   pull_request:
