@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# Clear prefix of unnecessary files after installing packages
+
+set -e
+
+if [ ! -d "${DIR_TERMUX}/files" ]; then
+	echo "Error: prefix not found"
+	exit 1
+fi
+
+rm -fr "${DIR_TERMUX}"/files/*
