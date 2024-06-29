@@ -1,0 +1,502 @@
+--- src/gcc-14.1.0/gcc/Makefile.in
++++ src/gcc-14.1.0/gcc/Makefile.in
+@@ -559,13 +559,9 @@ FNMATCH_H   = $(srcdir)/../include/fnmatch.h
+ LINKER_PLUGIN_API_H = $(srcdir)/../include/plugin-api.h
+ 
+ # Default native SYSTEM_HEADER_DIR, to be overridden by targets.
+-NATIVE_SYSTEM_HEADER_DIR = @NATIVE_SYSTEM_HEADER_DIR@
++NATIVE_SYSTEM_HEADER_DIR = /include
+ # Default cross SYSTEM_HEADER_DIR, to be overridden by targets.
+-ifeq (@includedir@,$(prefix)/include)
+-  CROSS_SYSTEM_HEADER_DIR = @CROSS_SYSTEM_HEADER_DIR@
+-else
+-  CROSS_SYSTEM_HEADER_DIR = @includedir@
+-endif
++CROSS_SYSTEM_HEADER_DIR = /include32
+ 
+ # autoconf sets SYSTEM_HEADER_DIR to one of the above.
+ # Purge it of unnecessary internal relative paths
+@@ -1164,7 +1160,7 @@ BUILD_LIBS = $(BUILD_LIBIBERTY)
+ 
+ BUILD_RTL = build/rtl.o build/read-rtl.o build/ggc-none.o \
+ 	    build/vec.o build/min-insn-modes.o build/gensupport.o \
+-	    build/print-rtl.o build/hash-table.o build/sort.o
++	    build/print-rtl.o build/hash-table.o build/sort.o build/cgct-app-prefix.o
+ BUILD_MD = build/read-md.o
+ BUILD_ERRORS = build/errors.o
+ 
+@@ -1291,7 +1287,7 @@ FORTRAN_TARGET_OBJS=@fortran_target_objs@
+ RUST_TARGET_OBJS=@rust_target_objs@
+ 
+ # Object files for gcc many-languages driver.
+-GCC_OBJS = gcc.o gcc-main.o ggc-none.o gcc-urlifier.o options-urls.o
++GCC_OBJS = gcc.o gcc-main.o ggc-none.o gcc-urlifier.o options-urls.o cgct-app-prefix.o
+ 
+ c-family-warn = $(STRICT_WARN)
+ 
+@@ -1421,6 +1417,7 @@ OBJS = \
+ 	coverage.o \
+ 	cppbuiltin.o \
+ 	cppdefault.o \
++	cgct-app-prefix.o \
+ 	cprop.o \
+ 	cse.o \
+ 	cselib.o \
+@@ -2369,7 +2366,7 @@ gcc-nm.cc: gcc-ar.cc
+ 	cp $^ $@
+ 
+ COLLECT2_OBJS = collect2.o collect2-aix.o vec.o ggc-none.o \
+-  collect-utils.o file-find.o hash-table.o selftest.o
++  collect-utils.o file-find.o hash-table.o selftest.o cgct-app-prefix.o
+ COLLECT2_LIBS = @COLLECT2_LIBS@
+ collect2$(exeext): $(COLLECT2_OBJS) $(LIBDEPS)
+ # Don't try modifying collect2 (aka ld) in place--it might be linking this.
+@@ -2985,6 +2982,7 @@ build/vec.o : vec.cc $(BCONFIG_H) $(SYSTEM_H) $(CORETYPES_H) $(VEC_H)	\
+ build/hash-table.o : hash-table.cc $(BCONFIG_H) $(SYSTEM_H)		\
+   $(CORETYPES_H) $(HASH_TABLE_H) $(GGC_H) toplev.h $(DIAGNOSTIC_CORE_H)
+ build/sort.o : sort.cc $(BCONFIG_H) $(SYSTEM_H)
++build/cgct-app-prefix.o : cgct-app-prefix.cc $(BCONFIG_H) $(SYSTEM_H)
+ build/inchash.o : inchash.cc $(BCONFIG_H) $(SYSTEM_H) $(CORETYPES_H)	\
+   $(HASHTAB_H) inchash.h
+ build/gencondmd.o : build/gencondmd.cc $(BCONFIG_H) $(SYSTEM_H)		\
+--- src/gcc-14.1.0/gcc/collect2.cc
++++ src/gcc-14.1.0/gcc/collect2.cc
+@@ -32,6 +32,7 @@ along with GCC; see the file COPYING3.  If not see
+ #include "file-find.h"
+ #include "simple-object.h"
+ #include "lto-section-names.h"
++#include "cgct-app-prefix.h"
+ 
+ /* TARGET_64BIT may be defined to use driver specific functionality. */
+ #undef TARGET_64BIT
+@@ -1191,8 +1192,10 @@ main (int argc, char **argv)
+   prefix_from_env ("LIBPATH", &libpath_lib_dirs);
+   /* Add to this list also two standard directories where
+      AIX loader always searches for libraries.  */
+-  add_prefix (&libpath_lib_dirs, "/lib");
+-  add_prefix (&libpath_lib_dirs, "/usr/lib");
++# ifdef TARGET_32BIT
++  add_prefix (&libpath_lib_dirs, cgct_app_prefix("/lib32"));
++# endif
++  add_prefix (&libpath_lib_dirs, cgct_app_prefix("/lib"));
+ #endif
+ 
+   /* Get any options that the upper GCC wants to pass to the sub-GCC.
+@@ -2682,20 +2685,20 @@ scan_libraries (const char *prog_name)
+ /* Array of standard AIX libraries which should not
+    be scanned for ctors/dtors.  */
+ static const char *const aix_std_libs[] = {
+-  "/unix",
+-  "/lib/libc.a",
+-  "/lib/libm.a",
+-  "/lib/libc_r.a",
+-  "/lib/libm_r.a",
+-  "/usr/lib/libc.a",
+-  "/usr/lib/libm.a",
+-  "/usr/lib/libc_r.a",
+-  "/usr/lib/libm_r.a",
+-  "/usr/lib/threads/libc.a",
+-  "/usr/ccs/lib/libc.a",
+-  "/usr/ccs/lib/libm.a",
+-  "/usr/ccs/lib/libc_r.a",
+-  "/usr/ccs/lib/libm_r.a",
++  cgct_app_prefix("/unix"),
++# ifdef TARGET_32BIT
++  cgct_app_prefix("/lib32/libc.a"),
++  cgct_app_prefix("/lib32/libm.a"),
++# endif
++  cgct_app_prefix("/lib/libc.a"),
++  cgct_app_prefix("/lib/libm.a"),
++  cgct_app_prefix("/lib/libc_r.a"),
++  cgct_app_prefix("/lib/libm_r.a"),
++  cgct_app_prefix("/lib/threads/libc.a"),
++  cgct_app_prefix("/ccs/lib/libc.a"),
++  cgct_app_prefix("/ccs/lib/libm.a"),
++  cgct_app_prefix("/ccs/lib/libc_r.a"),
++  cgct_app_prefix("/ccs/lib/libm_r.a"),
+   NULL
+ };
+ 
+--- src/gcc-14.1.0/gcc/config/aarch64/aarch64-linux.h
++++ src/gcc-14.1.0/gcc/config/aarch64/aarch64-linux.h
+@@ -21,7 +21,9 @@
+ #ifndef GCC_AARCH64_LINUX_H
+ #define GCC_AARCH64_LINUX_H
+ 
+-#define GLIBC_DYNAMIC_LINKER "/lib/ld-linux-aarch64%{mbig-endian:_be}%{mabi=ilp32:_ilp32}.so.1"
++#include "cgct-app-prefix.h"
++
++#define GLIBC_DYNAMIC_LINKER cgct_app_prefix("/lib/ld-linux-aarch64%{mbig-endian:_be}%{mabi=ilp32:_ilp32}.so.1")
+ 
+ #undef MUSL_DYNAMIC_LINKER
+ #define MUSL_DYNAMIC_LINKER "/lib/ld-musl-aarch64%{mbig-endian:_be}%{mabi=ilp32:_ilp32}.so.1"
+@@ -34,20 +36,20 @@
+ 
+ #define CPP_SPEC "%{pthread:-D_REENTRANT}"
+ 
+-#define LINUX_TARGET_LINK_SPEC  "%{h*}		\
++#define LINUX_TARGET_LINK_SPEC  concat("%{h*}		\
+    %{static:-Bstatic}				\
+    %{shared:-shared}				\
+    %{symbolic:-Bsymbolic}			\
+    %{!static:%{!static-pie:			\
+      %{rdynamic:-export-dynamic}		\
+-     %{!shared:-dynamic-linker " GNU_USER_DYNAMIC_LINKER "}}} \
++     %{!shared:-dynamic-linker ", GNU_USER_DYNAMIC_LINKER, "}}} \
+    %{static-pie:-Bstatic -pie --no-dynamic-linker -z text} \
+    -X						\
+    %{mbig-endian:-EB} %{mlittle-endian:-EL}     \
+-   -maarch64linux%{mabi=ilp32:32}%{mbig-endian:b}"
++   -maarch64linux%{mabi=ilp32:32}%{mbig-endian:b}", NULL)
+ 
+ 
+-#define LINK_SPEC LINUX_TARGET_LINK_SPEC AARCH64_ERRATA_LINK_SPEC
++#define LINK_SPEC concat(LINUX_TARGET_LINK_SPEC, AARCH64_ERRATA_LINK_SPEC, NULL)
+ 
+ #define GNU_USER_TARGET_MATHFILE_SPEC \
+   "%{Ofast|ffast-math|funsafe-math-optimizations:%{!shared:crtfastmath.o%s}}"
+--- src/gcc-14.1.0/gcc/config/arm/linux-eabi.h
++++ src/gcc-14.1.0/gcc/config/arm/linux-eabi.h
+@@ -18,6 +18,8 @@
+    along with GCC; see the file COPYING3.  If not see
+    <http://www.gnu.org/licenses/>.  */
+ 
++#include "cgct-app-prefix.h"
++
+ /* On EABI GNU/Linux, we want both the BPABI builtins and the
+    GNU/Linux builtins.  */
+ #undef  TARGET_OS_CPP_BUILTINS
+@@ -62,14 +64,14 @@
+    GLIBC_DYNAMIC_LINKER_DEFAULT and TARGET_DEFAULT_FLOAT_ABI.  */
+ 
+ #undef  GLIBC_DYNAMIC_LINKER
+-#define GLIBC_DYNAMIC_LINKER_SOFT_FLOAT "/lib/ld-linux.so.3"
+-#define GLIBC_DYNAMIC_LINKER_HARD_FLOAT "/lib/ld-linux-armhf.so.3"
++#define GLIBC_DYNAMIC_LINKER_SOFT_FLOAT cgct_app_prefix("/lib/ld-linux.so.3")
++#define GLIBC_DYNAMIC_LINKER_HARD_FLOAT cgct_app_prefix("/lib/ld-linux-armhf.so.3")
+ #define GLIBC_DYNAMIC_LINKER_DEFAULT GLIBC_DYNAMIC_LINKER_SOFT_FLOAT
+ 
+ #define GLIBC_DYNAMIC_LINKER \
+-   "%{mfloat-abi=hard:" GLIBC_DYNAMIC_LINKER_HARD_FLOAT "} \
+-    %{mfloat-abi=soft*:" GLIBC_DYNAMIC_LINKER_SOFT_FLOAT "} \
+-    %{!mfloat-abi=*:" GLIBC_DYNAMIC_LINKER_DEFAULT "}"
++   concat("%{mfloat-abi=hard:", GLIBC_DYNAMIC_LINKER_HARD_FLOAT, "} \
++    %{mfloat-abi=soft*:", GLIBC_DYNAMIC_LINKER_SOFT_FLOAT, "} \
++    %{!mfloat-abi=*:", GLIBC_DYNAMIC_LINKER_DEFAULT, "}", NULL)
+ 
+ /* For ARM musl currently supports four dynamic linkers:
+    - ld-musl-arm.so.1 - for the EABI-derived soft-float ABI
+@@ -91,9 +93,9 @@
+ /* At this point, bpabi.h will have clobbered LINK_SPEC.  We want to
+    use the GNU/Linux version, not the generic BPABI version.  */
+ #undef  LINK_SPEC
+-#define LINK_SPEC EABI_LINK_SPEC					\
+-  LINUX_OR_ANDROID_LD (LINUX_TARGET_LINK_SPEC,				\
+-		       LINUX_TARGET_LINK_SPEC " " ANDROID_LINK_SPEC)
++#define LINK_SPEC concat(EABI_LINK_SPEC,					\
++  LINUX_OR_ANDROID_LD (LINUX_TARGET_LINK_SPEC,					\
++		       concat(LINUX_TARGET_LINK_SPEC, " ", ANDROID_LINK_SPEC, NULL)), NULL)
+ 
+ #undef  ASAN_CC1_SPEC
+ #define ASAN_CC1_SPEC "%{%:sanitize(address):-funwind-tables}"
+@@ -121,8 +123,8 @@
+ 
+ #undef	ENDFILE_SPEC
+ #define ENDFILE_SPEC \
+-  "%{Ofast|ffast-math|funsafe-math-optimizations:%{!shared:crtfastmath.o%s}} "	\
+-  LINUX_OR_ANDROID_LD (GNU_USER_TARGET_ENDFILE_SPEC, ANDROID_ENDFILE_SPEC)
++  concat("%{Ofast|ffast-math|funsafe-math-optimizations:%{!shared:crtfastmath.o%s}} ",	\
++  LINUX_OR_ANDROID_LD (GNU_USER_TARGET_ENDFILE_SPEC, ANDROID_ENDFILE_SPEC), NULL)
+ 
+ /* Use the default LIBGCC_SPEC, not the version in linux-elf.h, as we
+    do not use -lfloat.  */
+--- src/gcc-14.1.0/gcc/config/arm/linux-elf.h
++++ src/gcc-14.1.0/gcc/config/arm/linux-elf.h
+@@ -62,16 +62,16 @@
+ 
+ #define GLIBC_DYNAMIC_LINKER "/lib/ld-linux.so.2"
+ 
+-#define LINUX_TARGET_LINK_SPEC  "%{h*} \
++#define LINUX_TARGET_LINK_SPEC  concat("%{h*} \
+    %{static:-Bstatic} \
+    %{shared:-shared} \
+    %{symbolic:-Bsymbolic} \
+    %{!static: \
+      %{rdynamic:-export-dynamic} \
+-     %{!shared:-dynamic-linker " GNU_USER_DYNAMIC_LINKER "}} \
++     %{!shared:-dynamic-linker ", GNU_USER_DYNAMIC_LINKER, "}} \
+    -X \
+-   %{mbig-endian:-EB} %{mlittle-endian:-EL}" \
+-   SUBTARGET_EXTRA_LINK_SPEC
++   %{mbig-endian:-EB} %{mlittle-endian:-EL}", \
++   SUBTARGET_EXTRA_LINK_SPEC, NULL)
+ 
+ #undef  LINK_SPEC
+ #define LINK_SPEC LINUX_TARGET_LINK_SPEC
+--- src/gcc-14.1.0/gcc/config/i386/gnu-user64.h
++++ src/gcc-14.1.0/gcc/config/i386/gnu-user64.h
+@@ -52,19 +52,19 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+  %{" SPEC_X32 ":--x32} \
+  %{msse2avx:%{!mavx:-msse2avx}}"
+ 
+-#define GNU_USER_TARGET_LINK_SPEC				   \
+-                  "%{" SPEC_64 ":-m " GNU_USER_LINK_EMULATION64 "} \
+-                   %{" SPEC_32 ":-m " GNU_USER_LINK_EMULATION32 "} \
+-                   %{" SPEC_X32 ":-m " GNU_USER_LINK_EMULATIONX32 "} \
++#define GNU_USER_TARGET_LINK_SPEC concat(			   \
++                  "%{", SPEC_64, ":-m ", GNU_USER_LINK_EMULATION64, "} \
++                   %{", SPEC_32, ":-m ", GNU_USER_LINK_EMULATION32, "} \
++                   %{", SPEC_X32, ":-m ", GNU_USER_LINK_EMULATIONX32, "} \
+   %{shared:-shared} \
+   %{!shared: \
+     %{!static: \
+       %{!static-pie: \
+ 	%{rdynamic:-export-dynamic} \
+-	%{" SPEC_32 ":-dynamic-linker " GNU_USER_DYNAMIC_LINKER32 "} \
+-	%{" SPEC_64 ":-dynamic-linker " GNU_USER_DYNAMIC_LINKER64 "} \
+-	%{" SPEC_X32 ":-dynamic-linker " GNU_USER_DYNAMIC_LINKERX32 "}}} \
+-    %{static:-static} %{static-pie:-static -pie --no-dynamic-linker -z text}}"
++	%{", SPEC_32, ":-dynamic-linker ", GNU_USER_DYNAMIC_LINKER32, "} \
++	%{", SPEC_64, ":-dynamic-linker ", GNU_USER_DYNAMIC_LINKER64, "} \
++	%{", SPEC_X32, ":-dynamic-linker ", GNU_USER_DYNAMIC_LINKERX32, "}}} \
++    %{static:-static} %{static-pie:-static -pie --no-dynamic-linker -z text}}", NULL)
+ 
+ #undef	LINK_SPEC
+ #define LINK_SPEC GNU_USER_TARGET_LINK_SPEC
+--- src/gcc-14.1.0/gcc/config/i386/linux-common.h
++++ src/gcc-14.1.0/gcc/config/i386/linux-common.h
+@@ -35,7 +35,7 @@ along with GCC; see the file COPYING3.  If not see
+ #undef	LINK_SPEC
+ #define LINK_SPEC \
+   LINUX_OR_ANDROID_LD (GNU_USER_TARGET_LINK_SPEC, \
+-		       GNU_USER_TARGET_LINK_SPEC " " ANDROID_LINK_SPEC)
++		       concat(GNU_USER_TARGET_LINK_SPEC, " ", ANDROID_LINK_SPEC, NULL))
+ 
+ #undef  LIB_SPEC
+ #define LIB_SPEC \
+--- src/gcc-14.1.0/gcc/config/i386/linux.h
++++ src/gcc-14.1.0/gcc/config/i386/linux.h
+@@ -19,8 +19,11 @@ You should have received a copy of the GNU General Public License
+ along with GCC; see the file COPYING3.  If not see
+ <http://www.gnu.org/licenses/>.  */
+ 
++#include "cgct-app-prefix.h"
++
++#define TARGET_32BIT
+ #define GNU_USER_LINK_EMULATION "elf_i386"
+-#define GLIBC_DYNAMIC_LINKER "/lib/ld-linux.so.2"
++#define GLIBC_DYNAMIC_LINKER cgct_app_prefix("/lib/ld-linux.so.2")
+ 
+ #undef MUSL_DYNAMIC_LINKER
+ #define MUSL_DYNAMIC_LINKER "/lib/ld-musl-i386.so.1"
+--- src/gcc-14.1.0/gcc/config/i386/linux64.h
++++ src/gcc-14.1.0/gcc/config/i386/linux64.h
+@@ -23,13 +23,15 @@ a copy of the GCC Runtime Library Exception along with this program;
+ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+ <http://www.gnu.org/licenses/>.  */
+ 
++#include "cgct-app-prefix.h"
++
+ #define GNU_USER_LINK_EMULATION32 "elf_i386"
+ #define GNU_USER_LINK_EMULATION64 "elf_x86_64"
+ #define GNU_USER_LINK_EMULATIONX32 "elf32_x86_64"
+ 
+-#define GLIBC_DYNAMIC_LINKER32 "/lib/ld-linux.so.2"
+-#define GLIBC_DYNAMIC_LINKER64 "/lib64/ld-linux-x86-64.so.2"
+-#define GLIBC_DYNAMIC_LINKERX32 "/libx32/ld-linux-x32.so.2"
++#define GLIBC_DYNAMIC_LINKER32 cgct_app_prefix("/lib/ld-linux.so.2")
++#define GLIBC_DYNAMIC_LINKER64 cgct_app_prefix("/lib/ld-linux-x86-64.so.2")
++#define GLIBC_DYNAMIC_LINKERX32 cgct_app_prefix("/lib/ld-linux-x32.so.2")
+ 
+ #undef MUSL_DYNAMIC_LINKER32
+ #define MUSL_DYNAMIC_LINKER32 "/lib/ld-musl-i386.so.1"
+--- src/gcc-14.1.0/gcc/config/linux-android.h
++++ src/gcc-14.1.0/gcc/config/linux-android.h
+@@ -35,7 +35,7 @@
+   "%{" NOANDROID "|tno-android-cc:" LINUX_SPEC ";:" ANDROID_SPEC "}"
+ 
+ #define LINUX_OR_ANDROID_LD(LINUX_SPEC, ANDROID_SPEC) \
+-  "%{" NOANDROID "|tno-android-ld:" LINUX_SPEC ";:" ANDROID_SPEC "}"
++  concat("%{", NOANDROID, "|tno-android-ld:", LINUX_SPEC, ";:", ANDROID_SPEC, "}", NULL)
+ 
+ #define ANDROID_LINK_SPEC \
+   "%{shared: -Bsymbolic}"
+--- src/gcc-14.1.0/gcc/config/linux.h
++++ src/gcc-14.1.0/gcc/config/linux.h
+@@ -27,6 +27,8 @@ a copy of the GCC Runtime Library Exception along with this program;
+ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+ <http://www.gnu.org/licenses/>.  */
+ 
++#include "cgct-app-prefix.h"
++
+ /* C libraries supported on Linux.  */
+ #ifdef SINGLE_LIBC
+ #define OPTION_GLIBC_P(opts)	(DEFAULT_LIBC == LIBC_GLIBC)
+@@ -64,7 +66,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+    the default.  */
+ 
+ #define CHOOSE_DYNAMIC_LINKER1(LIBC1, LIBC2, LIBC3, LIBC4, LD1, LD2, LD3, LD4)	\
+-  "%{" LIBC2 ":" LD2 ";:%{" LIBC3 ":" LD3 ";:%{" LIBC4 ":" LD4 ";:" LD1 "}}}"
++  concat("%{", LIBC2, ":", LD2, ";:%{", LIBC3, ":", LD3, ";:%{", LIBC4, ":", LD4, ";:", LD1, "}}}", NULL)
+ 
+ #if DEFAULT_LIBC == LIBC_GLIBC
+ #define CHOOSE_DYNAMIC_LINKER(G, U, B, M) \
+@@ -145,7 +147,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+ 
+ #ifdef CROSS_INCLUDE_DIR
+ #define INCLUDE_DEFAULTS_MUSL_CROSS			\
+-    { CROSS_INCLUDE_DIR, "GCC", 0, 0, 0, 0},
++    { cgct_app_prefix(CROSS_INCLUDE_DIR), "GCC", 0, 0, 0, 0},
+ #else
+ #define INCLUDE_DEFAULTS_MUSL_CROSS
+ #endif
+@@ -159,18 +161,13 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+ 
+ #ifdef NATIVE_SYSTEM_HEADER_DIR
+ #define INCLUDE_DEFAULTS_MUSL_NATIVE			\
+-    { NATIVE_SYSTEM_HEADER_DIR, 0, 0, 0, 1, 2 },	\
+-    { NATIVE_SYSTEM_HEADER_DIR, 0, 0, 0, 1, 0 },
++    { cgct_app_prefix(NATIVE_SYSTEM_HEADER_DIR), 0, 0, 0, 1, 2 },	\
++    { cgct_app_prefix(NATIVE_SYSTEM_HEADER_DIR), 0, 0, 0, 1, 0 },
+ #else
+ #define INCLUDE_DEFAULTS_MUSL_NATIVE
+ #endif
+ 
+-#if defined (CROSS_DIRECTORY_STRUCTURE) && !defined (TARGET_SYSTEM_ROOT)
+-# undef INCLUDE_DEFAULTS_MUSL_LOCAL
+-# define INCLUDE_DEFAULTS_MUSL_LOCAL
+-# undef INCLUDE_DEFAULTS_MUSL_NATIVE
+-# define INCLUDE_DEFAULTS_MUSL_NATIVE
+-#else
++#ifndef TARGET_32BIT
+ # undef INCLUDE_DEFAULTS_MUSL_CROSS
+ # define INCLUDE_DEFAULTS_MUSL_CROSS
+ #endif
+--- src/gcc-14.1.0/gcc/cppdefault.cc
++++ src/gcc-14.1.0/gcc/cppdefault.cc
+@@ -23,15 +23,13 @@
+ #include "coretypes.h"
+ #include "tm.h"
+ #include "cppdefault.h"
++#include "cgct-app-prefix.h"
+ 
+ #ifndef NATIVE_SYSTEM_HEADER_COMPONENT
+ #define NATIVE_SYSTEM_HEADER_COMPONENT 0
+ #endif
+ 
+-#if defined (CROSS_DIRECTORY_STRUCTURE) && !defined (TARGET_SYSTEM_ROOT)
+-# undef LOCAL_INCLUDE_DIR
+-# undef NATIVE_SYSTEM_HEADER_DIR
+-#else
++#ifndef TARGET_32BIT
+ # undef CROSS_INCLUDE_DIR
+ #endif
+ 
+@@ -89,7 +87,7 @@ const struct default_include cpp_include_defaults[]
+ #endif
+ #ifdef CROSS_INCLUDE_DIR
+     /* One place the target system's headers might be.  */
+-    { CROSS_INCLUDE_DIR, "GCC", 0, 0, 0, 0 },
++    { cgct_app_prefix(CROSS_INCLUDE_DIR), "GCC", 0, 0, 0, 0 },
+ #endif
+ #ifdef TOOL_INCLUDE_DIR
+     /* Another place the target system's headers might be.  */
+@@ -97,8 +95,8 @@ const struct default_include cpp_include_defaults[]
+ #endif
+ #ifdef NATIVE_SYSTEM_HEADER_DIR
+     /* /usr/include comes dead last.  */
+-    { NATIVE_SYSTEM_HEADER_DIR, NATIVE_SYSTEM_HEADER_COMPONENT, 0, 0, 1, 2 },
+-    { NATIVE_SYSTEM_HEADER_DIR, NATIVE_SYSTEM_HEADER_COMPONENT, 0, 0, 1, 0 },
++    { cgct_app_prefix(NATIVE_SYSTEM_HEADER_DIR), NATIVE_SYSTEM_HEADER_COMPONENT, 0, 0, 1, 2 },
++    { cgct_app_prefix(NATIVE_SYSTEM_HEADER_DIR), NATIVE_SYSTEM_HEADER_COMPONENT, 0, 0, 1, 0 },
+ #endif
+     { 0, 0, 0, 0, 0, 0 }
+   };
+--- src/gcc-14.1.0/gcc/gcc.cc
++++ src/gcc-14.1.0/gcc/gcc.cc
+@@ -47,6 +47,7 @@ compilation is specified by a string called a "spec".  */
+ #include "opts-jobserver.h"
+ #include "common/common-target.h"
+ #include "gcc-urlifier.h"
++#include "cgct-app-prefix.h"
+ 
+ #ifndef MATH_LIBRARY
+ #define MATH_LIBRARY "m"
+@@ -1603,11 +1604,10 @@ static const char *gcc_libexec_prefix;
+ 
+ /* Default prefixes to attach to command names.  */
+ 
+-#ifndef STANDARD_STARTFILE_PREFIX_1
+-#define STANDARD_STARTFILE_PREFIX_1 "/lib/"
+-#endif
+-#ifndef STANDARD_STARTFILE_PREFIX_2
+-#define STANDARD_STARTFILE_PREFIX_2 "/usr/lib/"
++#define STANDARD_STARTFILE_PREFIX_64 cgct_app_prefix("/lib/")
++
++#ifdef TARGET_32BIT
++#define STANDARD_STARTFILE_PREFIX_32 cgct_app_prefix("/lib32/")
+ #endif
+ 
+ #ifdef CROSS_DIRECTORY_STRUCTURE  /* Don't use these prefixes for a cross compiler.  */
+@@ -1644,10 +1644,10 @@ static const char *const standard_startfile_prefix = STANDARD_STARTFILE_PREFIX;
+ static const char *md_exec_prefix = MD_EXEC_PREFIX;
+ static const char *md_startfile_prefix = MD_STARTFILE_PREFIX;
+ static const char *md_startfile_prefix_1 = MD_STARTFILE_PREFIX_1;
+-static const char *const standard_startfile_prefix_1
+-  = STANDARD_STARTFILE_PREFIX_1;
+-static const char *const standard_startfile_prefix_2
+-  = STANDARD_STARTFILE_PREFIX_2;
++static const char *const standard_startfile_prefix_64 = STANDARD_STARTFILE_PREFIX_64;
++#ifdef TARGET_32BIT
++static const char *const standard_startfile_prefix_32 = STANDARD_STARTFILE_PREFIX_32;
++#endif
+ 
+ /* A relative path to be used in finding the location of tools
+    relative to the driver.  */
+@@ -4849,6 +4849,8 @@ process_command (unsigned int decoded_options_count,
+      that are lists of directory names with colons.  */
+ 
+   temp = env.get ("COMPILER_PATH");
++  if (!temp)
++    temp = standard_bindir_prefix;
+   if (temp)
+     {
+       const char *startp, *endp;
+@@ -8554,7 +8556,7 @@ driver::set_up_specs () const
+     }
+   /* We should eventually get rid of all these and stick to
+      startfile_prefix_spec exclusively.  */
+-  else if (*cross_compile == '0' || target_system_root)
++  else
+     {
+       if (*md_startfile_prefix)
+ 	add_sysrooted_prefix (&startfile_prefixes, md_startfile_prefix,
+@@ -8575,7 +8577,7 @@ driver::set_up_specs () const
+ 	add_sysrooted_prefix (&startfile_prefixes,
+ 			      standard_startfile_prefix, "BINUTILS",
+ 			      PREFIX_PRIORITY_LAST, 0, 1);
+-      else if (*cross_compile == '0')
++      else
+ 	{
+ 	  add_prefix (&startfile_prefixes,
+ 		      concat (gcc_exec_prefix
+@@ -8587,13 +8589,15 @@ driver::set_up_specs () const
+ 
+       /* Sysrooted prefixes are relocated because target_system_root is
+ 	 also relocated by gcc_exec_prefix.  */
+-      if (*standard_startfile_prefix_1)
++#ifdef TARGET_32BIT
++      if (*standard_startfile_prefix_32)
+  	add_sysrooted_prefix (&startfile_prefixes,
+-			      standard_startfile_prefix_1, "BINUTILS",
++			      standard_startfile_prefix_32, "BINUTILS",
+ 			      PREFIX_PRIORITY_LAST, 0, 1);
+-      if (*standard_startfile_prefix_2)
++#endif
++      if (*standard_startfile_prefix_64)
+ 	add_sysrooted_prefix (&startfile_prefixes,
+-			      standard_startfile_prefix_2, "BINUTILS",
++			      standard_startfile_prefix_64, "BINUTILS",
+ 			      PREFIX_PRIORITY_LAST, 0, 1);
+     }
+ 
