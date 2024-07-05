@@ -18,7 +18,6 @@ Server = https://service.termux-pacman.dev/gpkg/$arch
 ```
 
 ### Other information:
- - [Old README](/README-old.md)
  - Architecture support: all (aarch64, arm, x86_64, i686)
  - Signature: termux-pacman organization gpg key
  - Powered by aws
