@@ -1,43 +1,43 @@
 pkgname=cgt
 pkgver=14.1.0
-pkgrel=0
+pkgrel=1
 pkgdesc='Cross GCCs for Termux (only for Linux)'
 arch=(x86_64)
 url='https://gcc.gnu.org/'
 license=(GPL LGPL FDL)
 source=(https://ftp.gnu.org/gnu/gcc/gcc-$pkgver/gcc-$pkgver.tar.xz
-        collect2.cc.patch
-        gcc.cc.patch
-        gcc-Makefile.in.patch
 	gcc-configure.patch
 	config.sub.patch
 	configure.patch
-        set_glibc_dynamic_linker.patch)
+	set_dynamic_path.patch
+	cgct-app-prefix.cc
+	cgct-app-prefix.h
+        glimits.h.patch
+        asan_linux.cpp.patch)
 sha256sums=('e283c654987afe3de9d8080bc0bd79534b5ca0d681a73a11ff2b5d3767426840'
-            '81ea5884481df93191dffde2a0d86ba097812210d38e557b1f8cde9dc6c73c44'
-            '05b53d39f1c0bf88874f34ff5c20ab2d1a0c16dc6f79f1ded5dcd5201d4a9d71'
-            'cb20c4f93f7f2f60c26d5548e642404a8df5b0ee1d1c5988379612fac527011f'
             '89529c2ad7b8f25a1a1a7b4129b8a58d3b80e254026d85800bb20f60431a5a03'
             'fb1a2b9d2eb649153431e7bc81d4382c667338b9c461e4e4697d7db754041b68'
             'fc725f6e77dedc0e6cd3d55ef33e93f0b7c5b25b6d5cf1d42311357f6abf1047'
-            'dedc2709e53ed48772586695792ba3cd4f7ee185c671df56539e06ec3fe1dae2')
+            '212df1a86448ad774b1227a084767d78855159fe8741bb860b9f6f7beecb17e6'
+            '732e15a76056348911f60825c377c0378f6dad57b29eb86fcc7447cf8172f171'
+            '9fb91df134d096bf493844812617b5aed9ce5d6ccd564f8a3a11c8d9812be744'
+            'b73d23ad21f323a751897b532b3e9fdde6d878e8fc47fe44debfff825aebaf22'
+            '1ef9aa95daf069105bb1b378fd7ada10bbf1bbe094fb69d40d221ca7d48edf68')
 depends=('cbt')
 optdepends=('glibc-cgct')
 groups=('cgct')
-
 
 prepare() {
 	for i in *.patch; do
 		patch -Np1 -i ${srcdir}/$i
 	done
 
+	cp ./cgct-app-prefix.{cc,h} ./gcc-${pkgver}/gcc/
+
 	cd gcc-${pkgver}
 	sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
 	sed -i '/m64=/s/lib64/lib/' gcc/config/i386/t-linux64
 	sed -i '/lp64=/s/lib64/lib/' gcc/config/aarch64/t-aarch64-linux
-	for i in sys_lib_search_path_spec sys_lib_dlsearch_path_spec; do
-		sed -i "s|${i}=.*|${i}='${GLIBC_PREFIX}/lib'|g" */configure $(find -name libtool.m4)
-	done
 }
 
 build() {
@@ -45,10 +45,12 @@ build() {
 	CFLAGS="-O2 -pipe -fno-plt -fexceptions -Wp,-D_FORTIFY_SOURCE=2 -Wformat -fstack-clash-protection"
 	CXXFLAGS="${CFLAGS} -Wp,-D_GLIBCXX_ASSERTIONS"
 
+	clean_prefix || true
+
 	for target in aarch64-linux-gnu arm-linux-gnueabihf x86_64-linux-gnu i686-linux-gnu; do
 		arch_build=${target/-*}
 		CGCT_PREFIX=${CGCT_PATH}/${arch_build}
-		mkdir gcc-${arch_build}
+		mkdir gcc-${arch_build} || true
 		cd gcc-${arch_build}
 
 		for pkg in glibc linux-api-headers-glibc libxcrypt-glibc; do
