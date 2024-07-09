@@ -59,6 +59,19 @@
  build/inchash.o : inchash.cc $(BCONFIG_H) $(SYSTEM_H) $(CORETYPES_H)	\
    $(HASHTAB_H) inchash.h
  build/gencondmd.o : build/gencondmd.cc $(BCONFIG_H) $(SYSTEM_H)		\
+@@ -3327,11 +3325,7 @@ stmp-int-hdrs: $(STMP_FIXINC) $(T_GLIMITS_H) $(T_STDINT_GCC_H) $(USER_H) fixinc_
+ 	  sysroot_headers_suffix=`echo $${ml} | sed -e 's/;.*$$//'`; \
+ 	  multi_dir=`echo $${ml} | sed -e 's/^[^;]*;//'`; \
+ 	  include_dir=include$${multi_dir}; \
+-	  if $(LIMITS_H_TEST) ; then \
+-	    cat $(srcdir)/limitx.h $(T_GLIMITS_H) $(srcdir)/limity.h > tmp-xlimits.h; \
+-	  else \
+-	    cat $(T_GLIMITS_H) > tmp-xlimits.h; \
+-	  fi; \
++	  cat $(srcdir)/limitx.h $(T_GLIMITS_H) $(srcdir)/limity.h > tmp-xlimits.h; \
+ 	  $(mkinstalldirs) $${include_dir}; \
+ 	  chmod a+rx $${include_dir} || true; \
+ 	  $(SHELL) $(srcdir)/../move-if-change \
 --- src/gcc-14.1.0/gcc/collect2.cc
 +++ src/gcc-14.1.0/gcc/collect2.cc
 @@ -32,6 +32,7 @@ along with GCC; see the file COPYING3.  If not see
