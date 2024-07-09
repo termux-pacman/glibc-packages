@@ -1,6 +1,6 @@
 pkgname=cgt
 pkgver=14.1.0
-pkgrel=1
+pkgrel=2
 pkgdesc='Cross GCCs for Termux (only for Linux)'
 arch=(x86_64)
 url='https://gcc.gnu.org/'
@@ -11,18 +11,14 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-$pkgver/gcc-$pkgver.tar.xz
 	configure.patch
 	set_dynamic_path.patch
 	cgct-app-prefix.cc
-	cgct-app-prefix.h
-        glimits.h.patch
-        asan_linux.cpp.patch)
+	cgct-app-prefix.h)
 sha256sums=('e283c654987afe3de9d8080bc0bd79534b5ca0d681a73a11ff2b5d3767426840'
             '89529c2ad7b8f25a1a1a7b4129b8a58d3b80e254026d85800bb20f60431a5a03'
             'fb1a2b9d2eb649153431e7bc81d4382c667338b9c461e4e4697d7db754041b68'
             'fc725f6e77dedc0e6cd3d55ef33e93f0b7c5b25b6d5cf1d42311357f6abf1047'
-            '212df1a86448ad774b1227a084767d78855159fe8741bb860b9f6f7beecb17e6'
+            '4d61bcbbfa41ac6093d8f3b7c1c4007456172a18a0fafb1743871baf7863469e'
             '732e15a76056348911f60825c377c0378f6dad57b29eb86fcc7447cf8172f171'
-            '9fb91df134d096bf493844812617b5aed9ce5d6ccd564f8a3a11c8d9812be744'
-            'b73d23ad21f323a751897b532b3e9fdde6d878e8fc47fe44debfff825aebaf22'
-            '1ef9aa95daf069105bb1b378fd7ada10bbf1bbe094fb69d40d221ca7d48edf68')
+            '9fb91df134d096bf493844812617b5aed9ce5d6ccd564f8a3a11c8d9812be744')
 depends=('cbt')
 optdepends=('glibc-cgct')
 groups=('cgct')
