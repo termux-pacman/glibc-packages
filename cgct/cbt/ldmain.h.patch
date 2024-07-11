@@ -1,0 +1,9 @@
+--- src/binutils-2.42/ld/ldmain.h	2024-01-29 03:00:00.000000000 +0300
++++ src/binutils-2.42/ld/ldmain.h.patch	2024-07-12 00:55:23.103689441 +0300
+@@ -62,5 +62,6 @@
+ extern void add_ignoresym (struct bfd_link_info *, const char *);
+ extern void add_keepsyms_file (const char *);
+ extern void track_dependency_files (const char *);
++extern const char* cgct_app_prefix(const char* path);
+ 
+ #endif

@@ -1,0 +1,44 @@
+--- src/binutils-2.42/ld/ldmain.c	2024-01-29 03:00:00.000000000 +0300
++++ src/binutils-2.42/ld/ldmain.c.patch	2024-07-12 14:06:39.982582997 +0300
+@@ -55,6 +55,9 @@
+ #define TARGET_SYSTEM_ROOT ""
+ #endif
+ 
++#define CGCT_DEFAULT_PREFIX "/data/data/com.termux/files/usr/glibc"
++#define CGCT_GETENV_PREFIX getenv("CGCT_APP_PREFIX")
++
+ /* EXPORTS */
+ 
+ FILE *saved_script_handle = NULL;
+@@ -246,6 +249,19 @@
+   (*default_bfd_error_handler) (fmt, ap);
+ }
+ 
++/* Dynamic prefix */
++
++const char*
++cgct_app_prefix(const char* path) {
++  static char prefix[PATH_MAX];
++  if (CGCT_GETENV_PREFIX)
++    strcpy(prefix, CGCT_GETENV_PREFIX);
++  else
++    strcpy(prefix, CGCT_DEFAULT_PREFIX);
++  strcat(prefix, path);
++  return prefix;
++}
++
+ int
+ main (int argc, char **argv)
+ {
+@@ -259,6 +275,11 @@
+   bindtextdomain (PACKAGE, LOCALEDIR);
+   textdomain (PACKAGE);
+ 
++#ifdef TARGET_32BIT
++  ldfile_add_library_path(cgct_app_prefix("/lib32"), false);
++#endif
++  ldfile_add_library_path(cgct_app_prefix("/lib"), false);
++
+   program_name = argv[0];
+   xmalloc_set_program_name (program_name);
+ 

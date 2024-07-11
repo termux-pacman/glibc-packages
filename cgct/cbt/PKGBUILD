@@ -1,14 +1,18 @@
 pkgname=cbt
 pkgver=2.42
-pkgrel=2
+pkgrel=3
 pkgdesc='Cross Binutils for Termux (only for Linux)'
 arch=(x86_64)
 url='https://www.gnu.org/software/binutils/'
 license=('GPL3' 'GPL' 'FDL1.3' 'custom:FSFAP')
 source=(https://ftp.gnu.org/gnu/binutils/binutils-$pkgver.tar.xz
-	config.sub.patch)
+	config.sub.patch
+	ldmain.c.patch
+	ldmain.h.patch)
 sha256sums=('f6e4d41fd5fc778b06b7891457b3620da5ecea1006c6a4a41ae998109f85a800'
-            'c8835d73de13a9086da70e7def29c4a9606d089dfd458636ee3abe3a443c92e4')
+            'c8835d73de13a9086da70e7def29c4a9606d089dfd458636ee3abe3a443c92e4'
+            '18d1bd1c0456219a537a7746d8910610765614f0c05f9d70048a11a24b2c9bb3'
+            '371eaa7f4ec33139cc538b680cf1460b14222fd709b01bb4ffef99f05830f5b5')
 optdepends=('glibc-cgct')
 groups=('cgct')
 
@@ -29,6 +33,11 @@ build() {
 		mkdir binutils-${arch_build}
 		cd binutils-${arch_build}
 
+		local flags_32bit=""
+		if [ "${arch_build}" = "arm" ] || [ "${arch_build}" = "i686" ]; then
+			flags_32bit=" -DTARGET_32BIT -Wp,-DTARGET_32BIT"
+		fi
+
 		"$srcdir"/binutils-${pkgver}/configure \
 			--host=cgct \
 			--build=${CHOST} \
@@ -43,6 +52,8 @@ build() {
 			--enable-deterministic-archives \
 			CC=x86_64-linux-gnu-gcc \
 			CXX=x86_64-linux-gnu-g++ \
+			CFLAGS="${CFLAGS} ${flags_32bit}" \
+			CXXFLAGS="${CXXFLAGS} ${flags_32bit}" \
 			AR=ar \
 			LD=ld
 		make
