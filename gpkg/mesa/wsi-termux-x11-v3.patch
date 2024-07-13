@@ -12,8 +12,8 @@ index 9929993bbe0..85c744585a8 100644
 +                       int *fd,
 +                       uint32_t *offset)
 +{
-+   TU_FROM_HANDLE(tu_physical_device, pdevice, _pdevice);
-+   TU_FROM_HANDLE(tu_device_memory, memory, _memory);
++   VK_FROM_HANDLE(tu_physical_device, pdevice, _pdevice);
++   VK_FROM_HANDLE(tu_device_memory, memory, _memory);
 +   *fd = pdevice->local_fd;
 +   *offset = memory->bo->gem_handle << 12;
 +}
@@ -256,24 +256,6 @@ diff --git a/src/vulkan/wsi/wsi_common_x11.c b/src/vulkan/wsi/wsi_common_x11.c
 index 2dff27afa64..1ba21660bab 100644
 --- a/src/vulkan/wsi/wsi_common_x11.c
 +++ b/src/vulkan/wsi/wsi_common_x11.c
-@@ -1422,7 +1422,7 @@ x11_acquire_next_image_poll_find_index(struct x11_swapchain *chain, uint32_t *im
-    for (uint32_t i = 0; i < chain->base.image_count; i++) {
-       if (!chain->images[i].busy) {
-          /* We found a non-busy image */
--         xshmfence_await(chain->images[i].shm_fence);
-+         xcb_sync_await_fence(chain->conn, 1, &chain->images[i].sync_fence);
-          *image_index = i;
-          chain->images[i].busy = true;
-          chain->present_poll_acquire_count++;
-@@ -1578,7 +1578,7 @@ x11_acquire_next_image_from_queue(struct x11_swapchain *chain,
-    }
- 
-    assert(image_index < chain->base.image_count);
--   xshmfence_await(chain->images[image_index].shm_fence);
-+   xcb_sync_await_fence(chain->conn, 1, &chain->images[image_index].sync_fence);
- 
-    *image_index_out = image_index;
- 
 @@ -1617,7 +1617,7 @@ x11_present_to_x11_dri3(struct x11_swapchain *chain, uint32_t image_index,
        options |= XCB_PRESENT_OPTION_SUBOPTIMAL;
  #endif
@@ -283,6 +265,15 @@ index 2dff27afa64..1ba21660bab 100644
  
     ++chain->sent_image_count;
     assert(chain->sent_image_count <= chain->base.image_count);
+@@ -1749,7 +1749,7 @@ x11_acquire_next_image(struct wsi_swapchain *anv_chain,
+    assert(*image_index < chain->base.image_count);
+    if (chain->images[*image_index].shm_fence &&
+        !chain->base.image_info.explicit_sync)
+-      xshmfence_await(chain->images[*image_index].shm_fence);
++      xcb_sync_await_fence(chain->conn, 1, &chain->images[*image_index].sync_fence);
+
+    return result;
+ }
 @@ -2185,14 +2185,23 @@ x11_image_init(VkDevice device_h, struct x11_swapchain *chain,
           return VK_ERROR_OUT_OF_HOST_MEMORY;
  
@@ -315,14 +306,13 @@ index 2dff27afa64..1ba21660bab 100644
     }
  
     error = xcb_request_check(chain->conn, cookie);
-@@ -2201,6 +2210,12 @@ x11_image_init(VkDevice device_h, struct x11_swapchain *chain,
+@@ -2201,6 +2210,11 @@ x11_image_init(VkDevice device_h, struct x11_swapchain *chain,
        goto fail_image;
     }
  
 +   image->sync_fence = xcb_generate_id(chain->conn);
 +   xcb_sync_create_fence(chain->conn, image->pixmap, image->sync_fence, false);
 +   xcb_sync_trigger_fence(chain->conn, image->sync_fence);
-+   image->busy = false;
 +   return VK_SUCCESS;
 +
  out_fence:
