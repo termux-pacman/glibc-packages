@@ -17,5 +17,11 @@
     "distribution": "x11",
     "component": "x11",
     "url": "https://service.termux-pacman.dev/x11"
+  },
+  "root-packages": {
+    "name": "root",
+    "distribution": "root",
+    "component": "root",
+    "url": "https://service.termux-pacman.dev/root"
   }
 }

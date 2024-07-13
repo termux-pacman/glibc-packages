@@ -211,28 +211,6 @@ index 31be71a..1160491 100644
  				   mtpt, mtlen);
  	if (retval == 0)
  		return 0;
-diff --git a/lib/logindefs.c b/lib/logindefs.c
-index 9563122..ed34dc9 100644
---- a/lib/logindefs.c
-+++ b/lib/logindefs.c
-@@ -260,7 +260,7 @@ static void load_defaults(void)
- #else
- 			NULL,
- #endif
--			"/etc", "login", "defs", "= \t", "#");
-+			"@TERMUX_PREFIX@/etc", "login", "defs", "= \t", "#");
- 
- 	if (error)
- 	  syslog(LOG_NOTICE, _("Error reading login.defs: %s"),
-@@ -293,7 +293,7 @@ void logindefs_load_file(const char *filename)
- 	free (path);
- #endif
- 
--	xasprintf(&path, "/etc/%s", filename);
-+	xasprintf(&path, "@TERMUX_PREFIX@/etc/%s", filename);
- 
- 	if (!econf_readFile(&file_l, path, "= \t", "#")) {
- 	        if (file == NULL)
 diff --git a/lib/loopdev.c b/lib/loopdev.c
 index c72fb2c..41ef586 100644
 --- a/lib/loopdev.c
@@ -824,3 +802,25 @@ index 30ed046..93111ba 100644
  						if (!nobuf)
  							fclose(fbuf);
  						fclose(find);
+diff --git a/lib/logindefs.c b/lib/logindefs.c
+index b51e65f..7710222 100644
+--- a/lib/logindefs.c
++++ b/lib/logindefs.c
+@@ -256,7 +256,7 @@ static void load_defaults(void)
+ 
+ 	error = econf_readDirs(&file,
+ 			_PATH_VENDORDIR,
+-			"/etc", "login", "defs", "= \t", "#");
++			"@TERMUX_PREFIX@/etc", "login", "defs", "= \t", "#");
+ 
+ 	if (error)
+ 	  syslog(LOG_NOTICE, _("Error reading login.defs: %s"),
+@@ -289,7 +289,7 @@ void logindefs_load_file(const char *filename)
+ 	free (path);
+ #endif
+ 
+-	xasprintf(&path, "/etc/%s", filename);
++	xasprintf(&path, "@TERMUX_PREFIX@/etc/%s", filename);
+ 
+ 	if (!econf_readFile(&file_l, path, "= \t", "#")) {
+ 	        if (file == NULL)
