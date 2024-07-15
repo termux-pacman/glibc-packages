@@ -1,19 +1,6 @@
-We are using `install_symlink` which was introduced a version later.
---- src/meson.build     2024-02-14 23:55:00.000000000 +0300
-+++ src/meson.build.patch       2024-02-17 08:32:53.127999633 +0300
-@@ -23,7 +23,7 @@
-   ['c', 'cpp'],
-   version : files('VERSION'),
-   license : 'MIT',
--  meson_version : '>= 0.60',
-+  meson_version : '>= 0.61',
-   default_options : [
-     'buildtype=debugoptimized',
-     'b_ndebug=if-release',
-No, it isn't. Hardlinks won't work on Android.
---- a/src/gallium/targets/dri/meson.build     2024-01-10 23:39:55.000000000 +0300
-+++ b/src/gallium/targets/dri/meson.build.patch       2024-01-11 14:21:53.100387236 +0300
-@@ -132,7 +132,7 @@
+--- src/src/gallium/targets/dri/meson.build	2024-07-03 17:51:12.000000000 +0300
++++ src/src/gallium/targets/dri/meson.build.patch	2024-07-14 00:07:59.742357536 +0300
+@@ -143,7 +143,7 @@
        'devenv_@0@'.format(d),
        input : libgallium_dri,
        output : d,
