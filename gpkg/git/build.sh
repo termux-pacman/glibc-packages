@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://git-scm.com/
 TERMUX_PKG_DESCRIPTION="Fast, scalable, distributed revision control system"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION="2.45.2"
+TERMUX_PKG_VERSION="2.46.0"
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/pub/software/scm/git/git-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=51bfe87eb1c02fed1484051875365eeab229831d30d0cec5d89a14f9e40e9adb
+TERMUX_PKG_SHA256=7f123462a28b7ca3ebe2607485f7168554c2b10dfc155c7ec46300666ac27f95
 TERMUX_PKG_DEPENDS="libcurl-glibc, libexpat-glibc, libiconv-glibc, openssl-glibc, pcre2-glibc, zlib-glibc, less-glibc"
 TERMUX_PKG_SUGGESTS="perl-glibc"
 TERMUX_PKG_BUILD_IN_SRC=true
@@ -21,7 +21,7 @@ NO_PERL_CPAN_FALLBACKS=1
 USE_LIBPCRE2=1
 "
 _make() {
-	make -j $TERMUX_MAKE_PROCESSES $@ ${TERMUX_PKG_EXTRA_MAKE_ARGS}
+	make -j $TERMUX_PKG_MAKE_PROCESSES $@ ${TERMUX_PKG_EXTRA_MAKE_ARGS}
 }
 
 termux_step_configure() {
