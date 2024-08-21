@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Object-relational SQL database"
 TERMUX_PKG_LICENSE="PostgreSQL"
 TERMUX_PKG_LICENSE_FILE="COPYRIGHT"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION="16.3"
+TERMUX_PKG_VERSION="16.4"
 TERMUX_PKG_SRCURL=https://ftp.postgresql.org/pub/source/v$TERMUX_PKG_VERSION/postgresql-$TERMUX_PKG_VERSION.tar.bz2
-TERMUX_PKG_SHA256=331963d5d3dc4caf4216a049fa40b66d6bcb8c730615859411b9518764e60585
+TERMUX_PKG_SHA256=971766d645aa73e93b9ef4e3be44201b4f45b5477095b049125403f9f3386d6f
 TERMUX_PKG_DEPENDS="krb5-glibc, openssl-glibc, readline-glibc, zlib-glibc, libxml2-glibc, libpam-glibc, libicu-glibc, libllvm-glibc, libxslt-glibc, liblz4-glibc, zstd-glibc"
 TERMUX_PKG_BUILD_DEPENDS="perl-glibc, python-glibc, clang-glibc"
 #--with-ldap
@@ -57,6 +57,6 @@ termux_step_post_make_install() {
 		unaccent \
 		uuid-ossp \
 		; do
-		(make -C contrib/${contrib} -s -j ${TERMUX_MAKE_PROCESSES} install)
+		(make -C contrib/${contrib} -s -j ${TERMUX_PKG_MAKE_PROCESSES} install)
 	done
 }
