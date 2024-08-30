@@ -35,9 +35,6 @@
 		"setfsuid32",
 		"setfsgid",
 		"setfsgid32",
-		"mbind",
-		"get_mempolicy",
-		"set_mempolicy",
 		1008
 	],
 	"INLINE_SYSCALL_ERROR_RETURN_VALUE(ENOSYS)": [
@@ -47,10 +44,17 @@
 		"pidfd_send_signal",
 		"rseq",
 		"set_robust_list",
+		"get_robust_list",
 		"io_uring_setup",
 		"io_uring_enter",
 		"io_uring_register",
 		"name_to_handle_at",
-		"open_by_handle_at"
+		"open_by_handle_at",
+		"kcmp",
+		"mbind",
+		"get_mempolicy",
+		"set_mempolicy",
+		"mq_open",
+		"rt_sigreturn"
 	]
 }

@@ -8,8 +8,7 @@
    segment of the calling process.  SHMADDR and SHMFLG determine how
    and where the segment is attached.  */
 
-void* shmat(int shmid, void const* shmaddr, int shmflg)
-{
+void* shmat(int shmid, void const* shmaddr, int shmflg) {
 	ashv_check_pid();
 
 	int socket_id = ashv_socket_id_from_shmid(shmid);
