@@ -1,0 +1,21 @@
+--- glibc-2.39/sysdeps/unix/sysv/linux/mq_open.c	2024-01-31 03:34:58.000000000 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/mq_open.c.patch	2024-09-01 15:05:53.285594079 +0300
+@@ -22,6 +22,9 @@
+ #include <stdio.h>
+ #include <sysdep.h>
+ #include <shlib-compat.h>
++#include <unistd.h>
++#include <arch-syscall.h>
++#include <disabled-syscall.h>
+ 
+ /* Establish connection between a process and a message queue NAME and
+    return message queue descriptor or (mqd_t) -1 on error.  OFLAG determines
+@@ -48,7 +51,7 @@
+       va_end (ap);
+     }
+ 
+-  return INLINE_SYSCALL (mq_open, 4, name + 1, oflag, mode, attr);
++  return syscall (__NR_mq_open, 4, name + 1, oflag, mode, attr);
+ }
+ versioned_symbol (libc, __mq_open, mq_open, GLIBC_2_34);
+ #if OTHER_SHLIB_COMPAT (librt, GLIBC_2_3_4, GLIBC_2_34)

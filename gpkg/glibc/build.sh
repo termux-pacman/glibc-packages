@@ -38,19 +38,26 @@ termux_step_pre_configure() {
 		termux_error_exit "Compilation is only possible based on glibc"
 	fi
 
-	for i in shmem-android.h shmat.c  shmctl.c  shmdt.c  shmget.c mprotect.c syscall.c fakesyscall.h; do
-		install -Dm644 "${TERMUX_PKG_BUILDER_DIR}/${i}" "${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/${i}"
-	done
-
+	# disabling clone3 function
 	rm ${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/*/clone3.S
+	# disabling editing of `ldd` script for x86_64 arch
 	rm ${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/x86_64/configure*
 
+	# installing special scripts for correct operation of system calls
+	for i in shmem-android.* shmat.c  shmctl.c  shmdt.c  shmget.c mprotect.c syscall.c fakesyscall.h; do
+		cp ${TERMUX_PKG_BUILDER_DIR}/${i} ${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/
+	done
+
+	# installing and configuring scripts for parsing users/groups according to the android standard
 	for i in android_passwd_group.h android_passwd_group.c android_system_user_ids.h; do
 		cp ${TERMUX_PKG_BUILDER_DIR}/${i} ${TERMUX_PKG_SRCDIR}/nss/
 	done
 	bash ${TERMUX_PKG_BUILDER_DIR}/gen-android-ids.sh ${TERMUX_BASE_DIR} \
 		${TERMUX_PKG_SRCDIR}/nss/android_ids.h \
 		${TERMUX_PKG_BUILDER_DIR}/android_system_user_ids.h
+
+	# installing a syslog script that can work with the android log system
+	cp ${TERMUX_PKG_BUILDER_DIR}/syslog.c ${TERMUX_PKG_SRCDIR}/misc/
 
 	# `fakesyscall.json` - json file that stores a list of unsupported syscalls for Termux in keys,
 	# the name of which indicates the fakesyscall function and how it will be launched
@@ -100,6 +107,21 @@ termux_step_pre_configure() {
 		sed -i '$ s| \\||' $header_disabled_syscall
 	done
 
+	# replacing some hard paths that may not exist in some device
+	for i in /dev/stderr:/proc/self/fd/2 \
+		 /dev/stdin:/proc/self/fd/0 \
+		 /dev/stdout:/proc/self/fd/1; do
+		for j in $(grep -s -r -l ${i%%:*} ${TERMUX_PKG_SRCDIR}); do
+			sed -i "s|${i%%:*}|${i//*:}|g" ${j}
+		done
+	done
+
+	# adding revision to glibc version
+	sed -i "s/${TERMUX_PKG_VERSION}/${TERMUX_PKG_FULLVERSION_FOR_PACMAN}/" ${TERMUX_PKG_SRCDIR}/version.h
+
+	# specifying the current release (use only when developing glibc)
+	sed -i "s/stable/dev.$(git -C ${TERMUX_PKG_BUILDER_DIR} rev-parse --short HEAD)/" ${TERMUX_PKG_SRCDIR}/version.h
+
 	if [ "$TERMUX_PKG_BUILD32" = "true" ]; then
 		rm -fr ${TERMUX_PKG_BUILDDIR32}
 		mkdir -p ${TERMUX_PKG_BUILDDIR32}
@@ -121,6 +143,11 @@ termux_glibc_configure() {
 		"x86_64") _configure_flags+=(--enable-cet);;
 	esac
 
+	local _pkgversion="GNU libc for Android"
+	if [ -n "${TERMUX_APP_PACKAGE-}" ]; then
+		_pkgversion+="/${TERMUX_APP_PACKAGE}"
+	fi
+
 	${TERMUX_PKG_SRCDIR}/configure \
 		--prefix=$TERMUX_PREFIX \
 		--libdir=${TERMUX_PREFIX}/${libdir} \
@@ -129,6 +156,7 @@ termux_glibc_configure() {
 		--build=$TERMUX_HOST_PLATFORM \
 		--target=$TERMUX_HOST_PLATFORM \
 		--with-bugurl=https://github.com/termux-pacman/glibc-packages/issues \
+		--with-pkgversion="${_pkgversion}" \
 		--enable-bind-now \
 		--disable-multi-arch \
 		--enable-stack-protector=strong \
@@ -162,10 +190,15 @@ termux_step_make() {
 			make -O
 		)
 	fi
+}
 
-	elf/ld.so --library-path "$PWD" locale/localedef -c \
-		-f ${TERMUX_PKG_SRCDIR}/localedata/charmaps/UTF-8 \
-		-i ${TERMUX_PKG_SRCDIR}/localedata/locales/C ./C.UTF-8/
+termux_glibc_make_syscall_without_fsc() {
+	local libname="libsyscall_without_fsc.so"
+	local libdir="$1"
+	echo "Compiling '${libname}'..."
+	$CC ${TERMUX_PKG_BUILDER_DIR}/syscall.c -o ${TERMUX_PREFIX}/${libdir}/${libname} \
+		-shared -DWITHOUT_FAKESYSCALL
+	echo "DONE"
 }
 
 termux_step_make_install() {
@@ -192,14 +225,17 @@ termux_step_make_install() {
 		${TERMUX_PKG_SRCDIR}/localedata/SUPPORTED > ${TERMUX_PREFIX}/share/i18n/SUPPORTED
 
 	install -dm755 ${TERMUX_PREFIX}/lib/locale
-	cp -r ./C.UTF-8 -t ${TERMUX_PREFIX}/lib/locale
+	make -C ${TERMUX_PKG_SRCDIR}/localedata objdir=${TERMUX_PKG_BUILDDIR} \
+		SUPPORTED-LOCALES="C.UTF-8/UTF-8 en_US.UTF-8/UTF-8" install-locale-files
 	sed -i '/#C\.UTF-8 /d' ${TERMUX_PREFIX}/etc/locale.gen
 
 	install -Dm644 ${TERMUX_PKG_BUILDER_DIR}/sdt.h ${TERMUX_PREFIX}/include/sys/sdt.h
 	install -Dm644 ${TERMUX_PKG_BUILDER_DIR}/sdt-config.h ${TERMUX_PREFIX}/include/sys/sdt-config.h
 
-	ln -sfr $PATH_DYNAMIC_LINKER $TERMUX_PREFIX/bin/ld.so
-	ln -sfr $PATH_DYNAMIC_LINKER $TERMUX_PREFIX/lib/ld.so
+	ln -sfr $PATH_DYNAMIC_LINKER ${TERMUX_PREFIX}/bin/ld.so
+	ln -sfr $PATH_DYNAMIC_LINKER ${TERMUX_PREFIX}/lib/ld.so
+
+	termux_glibc_make_syscall_without_fsc "lib"
 
 	if [ "$TERMUX_PKG_BUILD32" = "true" ]; then
 		(
@@ -207,10 +243,14 @@ termux_step_make_install() {
 
 			make DESTDIR=${TERMUX_PKG_BUILDDIR32} install
 
-			cp -r ${TERMUX_PKG_BUILDDIR32}/${TERMUX_PREFIX}/lib32 ${TERMUX_PREFIX}
+			cp -r ${TERMUX_PKG_BUILDDIR32}/${TERMUX_PREFIX}/lib32 $TERMUX_PREFIX
 
-			ln -sfr $TERMUX_PREFIX/lib32/$DYNAMIC_LINKER $PATH_DYNAMIC_LINKER
-			ln -sfr $TERMUX_PREFIX/lib32/$DYNAMIC_LINKER $TERMUX_PREFIX/lib32/ld.so
+			ln -sfr ${TERMUX_PREFIX}/lib/locale ${TERMUX_PREFIX}/lib32/locale
+
+			ln -sfr ${TERMUX_PREFIX}/lib32/${DYNAMIC_LINKER} $PATH_DYNAMIC_LINKER
+			ln -sfr ${TERMUX_PREFIX}/lib32/${DYNAMIC_LINKER} ${TERMUX_PREFIX}/lib32/ld.so
+
+			termux_glibc_make_syscall_without_fsc "lib32"
 		)
 	fi
 }

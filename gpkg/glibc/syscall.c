@@ -1,6 +1,9 @@
-#include <stdarg.h>
+#ifndef WITHOUT_FAKESYSCALL
 #include <sysdep.h>
 #include <fakesyscall.h>
+#endif
+#include <stdarg.h>
+#include <unistd.h>
 
 long int
 syscall (long int number, ...)
@@ -15,9 +18,14 @@ syscall (long int number, ...)
   long int a5 = va_arg (args, long int);
   va_end (args);
 
-  switch (number) {
+#ifndef WITHOUT_FAKESYSCALL
+  switch (number)
+#endif
+  {
+#ifndef WITHOUT_FAKESYSCALL
     DISABLED_SYSCALL_WITH_FAKESYSCALL
     default:
+#endif
       return syscallS (number, a0, a1, a2, a3, a4, a5);
   }
 }

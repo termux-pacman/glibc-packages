@@ -7,8 +7,7 @@
 /* Detach shared memory segment starting at address specified by SHMADDR
    from the caller's data segment.  */
 
-int shmdt(void const* shmaddr)
-{
+int shmdt(void const* shmaddr) {
 	ashv_check_pid();
 
 	pthread_mutex_lock(&mutex);
