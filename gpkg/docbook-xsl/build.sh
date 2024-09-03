@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="XML stylesheets for Docbook-xml transformations"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_VERSION=1.79.2
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_LICENSE_FILE="docbook-xsl-${TERMUX_PKG_VERSION}/COPYING, docbook-xsl-nons-${TERMUX_PKG_VERSION}/COPYING"
 TERMUX_PKG_DEPENDS="docbook-xml-glibc, libxml2-utils-glibc, xsltproc-glibc"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -58,7 +59,7 @@ termux_step_make_install() {
 
 termux_step_create_debscripts() {
 	cat <<- EOF > ./postinst
-	#!$TERMUX_PREFIX/bin/sh
+	#!$TERMUX_PREFIX_CLASSICAL/bin/sh
 	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "configure" ]; then
 		if [ ! -e "$TERMUX_PREFIX/etc/xml/catalog" ]; then
 			LD_PRELOAD="" $TERMUX_PREFIX/bin/xmlcatalog --noout --create "$TERMUX_PREFIX/etc/xml/catalog"
@@ -86,7 +87,7 @@ termux_step_create_debscripts() {
 	EOF
 
 	cat <<- EOF > ./prerm
-	#!$TERMUX_PREFIX/bin/sh
+	#!$TERMUX_PREFIX_CLASSICAL/bin/sh
 	if [ "$TERMUX_PACKAGE_FORMAT" = "pacman" ] || [ "\$1" = "remove" ]; then
 		LD_PRELOAD='' $TERMUX_PREFIX/bin/xmlcatalog --noout --del "$TERMUX_PREFIX/share/xml/docbook/xsl-stylesheets-$TERMUX_PKG_VERSION" \
 			"$TERMUX_PREFIX/etc/xml/catalog"
