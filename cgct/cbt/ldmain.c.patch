@@ -35,9 +35,9 @@
    textdomain (PACKAGE);
  
 +#ifdef TARGET_32BIT
-+  ldfile_add_library_path(cgct_app_prefix("/lib32"), false);
++  ldfile_add_library_path(cgct_app_prefix("/lib32"), search_dir_linker_script);
 +#endif
-+  ldfile_add_library_path(cgct_app_prefix("/lib"), false);
++  ldfile_add_library_path(cgct_app_prefix("/lib"), search_dir_linker_script);
 +
    program_name = argv[0];
    xmalloc_set_program_name (program_name);
