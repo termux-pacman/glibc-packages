@@ -21,7 +21,7 @@ jobs:
   build:
     permissions:
       contents: read # actions/upload-artifact doesn't need contents: write
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         target_arch: [aarch64, arm, i686, x86_64]
@@ -33,7 +33,12 @@ jobs:
         fetch-depth: 1000
 
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3.0.0
+      run: |
+        sudo apt update
+        yes | sudo apt install qemu-user qemu-user-static binfmt-support
+        sudo update-binfmts --enable qemu-aarch64
+        sudo update-binfmts --enable qemu-arm
+        docker run --rm --privileged tonistiigi/binfmt --install all
 
     - name: Get files from termux-packages repository
       run: ./get-build-package.sh

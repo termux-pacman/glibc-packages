@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_VERSION=3.12.6
+TERMUX_PKG_REVISION=1
 _MAJOR_VERSION="${TERMUX_PKG_VERSION%.*}"
 _SETUPTOOLS_VERSION=69.5.1
 TERMUX_PKG_SRCURL=(https://www.python.org/ftp/python/${TERMUX_PKG_VERSION%rc*}/Python-${TERMUX_PKG_VERSION}.tar.xz
@@ -13,6 +14,7 @@ TERMUX_PKG_SHA256=(1999658298cf2fb837dffed8ff3c033ef0c98ef20cf73c5d5f66bed5ab896
 TERMUX_PKG_DEPENDS="libbz2-glibc, libexpat-glibc, gdbm-glibc, libffi-glibc, libnsl-glibc, libxcrypt-glibc, openssl-glibc, zlib-glibc"
 TERMUX_PKG_BUILD_DEPENDS="sqlite-glibc, mpdecimal-glibc, llvm-glibc"
 TERMUX_PKG_PROVIDES="python3-glibc"
+TERMUX_PKG_RM_AFTER_INSTALL="glibc/lib/python${_MAJOR_VERSION}/site-packages/*/"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
@@ -62,7 +64,6 @@ termux_step_make_install() {
 }
 
 termux_step_post_make_install() {
-	echo README.txt > ${TERMUX_PKG_SRCDIR}/setuptools-files
 	(
 		export TERMUX_PKG_SETUP_PYTHON=true
 		export TERMUX_SKIP_DEPCHECK=true
@@ -70,17 +71,7 @@ termux_step_post_make_install() {
 		termux_step_get_dependencies_python
 
 		cd ${TERMUX_PKG_SRCDIR}/setuptools-${_SETUPTOOLS_VERSION}
-		pip install --no-deps . --prefix $TERMUX_PREFIX
-
-		pip show -f setuptools | grep "^  " | sed 's/  //' \
-			| awk -F '/' '{printf $1 "\n"}' | uniq >> ${TERMUX_PKG_SRCDIR}/setuptools-files
+		pip install --no-deps . --target ${TERMUX_PKG_SRCDIR}/setuptools
+		cp -r ${TERMUX_PKG_SRCDIR}/setuptools/setuptools/_distutils ${TERMUX_PYTHON_HOME}/distutils
 	)
-}
-
-termux_step_post_massage() {
-	for i in glibc/lib/python${_MAJOR_VERSION}/site-packages/*; do
-		if ! grep -q "^${i##*/}$" ${TERMUX_PKG_SRCDIR}/setuptools-files; then
-			rm -fr $i
-		fi
-	done
 }

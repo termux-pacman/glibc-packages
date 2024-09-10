@@ -1,0 +1,55 @@
+--- Python-3.12.6/Python/initconfig.c	2024-09-06 22:03:47.000000000 +0300
++++ Python-3.12.6/Python/initconfig.c.patch	2024-09-28 15:11:27.913324313 +0300
+@@ -1454,11 +1454,40 @@
+ #endif
+ }
+ 
+-
+ #define CONFIG_GET_ENV_DUP(CONFIG, DEST, WNAME, NAME) \
+     config_get_env_dup(CONFIG, DEST, WNAME, NAME, "cannot decode " NAME)
+ 
+ 
++static PyStatus
++config_get_env_dup2(PyConfig *config,
++                   wchar_t **dest,
++                   char *name1, char *name2,
++                   const char *decode_err_msg)
++{
++    assert(*dest == NULL);
++    assert(config->use_environment >= 0);
++
++    if (!config->use_environment) {
++        *dest = NULL;
++        return _PyStatus_OK();
++    }
++
++    const char *var = getenv(name1);
++    if (!var)
++        var = getenv(name2);
++
++    if (!var || var[0] == '\0') {
++        *dest = NULL;
++        return _PyStatus_OK();
++    }
++
++    return config_set_bytes_string(config, dest, var, decode_err_msg);
++}
++
++#define CONFIG_GET_ENV_DUP2(CONFIG, DEST, NAME1, NAME2) \
++    config_get_env_dup2(CONFIG, DEST, NAME1, NAME2, "cannot decode " NAME2)
++
++
+ static void
+ config_get_global_vars(PyConfig *config)
+ {
+@@ -1668,8 +1697,8 @@
+     }
+ 
+     if (config->pythonpath_env == NULL) {
+-        status = CONFIG_GET_ENV_DUP(config, &config->pythonpath_env,
+-                                    L"PYTHONPATH", "PYTHONPATH");
++        status = CONFIG_GET_ENV_DUP2(config, &config->pythonpath_env,
++                                    "TERMUX_PYTHON_MAINPATH", "PYTHONPATH");
+         if (_PyStatus_EXCEPTION(status)) {
+             return status;
+         }
