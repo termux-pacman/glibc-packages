@@ -23,7 +23,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
+      uses: docker/setup-qemu-action@v3.2.0
     - name: Get list cgct packages
       run: |
         mkdir -p "pkgs/PKGBUILDs"
