@@ -24,7 +24,7 @@ LD_LIB=$(ls ${CGCT_DIR}/lib/ld-* 2> /dev/null)
 echo "Setting up CGCT..."
 
 for f in $(find "${CGCT_DIR}"/{aarch64,arm,x86_64,i686}/{bin,lib/gcc} -type f -exec grep -IL . "{}" \; | grep -v -e '\.a' -e '\.o' -e '\.so'); do
-	patchelf --set-rpath "$RPATH_LIBS" --set-interpreter "$LD_LIB" "$f"
+	patchelf --set-interpreter "$LD_LIB" "$f"
 	echo "Configured '${f}'"
 done
 
