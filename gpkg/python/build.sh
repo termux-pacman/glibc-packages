@@ -3,28 +3,30 @@ TERMUX_PKG_DESCRIPTION="The Python programming language"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=3.11.9
+TERMUX_PKG_VERSION=3.12.6
 _MAJOR_VERSION="${TERMUX_PKG_VERSION%.*}"
-TERMUX_PKG_SRCURL=https://www.python.org/ftp/python/${TERMUX_PKG_VERSION%rc*}/Python-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=9b1e896523fc510691126c864406d9360a3d1e986acbda59cda57b5abda45b87
+_SETUPTOOLS_VERSION=69.5.1
+TERMUX_PKG_SRCURL=(https://www.python.org/ftp/python/${TERMUX_PKG_VERSION%rc*}/Python-${TERMUX_PKG_VERSION}.tar.xz
+		https://github.com/pypa/setuptools/archive/refs/tags/v${_SETUPTOOLS_VERSION}.tar.gz)
+TERMUX_PKG_SHA256=(1999658298cf2fb837dffed8ff3c033ef0c98ef20cf73c5d5f66bed5ab89697c
+		2cf4ea407b1325c2c85862d13eb31f9b57098b0ae7f94e2258aea4e634f6534f)
 TERMUX_PKG_DEPENDS="libbz2-glibc, libexpat-glibc, gdbm-glibc, libffi-glibc, libnsl-glibc, libxcrypt-glibc, openssl-glibc, zlib-glibc"
 TERMUX_PKG_BUILD_DEPENDS="sqlite-glibc, mpdecimal-glibc, llvm-glibc"
 TERMUX_PKG_PROVIDES="python3-glibc"
-TERMUX_PKG_RM_AFTER_INSTALL="glibc/lib/python${_MAJOR_VERSION}/site-packages/*/"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_pre_configure() {
 	rm -rf Modules/expat
-	rm -r Modules/_ctypes/{darwin,libffi}*
 	rm -rf Modules/_decimal/libmpdec
+	sed -e '/tag_build = .post/d' -e '/tag_date = 1/d' -i setuptools-${_SETUPTOOLS_VERSION}/setup.cfg
 
-	export CFLAGS="${CFLAGS/-O2/-O3}"
+	export CFLAGS="${CFLAGS/-O2/-O3} -ffat-lto-objects"
 }
 
 termux_step_configure() {
 	local _CONF_FLAG=""
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
-		_CONF_FLAG="--with-build-python=python$_MAJOR_VERSION"
+		_CONF_FLAG="--with-build-python=python${_MAJOR_VERSION}"
 	fi
 
 	./configure --prefix=${TERMUX_PREFIX} \
@@ -41,6 +43,7 @@ termux_step_configure() {
 		--enable-loadable-sqlite-extensions \
 		--without-ensurepip \
 		${_CONF_FLAG} \
+		ac_cv_func_link=no \
 		LN='ln -s'
 }
 
@@ -56,4 +59,28 @@ termux_step_make_install() {
 	install -dm755 ${TERMUX_PREFIX}/lib/python${_MAJOR_VERSION}/Tools/{i18n,scripts}
 	install -m755 Tools/i18n/{msgfmt,pygettext}.py ${TERMUX_PREFIX}/lib/python${_MAJOR_VERSION}/Tools/i18n/
 	install -m755 Tools/scripts/{README,*py} ${TERMUX_PREFIX}/lib/python${_MAJOR_VERSION}/Tools/scripts/
+}
+
+termux_step_post_make_install() {
+	echo README.txt > ${TERMUX_PKG_SRCDIR}/setuptools-files
+	(
+		export TERMUX_PKG_SETUP_PYTHON=true
+		export TERMUX_SKIP_DEPCHECK=true
+		export SETUPTOOLS_INSTALL_WINDOWS_SPECIFIC_FILES=0
+		termux_step_get_dependencies_python
+
+		cd ${TERMUX_PKG_SRCDIR}/setuptools-${_SETUPTOOLS_VERSION}
+		pip install --no-deps . --prefix $TERMUX_PREFIX
+
+		pip show -f setuptools | grep "^  " | sed 's/  //' \
+			| awk -F '/' '{printf $1 "\n"}' | uniq >> ${TERMUX_PKG_SRCDIR}/setuptools-files
+	)
+}
+
+termux_step_post_massage() {
+	for i in glibc/lib/python${_MAJOR_VERSION}/site-packages/*; do
+		if ! grep -q "^${i##*/}$" ${TERMUX_PKG_SRCDIR}/setuptools-files; then
+			rm -fr $i
+		fi
+	done
 }
