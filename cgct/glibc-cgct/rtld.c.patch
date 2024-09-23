@@ -1,0 +1,180 @@
+--- src/glibc-2.40/elf/rtld.c	2024-07-21 19:33:37.000000000 +0300
++++ src/glibc-2.40/elf/rtld.c.patch	2024-09-23 19:07:59.974864614 +0300
+@@ -1862,7 +1862,7 @@
+      open().  So we do this first.  If it succeeds we do almost twice
+      the work but this does not matter, since it is not for production
+      use.  */
+-  static const char preload_file[] = "/etc/ld.so.preload";
++  static const char preload_file[] = "/data/data/com.termux/cgct/etc/ld.so.preload";
+   if (__glibc_unlikely (__access (preload_file, R_OK) == 0))
+     {
+       /* Read the contents of the file.  */
+@@ -2562,8 +2562,8 @@
+ 	     are ignored.  Also, shared audit objects are only loaded only from
+ 	     the standard search directories and only if they have set-user-ID
+ 	     mode bit enabled.  */
+-	  if (memcmp (envline, "AUDIT", 5) == 0)
+-	    audit_list_add_string (&state->audit_list, &envline[6]);
++	  if (memcmp (envline, "AUDIT_CGCT", 10) == 0)
++	    audit_list_add_string (&state->audit_list, &envline[11]);
+ 	  break;
+ 
+ 	case 7:
+@@ -2571,8 +2571,8 @@
+ 	     are ignored.  Also, shared objects are only preloaded from the
+ 	     standard search directories and only if they have set-user-ID mode
+ 	     bit enabled.  */
+-	  if (memcmp (envline, "PRELOAD", 7) == 0)
+-	    state->preloadlist = &envline[8];
++	  if (memcmp (envline, "PRELOAD_CGCT", 12) == 0)
++	    state->preloadlist = &envline[13];
+ 	  break;
+ 	}
+     }
+@@ -2628,32 +2628,32 @@
+ 
+       switch (len)
+ 	{
+-	case 4:
++	case 9:
+ 	  /* Warning level, verbose or not.  */
+-	  if (memcmp (envline, "WARN", 4) == 0)
+-	    GLRO(dl_verbose) = envline[5] != '\0';
++	  if (memcmp (envline, "WARN_CGCT", 9) == 0)
++	    GLRO(dl_verbose) = envline[10] != '\0';
+ 	  break;
+ 
+-	case 5:
++	case 10:
+ 	  /* Debugging of the dynamic linker?  */
+-	  if (memcmp (envline, "DEBUG", 5) == 0)
++	  if (memcmp (envline, "DEBUG_CGCT", 10) == 0)
+ 	    {
+-	      process_dl_debug (state, &envline[6]);
++	      process_dl_debug (state, &envline[11]);
+ 	      break;
+ 	    }
+ 	  /* For __libc_enable_secure mode, audit pathnames containing slashes
+ 	     are ignored.  Also, shared audit objects are only loaded only from
+ 	     the standard search directories and only if they have set-user-ID
+ 	     mode bit enabled.  */
+-	  if (memcmp (envline, "AUDIT", 5) == 0)
+-	    audit_list_add_string (&state->audit_list, &envline[6]);
++	  if (memcmp (envline, "AUDIT_CGCT", 10) == 0)
++	    audit_list_add_string (&state->audit_list, &envline[11]);
+ 	  break;
+ 
+-	case 7:
++	case 12:
+ 	  /* Print information about versions.  */
+-	  if (memcmp (envline, "VERBOSE", 7) == 0)
++	  if (memcmp (envline, "VERBOSE_CGCT", 12) == 0)
+ 	    {
+-	      state->version_info = envline[8] != '\0';
++	      state->version_info = envline[13] != '\0';
+ 	      break;
+ 	    }
+ 
+@@ -2661,75 +2661,75 @@
+ 	     are ignored.  Also, shared objects are only preloaded from the
+ 	     standard search directories and only if they have set-user-ID mode
+ 	     bit enabled.  */
+-	  if (memcmp (envline, "PRELOAD", 7) == 0)
++	  if (memcmp (envline, "PRELOAD_CGCT", 12) == 0)
+ 	    {
+-	      state->preloadlist = &envline[8];
++	      state->preloadlist = &envline[13];
+ 	      break;
+ 	    }
+ 
+ 	  /* Which shared object shall be profiled.  */
+-	  if (memcmp (envline, "PROFILE", 7) == 0 && envline[8] != '\0')
+-	    GLRO(dl_profile) = &envline[8];
++	  if (memcmp (envline, "PROFILE_CGCT", 12) == 0 && envline[13] != '\0')
++	    GLRO(dl_profile) = &envline[13];
+ 	  break;
+ 
+-	case 8:
++	case 13:
+ 	  /* Do we bind early?  */
+-	  if (memcmp (envline, "BIND_NOW", 8) == 0)
++	  if (memcmp (envline, "BIND_NOW_CGCT", 13) == 0)
+ 	    {
+-	      GLRO(dl_lazy) = envline[9] == '\0';
++	      GLRO(dl_lazy) = envline[14] == '\0';
+ 	      break;
+ 	    }
+-	  if (memcmp (envline, "BIND_NOT", 8) == 0)
+-	    GLRO(dl_bind_not) = envline[9] != '\0';
++	  if (memcmp (envline, "BIND_NOT_CGCT", 13) == 0)
++	    GLRO(dl_bind_not) = envline[14] != '\0';
+ 	  break;
+ 
+-	case 9:
++	case 14:
+ 	  /* Test whether we want to see the content of the auxiliary
+ 	     array passed up from the kernel.  */
+-	  if (memcmp (envline, "SHOW_AUXV", 9) == 0)
++	  if (memcmp (envline, "SHOW_AUXV_CGCT", 14) == 0)
+ 	    _dl_show_auxv ();
+ 	  break;
+ 
+-	case 11:
++	case 16:
+ 	  /* Path where the binary is found.  */
+-	  if (memcmp (envline, "ORIGIN_PATH", 11) == 0)
+-	    GLRO(dl_origin_path) = &envline[12];
++	  if (memcmp (envline, "ORIGIN_PATH_CGCT", 16) == 0)
++	    GLRO(dl_origin_path) = &envline[17];
+ 	  break;
+ 
+-	case 12:
++	case 17:
+ 	  /* The library search path.  */
+-	  if (memcmp (envline, "LIBRARY_PATH", 12) == 0)
++	  if (memcmp (envline, "LIBRARY_PATH_CGCT", 17) == 0)
+ 	    {
+-	      state->library_path = &envline[13];
++	      state->library_path = &envline[18];
+ 	      state->library_path_source = "LD_LIBRARY_PATH";
+ 	      break;
+ 	    }
+ 
+ 	  /* Where to place the profiling data file.  */
+-	  if (memcmp (envline, "DEBUG_OUTPUT", 12) == 0)
++	  if (memcmp (envline, "DEBUG_OUTPUT_CGCT", 17) == 0)
+ 	    {
+-	      debug_output = &envline[13];
++	      debug_output = &envline[18];
+ 	      break;
+ 	    }
+ 
+-	  if (memcmp (envline, "DYNAMIC_WEAK", 12) == 0)
++	  if (memcmp (envline, "DYNAMIC_WEAK_CGCT", 17) == 0)
+ 	    GLRO(dl_dynamic_weak) = 1;
+ 	  break;
+ 
+-	case 14:
++	case 19:
+ 	  /* Where to place the profiling data file.  */
+-	  if (memcmp (envline, "PROFILE_OUTPUT", 14) == 0
+-	      && envline[15] != '\0')
+-	    GLRO(dl_profile_output) = &envline[15];
++	  if (memcmp (envline, "PROFILE_OUTPUT_CGCT", 19) == 0
++	      && envline[20] != '\0')
++	    GLRO(dl_profile_output) = &envline[20];
+ 	  break;
+ 
+-	case 20:
++	case 25:
+ 	  /* The mode of the dynamic linker can be set.  */
+-	  if (memcmp (envline, "TRACE_LOADED_OBJECTS", 20) == 0)
++	  if (memcmp (envline, "TRACE_LOADED_OBJECTS_CGCT", 25) == 0)
+ 	    {
+ 	      state->mode = rtld_mode_trace;
+ 	      state->mode_trace_program
+-		= _dl_strtoul (&envline[21], NULL) > 1;
++		= _dl_strtoul (&envline[26], NULL) > 1;
+ 	    }
+ 	  break;
+ 	}

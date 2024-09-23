@@ -1,21 +1,27 @@
 pkgname=glibc-cgct
 pkgver=2.40
-pkgrel=1
+pkgrel=2
 pkgdesc="GNU C Library for CGCT (only for Linux)"
 arch=(x86_64)
 url='https://www.gnu.org/software/libc/'
 license=('GPL' 'LGPL')
 source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz
-	dl-support.c.patch
+	rtld.c.patch
 	setup-cgct)
 sha256sums=('19a890175e9263d748f627993de6f4b1af9cd21e03f080e4bfb3a1fac10205a2'
-            'a687fd304c85dbcb9324a917c83c68333f45bc27424ea7c49449e840306c416d'
+            'e40eb4a004438f0ea40e08d159e5558c341c3572d7f037dcefb3e733c6595145'
             '15dcc4a741f0a347252aa26963bb0f1a7bdd5dbfc2690827600d6acb5dbd2aa9')
 groups=('cgct')
 
 prepare() {
 	for i in *.patch; do
 		patch -Np1 -i ${srcdir}/$i
+	done
+
+	for var in LD_WARN LD_LIBRARY_PATH LD_BIND_NOW LD_BIND_NOT LD_DYNAMIC_WEAK LD_PRELOAD; do
+		for file in $(grep -s -r -l "${var}" ./glibc-${pkgver}); do
+			sed -i "s/${var}/${var}_CGCT/g" ${file}
+		done
 	done
 
 	rm ./glibc-${pkgver}/sysdeps/unix/sysv/linux/x86_64/configure*
