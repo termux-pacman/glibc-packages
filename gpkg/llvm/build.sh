@@ -3,16 +3,17 @@ TERMUX_PKG_DESCRIPTION="Compiler infrastructure"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_LICENSE_FILE="LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=18.1.8
+TERMUX_PKG_VERSION=19.1.1
 _SOURCE=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION
 TERMUX_PKG_SRCURL=($_SOURCE/llvm-$TERMUX_PKG_VERSION.src.tar.xz
 		$_SOURCE/cmake-$TERMUX_PKG_VERSION.src.tar.xz
 		$_SOURCE/third-party-$TERMUX_PKG_VERSION.src.tar.xz)
-TERMUX_PKG_SHA256=(f68cf90f369bc7d0158ba70d860b0cb34dbc163d6ff0ebc6cfa5e515b9b2e28d
-		59badef592dd34893cd319d42b323aaa990b452d05c7180ff20f23ab1b41e837
-		b76b810f3d3dc5d08e83c4236cb6e395aa9bd5e3ea861e8c319b216d093db074)
+TERMUX_PKG_SHA256=(15a7c77f9c39444d9dd6756b75b9a70129dcbd1e340724a6e45b3b488f55bc4b
+		92a016ecfe46ad7c18db6425a018c2c6ee126b9d0e5513d6fad989fee6648ffa
+		39dec41a0a4d39af6428a58ddbd5c3e5c3ae4f6175e3655480909559cba86cb7)
 TERMUX_PKG_DEPENDS="libllvm-glibc, perl-glibc"
-TERMUX_PKG_BUILD_DEPENDS="binutils-libs-glibc"
+TERMUX_PKG_BUILD_DEPENDS="binutils-libs-glibc, python-glibc"
+TERMUX_PKG_PYTHON_COMMON_DEPS="setuptools"
 TERMUX_PKG_NO_STATICSPLIT=true
 
 termux_step_post_get_source() {
@@ -68,6 +69,6 @@ termux_step_configure() {
 termux_step_post_make_install() {
 	(
 		cd ${TERMUX_PKG_SRCDIR}/utils/lit
-		python3 setup.py install --prefix=$TERMUX_PREFIX -O1
+		python${TERMUX_PYTHON_VERSION} setup.py install --prefix=$TERMUX_PREFIX -O1
 	)
 }
