@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="Object-relational SQL database"
 TERMUX_PKG_LICENSE="PostgreSQL"
 TERMUX_PKG_LICENSE_FILE="COPYRIGHT"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION="16.4"
+TERMUX_PKG_VERSION="17.0"
 TERMUX_PKG_SRCURL=https://ftp.postgresql.org/pub/source/v$TERMUX_PKG_VERSION/postgresql-$TERMUX_PKG_VERSION.tar.bz2
-TERMUX_PKG_SHA256=971766d645aa73e93b9ef4e3be44201b4f45b5477095b049125403f9f3386d6f
+TERMUX_PKG_SHA256=7e276131c0fdd6b62588dbad9b3bb24b8c3498d5009328dba59af16e819109de
 TERMUX_PKG_DEPENDS="krb5-glibc, openssl-glibc, readline-glibc, zlib-glibc, libxml2-glibc, libpam-glibc, libicu-glibc, libllvm-glibc, libxslt-glibc, liblz4-glibc, zstd-glibc"
 TERMUX_PKG_BUILD_DEPENDS="perl-glibc, python-glibc, clang-glibc"
 #--with-ldap
@@ -30,6 +30,8 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 TCLSH=$TERMUX_PREFIX/bin/tclsh
 PYTHON=$TERMUX_PREFIX/bin/python
 PERL=$TERMUX_PREFIX/bin/perl
+LLVM_CONFIG=$TERMUX_PREFIX/bin/llvm-config
+CLANG=$TERMUX_PREFIX/bin/clang
 "
 
 termux_step_pre_configure() {
