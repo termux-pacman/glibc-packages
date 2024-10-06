@@ -1,5 +1,5 @@
---- src/binutils-2.43/ld/ldmain.c	2024-01-29 03:00:00.000000000 +0300
-+++ src/binutils-2.43/ld/ldmain.c.patch	2024-07-12 14:06:39.982582997 +0300
+--- src/binutils-2.43.1/ld/ldmain.c	2024-01-29 03:00:00.000000000 +0300
++++ src/binutils-2.43.1/ld/ldmain.c.patch	2024-07-12 14:06:39.982582997 +0300
 @@ -55,6 +55,9 @@
  #define TARGET_SYSTEM_ROOT ""
  #endif

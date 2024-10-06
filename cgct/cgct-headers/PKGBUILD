@@ -1,0 +1,84 @@
+pkgname=cgct-headers
+pkgver=6.10
+pkgrel=0
+pkgdesc="Kernel headers for CGCT (only for Linux)"
+arch=(x86_64)
+url='https://www.gnu.org/software/libc/'
+source=(https://www.kernel.org/pub/linux/kernel/v${pkgver:0:1}.x/linux-${pkgver}.tar.xz)
+sha256sums=('774698422ee54c5f1e704456f37c65c06b51b4e9a8b0866f34580d86fef8e226')
+groups=('cgct')
+
+build() {
+	for target in arm64 arm x86; do
+		mkdir headers-${target} || true
+		cd headers-${target}
+
+		make -C "${srcdir}/linux-${pkgver}" ARCH=${target} mrproper
+
+		cd ..
+	done
+}
+
+package() {
+	export DIR_TERMUX="/data/data/com.termux"
+	export CGCT_PATH="${DIR_TERMUX}/cgct"
+
+	for target in arm64 arm x86; do
+		cd headers-${target}
+
+		case "$target" in
+			"arm64") arch_build="aarch64";;
+			"x86") arch_build="x86_64";;
+			*) arch_build="$target";;
+		esac
+
+		make -C "${srcdir}/linux-${pkgver}" INSTALL_HDR_PATH="${pkgdir}/${CGCT_PATH}/${arch_build}" ARCH=${target} headers_install
+		if [ "$target" = "x86" ]; then
+			make -C "${srcdir}/linux-${pkgver}" INSTALL_HDR_PATH="${pkgdir}/${CGCT_PATH}/i686" ARCH=${target} headers_install
+		fi
+
+		cd ..
+	done
+
+	echo "Sorting headers..."
+
+	declare -A HEADERS
+	IFS=$'\n'
+	for i in $(find "${pkgdir}/${CGCT_PATH}" ! -empty -type f -exec md5sum {} + | sort | uniq -w32 -dD); do
+		header=$(awk '{printf $2}' <<< "$i")
+		header="${header/*\/cgct\//}"
+		HEADERS[$(awk '{printf $1}' <<< "$i")]+="\n${header}"
+	done
+	unset IFS
+
+	for i in ${!HEADERS[@]}; do
+		headers=$(echo -e "${HEADERS[$i]}")
+		! grep -q ^x86_64/ <<< "${headers}" && continue
+		root_header=$(awk '{printf $1}' <<< $(grep ^x86_64/ <<< "${headers}"))
+
+		header="${root_header/*\/include\//}"
+		h_file="${header##*/}"
+		h_path="${header//${h_file}/}"
+
+		[ -f "${pkgdir}/${CGCT_PATH}/include/${header}" ] && continue
+
+		mkdir -p "${pkgdir}/${CGCT_PATH}/include/${h_path}"
+		cp -P "${pkgdir}/${CGCT_PATH}/${root_header}" "${pkgdir}/${CGCT_PATH}/include/${h_path}"
+		for j in ${headers}; do
+			rm "${pkgdir}/${CGCT_PATH}/${j}"
+			ln -srv "${pkgdir}/${CGCT_PATH}/include/${header}" "${pkgdir}/${CGCT_PATH}/${j}"
+		done
+	done
+
+	for i in "${pkgdir}/${CGCT_PATH}"/{aarch64,arm,x86_64,i686}/include/*/; do
+		h_path="${i::-1}"
+		h_name="${h_path##*/}"
+		if [ "$(find $i -type f | wc -l)" = 0 ] && \
+			[ "$(find $i -type l | wc -l)" = "$(find ${pkgdir}/${CGCT_PATH}/include/${h_name} -type f,l | wc -l)" ]; then
+			rm -fr $i
+			ln -srv "${pkgdir}/${CGCT_PATH}/include/${h_name}" "${h_path}"
+		fi
+	done
+
+	echo "Sorting complete"
+}
