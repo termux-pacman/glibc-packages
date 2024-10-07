@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/libc/
 TERMUX_PKG_DESCRIPTION="Kernel headers sanitized for use in userspace"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=6.9
+TERMUX_PKG_VERSION=6.10
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/kernel/v${TERMUX_PKG_VERSION:0:1}.x/linux-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=24fa01fb989c7a3e28453f117799168713766e119c5381dac30115f18f268149
+TERMUX_PKG_SHA256=774698422ee54c5f1e704456f37c65c06b51b4e9a8b0866f34580d86fef8e226
 
 _target_arch="x86"
 case "${TERMUX_ARCH}" in
@@ -22,7 +22,7 @@ termux_step_make_install() {
 
 	if [ "$TERMUX_ARCH" = "aarch64" ]; then
 		make -C $TERMUX_PKG_SRCDIR INSTALL_HDR_PATH="$TERMUX_PKG_BUILDDIR" ARCH=arm HOSTCC=${CC} HOSTCXX=${CXX} headers_install
-		mkdir $TERMUX_PREFIX/include32
+		mkdir -p $TERMUX_PREFIX/include32
 		cp -r $TERMUX_PKG_BUILDDIR/include/asm $TERMUX_PREFIX/include32
 	fi
 }
