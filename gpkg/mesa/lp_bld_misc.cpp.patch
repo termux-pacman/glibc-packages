@@ -1,0 +1,12 @@
+--- src/src/gallium/auxiliary/gallivm/lp_bld_misc.cpp	2024-10-03 18:38:59.000000000 +0300
++++ src/src/gallium/auxiliary/gallivm/lp_bld_misc.cpp.patch	2024-10-08 14:38:10.766461075 +0300
+@@ -329,8 +329,7 @@
+     * which allows us to enable/disable code generation based
+     * on the results of cpuid on these architectures.
+     */
+-   llvm::StringMap<bool> features;
+-   llvm::sys::getHostCPUFeatures(features);
++   llvm::StringMap<bool> features = llvm::sys::getHostCPUFeatures();
+ 
+    for (llvm::StringMapIterator<bool> f = features.begin();
+         f != features.end();
