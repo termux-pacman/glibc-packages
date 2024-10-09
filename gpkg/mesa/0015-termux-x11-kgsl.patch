@@ -1,0 +1,333 @@
+From https://github.com/xMeM/termux-packages/commit/57b1bb44c9eed341c700105efed93f9fd8bc34a6
+diff --git a/src/egl/drivers/dri2/egl_dri2.c b/src/egl/drivers/dri2/egl_dri2.c
+index 5857acbcdf3..04a97d0ea59 100644
+--- a/src/egl/drivers/dri2/egl_dri2.c
++++ b/src/egl/drivers/dri2/egl_dri2.c
+@@ -994,6 +994,9 @@ dri2_setup_device(_EGLDisplay *disp, EGLBoolean software)
+    /* If we're not software, we need a DRM node FD */
+    assert(software || dri2_dpy->fd_render_gpu >= 0);
+ 
++   if (disp->Options.Kgsl)
++      software = true;
++
+    /* fd_render_gpu is what we got from WSI, so might actually be a lie and
+     * not a render node... */
+    if (software) {
+diff --git a/src/egl/drivers/dri2/platform_drm.c b/src/egl/drivers/dri2/platform_drm.c
+index 39827bbed40..85d7d0267b3 100644
+--- a/src/egl/drivers/dri2/platform_drm.c
++++ b/src/egl/drivers/dri2/platform_drm.c
+@@ -586,6 +586,9 @@ dri2_initialize_drm(_EGLDisplay *disp)
+ 
+          dri2_dpy->fd_display_gpu =
+             loader_open_device(drm->nodes[DRM_NODE_PRIMARY]);
++      } else if (disp->Options.Kgsl) {
++         dri2_dpy->fd_render_gpu = dri2_dpy->fd_display_gpu =
++            loader_open_device("/dev/kgsl-3d0");
+       } else {
+          _EGLDevice *dev_list = _eglGlobal.DeviceList;
+          drmDevicePtr drm;
+@@ -626,6 +629,8 @@ dri2_initialize_drm(_EGLDisplay *disp)
+    if (!dri2_dpy->gbm_dri->software) {
+       dri2_dpy->fd_render_gpu =
+          get_fd_render_gpu_drm(dri2_dpy->gbm_dri, dri2_dpy->fd_display_gpu);
++      if (dri2_dpy->fd_render_gpu < 0 && disp->Options.Kgsl)
++         dri2_dpy->fd_render_gpu = dri2_dpy->fd_display_gpu;
+       if (dri2_dpy->fd_render_gpu < 0) {
+          err = "DRI2: failed to get compatible render device";
+          goto cleanup;
+diff --git a/src/egl/drivers/dri2/platform_surfaceless.c b/src/egl/drivers/dri2/platform_surfaceless.c
+index 2f6e54bd8e0..d895173cefd 100644
+--- a/src/egl/drivers/dri2/platform_surfaceless.c
++++ b/src/egl/drivers/dri2/platform_surfaceless.c
+@@ -339,6 +339,20 @@ dri2_initialize_surfaceless(_EGLDisplay *disp)
+       driver_loaded = surfaceless_probe_device_sw(disp);
+    }
+ 
++   if (!driver_loaded && disp->Options.Kgsl) {
++      dri2_dpy->fd_render_gpu = loader_open_device("/dev/kgsl-3d0");
++      dri2_dpy->driver_name = strdup("kgsl");
++      driver_loaded = dri2_load_driver(disp);
++      if (driver_loaded) {
++         dri2_dpy->loader_extensions = image_loader_extensions;
++      } else {
++         free(dri2_dpy->driver_name);
++         dri2_dpy->driver_name = NULL;
++         close(dri2_dpy->fd_render_gpu);
++         dri2_dpy->fd_render_gpu = -1;
++      }
++   }
++
+    if (!driver_loaded) {
+       err = "DRI2: failed to load driver";
+       goto cleanup;
+diff --git a/src/egl/drivers/dri2/platform_wayland.c b/src/egl/drivers/dri2/platform_wayland.c
+index 18817ad73d1..1d9c6157287 100644
+--- a/src/egl/drivers/dri2/platform_wayland.c
++++ b/src/egl/drivers/dri2/platform_wayland.c
+@@ -2264,8 +2264,12 @@ dri2_initialize_wayland_drm(_EGLDisplay *disp)
+    if (roundtrip(dri2_dpy) < 0)
+       goto cleanup;
+ 
+-   if (!dri2_initialize_wayland_drm_extensions(dri2_dpy))
+-      goto cleanup;
++   if (!dri2_initialize_wayland_drm_extensions(dri2_dpy)) {
++      if (disp->Options.Kgsl)
++         dri2_dpy->fd_render_gpu = loader_open_device("/dev/kgsl-3d0");
++      else
++         goto cleanup;
++   }
+ 
+    loader_get_user_preferred_fd(&dri2_dpy->fd_render_gpu,
+                                 &dri2_dpy->fd_display_gpu);
+diff --git a/src/egl/main/eglapi.c b/src/egl/main/eglapi.c
+index b4ffaad498d..b630390a086 100644
+--- a/src/egl/main/eglapi.c
++++ b/src/egl/main/eglapi.c
+@@ -687,6 +687,7 @@ eglInitialize(EGLDisplay dpy, EGLint *major, EGLint *minor)
+ 
+       const char *env = os_get_option("MESA_LOADER_DRIVER_OVERRIDE");
+       disp->Options.Zink = env && !strcmp(env, "zink");
++      disp->Options.Kgsl = env && !strcmp(env, "kgsl");
+ 
+       const char *gallium_hud_env = os_get_option("GALLIUM_HUD");
+       disp->Options.GalliumHudWarn =
+diff --git a/src/egl/main/egldisplay.h b/src/egl/main/egldisplay.h
+index 479b26d5f26..ba63a3f69af 100644
+--- a/src/egl/main/egldisplay.h
++++ b/src/egl/main/egldisplay.h
+@@ -199,6 +199,7 @@ struct _egl_display {
+ 
+    /* options that affect how the driver initializes the display */
+    struct {
++      EGLBoolean Kgsl;           /**< Use kgsl only */
+       EGLBoolean Zink;           /**< Use kopper only */
+       EGLBoolean FallbackZink;   /**< True if zink is tried as fallback */
+       EGLBoolean ForceSoftware;  /**< Use software path only */
+diff --git a/src/loader/loader.c b/src/loader/loader.c
+index e9eb4d8b796..a90b4a3df45 100644
+--- a/src/loader/loader.c
++++ b/src/loader/loader.c
+@@ -647,6 +647,10 @@ loader_get_linux_pci_id_for_fd(int fd, int *vendor_id, int *chip_id)
+ bool
+ loader_get_pci_id_for_fd(int fd, int *vendor_id, int *chip_id)
+ {
++   const char *env = getenv("MESA_LOADER_DRIVER_OVERRIDE");
++   if (env && !strcmp(env, "kgsl"))
++      return false;
++
+ #ifdef __linux__
+    /* Implementation without causing full enumeration of DRM devices. */
+    if (loader_get_linux_pci_id_for_fd(fd, vendor_id, chip_id))
+diff --git a/src/loader/loader_dri3_helper.c b/src/loader/loader_dri3_helper.c
+index 6375143e290..dbfbd726c40 100644
+--- a/src/loader/loader_dri3_helper.c
++++ b/src/loader/loader_dri3_helper.c
+@@ -26,14 +26,13 @@
+ #include <unistd.h>
+ #include <string.h>
+ 
+-#include <X11/xshmfence.h>
+ #include <xcb/xcb.h>
+ #include <xcb/dri3.h>
+ #include <xcb/present.h>
+-#include <xcb/xfixes.h>
+ 
+ #include <X11/Xlib-xcb.h>
+ 
++#include <loader.h>
+ #include "loader_dri_helper.h"
+ #include "loader_dri3_helper.h"
+ #include "util/macros.h"
+@@ -239,13 +238,11 @@ loader_dri3_blit_image(struct loader_dri3_drawable *draw,
+ static inline void
+ dri3_fence_reset(xcb_connection_t *c, struct loader_dri3_buffer *buffer)
+ {
+-   xshmfence_reset(buffer->shm_fence);
+ }
+ 
+ static inline void
+ dri3_fence_set(struct loader_dri3_buffer *buffer)
+ {
+-   xshmfence_trigger(buffer->shm_fence);
+ }
+ 
+ static inline void
+@@ -259,7 +256,6 @@ dri3_fence_await(xcb_connection_t *c, struct loader_dri3_drawable *draw,
+                  struct loader_dri3_buffer *buffer)
+ {
+    xcb_flush(c);
+-   xshmfence_await(buffer->shm_fence);
+    if (draw) {
+       mtx_lock(&draw->mtx);
+       dri3_flush_present_events(draw);
+@@ -335,8 +331,6 @@ dri3_free_render_buffer(struct loader_dri3_drawable *draw,
+ 
+    if (buffer->own_pixmap)
+       xcb_free_pixmap(draw->conn, buffer->pixmap);
+-   xcb_sync_destroy_fence(draw->conn, buffer->sync_fence);
+-   xshmfence_unmap_shm(buffer->shm_fence);
+    draw->ext->image->destroyImage(buffer->image);
+    if (buffer->linear_buffer)
+       draw->ext->image->destroyImage(buffer->linear_buffer);
+@@ -1141,26 +1135,7 @@ loader_dri3_swap_buffers_msc(struct loader_dri3_drawable *draw,
+       back->busy = 1;
+       back->last_swap = draw->send_sbc;
+ 
+-      if (!draw->region) {
+-         draw->region = xcb_generate_id(draw->conn);
+-         xcb_xfixes_create_region(draw->conn, draw->region, 0, NULL);
+-      }
+-
+       xcb_xfixes_region_t region = 0;
+-      xcb_rectangle_t xcb_rects[64];
+-
+-      if (n_rects > 0 && n_rects <= ARRAY_SIZE(xcb_rects)) {
+-         for (int i = 0; i < n_rects; i++) {
+-            const int *rect = &rects[i * 4];
+-            xcb_rects[i].x = rect[0];
+-            xcb_rects[i].y = draw->height - rect[1] - rect[3];
+-            xcb_rects[i].width = rect[2];
+-            xcb_rects[i].height = rect[3];
+-         }
+-
+-         region = draw->region;
+-         xcb_xfixes_set_region(draw->conn, region, n_rects, xcb_rects);
+-      }
+ 
+       xcb_present_pixmap(draw->conn,
+                          draw->drawable,
+@@ -1292,6 +1267,10 @@ loader_dri3_open(xcb_connection_t *conn,
+    int                          fd;
+    const xcb_query_extension_reply_t *extension;
+ 
++   const char *env = getenv("MESA_LOADER_DRIVER_OVERRIDE");
++   if (env && !strcmp(env, "kgsl"))
++      return loader_open_device("/dev/kgsl-3d0");
++
+    xcb_prefetch_extension_data(conn, &xcb_dri3_id);
+    extension = xcb_get_extension_data(conn, &xcb_dri3_id);
+    if (!(extension && extension->present))
+@@ -1439,27 +1418,13 @@ dri3_alloc_render_buffer(struct loader_dri3_drawable *draw, unsigned int fourcc,
+    __DRIimage *pixmap_buffer = NULL, *linear_buffer_display_gpu = NULL;
+    int format = loader_fourcc_to_image_format(fourcc);
+    xcb_pixmap_t pixmap;
+-   xcb_sync_fence_t sync_fence;
+-   struct xshmfence *shm_fence;
+-   int buffer_fds[4], fence_fd;
++   int buffer_fds[4];
+    int num_planes = 0;
+    uint64_t *modifiers = NULL;
+    uint32_t count = 0;
+    int i, mod;
+    int ret;
+ 
+-   /* Create an xshmfence object and
+-    * prepare to send that to the X server
+-    */
+-
+-   fence_fd = xshmfence_alloc_shm();
+-   if (fence_fd < 0)
+-      return NULL;
+-
+-   shm_fence = xshmfence_map_shm(fence_fd);
+-   if (shm_fence == NULL)
+-      goto no_shm_fence;
+-
+    /* Allocate the image from the driver
+     */
+    buffer = calloc(1, sizeof *buffer);
+@@ -1658,7 +1623,7 @@ dri3_alloc_render_buffer(struct loader_dri3_drawable *draw, unsigned int fourcc,
+                                    buffer->strides[2], buffer->offsets[2],
+                                    buffer->strides[3], buffer->offsets[3],
+                                    depth, buffer->cpp * 8,
+-                                   buffer->modifier,
++                                   buffer->modifier ? buffer->modifier : 1274,
+                                    buffer_fds);
+    } else
+ #endif
+@@ -1672,16 +1637,8 @@ dri3_alloc_render_buffer(struct loader_dri3_drawable *draw, unsigned int fourcc,
+                                   buffer_fds[0]);
+    }
+ 
+-   xcb_dri3_fence_from_fd(draw->conn,
+-                          pixmap,
+-                          (sync_fence = xcb_generate_id(draw->conn)),
+-                          false,
+-                          fence_fd);
+-
+    buffer->pixmap = pixmap;
+    buffer->own_pixmap = true;
+-   buffer->sync_fence = sync_fence;
+-   buffer->shm_fence = shm_fence;
+    buffer->width = width;
+    buffer->height = height;
+ 
+@@ -1703,9 +1660,6 @@ no_linear_buffer:
+ no_image:
+    free(buffer);
+ no_buffer:
+-   xshmfence_unmap_shm(shm_fence);
+-no_shm_fence:
+-   close(fence_fd);
+    return NULL;
+ }
+ 
+@@ -1935,11 +1889,8 @@ dri3_get_pixmap_buffer(__DRIdrawable *driDrawable, unsigned int fourcc,
+    int                                  buf_id = loader_dri3_pixmap_buf_id(buffer_type);
+    struct loader_dri3_buffer            *buffer = draw->buffers[buf_id];
+    xcb_drawable_t                       pixmap;
+-   xcb_sync_fence_t                     sync_fence;
+-   struct xshmfence                     *shm_fence;
+    int                                  width;
+    int                                  height;
+-   int                                  fence_fd;
+    __DRIscreen                          *cur_screen;
+ 
+    if (buffer)
+@@ -1951,15 +1902,6 @@ dri3_get_pixmap_buffer(__DRIdrawable *driDrawable, unsigned int fourcc,
+    if (!buffer)
+       goto no_buffer;
+ 
+-   fence_fd = xshmfence_alloc_shm();
+-   if (fence_fd < 0)
+-      goto no_fence;
+-   shm_fence = xshmfence_map_shm(fence_fd);
+-   if (shm_fence == NULL) {
+-      close (fence_fd);
+-      goto no_fence;
+-   }
+-
+    /* Get the currently-bound screen or revert to using the drawable's screen if
+     * no contexts are currently bound. The latter case is at least necessary for
+     * obs-studio, when using Window Capture (Xcomposite) as a Source.
+@@ -1969,11 +1911,6 @@ dri3_get_pixmap_buffer(__DRIdrawable *driDrawable, unsigned int fourcc,
+        cur_screen = draw->dri_screen_render_gpu;
+    }
+ 
+-   xcb_dri3_fence_from_fd(draw->conn,
+-                          pixmap,
+-                          (sync_fence = xcb_generate_id(draw->conn)),
+-                          false,
+-                          fence_fd);
+ #ifdef HAVE_DRI3_MODIFIERS
+    if (draw->multiplanes_available &&
+        draw->ext->image->base.version >= 15 &&
+@@ -2019,17 +1956,12 @@ dri3_get_pixmap_buffer(__DRIdrawable *driDrawable, unsigned int fourcc,
+    buffer->own_pixmap = false;
+    buffer->width = width;
+    buffer->height = height;
+-   buffer->shm_fence = shm_fence;
+-   buffer->sync_fence = sync_fence;
+ 
+    dri3_set_render_buffer(draw, buf_id, buffer);
+ 
+    return buffer;
+ 
+ no_image:
+-   xcb_sync_destroy_fence(draw->conn, sync_fence);
+-   xshmfence_unmap_shm(shm_fence);
+-no_fence:
+    free(buffer);
+ no_buffer:
+    return NULL;
