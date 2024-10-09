@@ -1,5 +1,5 @@
---- src/gcc-14.1.0/gcc/Makefile.in
-+++ src/gcc-14.1.0/gcc/Makefile.in
+--- src/gcc-14.2.0/gcc/Makefile.in
++++ src/gcc-14.2.0/gcc/Makefile.in
 @@ -559,13 +559,9 @@ FNMATCH_H   = $(srcdir)/../include/fnmatch.h
  LINKER_PLUGIN_API_H = $(srcdir)/../include/plugin-api.h
  
@@ -72,8 +72,8 @@
  	  $(mkinstalldirs) $${include_dir}; \
  	  chmod a+rx $${include_dir} || true; \
  	  $(SHELL) $(srcdir)/../move-if-change \
---- src/gcc-14.1.0/gcc/collect2.cc
-+++ src/gcc-14.1.0/gcc/collect2.cc
+--- src/gcc-14.2.0/gcc/collect2.cc
++++ src/gcc-14.2.0/gcc/collect2.cc
 @@ -32,6 +32,7 @@ along with GCC; see the file COPYING3.  If not see
  #include "file-find.h"
  #include "simple-object.h"
@@ -130,8 +130,8 @@
    NULL
  };
  
---- src/gcc-14.1.0/gcc/config/aarch64/aarch64-linux.h
-+++ src/gcc-14.1.0/gcc/config/aarch64/aarch64-linux.h
+--- src/gcc-14.2.0/gcc/config/aarch64/aarch64-linux.h
++++ src/gcc-14.2.0/gcc/config/aarch64/aarch64-linux.h
 @@ -21,7 +21,9 @@
  #ifndef GCC_AARCH64_LINUX_H
  #define GCC_AARCH64_LINUX_H
@@ -168,8 +168,8 @@
  
  #define GNU_USER_TARGET_MATHFILE_SPEC \
    "%{Ofast|ffast-math|funsafe-math-optimizations:%{!shared:crtfastmath.o%s}}"
---- src/gcc-14.1.0/gcc/config/arm/linux-eabi.h
-+++ src/gcc-14.1.0/gcc/config/arm/linux-eabi.h
+--- src/gcc-14.2.0/gcc/config/arm/linux-eabi.h
++++ src/gcc-14.2.0/gcc/config/arm/linux-eabi.h
 @@ -18,6 +18,8 @@
     along with GCC; see the file COPYING3.  If not see
     <http://www.gnu.org/licenses/>.  */
@@ -223,8 +223,8 @@
  
  /* Use the default LIBGCC_SPEC, not the version in linux-elf.h, as we
     do not use -lfloat.  */
---- src/gcc-14.1.0/gcc/config/arm/linux-elf.h
-+++ src/gcc-14.1.0/gcc/config/arm/linux-elf.h
+--- src/gcc-14.2.0/gcc/config/arm/linux-elf.h
++++ src/gcc-14.2.0/gcc/config/arm/linux-elf.h
 @@ -62,16 +62,16 @@
  
  #define GLIBC_DYNAMIC_LINKER "/lib/ld-linux.so.2"
@@ -246,8 +246,8 @@
  
  #undef  LINK_SPEC
  #define LINK_SPEC LINUX_TARGET_LINK_SPEC
---- src/gcc-14.1.0/gcc/config/i386/gnu-user64.h
-+++ src/gcc-14.1.0/gcc/config/i386/gnu-user64.h
+--- src/gcc-14.2.0/gcc/config/i386/gnu-user64.h
++++ src/gcc-14.2.0/gcc/config/i386/gnu-user64.h
 @@ -52,19 +52,19 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
   %{" SPEC_X32 ":--x32} \
   %{msse2avx:%{!mavx:-msse2avx}}"
@@ -276,8 +276,8 @@
  
  #undef	LINK_SPEC
  #define LINK_SPEC GNU_USER_TARGET_LINK_SPEC
---- src/gcc-14.1.0/gcc/config/i386/linux-common.h
-+++ src/gcc-14.1.0/gcc/config/i386/linux-common.h
+--- src/gcc-14.2.0/gcc/config/i386/linux-common.h
++++ src/gcc-14.2.0/gcc/config/i386/linux-common.h
 @@ -35,7 +35,7 @@ along with GCC; see the file COPYING3.  If not see
  #undef	LINK_SPEC
  #define LINK_SPEC \
@@ -287,8 +287,8 @@
  
  #undef  LIB_SPEC
  #define LIB_SPEC \
---- src/gcc-14.1.0/gcc/config/i386/linux.h
-+++ src/gcc-14.1.0/gcc/config/i386/linux.h
+--- src/gcc-14.2.0/gcc/config/i386/linux.h
++++ src/gcc-14.2.0/gcc/config/i386/linux.h
 @@ -19,8 +19,11 @@ You should have received a copy of the GNU General Public License
  along with GCC; see the file COPYING3.  If not see
  <http://www.gnu.org/licenses/>.  */
@@ -302,8 +302,8 @@
  
  #undef MUSL_DYNAMIC_LINKER
  #define MUSL_DYNAMIC_LINKER "/lib/ld-musl-i386.so.1"
---- src/gcc-14.1.0/gcc/config/i386/linux64.h
-+++ src/gcc-14.1.0/gcc/config/i386/linux64.h
+--- src/gcc-14.2.0/gcc/config/i386/linux64.h
++++ src/gcc-14.2.0/gcc/config/i386/linux64.h
 @@ -23,13 +23,15 @@ a copy of the GCC Runtime Library Exception along with this program;
  see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
  <http://www.gnu.org/licenses/>.  */
@@ -323,8 +323,8 @@
  
  #undef MUSL_DYNAMIC_LINKER32
  #define MUSL_DYNAMIC_LINKER32 "/lib/ld-musl-i386.so.1"
---- src/gcc-14.1.0/gcc/config/linux-android.h
-+++ src/gcc-14.1.0/gcc/config/linux-android.h
+--- src/gcc-14.2.0/gcc/config/linux-android.h
++++ src/gcc-14.2.0/gcc/config/linux-android.h
 @@ -35,7 +35,7 @@
    "%{" NOANDROID "|tno-android-cc:" LINUX_SPEC ";:" ANDROID_SPEC "}"
  
@@ -334,8 +334,8 @@
  
  #define ANDROID_LINK_SPEC \
    "%{shared: -Bsymbolic}"
---- src/gcc-14.1.0/gcc/config/linux.h
-+++ src/gcc-14.1.0/gcc/config/linux.h
+--- src/gcc-14.2.0/gcc/config/linux.h
++++ src/gcc-14.2.0/gcc/config/linux.h
 @@ -27,6 +27,8 @@ a copy of the GCC Runtime Library Exception along with this program;
  see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
  <http://www.gnu.org/licenses/>.  */
@@ -385,8 +385,8 @@
  # undef INCLUDE_DEFAULTS_MUSL_CROSS
  # define INCLUDE_DEFAULTS_MUSL_CROSS
  #endif
---- src/gcc-14.1.0/gcc/cppdefault.cc
-+++ src/gcc-14.1.0/gcc/cppdefault.cc
+--- src/gcc-14.2.0/gcc/cppdefault.cc
++++ src/gcc-14.2.0/gcc/cppdefault.cc
 @@ -23,15 +23,13 @@
  #include "coretypes.h"
  #include "tm.h"
@@ -425,8 +425,8 @@
  #endif
      { 0, 0, 0, 0, 0, 0 }
    };
---- src/gcc-14.1.0/gcc/gcc.cc
-+++ src/gcc-14.1.0/gcc/gcc.cc
+--- src/gcc-14.2.0/gcc/gcc.cc
++++ src/gcc-14.2.0/gcc/gcc.cc
 @@ -47,6 +47,7 @@ compilation is specified by a string called a "spec".  */
  #include "opts-jobserver.h"
  #include "common/common-target.h"
