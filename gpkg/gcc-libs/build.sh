@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://gcc.gnu.org/
 TERMUX_PKG_DESCRIPTION="Runtime libraries shipped by GCC"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=14.1.0
+TERMUX_PKG_VERSION=14.2.0
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/gcc/gcc-$TERMUX_PKG_VERSION/gcc-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=e283c654987afe3de9d8080bc0bd79534b5ca0d681a73a11ff2b5d3767426840
+TERMUX_PKG_SHA256=a7b39bc69cbf9e25826c5a60ab26477001f7c08d85cec04bc0e29cabed6f3cc9
 TERMUX_PKG_DEPENDS="glibc"
 TERMUX_PKG_BUILD_DEPENDS="doxygen-glibc"
 TERMUX_PKG_BREAKS="gcc-glibc-libs-dev"
@@ -45,21 +45,23 @@ termux_step_configure() {
 		--with-gmp=$TERMUX_PREFIX \
 		--with-mpfr=$TERMUX_PREFIX \
 		--with-mpc=$TERMUX_PREFIX \
+		--enable-clocale=gnu \
 		$CONFIGFLAG \
 		--disable-multilib \
 		--disable-bootstrap \
 		--disable-nls \
 		--enable-default-pie \
+		--enable-default-ssp \
 		--enable-languages=c,c++,fortran \
 		--with-system-zlib \
 		--enable-__cxa_atexit \
 		--enable-linker-build-id \
 		--enable-plugin \
+		--enable-libstdcxx-backtrace \
 		--with-linker-hash-style=gnu \
 		--enable-gnu-indirect-function \
 		--disable-werror \
 		--disable-checking \
-		--disable-static \
 		--enable-host-shared \
 		--disable-libssp \
 		--disable-libstdcxx-pch \
