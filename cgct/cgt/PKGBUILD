@@ -1,6 +1,6 @@
 pkgname=cgt
-pkgver=14.1.0
-pkgrel=2
+pkgver=14.2.0
+pkgrel=0
 pkgdesc='Cross GCCs for Termux (only for Linux)'
 arch=(x86_64)
 url='https://gcc.gnu.org/'
@@ -12,16 +12,18 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-$pkgver/gcc-$pkgver.tar.xz
 	set_dynamic_path.patch
 	cgct-app-prefix.cc
 	cgct-app-prefix.h)
-sha256sums=('e283c654987afe3de9d8080bc0bd79534b5ca0d681a73a11ff2b5d3767426840'
-            '89529c2ad7b8f25a1a1a7b4129b8a58d3b80e254026d85800bb20f60431a5a03'
-            'fb1a2b9d2eb649153431e7bc81d4382c667338b9c461e4e4697d7db754041b68'
-            'fc725f6e77dedc0e6cd3d55ef33e93f0b7c5b25b6d5cf1d42311357f6abf1047'
-            '4d61bcbbfa41ac6093d8f3b7c1c4007456172a18a0fafb1743871baf7863469e'
+sha256sums=('a7b39bc69cbf9e25826c5a60ab26477001f7c08d85cec04bc0e29cabed6f3cc9'
+            'f4962b9ab48271994fefbd7c654fd2d60356a39abecc3510cfe45d1be7f50483'
+            '805fa7799fe23f2e4b1d5f9d10fadf46a45f446c6462f32f3b7633b8941003f3'
+            'ba65de3512c3d02030c5e3bcd70b69a7922eec6bdc24763bf4a6045447dc1d84'
+            'e402f2bc3288158e8edbef27b511015d87f37ba70ddbd84c2b925fe075822f95'
             '732e15a76056348911f60825c377c0378f6dad57b29eb86fcc7447cf8172f171'
             '9fb91df134d096bf493844812617b5aed9ce5d6ccd564f8a3a11c8d9812be744')
 depends=('cbt')
 optdepends=('glibc-cgct')
 groups=('cgct')
+targets=(aarch64-linux-gnu arm-linux-gnueabihf x86_64-linux-gnu i686-linux-gnu)
+options=(libtool staticlibs !emptydirs)
 
 prepare() {
 	for i in *.patch; do
@@ -34,6 +36,12 @@ prepare() {
 	sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
 	sed -i '/m64=/s/lib64/lib/' gcc/config/i386/t-linux64
 	sed -i '/lp64=/s/lib64/lib/' gcc/config/aarch64/t-aarch64-linux
+	for i in "'\${exec_prefix}'/\${target_noncanonical}" \
+		'${exec_prefix}/'{'${host_alias}','${target_noncanonical}'} \
+		'$(exec_prefix)/'{'$(host_noncanonical)','$(target_noncanonical)','$(target_alias)'} \
+		'${prefix}/${target_alias}'; do
+		sed -i "s|${i}|${i%%/*}|" $(grep -s -r -l "${i}")
+	done
 }
 
 build() {
@@ -43,7 +51,7 @@ build() {
 
 	clean_prefix || true
 
-	for target in aarch64-linux-gnu arm-linux-gnueabihf x86_64-linux-gnu i686-linux-gnu; do
+	for target in ${targets[@]}; do
 		arch_build=${target/-*}
 		CGCT_PREFIX=${CGCT_PATH}/${arch_build}
 		mkdir gcc-${arch_build} || true
@@ -90,6 +98,7 @@ build() {
 			--with-linker-hash-style=gnu \
 			--enable-gnu-indirect-function \
 			--enable-gnu-unique-object \
+			--enable-libstdcxx-backtrace \
 			--enable-shared \
 			--disable-werror \
 			--disable-libssp \
@@ -119,7 +128,9 @@ build() {
 }
 
 package() {
-	for target in aarch64-linux-gnu arm-linux-gnueabihf x86_64-linux-gnu i686-linux-gnu; do
+	clean_prefix || true
+
+	for target in ${targets[@]}; do
 		arch_build=${target/-*}
 		CGCT_PREFIX=${CGCT_PATH}/${arch_build}
 		cd gcc-${arch_build}
@@ -128,26 +139,15 @@ package() {
 			install_gpkg ${arch_build} ${pkg}
 		done
 
-		make DESTDIR="$pkgdir" install-gcc install-target-{libgcc,libstdc++-v3,libgomp,libquadmath,libatomic}
+		make DESTDIR="$pkgdir" install-gcc \
+			install-target-{libgcc,libstdc++-v3,libgomp,libquadmath,libatomic,libitm,libsanitizer,libvtv}
 
-		if [ -d $pkgdir/${CGCT_PREFIX}/$target/lib ]; then
-			mv $pkgdir/${CGCT_PREFIX}/$target/lib/* $pkgdir/${CGCT_PREFIX}/lib
-		fi
-		if [ -d $pkgdir/${CGCT_PREFIX}/$target/include ]; then
-			mv $pkgdir/${CGCT_PREFIX}/$target/include/* $pkgdir/${CGCT_PREFIX}/include
-		fi
-		if [ -d $pkgdir/${CGCT_PREFIX}/include/$pkgver ]; then
-			mkdir $pkgdir/${CGCT_PREFIX}/include/c++
-			mv $pkgdir/${CGCT_PREFIX}/include/$pkgver $pkgdir/${CGCT_PREFIX}/include/c++
-		fi
 		for i in gcc g++; do
 			ln -s ${target}-${i} $pkgdir/${CGCT_PREFIX}/bin/${i}
 		done
 		ln -s gcc $pkgdir/${CGCT_PREFIX}/bin/cc
 		ln -s g++ $pkgdir/${CGCT_PREFIX}/bin/cpp
 		rm -fr $pkgdir/${CGCT_PREFIX}/share
-		rm -fr $pkgdir/${CGCT_PREFIX}/$target
-		rm -fr $pkgdir/${DIR_TERMUX}/files
 
 		clean_prefix
 
