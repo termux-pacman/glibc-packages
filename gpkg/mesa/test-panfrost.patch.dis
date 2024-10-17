@@ -1,0 +1,207 @@
+From https://github.com/Saikatsaha1996/mesa-Panfrost-G610
+This patch introduces changes that should configure
+the panfrost driver for Termux, but the resulting
+panfrost does not work. So it is disabled.
+
+diff --git a/src/gallium/auxiliary/target-helpers/sw_helper.h b/src/gallium/auxiliary/target-helpers/sw_helper.h
+index 65fadc4..f434928 100644
+--- a/src/gallium/auxiliary/target-helpers/sw_helper.h
++++ b/src/gallium/auxiliary/target-helpers/sw_helper.h
+@@ -20,6 +20,10 @@
+ #include "d3d12/d3d12_public.h"
+ #endif
+ 
++#ifdef GALLIUM_PANFROST
++#include "panfrost/pan_public.h"
++#endif
++
+ #ifdef GALLIUM_SOFTPIPE
+ #include "softpipe/sp_public.h"
+ #endif
+@@ -66,6 +70,11 @@ sw_screen_create_named(struct sw_winsys *winsys, const struct pipe_screen_config
+       screen = d3d12_create_dxcore_screen(winsys, NULL);
+ #endif
+ 
++#if defined(GALLIUM_PANFROST)
++   if (screen == NULL && strcmp(driver, "panfrost") == 0)
++      screen = panfrost_create_screen_sw(winsys, config);
++#endif
++
+    return screen;
+ }
+ 
+@@ -78,6 +87,9 @@ sw_screen_create_vk(struct sw_winsys *winsys, const struct pipe_screen_config *c
+ #if defined(GALLIUM_D3D12)
+       (sw_vk || only_sw) ? "" : "d3d12",
+ #endif
++#if defined(GALLIUM_PANFROST)
++      (sw_vk || only_sw) ? "" : "panfrost",
++#endif
+ #if defined(GALLIUM_LLVMPIPE)
+       "llvmpipe",
+ #endif
+diff --git a/src/gallium/drivers/panfrost/pan_public.h b/src/gallium/drivers/panfrost/pan_public.h
+index 587fc3f..c7f5048 100644
+--- a/src/gallium/drivers/panfrost/pan_public.h
++++ b/src/gallium/drivers/panfrost/pan_public.h
+@@ -31,11 +31,15 @@ extern "C" {
+ struct pipe_screen;
+ struct pipe_screen_config;
+ struct renderonly;
++struct sw_winsys;
+ 
+ struct pipe_screen *
+ panfrost_create_screen(int fd, const struct pipe_screen_config *config,
+                        struct renderonly *ro);
+ 
++struct pipe_screen *
++panfrost_create_screen_sw(struct sw_winsys *winsys, struct pipe_screen_config *config);
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/src/gallium/drivers/panfrost/pan_resource.c b/src/gallium/drivers/panfrost/pan_resource.c
+index 4268c26..3a53749 100644
+--- a/src/gallium/drivers/panfrost/pan_resource.c
++++ b/src/gallium/drivers/panfrost/pan_resource.c
+@@ -31,11 +31,13 @@
+  *
+  */
+ 
++#include <stdbool.h>
+ #include <fcntl.h>
+ #include <xf86drm.h>
+ #include "drm-uapi/drm_fourcc.h"
+ 
+ #include "frontend/winsys_handle.h"
++#include "frontend/sw_winsys.h"
+ #include "util/format/u_format.h"
+ #include "util/u_debug_image.h"
+ #include "util/u_drm.h"
+@@ -721,6 +723,19 @@ panfrost_resource_create_with_modifier(struct pipe_screen *screen,
+    so->base = *template;
+    so->base.screen = screen;
+ 
++   if (pan_screen(screen)->sw_winsys &&
++       (template->bind & PAN_BIND_SHARED_MASK)) {
++           so->dt = pan_screen(screen)->sw_winsys->displaytarget_create(
++                   pan_screen(screen)->sw_winsys,
++                   so->base.bind,
++                   so->base.format,
++                   so->base.width0,
++                   so->base.height0,
++                   64,
++                   NULL /*map_front_private*/,
++                   &so->dt_stride);
++   }
++
+    pipe_reference_init(&so->base.reference, 1);
+ 
+    util_range_init(&so->valid_buffer_range);
+diff --git a/src/gallium/drivers/panfrost/pan_resource.h b/src/gallium/drivers/panfrost/pan_resource.h
+index e63bcc9..bd0c4b0 100644
+--- a/src/gallium/drivers/panfrost/pan_resource.h
++++ b/src/gallium/drivers/panfrost/pan_resource.h
+@@ -83,6 +83,9 @@ struct panfrost_resource {
+ 
+    /* Cached min/max values for index buffers */
+    struct panfrost_minmax_cache *index_cache;
++
++   struct sw_displaytarget *dt;
++   unsigned dt_stride;
+ };
+ 
+ static inline struct panfrost_resource *
+diff --git a/src/gallium/drivers/panfrost/pan_screen.c b/src/gallium/drivers/panfrost/pan_screen.c
+index 3d0f151..c22037e 100644
+--- a/src/gallium/drivers/panfrost/pan_screen.c
++++ b/src/gallium/drivers/panfrost/pan_screen.c
+@@ -55,6 +55,9 @@
+ 
+ #include "pan_context.h"
+ 
++#include "pan_public.h"
++#include "frontend/sw_winsys.h"
++
+ #define DEFAULT_MAX_AFBC_PACKING_RATIO 90
+ 
+ /* clang-format off */
+@@ -903,6 +906,39 @@ panfrost_get_driver_query_info(struct pipe_screen *pscreen, unsigned index,
+    return 1;
+ }
+ 
++static void
++panfrost_flush_frontbuffer(struct pipe_screen *_screen,
++                           struct pipe_context *pctx,
++                           struct pipe_resource *prsrc,
++                           unsigned level, unsigned layer,
++                           void *context_private,
++                           unsigned nboxes,
++                           struct pipe_box *sub_box)
++{
++   struct panfrost_resource *rsrc = pan_resource(prsrc);
++   struct panfrost_screen *screen = pan_screen(_screen);
++   struct sw_winsys *winsys = screen->sw_winsys;
++   assert(level == 0);
++   struct pipe_box my_box = {
++           .width = rsrc->base.width0,
++           .height = rsrc->base.height0,
++           .depth = 1,
++   };
++   assert(rsrc->dt);
++   uint8_t *map = winsys->displaytarget_map(winsys, rsrc->dt,
++                                            PIPE_USAGE_DEFAULT);
++   assert(map);
++   struct pipe_transfer *trans = NULL;
++   uint8_t *tex_map = pctx->texture_map(pctx, prsrc, level,
++                                        PIPE_MAP_READ, &my_box, &trans);
++   for (unsigned row = 0; row < rsrc->base.height0; ++row)
++           memcpy(map + row * rsrc->dt_stride,
++                  tex_map + row * trans->stride,
++                  MIN2(rsrc->dt_stride, trans->stride));
++   pctx->texture_unmap(pctx, trans);
++   winsys->displaytarget_display(winsys, rsrc->dt, context_private, nboxes, sub_box);
++}
++
+ struct pipe_screen *
+ panfrost_create_screen(int fd, const struct pipe_screen_config *config,
+                        struct renderonly *ro)
+@@ -984,6 +1020,7 @@ panfrost_create_screen(int fd, const struct pipe_screen_config *config,
+    screen->base.fence_finish = panfrost_fence_finish;
+    screen->base.fence_get_fd = panfrost_fence_get_fd;
+    screen->base.set_damage_region = panfrost_resource_set_damage_region;
++   screen->base.flush_frontbuffer = panfrost_flush_frontbuffer;
+    screen->base.query_compression_rates = panfrost_query_compression_rates;
+    screen->base.query_compression_modifiers =
+       panfrost_query_compression_modifiers;
+@@ -1016,3 +1053,17 @@ panfrost_create_screen(int fd, const struct pipe_screen_config *config,
+ 
+    return &screen->base;
+ }
++
++struct pipe_screen *
++panfrost_create_screen_sw(struct sw_winsys *winsys, struct pipe_screen_config *config)
++{
++   int fd = drmOpenWithType("panfrost", NULL, DRM_NODE_RENDER);
++   if (fd < 0)
++           fd = open("/dev/mali0", O_RDWR | O_CLOEXEC | O_NONBLOCK);
++   if (fd < 0)
++           return NULL;
++   struct pipe_screen *scr = panfrost_create_screen(fd, config, NULL);
++   if (scr)
++           pan_screen(scr)->sw_winsys = winsys;
++   return scr;
++}
+diff --git a/src/gallium/drivers/panfrost/pan_screen.h b/src/gallium/drivers/panfrost/pan_screen.h
+index ba78019..b820e38 100644
+--- a/src/gallium/drivers/panfrost/pan_screen.h
++++ b/src/gallium/drivers/panfrost/pan_screen.h
+@@ -114,6 +114,8 @@ struct panfrost_screen {
+       struct panfrost_pool desc_pool;
+    } blitter;
+ 
++   struct sw_winsys *sw_winsys;
++
+    struct panfrost_vtable vtbl;
+    struct disk_cache *disk_cache;
+    unsigned max_afbc_packing_ratio;
