@@ -1,0 +1,14 @@
+From https://github.com/xMeM/termux-packages/commit/57b1bb44c9eed341c700105efed93f9fd8bc34a6
+diff --git a/src/util/os_file.c b/src/util/os_file.c
+index 425c8378c05..1146ee4f538 100644
+--- a/src/util/os_file.c
++++ b/src/util/os_file.c
+@@ -224,6 +224,8 @@ typedef void *kvaddr_t;
+ 
+ #endif /* DETECT_OS_DRAGONFLY || DETECT_OS_FREEBSD */
+ 
++#undef SYS_kcmp
++
+ int
+ os_same_file_description(int fd1, int fd2)
+ {
