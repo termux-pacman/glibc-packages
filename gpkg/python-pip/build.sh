@@ -2,10 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://pip.pypa.io/
 TERMUX_PKG_DESCRIPTION="The PyPA recommended tool for installing Python packages"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION="24.2"
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_VERSION="24.3.1"
 TERMUX_PKG_SRCURL=https://github.com/pypa/pip/archive/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=e527f2366551b8483fa3a8ac2954aa79f2461e6600d917f3b6ae741d708cb982
+TERMUX_PKG_SHA256=1349240eff5fd44f4b9d834d503d87505a6cd0a8ab022f3f1665181d6a719a73
 TERMUX_PKG_DEPENDS="gcc-glibc, make-glibc, pkgconf-glibc, python-glibc (>= 3.11.1-1)"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="gcc-glibc"
 TERMUX_PKG_BREAKS="python-glibc (<< 3.11.1-1)"
