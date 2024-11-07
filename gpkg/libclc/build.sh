@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://libclc.llvm.org/
 TERMUX_PKG_DESCRIPTION="Library requirements of the OpenCL C programming language"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=19.1.2
+TERMUX_PKG_VERSION=19.1.3
 TERMUX_PKG_SRCURL=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION/libclc-$TERMUX_PKG_VERSION.src.tar.xz
-TERMUX_PKG_SHA256=2a9351b15d935d84e1d7d24daff895fa907ff94d120a5ed0ba463df04eecf4e9
+TERMUX_PKG_SHA256=b49fab401aaa65272f0480f6d707a9a175ea8e68b6c5aa910457c4166aa6328f
 TERMUX_PKG_BUILD_DEPENDS="clang-glibc, python-glibc, spirv-llvm-translator-glibc"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
