@@ -4,7 +4,7 @@
 # may not be installed.
 unset LD_PRELOAD
 if [ -x "$(command -v glib-compile-schemas)" ]; then
-	@TERMUX_PREFIX@/glib-compile-schemas "@TERMUX_PREFIX@/share/glib-2.0/schemas" > /dev/null
+	@TERMUX_PREFIX@/bin/glib-compile-schemas "@TERMUX_PREFIX@/share/glib-2.0/schemas" > /dev/null
 fi
 
 exit 0
