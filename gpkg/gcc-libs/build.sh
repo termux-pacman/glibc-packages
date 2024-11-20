@@ -2,9 +2,13 @@ TERMUX_PKG_HOMEPAGE=https://gcc.gnu.org/
 TERMUX_PKG_DESCRIPTION="Runtime libraries shipped by GCC"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=14.2.0
-TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/gcc/gcc-$TERMUX_PKG_VERSION/gcc-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=a7b39bc69cbf9e25826c5a60ab26477001f7c08d85cec04bc0e29cabed6f3cc9
+TERMUX_PKG_VERSION=14.2.1
+_COMMIT=694613a7f9adfa9c87e733adc63839c8801f2b5c
+TERMUX_PKG_SRCURL=git+https://sourceware.org/git/gcc
+TERMUX_PKG_SHA256=e3abe0e81ee3eba35a592ef75c82fe9ae23c77631ec4f6726f7fa08444769678
+TERMUX_PKG_GIT_BRANCH="master"
+#TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/gcc/gcc-$TERMUX_PKG_VERSION/gcc-$TERMUX_PKG_VERSION.tar.xz
+#TERMUX_PKG_SHA256=a7b39bc69cbf9e25826c5a60ab26477001f7c08d85cec04bc0e29cabed6f3cc9
 TERMUX_PKG_DEPENDS="glibc"
 TERMUX_PKG_BUILD_DEPENDS="doxygen-glibc"
 TERMUX_PKG_BREAKS="gcc-glibc-libs-dev"
@@ -13,10 +17,22 @@ TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_SEPARATE_SUB_DEPENDS=true
 TERMUX_PKG_ONLY_INSTALLING=true
 
+termux_step_post_get_source() {
+	git fetch --unshallow
+	git checkout $_COMMIT
+
+	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
+	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
+		termux_error_exit "Checksum mismatch for source files."
+	fi
+}
+
 termux_step_pre_configure() {
 	sed -i 's@\./fixinc\.sh@-c true@' ${TERMUX_PKG_SRCDIR}/gcc/Makefile.in
 	sed -i '/m64=/s/lib64/lib/' ${TERMUX_PKG_SRCDIR}/gcc/config/i386/t-linux64
 	sed -i '/lp64=/s/lib64/lib/' ${TERMUX_PKG_SRCDIR}/gcc/config/aarch64/t-aarch64-linux
+	echo "${TERMUX_PKG_VERSION}" > ${TERMUX_PKG_SRCDIR}/gcc/BASE-VER
+	echo "${_COMMIT}" > ${TERMUX_PKG_SRCDIR}/gcc/DEV-PHASE
 	CFLAGS=${CFLAGS/-Werror=format-security/}
 	CXXFLAGS=${CXXFLAGS/-Werror=format-security/}
 	CFLAGS+=" -I${TERMUX_PREFIX}/include -L${TERMUX_PREFIX}/lib"
