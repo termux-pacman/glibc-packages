@@ -1,5 +1,5 @@
---- src/gcc-14.2.0/configure	2023-07-27 11:13:03.000000000 +0300
-+++ src/gcc-14.2.0/configure.patch	2024-04-17 19:47:43.249004152 +0300
+--- src/gcc/configure	2023-07-27 11:13:03.000000000 +0300
++++ src/gcc/configure.patch	2024-04-17 19:47:43.249004152 +0300
 @@ -17498,7 +17498,7 @@
  
  { $as_echo "$as_me:${as_lineno-$LINENO}: checking where to find the target ar" >&5
