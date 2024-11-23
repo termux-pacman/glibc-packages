@@ -1,22 +1,23 @@
 pkgname=cgt
-pkgver=14.2.0
+pkgver=14.2.1
 pkgrel=0
 pkgdesc='Cross GCCs for Termux (only for Linux)'
 arch=(x86_64)
 url='https://gcc.gnu.org/'
 license=(GPL LGPL FDL)
-source=(https://ftp.gnu.org/gnu/gcc/gcc-$pkgver/gcc-$pkgver.tar.xz
+_commit=694613a7f9adfa9c87e733adc63839c8801f2b5c
+source=(git+https://sourceware.org/git/gcc.git#commit=${_commit}
 	gcc-configure.patch
 	config.sub.patch
 	configure.patch
 	set_dynamic_path.patch
 	cgct-app-prefix.cc
 	cgct-app-prefix.h)
-sha256sums=('a7b39bc69cbf9e25826c5a60ab26477001f7c08d85cec04bc0e29cabed6f3cc9'
-            'f4962b9ab48271994fefbd7c654fd2d60356a39abecc3510cfe45d1be7f50483'
-            '805fa7799fe23f2e4b1d5f9d10fadf46a45f446c6462f32f3b7633b8941003f3'
-            'ba65de3512c3d02030c5e3bcd70b69a7922eec6bdc24763bf4a6045447dc1d84'
-            'e402f2bc3288158e8edbef27b511015d87f37ba70ddbd84c2b925fe075822f95'
+sha256sums=('085eba5de615f6f74729f96e8c301808159b72382ad331ebec9c79c2bd08e20d'
+            'b0d2153d28248189ad1f000194c9b12aa7cea04c09c9f36a2e78b2c25b771392'
+            'a688899b982608089ee76a97e18c019f596ccb5cad055916a6ad6d387568b3dc'
+            '8ad880e14a32a3b5f3ab8039df89b22479c4a92bfbe6b3f758409264ddef5479'
+            'aa87377b2a73e303c45d9a86496b94193799083324a442572768bd1b704a71e8'
             '732e15a76056348911f60825c377c0378f6dad57b29eb86fcc7447cf8172f171'
             '9fb91df134d096bf493844812617b5aed9ce5d6ccd564f8a3a11c8d9812be744')
 depends=('cbt')
@@ -26,13 +27,14 @@ targets=(aarch64-linux-gnu arm-linux-gnueabihf x86_64-linux-gnu i686-linux-gnu)
 options=(libtool staticlibs !emptydirs)
 
 prepare() {
+	[ ! -d gcc ] && ln -s gcc-${pkgver} gcc
 	for i in *.patch; do
 		patch -Np1 -i ${srcdir}/$i
 	done
 
-	cp ./cgct-app-prefix.{cc,h} ./gcc-${pkgver}/gcc/
+	cp ./cgct-app-prefix.{cc,h} ./gcc/gcc/
 
-	cd gcc-${pkgver}
+	cd gcc
 	sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
 	sed -i '/m64=/s/lib64/lib/' gcc/config/i386/t-linux64
 	sed -i '/lp64=/s/lib64/lib/' gcc/config/aarch64/t-aarch64-linux
@@ -42,6 +44,8 @@ prepare() {
 		'${prefix}/${target_alias}'; do
 		sed -i "s|${i}|${i%%/*}|" $(grep -s -r -l "${i}")
 	done
+	echo "${pkgver}" > gcc/BASE-VER
+	echo "${_commit}" > gcc/DEV-PHASE
 }
 
 build() {
@@ -70,7 +74,7 @@ build() {
 			"i686") CONFIGFLAG="--with-arch=i686";;
 		esac
 
-		"$srcdir"/gcc-${pkgver}/configure \
+		"$srcdir"/gcc/configure \
 			--host=cgct \
 			--build=${CHOST} \
 			--target=${target} \

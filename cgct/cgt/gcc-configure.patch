@@ -1,5 +1,5 @@
---- src/gcc-14.2.0/gcc/configure	2024-05-20 09:02:31.592159861 +0300
-+++ src/gcc-14.2.0/gcc/configure.patch	2024-05-20 09:04:22.992159819 +0300
+--- src/gcc/gcc/configure	2024-05-20 09:02:31.592159861 +0300
++++ src/gcc/gcc/configure.patch	2024-05-20 09:04:22.992159819 +0300
 @@ -3784,9 +3784,6 @@
      gcc_gxx_include_dir='${libsubdir}/include/c++'
    else
