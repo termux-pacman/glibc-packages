@@ -425,17 +425,17 @@
  #endif
      { 0, 0, 0, 0, 0, 0 }
    };
---- src/gcc/gcc/gcc.cc	2024-11-22 23:52:07.605751246 +0300
-+++ src/gcc/gcc/gcc.cc.patch	2024-11-23 00:09:51.505136358 +0300
-@@ -51,6 +51,7 @@ compilation is specified by a string cal
+--- src/gcc/gcc/gcc.cc
++++ src/gcc/gcc/gcc.cc
+@@ -47,6 +47,7 @@ compilation is specified by a string called a "spec".  */
+ #include "opts-jobserver.h"
  #include "common/common-target.h"
  #include "gcc-urlifier.h"
- #include "opts-diagnostic.h"
 +#include "cgct-app-prefix.h"
  
  #ifndef MATH_LIBRARY
  #define MATH_LIBRARY "m"
-@@ -1607,11 +1608,10 @@ static const char *gcc_libexec_prefix;
+@@ -1603,11 +1604,10 @@ static const char *gcc_libexec_prefix;
  
  /* Default prefixes to attach to command names.  */
  
@@ -451,7 +451,7 @@
  #endif
  
  #ifdef CROSS_DIRECTORY_STRUCTURE  /* Don't use these prefixes for a cross compiler.  */
-@@ -1648,10 +1648,10 @@ static const char *const standard_startf
+@@ -1644,10 +1644,10 @@ static const char *const standard_startfile_prefix = STANDARD_STARTFILE_PREFIX;
  static const char *md_exec_prefix = MD_EXEC_PREFIX;
  static const char *md_startfile_prefix = MD_STARTFILE_PREFIX;
  static const char *md_startfile_prefix_1 = MD_STARTFILE_PREFIX_1;
@@ -466,7 +466,7 @@
  
  /* A relative path to be used in finding the location of tools
     relative to the driver.  */
-@@ -4876,6 +4876,8 @@ process_command (unsigned int decoded_op
+@@ -4849,6 +4849,8 @@ process_command (unsigned int decoded_options_count,
       that are lists of directory names with colons.  */
  
    temp = env.get ("COMPILER_PATH");
@@ -475,7 +475,7 @@
    if (temp)
      {
        const char *startp, *endp;
-@@ -8569,7 +8571,7 @@ driver::set_up_specs () const
+@@ -8554,7 +8556,7 @@ driver::set_up_specs () const
      }
    /* We should eventually get rid of all these and stick to
       startfile_prefix_spec exclusively.  */
@@ -484,7 +484,7 @@
      {
        if (*md_startfile_prefix)
  	add_sysrooted_prefix (&startfile_prefixes, md_startfile_prefix,
-@@ -8590,7 +8592,7 @@ driver::set_up_specs () const
+@@ -8575,7 +8577,7 @@ driver::set_up_specs () const
  	add_sysrooted_prefix (&startfile_prefixes,
  			      standard_startfile_prefix, "BINUTILS",
  			      PREFIX_PRIORITY_LAST, 0, 1);
@@ -493,7 +493,7 @@
  	{
  	  add_prefix (&startfile_prefixes,
  		      concat (gcc_exec_prefix
-@@ -8602,13 +8604,15 @@ driver::set_up_specs () const
+@@ -8587,13 +8589,15 @@ driver::set_up_specs () const
  
        /* Sysrooted prefixes are relocated because target_system_root is
  	 also relocated by gcc_exec_prefix.  */

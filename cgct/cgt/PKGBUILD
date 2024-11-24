@@ -1,33 +1,43 @@
 pkgname=cgt
-pkgver=14.2.1
+pkgver=14.2.2
+orgver=14.2.0
 pkgrel=0
 pkgdesc='Cross GCCs for Termux (only for Linux)'
 arch=(x86_64)
 url='https://gcc.gnu.org/'
 license=(GPL LGPL FDL)
-_commit=694613a7f9adfa9c87e733adc63839c8801f2b5c
-source=(git+https://sourceware.org/git/gcc.git#commit=${_commit}
+source=(https://ftp.gnu.org/gnu/gcc/gcc-${orgver}/gcc-${orgver}.tar.xz
 	gcc-configure.patch
 	config.sub.patch
 	configure.patch
 	set_dynamic_path.patch
 	cgct-app-prefix.cc
-	cgct-app-prefix.h)
-sha256sums=('085eba5de615f6f74729f96e8c301808159b72382ad331ebec9c79c2bd08e20d'
+	cgct-app-prefix.h
+	explow.cc.patch
+	explow.h.patch
+	expr.cc.patch
+	expr.h.patch)
+sha256sums=('a7b39bc69cbf9e25826c5a60ab26477001f7c08d85cec04bc0e29cabed6f3cc9'
             'b0d2153d28248189ad1f000194c9b12aa7cea04c09c9f36a2e78b2c25b771392'
             'a688899b982608089ee76a97e18c019f596ccb5cad055916a6ad6d387568b3dc'
             '8ad880e14a32a3b5f3ab8039df89b22479c4a92bfbe6b3f758409264ddef5479'
-            'aa87377b2a73e303c45d9a86496b94193799083324a442572768bd1b704a71e8'
+            '5017efad199c2133586849e3cb978c7ba328ea0fc56fdad0d7c55bb036a35caf'
             '732e15a76056348911f60825c377c0378f6dad57b29eb86fcc7447cf8172f171'
-            '9fb91df134d096bf493844812617b5aed9ce5d6ccd564f8a3a11c8d9812be744')
+            '9fb91df134d096bf493844812617b5aed9ce5d6ccd564f8a3a11c8d9812be744'
+            'c19922f4dc8df24f3ff29761bd5f8e2627faf89f711b41835ce47596d8f2e4b8'
+            '82f050596e1fac7fb53d22f29a1f1da58d996f9e8cc5f2524e80affc48d7480f'
+            'a751bf9bb15a90247588eda4ab0c34485665efeb702c3a49b2ed82647e659e6e'
+            '3fddaf4da4ad688a3adf9483b7b6479c7a96acae319e8a97e4d7e5b062803efa')
 depends=('cbt')
 optdepends=('glibc-cgct')
 groups=('cgct')
-targets=(aarch64-linux-gnu arm-linux-gnueabihf x86_64-linux-gnu i686-linux-gnu)
+#targets=(aarch64-linux-gnu arm-linux-gnueabihf x86_64-linux-gnu i686-linux-gnu)
+#TESTING
+targets=(aarch64-linux-gnu arm-linux-gnueabihf)
 options=(libtool staticlibs !emptydirs)
 
 prepare() {
-	[ ! -d gcc ] && ln -s gcc-${pkgver} gcc
+	[ ! -d gcc ] && ln -s gcc-${orgver} gcc
 	for i in *.patch; do
 		patch -Np1 -i ${srcdir}/$i
 	done
@@ -45,7 +55,6 @@ prepare() {
 		sed -i "s|${i}|${i%%/*}|" $(grep -s -r -l "${i}")
 	done
 	echo "${pkgver}" > gcc/BASE-VER
-	echo "${_commit}" > gcc/DEV-PHASE
 }
 
 build() {
