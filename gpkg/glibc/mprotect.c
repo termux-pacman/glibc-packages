@@ -22,7 +22,7 @@
 /* - String To Unsigned Long Int
    There are two chairs - one is called "strtoul", the other "stuli"...
 */
-unsigned long int __stuli(char *value) {
+static unsigned long int __stuli(char *value) {
 	unsigned long int val, res = 0;
 	int len = strlen(value);
 

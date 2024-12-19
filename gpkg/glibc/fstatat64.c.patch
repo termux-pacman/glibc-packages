@@ -1,0 +1,75 @@
+--- glibc-2.39/sysdeps/unix/sysv/linux/fstatat64.c	2024-12-11 13:13:54.323887003 +0300
++++ glibc-2.39/sysdeps/unix/sysv/linux/fstatat64.c.patch	2024-12-11 13:16:09.283886951 +0300
+@@ -38,46 +38,8 @@
+                 "__blkcnt_t and __blkcnt64_t must match");
+ #endif
+ 
+-#if FSTATAT_USE_STATX
+-
+-static inline int
+-fstatat64_time64_statx (int fd, const char *file, struct __stat64_t64 *buf,
+-			int flag)
+-{
+-  /* 32-bit kABI with default 64-bit time_t, e.g. arc, riscv32.   Also
+-     64-bit time_t support is done through statx syscall.  */
+-  struct statx tmp;
+-  int r = INTERNAL_SYSCALL_CALL (statx, fd, file, AT_NO_AUTOMOUNT | flag,
+-				 STATX_BASIC_STATS, &tmp);
+-  if (r != 0)
+-    return r;
+-
+-  *buf = (struct __stat64_t64) {
+-    .st_dev = __gnu_dev_makedev (tmp.stx_dev_major, tmp.stx_dev_minor),
+-    .st_rdev = __gnu_dev_makedev (tmp.stx_rdev_major, tmp.stx_rdev_minor),
+-    .st_ino = tmp.stx_ino,
+-    .st_mode = tmp.stx_mode,
+-    .st_nlink = tmp.stx_nlink,
+-    .st_uid = tmp.stx_uid,
+-    .st_gid = tmp.stx_gid,
+-    .st_atime = tmp.stx_atime.tv_sec,
+-    .st_atim.tv_nsec = tmp.stx_atime.tv_nsec,
+-    .st_mtime = tmp.stx_mtime.tv_sec,
+-    .st_mtim.tv_nsec = tmp.stx_mtime.tv_nsec,
+-    .st_ctime = tmp.stx_ctime.tv_sec,
+-    .st_ctim.tv_nsec = tmp.stx_ctime.tv_nsec,
+-    .st_size = tmp.stx_size,
+-    .st_blocks = tmp.stx_blocks,
+-    .st_blksize = tmp.stx_blksize,
+-  };
+-
+-  return r;
+-}
+-#endif
+-
+ /* Only statx supports 64-bit timestamps for 32-bit architectures with
+    __ASSUME_STATX, so there is no point in building the fallback.  */
+-#if !FSTATAT_USE_STATX || (FSTATAT_USE_STATX && !defined __ASSUME_STATX)
+ static inline int
+ fstatat64_time64_stat (int fd, const char *file, struct __stat64_t64 *buf,
+ 		       int flag)
+@@ -138,24 +100,12 @@
+ 
+   return r;
+ }
+-#endif
+ 
+ int
+ __fstatat64_time64 (int fd, const char *file, struct __stat64_t64 *buf,
+ 		    int flag)
+ {
+-  int r;
+-
+-#if FSTATAT_USE_STATX
+-  r = fstatat64_time64_statx (fd, file, buf, flag);
+-# ifndef __ASSUME_STATX
+-  if (r == -ENOSYS)
+-    r = fstatat64_time64_stat (fd, file, buf, flag);
+-# endif
+-#else
+-  r = fstatat64_time64_stat (fd, file, buf, flag);
+-#endif
+-
++  int r = fstatat64_time64_stat (fd, file, buf, flag);
+   return INTERNAL_SYSCALL_ERROR_P (r)
+ 	 ? INLINE_SYSCALL_ERROR_RETURN_VALUE (-r)
+ 	 : 0;
