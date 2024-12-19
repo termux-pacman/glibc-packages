@@ -1,6 +1,5 @@
 #ifndef WITHOUT_FAKESYSCALL
-# include <sysdep.h>
-# include <fakesyscall.h>
+# include <fakesyscall-base.h>
 #else
 # include <unistd.h>
 #endif

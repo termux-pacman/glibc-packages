@@ -9,11 +9,3 @@
    setvmaname \
    signalfd \
    splice \
-@@ -503,6 +501,7 @@
-   sched_getcpu \
-   spawnattr_getcgroup_np \
-   spawnattr_setcgroup_np \
-+  shmem-android \
-   # sysdep_routines
- 
- tests += \

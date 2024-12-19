@@ -1,14 +1,32 @@
+diff --git a/sysdeps/unix/sysv/linux/epoll_pwait2.c b/sysdeps/unix/sysv/linux/epoll_pwait2.c
+index 0f6ac3e1..9b111ad2 100644
+--- a/sysdeps/unix/sysv/linux/epoll_pwait2.c
++++ b/sysdeps/unix/sysv/linux/epoll_pwait2.c
+@@ -18,13 +18,14 @@
+ 
+ #include <sys/epoll.h>
+ #include <sysdep.h>
++#include <fakesyscall.h>
+ 
+ int
+ __epoll_pwait2_time64 (int fd, struct epoll_event *ev, int maxev,
+ 		       const struct __timespec64 *tmo, const sigset_t *s)
+ {
+   /* The syscall only supports 64-bit time_t.  */
+-  return SYSCALL_CANCEL (epoll_pwait2, fd, ev, maxev, tmo, s, __NSIG_BYTES);
++  return syscall (__NR_epoll_pwait2, fd, ev, maxev, tmo, s, __NSIG_BYTES);
+ }
+ #if __TIMESIZE != 64
+ libc_hidden_def (__epoll_pwait2_time64)
 diff --git a/sysdeps/unix/sysv/linux/local-setxid.h b/sysdeps/unix/sysv/linux/local-setxid.h
-index 97d787d9..79792f6f 100644
+index 97d787d9..c975fa86 100644
 --- a/sysdeps/unix/sysv/linux/local-setxid.h
 +++ b/sysdeps/unix/sysv/linux/local-setxid.h
-@@ -1,16 +1,18 @@
+@@ -1,16 +1,17 @@
  /* SETxID functions which only have to change the local thread and
     none of the possible other threads.  */
--#include <sysdep.h>
-+#include <unistd.h>
-+#include <arch-syscall.h>
-+#include <disabled-syscall.h>
+ #include <sysdep.h>
++#include <fakesyscall.h>
  
  #ifdef __NR_setresuid32
 -# define local_seteuid(id) INLINE_SYSCALL (setresuid32, 3, -1, id, -1)
@@ -26,20 +44,56 @@ index 97d787d9..79792f6f 100644
 -# define local_setegid(id) INLINE_SYSCALL (setresgid, 3, -1, id, -1)
 +# define local_setegid(id) syscall (__NR_setresgid, 3, -1, id, -1)
  #endif
+diff --git a/sysdeps/unix/sysv/linux/mq_open.c b/sysdeps/unix/sysv/linux/mq_open.c
+index 936001b8..eb381a01 100644
+--- a/sysdeps/unix/sysv/linux/mq_open.c
++++ b/sysdeps/unix/sysv/linux/mq_open.c
+@@ -22,6 +22,7 @@
+ #include <stdio.h>
+ #include <sysdep.h>
+ #include <shlib-compat.h>
++#include <fakesyscall.h>
+ 
+ /* Establish connection between a process and a message queue NAME and
+    return message queue descriptor or (mqd_t) -1 on error.  OFLAG determines
+@@ -48,7 +49,7 @@ __mq_open (const char *name, int oflag, ...)
+       va_end (ap);
+     }
+ 
+-  return INLINE_SYSCALL (mq_open, 4, name + 1, oflag, mode, attr);
++  return syscall (__NR_mq_open, 4, name + 1, oflag, mode, attr);
+ }
+ versioned_symbol (libc, __mq_open, mq_open, GLIBC_2_34);
+ #if OTHER_SHLIB_COMPAT (librt, GLIBC_2_3_4, GLIBC_2_34)
+diff --git a/sysdeps/unix/sysv/linux/open_by_handle_at.c b/sysdeps/unix/sysv/linux/open_by_handle_at.c
+index 730059d7..23ec12ad 100644
+--- a/sysdeps/unix/sysv/linux/open_by_handle_at.c
++++ b/sysdeps/unix/sysv/linux/open_by_handle_at.c
+@@ -20,9 +20,10 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sysdep-cancel.h>
++#include <fakesyscall.h>
+ 
+ int
+ open_by_handle_at (int mount_fd, struct file_handle *handle, int flags)
+ {
+-  return SYSCALL_CANCEL (open_by_handle_at, mount_fd, handle, flags);
++  return syscall (__NR_open_by_handle_at, mount_fd, handle, flags);
+ }
 diff --git a/sysdeps/unix/sysv/linux/setegid.c b/sysdeps/unix/sysv/linux/setegid.c
-index 4a608532..f1140ed1 100644
+index 4a608532..e4ff2bc3 100644
 --- a/sysdeps/unix/sysv/linux/setegid.c
 +++ b/sysdeps/unix/sysv/linux/setegid.c
-@@ -18,6 +18,8 @@
+@@ -18,6 +18,7 @@
  #include <errno.h>
  #include <unistd.h>
  #include <setxid.h>
-+#include <arch-syscall.h>
-+#include <disabled-syscall.h>
++#include <fakesyscall.h>
  
  
  int
-@@ -29,9 +31,9 @@ setegid (gid_t gid)
+@@ -29,9 +30,9 @@ setegid (gid_t gid)
      return INLINE_SYSCALL_ERROR_RETURN_VALUE (EINVAL);
  
  #ifdef __NR_setresgid32
@@ -52,19 +106,18 @@ index 4a608532..f1140ed1 100644
  
    return result;
 diff --git a/sysdeps/unix/sysv/linux/seteuid.c b/sysdeps/unix/sysv/linux/seteuid.c
-index 64d3c84f..ae816280 100644
+index 64d3c84f..75e7497c 100644
 --- a/sysdeps/unix/sysv/linux/seteuid.c
 +++ b/sysdeps/unix/sysv/linux/seteuid.c
-@@ -18,6 +18,8 @@
+@@ -18,6 +18,7 @@
  #include <errno.h>
  #include <unistd.h>
  #include <setxid.h>
-+#include <arch-syscall.h>
-+#include <disabled-syscall.h>
++#include <fakesyscall.h>
  
  
  int
-@@ -29,9 +31,9 @@ seteuid (uid_t uid)
+@@ -29,9 +30,9 @@ seteuid (uid_t uid)
      return INLINE_SYSCALL_ERROR_RETURN_VALUE (EINVAL);
  
  #ifdef __NR_setresuid32
@@ -77,15 +130,14 @@ index 64d3c84f..ae816280 100644
  
    return result;
 diff --git a/sysdeps/unix/sysv/linux/setgid.c b/sysdeps/unix/sysv/linux/setgid.c
-index 51d4df8a..a43cb2e7 100644
+index 51d4df8a..8b065c03 100644
 --- a/sysdeps/unix/sysv/linux/setgid.c
 +++ b/sysdeps/unix/sysv/linux/setgid.c
-@@ -18,15 +18,17 @@
+@@ -18,15 +18,16 @@
  #include <errno.h>
  #include <unistd.h>
  #include <setxid.h>
-+#include <arch-syscall.h>
-+#include <disabled-syscall.h>
++#include <fakesyscall.h>
  
  
  int
@@ -101,15 +153,14 @@ index 51d4df8a..a43cb2e7 100644
  }
  #ifndef __setgid
 diff --git a/sysdeps/unix/sysv/linux/setregid.c b/sysdeps/unix/sysv/linux/setregid.c
-index 2e89677a..09b3d9e4 100644
+index 2e89677a..4c3ea415 100644
 --- a/sysdeps/unix/sysv/linux/setregid.c
 +++ b/sysdeps/unix/sysv/linux/setregid.c
-@@ -18,15 +18,17 @@
+@@ -18,15 +18,16 @@
  #include <errno.h>
  #include <unistd.h>
  #include <setxid.h>
-+#include <arch-syscall.h>
-+#include <disabled-syscall.h>
++#include <fakesyscall.h>
  
  
  int
@@ -125,15 +176,14 @@ index 2e89677a..09b3d9e4 100644
  }
  #ifndef __setregid
 diff --git a/sysdeps/unix/sysv/linux/setresgid.c b/sysdeps/unix/sysv/linux/setresgid.c
-index 6b44503c..0ea2c8e6 100644
+index 6b44503c..7b1a9f39 100644
 --- a/sysdeps/unix/sysv/linux/setresgid.c
 +++ b/sysdeps/unix/sysv/linux/setresgid.c
-@@ -18,15 +18,17 @@
+@@ -18,15 +18,16 @@
  #include <errno.h>
  #include <unistd.h>
  #include <setxid.h>
-+#include <arch-syscall.h>
-+#include <disabled-syscall.h>
++#include <fakesyscall.h>
  
  
  int
@@ -149,15 +199,14 @@ index 6b44503c..0ea2c8e6 100644
  }
  libc_hidden_def (__setresgid)
 diff --git a/sysdeps/unix/sysv/linux/setresuid.c b/sysdeps/unix/sysv/linux/setresuid.c
-index 3339779a..efd462a3 100644
+index 3339779a..f104b2a2 100644
 --- a/sysdeps/unix/sysv/linux/setresuid.c
 +++ b/sysdeps/unix/sysv/linux/setresuid.c
-@@ -18,15 +18,17 @@
+@@ -18,15 +18,16 @@
  #include <errno.h>
  #include <unistd.h>
  #include <setxid.h>
-+#include <arch-syscall.h>
-+#include <disabled-syscall.h>
++#include <fakesyscall.h>
  
  
  int
@@ -173,15 +222,14 @@ index 3339779a..efd462a3 100644
  }
  libc_hidden_def (__setresuid)
 diff --git a/sysdeps/unix/sysv/linux/setreuid.c b/sysdeps/unix/sysv/linux/setreuid.c
-index a3889b3f..e0d5b36d 100644
+index a3889b3f..8728cd10 100644
 --- a/sysdeps/unix/sysv/linux/setreuid.c
 +++ b/sysdeps/unix/sysv/linux/setreuid.c
-@@ -18,15 +18,17 @@
+@@ -18,15 +18,16 @@
  #include <errno.h>
  #include <unistd.h>
  #include <setxid.h>
-+#include <arch-syscall.h>
-+#include <disabled-syscall.h>
++#include <fakesyscall.h>
  
  
  int
@@ -197,15 +245,14 @@ index a3889b3f..e0d5b36d 100644
  }
  #ifndef __setreuid
 diff --git a/sysdeps/unix/sysv/linux/setuid.c b/sysdeps/unix/sysv/linux/setuid.c
-index 39d5e0cf..2de7f5a0 100644
+index 39d5e0cf..3e1e0bcb 100644
 --- a/sysdeps/unix/sysv/linux/setuid.c
 +++ b/sysdeps/unix/sysv/linux/setuid.c
-@@ -18,14 +18,16 @@
+@@ -18,14 +18,15 @@
  #include <errno.h>
  #include <unistd.h>
  #include <setxid.h>
-+#include <arch-syscall.h>
-+#include <disabled-syscall.h>
++#include <fakesyscall.h>
  
  int
  __setuid (uid_t uid)
@@ -219,3 +266,51 @@ index 39d5e0cf..2de7f5a0 100644
  #endif
  }
  #ifndef __setuid
+diff --git a/sysdeps/unix/sysv/linux/spawni.c b/sysdeps/unix/sysv/linux/spawni.c
+index e8ed2bab..7a4ab68b 100644
+--- a/sysdeps/unix/sysv/linux/spawni.c
++++ b/sysdeps/unix/sysv/linux/spawni.c
+@@ -27,6 +27,7 @@
+ #include <sysdep.h>
+ #include <sys/resource.h>
+ #include <clone_internal.h>
++#include <fakesyscall.h>
+ 
+ /* The Linux implementation of posix_spawn{p} uses the clone syscall directly
+    with CLONE_VM and CLONE_VFORK flags and an allocated stack.  The new stack
+@@ -265,7 +266,7 @@ __spawni_child (void *arguments)
+ 	    case spawn_do_closefrom:
+ 	      {
+ 		int lowfd = action->action.closefrom_action.from;
+-	        int r = INLINE_SYSCALL_CALL (close_range, lowfd, ~0U, 0);
++	        int r = syscall (__NR_close_range, lowfd, ~0U, 0);
+ 		if (r != 0 && !__closefrom_fallback (lowfd, false))
+ 		  goto fail;
+ 	      } break;
+diff --git a/sysdeps/unix/sysv/linux/statx.c b/sysdeps/unix/sysv/linux/statx.c
+index a6295a15..db970a8d 100644
+--- a/sysdeps/unix/sysv/linux/statx.c
++++ b/sysdeps/unix/sysv/linux/statx.c
+@@ -19,20 +19,11 @@
+ #include <errno.h>
+ #include <sys/stat.h>
+ #include <sysdep.h>
+-#include "statx_generic.c"
++#include <fakesyscall.h>
+ 
+ int
+ statx (int fd, const char *path, int flags,
+        unsigned int mask, struct statx *buf)
+ {
+-  int ret = INLINE_SYSCALL_CALL (statx, fd, path, flags, mask, buf);
+-#ifdef __ASSUME_STATX
+-  return ret;
+-#else
+-  if (ret == 0 || errno != ENOSYS)
+-    /* Preserve non-error/non-ENOSYS return values.  */
+-    return ret;
+-  else
+-    return statx_generic (fd, path, flags, mask, buf);
+-#endif
++  return syscall (__NR_statx, fd, path, flags, mask, buf);
+ }

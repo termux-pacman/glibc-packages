@@ -1,6 +1,3 @@
-#include <ipc_priv.h>
-#include <sysdep.h>
-#include <errno.h>
 #include <shmem-android.h>
 #include <sys/mman.h>
 

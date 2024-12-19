@@ -1,15 +1,8 @@
-#include <stdarg.h>
-#include <ipc_priv.h>
-#include <sysdep.h>
-#include <shlib-compat.h>
-#include <errno.h>
 #include <shmem-android.h>
+#include <stdarg.h>
+#include <shlib-compat.h>
 #include <asm-generic/ipcbuf.h>
 #include <asm-generic/shmbuf.h>
-
-#ifndef shmid_ds
-# define shmid_ds shmid64_ds
-#endif
 
 int shmctl(int shmid, int cmd, struct shmid_ds *buf) {
 	ashv_check_pid();
@@ -54,13 +47,13 @@ int shmctl(int shmid, int cmd, struct shmid_ds *buf) {
 		memset(buf, 0, sizeof(struct shmid_ds));
 		buf->shm_segsz = shmem[idx].size;
 		buf->shm_nattch = 1;
-		buf->shm_perm.key = shmem[idx].key;
+		buf->shm_perm.__key = shmem[idx].key;
 		buf->shm_perm.uid = geteuid();
 		buf->shm_perm.gid = getegid();
 		buf->shm_perm.cuid = geteuid();
 		buf->shm_perm.cgid = getegid();
 		buf->shm_perm.mode = 0666;
-		buf->shm_perm.seq = 1;
+		buf->shm_perm.__seq = 1;
 
 		pthread_mutex_unlock (&mutex);
 		return 0;
@@ -71,4 +64,4 @@ int shmctl(int shmid, int cmd, struct shmid_ds *buf) {
 	return -1;
 }
 
-weak_alias (shmctl, __shmctl64)
+weak_alias(shmctl, __shmctl64)
