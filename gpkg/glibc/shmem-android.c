@@ -13,8 +13,6 @@
  */
 
 #include <shmem-android.h>
-#include <errno.h>
-#include <stdlib.h>
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 shmem_t* shmem = NULL;
@@ -23,7 +21,7 @@ int ashv_local_socket_id = 0;
 int ashv_pid_setup = 0;
 pthread_t ashv_listening_thread_id = 0;
 
-int ancil_send_fd(int sock, int fd) {
+static int ancil_send_fd(int sock, int fd) {
 	char nothing = '!';
 	struct iovec nothing_ptr = { .iov_base = &nothing, .iov_len = 1 };
 
@@ -51,7 +49,7 @@ int ancil_send_fd(int sock, int fd) {
 	return sendmsg(sock, &message_header, 0) >= 0 ? 0 : -1;
 }
 
-int ancil_recv_fd(int sock) {
+static int ancil_recv_fd(int sock) {
 	char nothing = '!';
 	struct iovec nothing_ptr = { .iov_base = &nothing, .iov_len = 1 };
 
@@ -81,7 +79,7 @@ int ancil_recv_fd(int sock) {
 	return ((int*) CMSG_DATA(cmsg))[0];
 }
 
-int ashmem_get_size_region(int fd) {
+static int ashmem_get_size_region(int fd) {
 	//int ret = __ashmem_is_ashmem(fd, 1);
 	//if (ret < 0) return ret;
 	return TEMP_FAILURE_RETRY(ioctl(fd, ASHMEM_GET_SIZE, NULL));
@@ -196,7 +194,7 @@ int ashv_read_remote_segment(int shmid) {
 	struct sockaddr_un addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sun_family = AF_UNIX;
-	sprintf(&addr.sun_path[1], ANDROID_SHMEM_SOCKNAME, ashv_socket_id_from_shmid(shmid));
+	__snprintf(&addr.sun_path[1], sizeof(&addr.sun_path[1]), ANDROID_SHMEM_SOCKNAME, ashv_socket_id_from_shmid(shmid));
 	int addrlen = sizeof(addr.sun_family) + strlen(&addr.sun_path[1]) + 1;
 
 	int recvsock = socket(AF_UNIX, SOCK_STREAM, 0);

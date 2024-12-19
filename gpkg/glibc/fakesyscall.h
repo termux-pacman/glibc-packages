@@ -3,37 +3,10 @@
 
 #include <arch-syscall.h>
 #include <disabled-syscall.h>
-#include <fcntl.h>
+#undef DISABLED_SYSCALL_WITH_FAKESYSCALL
 
-// close_range
-// fchownat
-// ftruncate
-// getpgrp
-// unlinkat
-// symlink
-// link
-// faccessat
-#include <unistd.h>
-
-// accept4
-// recvfrom
-// sendto
-#include <sys/socket.h>
-
-// fchmodat
-// statx_generic
-#include <sys/stat.h>
-
-// __clock_gettime64
-#include <time.h>
-
-// epoll_pwait2
-#include <sys/epoll.h>
-
-// shmat
-// shmctl
-// shmdt
-// shmget
-#include <sys/shm.h>
+#ifndef _UNISTD_H
+extern long int syscall (long int __sysno, ...) __THROW;
+#endif
 
 #endif //_FAKE_SYSCALL

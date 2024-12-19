@@ -69,6 +69,19 @@ index b19aca32..ecb588a2 100644
        name = ext_name;
  
        fd = open (ext_name, O_RDONLY);
+diff --git a/hesiod/hesiod.c b/hesiod/hesiod.c
+index ee087b03..22c50837 100644
+--- a/hesiod/hesiod.c
++++ b/hesiod/hesiod.c
+@@ -60,7 +60,7 @@
+ #include "hesiod.h"
+ #include "hesiod_p.h"
+ 
+-#define _PATH_HESIOD_CONF "/etc/hesiod.conf"
++#define _PATH_HESIOD_CONF "@TERMUX_PREFIX@/etc/hesiod.conf"
+ 
+ /* Forward */
+ 
 diff --git a/include/shm-directory.h b/include/shm-directory.h
 index 5ba63e8a..6dad34ab 100644
 --- a/include/shm-directory.h
@@ -220,6 +233,19 @@ index 3ec350e8..0ee1addf 100644
  
  /* Maximum allowed length for the key.  */
  #define MAXKEYLEN 1024
+diff --git a/nss/bug-erange.c b/nss/bug-erange.c
+index b709418b..0aff48d1 100644
+--- a/nss/bug-erange.c
++++ b/nss/bug-erange.c
+@@ -37,7 +37,7 @@ main (void)
+     {
+       printf ("gethostbyname_r failed: %s (errno: %m)\n", strerror (res));
+ 
+-      if (access ("/etc/resolv.conf", R_OK))
++      if (access ("@TERMUX_PREFIX@/etc/resolv.conf", R_OK))
+ 	{
+ 	  puts ("DNS probably not set up");
+ 	  return 0;
 diff --git a/nss/db-Makefile b/nss/db-Makefile
 index ab37e62b..1c0c4f75 100644
 --- a/nss/db-Makefile
@@ -321,6 +347,32 @@ index ab37e62b..1c0c4f75 100644
  	@printf %s "$(patsubst %.db,%,$(@F))... "
  	@$(AWK) 'BEGIN { ini=1 } \
  		 /^[ \t]*$$/ { next } \
+diff --git a/nss/getaddrinfo.c b/nss/getaddrinfo.c
+index 3ccd3905..c132aa88 100644
+--- a/nss/getaddrinfo.c
++++ b/nss/getaddrinfo.c
+@@ -1726,7 +1726,7 @@ in6aicmp (const void *p1, const void *p2)
+ 
+ 
+ /* Name of the config file for RFC 3484 sorting (for now).  */
+-#define GAICONF_FNAME "/etc/gai.conf"
++#define GAICONF_FNAME "@TERMUX_PREFIX@/etc/gai.conf"
+ 
+ 
+ /* Non-zero if we are supposed to reload the config file automatically
+diff --git a/nss/lckpwdf.c b/nss/lckpwdf.c
+index ce0401a8..58a5dda5 100644
+--- a/nss/lckpwdf.c
++++ b/nss/lckpwdf.c
+@@ -29,7 +29,7 @@
+ 
+ 
+ /* Name of the lock file.  */
+-#define PWD_LOCKFILE "/etc/.pwd.lock"
++#define PWD_LOCKFILE "@TERMUX_PREFIX@/etc/.pwd.lock"
+ 
+ /* How long to wait for getting the lock before returning with an
+    error.  */
 diff --git a/nss/nss_compat/compat-grp.c b/nss/nss_compat/compat-grp.c
 index ede7503d..151773ab 100644
 --- a/nss/nss_compat/compat-grp.c
@@ -558,7 +610,7 @@ index 84dc81a4..841b2d80 100644
  int
  main (void)
 diff --git a/resolv/netdb.h b/resolv/netdb.h
-index 14228b0d..8abc0d86 100644
+index 14228b0d..9e97ed4d 100644
 --- a/resolv/netdb.h
 +++ b/resolv/netdb.h
 @@ -40,12 +40,12 @@
@@ -566,12 +618,13 @@ index 14228b0d..8abc0d86 100644
  
  /* Absolute file name for network data base files.  */
 -#define	_PATH_HEQUIV		"/etc/hosts.equiv"
-+#define	_PATH_HEQUIV		"@TERMUX_PREFIX@/etc/hosts.equiv"
- #define	_PATH_HOSTS		"/etc/hosts"
+-#define	_PATH_HOSTS		"/etc/hosts"
 -#define	_PATH_NETWORKS		"/etc/networks"
 -#define	_PATH_NSSWITCH_CONF	"/etc/nsswitch.conf"
 -#define	_PATH_PROTOCOLS		"/etc/protocols"
 -#define	_PATH_SERVICES		"/etc/services"
++#define	_PATH_HEQUIV		"@TERMUX_PREFIX@/etc/hosts.equiv"
++#define	_PATH_HOSTS		"@TERMUX_PREFIX@/etc/hosts"
 +#define	_PATH_NETWORKS		"@TERMUX_PREFIX@/etc/networks"
 +#define	_PATH_NSSWITCH_CONF	"@TERMUX_PREFIX@/etc/nsswitch.conf"
 +#define	_PATH_PROTOCOLS		"@TERMUX_PREFIX@/etc/protocols"
@@ -579,6 +632,19 @@ index 14228b0d..8abc0d86 100644
  
  
  __BEGIN_DECLS
+diff --git a/resolv/res_hconf.c b/resolv/res_hconf.c
+index e1158943..6c9624cc 100644
+--- a/resolv/res_hconf.c
++++ b/resolv/res_hconf.c
+@@ -48,7 +48,7 @@
+ # define fgets_unlocked __fgets_unlocked
+ #endif
+ 
+-#define _PATH_HOSTCONF	"/etc/host.conf"
++#define _PATH_HOSTCONF	"@TERMUX_PREFIX@/etc/host.conf"
+ 
+ /* Environment vars that all user to override default behavior:  */
+ #define ENV_HOSTCONF	"RESOLV_HOST_CONF"
 diff --git a/resolv/resolv.h b/resolv/resolv.h
 index f40d6c58..a982e162 100644
 --- a/resolv/resolv.h

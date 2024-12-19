@@ -44,13 +44,13 @@ termux_step_pre_configure() {
 	rm ${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/x86_64/configure*
 
 	# installing special scripts for correct operation of system calls
-	for i in ${TERMUX_PKG_BUILDER_DIR}/{shmem-android.*,shmat.c,shmctl.c,shmdt.c,shmget.c,mprotect.c,syscall.c,fakesyscall.h}; do
+	for i in ${TERMUX_PKG_BUILDER_DIR}/{shm{at,ctl,dt,get}.c,mprotect.c,syscall.c,fakesyscall*.h,fake_epoll_pwait2.c}; do
 		cp ${i} ${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/
 	done
 
 	# installing and configuring scripts for parsing users/groups according to the android standard
-	for i in android_passwd_group.h android_passwd_group.c android_system_user_ids.h; do
-		cp ${TERMUX_PKG_BUILDER_DIR}/${i} ${TERMUX_PKG_SRCDIR}/nss/
+	for i in ${TERMUX_PKG_BUILDER_DIR}/{android_passwd_group.*,android_system_user_ids.h}; do
+		cp ${i} ${TERMUX_PKG_SRCDIR}/nss/
 	done
 	bash ${TERMUX_PKG_BUILDER_DIR}/gen-android-ids.sh ${TERMUX_BASE_DIR} \
 		${TERMUX_PKG_SRCDIR}/nss/android_ids.h \
@@ -58,6 +58,8 @@ termux_step_pre_configure() {
 
 	# installing a syslog script that can work with the android log system
 	cp ${TERMUX_PKG_BUILDER_DIR}/syslog.c ${TERMUX_PKG_SRCDIR}/misc/
+
+	cp ${TERMUX_PKG_BUILDER_DIR}/shmem-android.* ${TERMUX_PKG_SRCDIR}/sysvipc/
 
 	# `fakesyscall.json` - json file that stores a list of unsupported syscalls for Termux in keys,
 	# the name of which indicates the fakesyscall function and how it will be launched
@@ -120,7 +122,7 @@ termux_step_pre_configure() {
 	sed -i "s/${TERMUX_PKG_VERSION}/${TERMUX_PKG_FULLVERSION_FOR_PACMAN}/" ${TERMUX_PKG_SRCDIR}/version.h
 
 	# specifying the current release (use only when developing glibc)
-	sed -i "s/stable/dev.$(git -C ${TERMUX_PKG_BUILDER_DIR} rev-parse --short HEAD)/" ${TERMUX_PKG_SRCDIR}/version.h
+	sed -i "s/stable/dev.$(git -C ${TERMUX_PKG_BUILDER_DIR} rev-parse --short HEAD).$(date +%Y%m%d%H%M%S)/" ${TERMUX_PKG_SRCDIR}/version.h
 
 	if [ "$TERMUX_PKG_BUILD32" = "true" ]; then
 		rm -fr ${TERMUX_PKG_BUILDDIR32}

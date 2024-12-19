@@ -1,8 +1,6 @@
+#include <shmem-android.h>
 #include <sys/msg.h>
 #include <stddef.h>
-#include <ipc_priv.h>
-#include <sysdep.h>
-#include <shmem-android.h>
 
 /* Return an identifier for an shared memory segment of at least size SIZE
    which is associated with KEY.  */

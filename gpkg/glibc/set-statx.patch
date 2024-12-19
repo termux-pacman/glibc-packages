@@ -1,0 +1,44 @@
+diff --git a/io/statx_generic.c b/io/statx_generic.c
+index 93faf122..a05cb3b0 100644
+--- a/io/statx_generic.c
++++ b/io/statx_generic.c
+@@ -28,6 +28,8 @@
+ #include <bits/types/struct_statx.h>
+ #undef statx
+ 
++extern int fstatat64_time64_stat (int fd, const char *file, struct __stat64_t64 *buf, int flag);
++
+ static inline struct statx_timestamp
+ statx_convert_timestamp (struct timespec tv)
+ {
+@@ -57,7 +59,7 @@ statx_generic (int fd, const char *path, int flags,
+     }
+ 
+   struct stat64 st;
+-  int ret = __fstatat64 (fd, path, &st, flags & ~clear_flags);
++  int ret = fstatat64_time64_stat (fd, path, &st, flags & ~clear_flags);
+   if (ret != 0)
+     return ret;
+ 
+diff --git a/sysdeps/unix/sysv/linux/fstatat64.c b/sysdeps/unix/sysv/linux/fstatat64.c
+index da496177..2026253d 100644
+--- a/sysdeps/unix/sysv/linux/fstatat64.c
++++ b/sysdeps/unix/sysv/linux/fstatat64.c
+@@ -77,8 +77,7 @@ fstatat64_time64_statx (int fd, const char *file, struct __stat64_t64 *buf,
+ 
+ /* Only statx supports 64-bit timestamps for 32-bit architectures with
+    __ASSUME_STATX, so there is no point in building the fallback.  */
+-#if !FSTATAT_USE_STATX || (FSTATAT_USE_STATX && !defined __ASSUME_STATX)
+-static inline int
++int
+ fstatat64_time64_stat (int fd, const char *file, struct __stat64_t64 *buf,
+ 		       int flag)
+ {
+@@ -138,7 +137,6 @@ fstatat64_time64_stat (int fd, const char *file, struct __stat64_t64 *buf,
+ 
+   return r;
+ }
+-#endif
+ 
+ int
+ __fstatat64_time64 (int fd, const char *file, struct __stat64_t64 *buf,
