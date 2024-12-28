@@ -3,9 +3,10 @@ TERMUX_PKG_DESCRIPTION="Runtime libraries shipped by GCC"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_VERSION=14.2.1
-_COMMIT=694613a7f9adfa9c87e733adc63839c8801f2b5c
+TERMUX_PKG_REVISION=1
+_COMMIT=a8ee522c5923ba17851e4b71316a2dff19d6368f
 TERMUX_PKG_SRCURL=git+https://sourceware.org/git/gcc
-TERMUX_PKG_SHA256=e3abe0e81ee3eba35a592ef75c82fe9ae23c77631ec4f6726f7fa08444769678
+TERMUX_PKG_SHA256=ee47c48b656c2fe6e937f99954303f07ef6eab26d40cf70401880cdc2c290b1c
 TERMUX_PKG_GIT_BRANCH="master"
 #TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/gcc/gcc-$TERMUX_PKG_VERSION/gcc-$TERMUX_PKG_VERSION.tar.xz
 #TERMUX_PKG_SHA256=a7b39bc69cbf9e25826c5a60ab26477001f7c08d85cec04bc0e29cabed6f3cc9
@@ -81,7 +82,7 @@ termux_step_configure() {
 		--enable-host-shared \
 		--disable-libssp \
 		--disable-libstdcxx-pch \
-		LD_FOR_TARGET=$TERMUX_PREFIX/bin/ld
+		LD_FOR_TARGET=$TERMUX_PREFIX/bin/ld || (cat config.log && exit 1)
 }
 
 termux_step_make() {
