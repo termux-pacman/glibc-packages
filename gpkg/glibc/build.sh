@@ -2,36 +2,15 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/libc/
 TERMUX_PKG_DESCRIPTION="GNU C Library"
 TERMUX_PKG_LICENSE="GPL-3.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=2.39
-TERMUX_PKG_REVISION=5
+TERMUX_PKG_VERSION=2.41
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/libc/glibc-$TERMUX_PKG_VERSION.tar.xz
-TERMUX_PKG_SHA256=f77bd47cf8170c57365ae7bf86696c118adb3b120d3259c64c502d3dc1e2d926
+TERMUX_PKG_SHA256=a5a26b22f545d6b7d7b3dd828e11e428f24f4fac43c934fb071b6a7d0828e901
 TERMUX_PKG_DEPENDS="linux-api-headers-glibc"
 TERMUX_PKG_RECOMMENDS="glibc-runner"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_CONFFILES="glibc/etc/gai.conf, glibc/etc/locale.gen"
 TERMUX_PKG_SEPARATE_SUB_DEPENDS=true
-
-# Variables for glibc32 compilation
-TERMUX_PKG_BUILD32=$(test "$TERMUX_ARCH" = "aarch64" || test "$TERMUX_ARCH" = "arm" && \
-		     test "$TERMUX_ON_DEVICE_BUILD" = "false" && echo "true" || echo "false")
-TERMUX_PKG_BUILDDIR32="${TERMUX_TOPDIR}/${TERMUX_PKG_NAME}/build32"
-#if [ "$TERMUX_PKG_BUILD32" = "true" ]; then
-#	TERMUX_PKG_BUILD_DEPENDS="glibc32"
-#fi
-
-termux_setup_build32() {
-	case $TERMUX_ARCH in
-		"aarch64")
-			TERMUX_ARCH="arm"
-			TERMUX_HOST_PLATFORM="arm-linux-gnueabihf";;
-		"x86_64")
-			TERMUX_ARCH="i686"
-			TERMUX_HOST_PLATFORM="i686-linux-gnu";;
-	esac
-	termux_step_setup_toolchain
-	cd ${TERMUX_PKG_BUILDDIR32}
-}
+TERMUX_PKG_BUILD32=true
 
 termux_step_pre_configure() {
 	if [ "$TERMUX_PACKAGE_LIBRARY" != "glibc" ]; then
@@ -44,14 +23,12 @@ termux_step_pre_configure() {
 	rm ${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/x86_64/configure*
 
 	# installing special scripts for correct operation of system calls
-	for i in ${TERMUX_PKG_BUILDER_DIR}/{shm{at,ctl,dt,get}.c,mprotect.c,syscall.c,fakesyscall*.h,fake_epoll_pwait2.c}; do
-		cp ${i} ${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/
-	done
+	cp ${TERMUX_PKG_BUILDER_DIR}/{shm{at,ctl,dt,get}.c,mprotect.c,syscall.c,fakesyscall*.h,fake_epoll_pwait2.c,setfs{u,g}id.c} \
+		${TERMUX_PKG_SRCDIR}/sysdeps/unix/sysv/linux/
 
 	# installing and configuring scripts for parsing users/groups according to the android standard
-	for i in ${TERMUX_PKG_BUILDER_DIR}/{android_passwd_group.*,android_system_user_ids.h}; do
-		cp ${i} ${TERMUX_PKG_SRCDIR}/nss/
-	done
+	cp ${TERMUX_PKG_BUILDER_DIR}/{android_passwd_group.*,android_system_user_ids.h} \
+		${TERMUX_PKG_SRCDIR}/nss/
 	bash ${TERMUX_PKG_BUILDER_DIR}/gen-android-ids.sh ${TERMUX_BASE_DIR} \
 		${TERMUX_PKG_SRCDIR}/nss/android_ids.h \
 		${TERMUX_PKG_BUILDER_DIR}/android_system_user_ids.h
@@ -112,8 +89,8 @@ termux_step_pre_configure() {
 
 	# replacing some hard paths that may not exist in some device
 	for i in /dev/stderr:/proc/self/fd/2 \
-		 /dev/stdin:/proc/self/fd/0 \
-		 /dev/stdout:/proc/self/fd/1; do
+		/dev/stdin:/proc/self/fd/0 \
+		/dev/stdout:/proc/self/fd/1; do
 		for j in $(grep -s -r -l ${i%%:*} ${TERMUX_PKG_SRCDIR}); do
 			sed -i "s|${i%%:*}|${i//*:}|g" ${j}
 		done
@@ -124,20 +101,16 @@ termux_step_pre_configure() {
 
 	# specifying the current release (use only when developing glibc)
 	sed -i "s/stable/dev.$(git -C ${TERMUX_PKG_BUILDER_DIR} rev-parse --short HEAD).$(date +%Y%m%d%H%M%S)/" ${TERMUX_PKG_SRCDIR}/version.h
-
-	if [ "$TERMUX_PKG_BUILD32" = "true" ]; then
-		rm -fr ${TERMUX_PKG_BUILDDIR32}
-		mkdir -p ${TERMUX_PKG_BUILDDIR32}
-	fi
 }
 
-termux_glibc_configure() {
-	local libdir="${1}"
-
-	echo "slibdir=${TERMUX_PREFIX}/${libdir}" > configparms
-	echo "rtlddir=${TERMUX_PREFIX}/${libdir}" >> configparms
+termux_step_configure() {
+	echo "slibdir=${TERMUX__PREFIX__LIB_DIR}" > configparms
+	echo "rtlddir=${TERMUX__PREFIX__LIB_DIR}" >> configparms
 	echo "sbindir=${TERMUX_PREFIX}/bin" >> configparms
 	echo "rootsbindir=${TERMUX_PREFIX}/bin" >> configparms
+	if [ "$TERMUX_ARCH" != "$TERMUX_REAL_ARCH" ]; then
+		echo 'build-programs=no' >> configparms
+	fi
 
 	local _configure_flags=()
 	case $TERMUX_ARCH in
@@ -151,16 +124,19 @@ termux_glibc_configure() {
 		_pkgversion+="/${TERMUX_APP_PACKAGE}"
 	fi
 
+	CFLAGS="${CFLAGS/-Wp,-D_FORTIFY_SOURCE=2/}"
 	${TERMUX_PKG_SRCDIR}/configure \
 		--prefix=$TERMUX_PREFIX \
-		--libdir=${TERMUX_PREFIX}/${libdir} \
-		--libexecdir=${TERMUX_PREFIX}/${libdir} \
+		--libdir=$TERMUX__PREFIX__LIB_DIR \
+		--libexecdir=$TERMUX__PREFIX__LIB_DIR \
+		--includedir=$TERMUX__PREFIX__INCLUDE_DIR \
 		--host=$TERMUX_HOST_PLATFORM \
 		--build=$TERMUX_HOST_PLATFORM \
 		--target=$TERMUX_HOST_PLATFORM \
 		--with-bugurl=https://github.com/termux-pacman/glibc-packages/issues \
 		--with-pkgversion="${_pkgversion}" \
 		--enable-bind-now \
+		--enable-fortify-source \
 		--disable-multi-arch \
 		--enable-stack-protector=strong \
 		--enable-systemtap \
@@ -171,50 +147,43 @@ termux_glibc_configure() {
 		"${_configure_flags[@]}"
 }
 
-termux_step_configure() {
-	termux_glibc_configure "lib"
-
-	if [ "$TERMUX_PKG_BUILD32" = "true" ]; then
-		(
-			termux_setup_build32
-			termux_glibc_configure "lib32"
-			echo 'build-programs=no' >> configparms
-		)
-	fi
-}
-
 termux_step_make() {
 	make -O
-	make info
-
-	if [ "$TERMUX_PKG_BUILD32" = "true" ]; then
-		(
-			termux_setup_build32
-			make -O
-		)
+	if [ "$TERMUX_ARCH" = "$TERMUX_REAL_ARCH" ]; then
+		make info
 	fi
 }
 
 termux_glibc_make_syscall_without_fsc() {
 	local libname="libsyscall_without_fsc.so"
-	local libdir="$1"
 	echo "Compiling '${libname}'..."
-	$CC ${TERMUX_PKG_BUILDER_DIR}/syscall.c -o ${TERMUX_PREFIX}/${libdir}/${libname} \
+	$CC ${TERMUX_PKG_BUILDER_DIR}/syscall.c -o ${TERMUX__PREFIX__LIB_DIR}/${libname} \
 		-shared -DWITHOUT_FAKESYSCALL
 	echo "DONE"
 }
 
 termux_step_make_install() {
-	rm -fr ${TERMUX_PREFIX}/include/gnu
+	rm -fr ${TERMUX__PREFIX__INCLUDE_DIR}/gnu
 
-	make install_root="/" install
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "true" ]; then
+		# If there have been no glibc updates on the device for a long time,
+		# then when installing glibc components in the usual way (`make install`),
+		# the glibc environment may break. Therefore, you need to install the libraries first,
+		# and then everything else.
+		local glibc_dir="${TERMUX_PKG_TMPDIR}/glibc/"
+		mkdir -p ${glibc_dir}
+		make DESTDIR=${glibc_dir} elf/ldso_install install-lib
+		cp -r ${TERMUX_PKG_BUILDDIR}/libc.so ${glibc_dir}/${TERMUX__PREFIX__LIB_DIR}/libc.so.6
+		LD_PRELOAD="" LD_LIBRARY_PATH="" /system/bin/cp -r ${glibc_dir}/${TERMUX__PREFIX__LIB_DIR}/* ${TERMUX__PREFIX__LIB_DIR}
+	fi
+	make install
 
 	rm -f ${TERMUX_PREFIX}/etc/ld.so.cache
-	rm -f ${TERMUX_PREFIX}/bin/{tzselect,zdump,zic}
+	#rm -f ${TERMUX_PREFIX}/bin/{tzselect,zdump,zic}
 
-	install -dm755 ${TERMUX_PREFIX}/lib/tmpfiles.d
+	install -dm755 ${TERMUX__PREFIX__LIB_DIR}/tmpfiles.d
 	install -m644 ${TERMUX_PKG_SRCDIR}/nscd/nscd.conf ${TERMUX_PREFIX}/etc/nscd.conf
-	install -m644 ${TERMUX_PKG_SRCDIR}/nscd/nscd.tmpfiles ${TERMUX_PREFIX}/lib/tmpfiles.d/nscd.conf
+	install -m644 ${TERMUX_PKG_SRCDIR}/nscd/nscd.tmpfiles ${TERMUX__PREFIX__LIB_DIR}/tmpfiles.d/nscd.conf
 	install -m644 ${TERMUX_PKG_SRCDIR}/posix/gai.conf ${TERMUX_PREFIX}/etc/gai.conf
 	install -m755 ${TERMUX_PKG_BUILDER_DIR}/locale-gen ${TERMUX_PREFIX}/bin
 	sed -i "s|@TERMUX_PREFIX@|$TERMUX_PREFIX|g; s|@TERMUX_PREFIX_CLASSICAL@|$TERMUX_PREFIX_CLASSICAL|g" \
@@ -227,33 +196,34 @@ termux_step_make_install() {
 	sed -e '1,3d' -e 's|/| |g' -e 's| \\||g' \
 		${TERMUX_PKG_SRCDIR}/localedata/SUPPORTED > ${TERMUX_PREFIX}/share/i18n/SUPPORTED
 
-	install -dm755 ${TERMUX_PREFIX}/lib/locale
+	install -dm755 ${TERMUX__PREFIX__LIB_DIR}/locale
 	make -C ${TERMUX_PKG_SRCDIR}/localedata objdir=${TERMUX_PKG_BUILDDIR} \
 		SUPPORTED-LOCALES="C.UTF-8/UTF-8 en_US.UTF-8/UTF-8" install-locale-files
 	sed -i '/#C\.UTF-8 /d' ${TERMUX_PREFIX}/etc/locale.gen
 
-	install -Dm644 ${TERMUX_PKG_BUILDER_DIR}/sdt.h ${TERMUX_PREFIX}/include/sys/sdt.h
-	install -Dm644 ${TERMUX_PKG_BUILDER_DIR}/sdt-config.h ${TERMUX_PREFIX}/include/sys/sdt-config.h
+	install -Dm644 ${TERMUX_PKG_BUILDER_DIR}/sdt.h ${TERMUX__PREFIX__INCLUDE_DIR}/sys/sdt.h
+	install -Dm644 ${TERMUX_PKG_BUILDER_DIR}/sdt-config.h ${TERMUX__PREFIX__INCLUDE_DIR}/sys/sdt-config.h
 
 	ln -sfr $PATH_DYNAMIC_LINKER ${TERMUX_PREFIX}/bin/ld.so
-	ln -sfr $PATH_DYNAMIC_LINKER ${TERMUX_PREFIX}/lib/ld.so
+	ln -sfr $PATH_DYNAMIC_LINKER ${TERMUX__PREFIX__LIB_DIR}/ld.so
 
-	termux_glibc_make_syscall_without_fsc "lib"
+	termux_glibc_make_syscall_without_fsc
+}
 
-	if [ "$TERMUX_PKG_BUILD32" = "true" ]; then
-		(
-			termux_setup_build32
+termux_step_make_install32() {
+	local glibc32_dir="${TERMUX_PKG_TMPDIR}/glibc32/"
+	mkdir -p ${glibc32_dir}
+	make DESTDIR=${glibc32_dir} install
 
-			make DESTDIR=${TERMUX_PKG_BUILDDIR32} install
+	cp -TR ${glibc32_dir}/${TERMUX__PREFIX__LIB_DIR} $TERMUX__PREFIX__LIB_DIR
+	cp -TR ${glibc32_dir}/${TERMUX__PREFIX__INCLUDE_DIR} $TERMUX__PREFIX__INCLUDE_DIR
 
-			cp -r ${TERMUX_PKG_BUILDDIR32}/${TERMUX_PREFIX}/lib32 $TERMUX_PREFIX
+	rm -fr ${TERMUX__PREFIX__LIB_DIR}/locale
+	ln -sfr ${TERMUX__PREFIX__BASE_LIB_DIR}/locale ${TERMUX__PREFIX__LIB_DIR}/locale
 
-			ln -sfr ${TERMUX_PREFIX}/lib/locale ${TERMUX_PREFIX}/lib32/locale
+	ln -sfr ${TERMUX__PREFIX__LIB_DIR}/${DYNAMIC_LINKER} $PATH_DYNAMIC_LINKER
+	ln -sfr ${TERMUX__PREFIX__LIB_DIR}/${DYNAMIC_LINKER} ${TERMUX_PREFIX}/bin/ld32.so
+	ln -sfr ${TERMUX__PREFIX__LIB_DIR}/${DYNAMIC_LINKER} ${TERMUX__PREFIX__LIB_DIR}/ld.so
 
-			ln -sfr ${TERMUX_PREFIX}/lib32/${DYNAMIC_LINKER} $PATH_DYNAMIC_LINKER
-			ln -sfr ${TERMUX_PREFIX}/lib32/${DYNAMIC_LINKER} ${TERMUX_PREFIX}/lib32/ld.so
-
-			termux_glibc_make_syscall_without_fsc "lib32"
-		)
-	fi
+	termux_glibc_make_syscall_without_fsc
 }

@@ -56,6 +56,15 @@
 		"get_mempolicy",
 		"set_mempolicy",
 		"mq_open",
-		"rt_sigreturn"
+		"rt_sigreturn",
+		"semget",
+		"semctl",
+		"semop",
+		"semtimedop",
+		"semtimedop_time64",
+		"msgctl",
+		"msgget",
+		"msgrcv",
+		"msgsnd"
 	]
 }
