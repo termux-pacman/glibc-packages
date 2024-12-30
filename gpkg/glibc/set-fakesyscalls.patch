@@ -65,6 +65,96 @@ index 936001b8..eb381a01 100644
  }
  versioned_symbol (libc, __mq_open, mq_open, GLIBC_2_34);
  #if OTHER_SHLIB_COMPAT (librt, GLIBC_2_3_4, GLIBC_2_34)
+diff --git a/sysdeps/unix/sysv/linux/msgctl.c b/sysdeps/unix/sysv/linux/msgctl.c
+index 3120cae0..dd306cd1 100644
+--- a/sysdeps/unix/sysv/linux/msgctl.c
++++ b/sysdeps/unix/sysv/linux/msgctl.c
+@@ -21,6 +21,7 @@
+ #include <shlib-compat.h>
+ #include <errno.h>
+ #include <linux/posix_types.h>  /* For __kernel_mode_t.  */
++#include <fakesyscall.h>
+ 
+ /* POSIX states ipc_perm mode should have type of mode_t.  */
+ _Static_assert (sizeof ((struct msqid_ds){0}.msg_perm.mode)
+@@ -75,7 +76,7 @@ static int
+ msgctl_syscall (int msqid, int cmd, msgctl_arg_t *buf)
+ {
+ #ifdef __ASSUME_DIRECT_SYSVIPC_SYSCALLS
+-  return INLINE_SYSCALL_CALL (msgctl, msqid, cmd | __IPC_64, buf);
++  return syscall (__NR_msgctl, msqid, cmd | __IPC_64, buf);
+ #else
+   return INLINE_SYSCALL_CALL (ipc, IPCOP_msgctl, msqid, cmd | __IPC_64, 0,
+ 			      buf);
+@@ -282,7 +283,7 @@ __old_msgctl (int msqid, int cmd, struct __old_msqid_ds *buf)
+   /* For architecture that have wire-up msgctl but also have __IPC_64 to a
+      value different than default (0x0) it means the compat symbol used the
+      __NR_ipc syscall.  */
+-  return INLINE_SYSCALL_CALL (msgctl, msqid, cmd, buf);
++  return syscall (__NR_msgctl, msqid, cmd, buf);
+ #else
+   return INLINE_SYSCALL_CALL (ipc, IPCOP_msgctl, msqid, cmd, 0, buf);
+ #endif
+diff --git a/sysdeps/unix/sysv/linux/msgget.c b/sysdeps/unix/sysv/linux/msgget.c
+index 71eea731..58dde6ed 100644
+--- a/sysdeps/unix/sysv/linux/msgget.c
++++ b/sysdeps/unix/sysv/linux/msgget.c
+@@ -18,6 +18,7 @@
+ #include <ipc_priv.h>
+ #include <sysdep.h>
+ #include <errno.h>
++#include <fakesyscall.h>
+ 
+ /* Return descriptor for message queue associated with KEY.  The MSGFLG
+    parameter describes how to proceed with clashing of key values.  */
+@@ -26,7 +27,7 @@ int
+ msgget (key_t key, int msgflg)
+ {
+ #ifdef __ASSUME_DIRECT_SYSVIPC_SYSCALLS
+-  return INLINE_SYSCALL_CALL (msgget, key, msgflg);
++  return syscall (__NR_msgget, key, msgflg);
+ #else
+   return INLINE_SYSCALL_CALL (ipc, IPCOP_msgget, key, msgflg, 0, NULL);
+ #endif
+diff --git a/sysdeps/unix/sysv/linux/msgrcv.c b/sysdeps/unix/sysv/linux/msgrcv.c
+index 30519008..2201fe68 100644
+--- a/sysdeps/unix/sysv/linux/msgrcv.c
++++ b/sysdeps/unix/sysv/linux/msgrcv.c
+@@ -17,13 +17,14 @@
+ 
+ #include <ipc_priv.h>
+ #include <sysdep-cancel.h>
++#include <fakesyscall.h>
+ 
+ ssize_t
+ __libc_msgrcv (int msqid, void *msgp, size_t msgsz, long int msgtyp,
+ 	       int msgflg)
+ {
+ #ifdef __ASSUME_DIRECT_SYSVIPC_SYSCALLS
+-  return SYSCALL_CANCEL (msgrcv, msqid, msgp, msgsz, msgtyp, msgflg);
++  return syscall (__NR_msgrcv, msqid, msgp, msgsz, msgtyp, msgflg);
+ #else
+   return SYSCALL_CANCEL (ipc, IPCOP_msgrcv, msqid, msgsz, msgflg,
+ 			 MSGRCV_ARGS (msgp, msgtyp));
+diff --git a/sysdeps/unix/sysv/linux/msgsnd.c b/sysdeps/unix/sysv/linux/msgsnd.c
+index 8af400c3..887b32da 100644
+--- a/sysdeps/unix/sysv/linux/msgsnd.c
++++ b/sysdeps/unix/sysv/linux/msgsnd.c
+@@ -17,12 +17,13 @@
+ 
+ #include <ipc_priv.h>
+ #include <sysdep-cancel.h>
++#include <fakesyscall.h>
+ 
+ int
+ __libc_msgsnd (int msqid, const void *msgp, size_t msgsz, int msgflg)
+ {
+ #ifdef __ASSUME_DIRECT_SYSVIPC_SYSCALLS
+-  return SYSCALL_CANCEL (msgsnd, msqid, msgp, msgsz, msgflg);
++  return syscall (__NR_msgsnd, msqid, msgp, msgsz, msgflg);
+ #else
+   return SYSCALL_CANCEL (ipc, IPCOP_msgsnd, msqid, msgsz, msgflg,
+ 			 msgp);
 diff --git a/sysdeps/unix/sysv/linux/open_by_handle_at.c b/sysdeps/unix/sysv/linux/open_by_handle_at.c
 index 730059d7..23ec12ad 100644
 --- a/sysdeps/unix/sysv/linux/open_by_handle_at.c
@@ -81,6 +171,89 @@ index 730059d7..23ec12ad 100644
 -  return SYSCALL_CANCEL (open_by_handle_at, mount_fd, handle, flags);
 +  return syscall (__NR_open_by_handle_at, mount_fd, handle, flags);
  }
+diff --git a/sysdeps/unix/sysv/linux/semctl.c b/sysdeps/unix/sysv/linux/semctl.c
+index c57fceab..0da2d1d7 100644
+--- a/sysdeps/unix/sysv/linux/semctl.c
++++ b/sysdeps/unix/sysv/linux/semctl.c
+@@ -21,6 +21,7 @@
+ #include <sysdep.h>
+ #include <shlib-compat.h>
+ #include <linux/posix_types.h>             /* For __kernel_mode_t.  */
++#include <fakesyscall.h>
+ 
+ /* The struct used to issue the syscall.  For architectures that assume
+    64-bit time as default (!__ASSUME_TIME64_SYSCALLS) the syscall will
+@@ -121,7 +122,7 @@ static int
+ semctl_syscall (int semid, int semnum, int cmd, semctl_arg_t arg)
+ {
+ #ifdef __ASSUME_DIRECT_SYSVIPC_SYSCALLS
+-  return INLINE_SYSCALL_CALL (semctl, semid, semnum, cmd | __IPC_64,
++  return syscall (__NR_semctl, semid, semnum, cmd | __IPC_64,
+ 			      arg.array);
+ #else
+   return INLINE_SYSCALL_CALL (ipc, IPCOP_semctl, semid, semnum, cmd | __IPC_64,
+@@ -388,7 +389,7 @@ __old_semctl (int semid, int semnum, int cmd, ...)
+  /* For architectures that have wire-up semctl but also have __IPC_64 to a
+     value different than default (0x0) it means the compat symbol used the
+     __NR_ipc syscall.  */
+-  return INLINE_SYSCALL_CALL (semctl, semid, semnum, cmd, arg.array);
++  return syscall (__NR_semctl, semid, semnum, cmd, arg.array);
+ # else
+   return INLINE_SYSCALL_CALL (ipc, IPCOP_semctl, semid, semnum, cmd,
+ 			      SEMCTL_ARG_ADDRESS (arg));
+diff --git a/sysdeps/unix/sysv/linux/semget.c b/sysdeps/unix/sysv/linux/semget.c
+index 26d00467..9675de7a 100644
+--- a/sysdeps/unix/sysv/linux/semget.c
++++ b/sysdeps/unix/sysv/linux/semget.c
+@@ -19,6 +19,7 @@
+ #include <ipc_priv.h>
+ #include <sysdep.h>
+ #include <errno.h>
++#include <fakesyscall.h>
+ 
+ /* Return identifier for array of NSEMS semaphores associated with
+    KEY.  */
+@@ -27,7 +28,7 @@ int
+ semget (key_t key, int nsems, int semflg)
+ {
+ #ifdef __ASSUME_DIRECT_SYSVIPC_SYSCALLS
+-  return INLINE_SYSCALL_CALL (semget, key, nsems, semflg);
++  return syscall (__NR_semget, key, nsems, semflg);
+ #else
+   return INLINE_SYSCALL_CALL (ipc, IPCOP_semget, key, nsems, semflg, NULL);
+ #endif
+diff --git a/sysdeps/unix/sysv/linux/semtimedop.c b/sysdeps/unix/sysv/linux/semtimedop.c
+index 181289fa..e503f813 100644
+--- a/sysdeps/unix/sysv/linux/semtimedop.c
++++ b/sysdeps/unix/sysv/linux/semtimedop.c
+@@ -19,15 +19,16 @@
+ #include <ipc_priv.h>
+ #include <sysdep.h>
+ #include <errno.h>
++#include <fakesyscall.h>
+ 
+ static int
+ semtimedop_syscall (int semid, struct sembuf *sops, size_t nsops,
+ 		    const struct __timespec64 *timeout)
+ {
+ #ifdef __NR_semtimedop_time64
+-  return INLINE_SYSCALL_CALL (semtimedop_time64, semid, sops, nsops, timeout);
++  return syscall (__NR_semtimedop_time64, semid, sops, nsops, timeout);
+ #elif defined __ASSUME_DIRECT_SYSVIPC_SYSCALLS && defined __NR_semtimedop
+-  return INLINE_SYSCALL_CALL (semtimedop, semid, sops, nsops, timeout);
++  return syscall (__NR_semtimedop, semid, sops, nsops, timeout);
+ #else
+   return INLINE_SYSCALL_CALL (ipc, IPCOP_semtimedop, semid,
+ 			      SEMTIMEDOP_IPC_ARGS (nsops, sops, timeout));
+@@ -59,7 +60,7 @@ __semtimedop64 (int semid, struct sembuf *sops, size_t nsops,
+       pts32 = &ts32;
+     }
+ # ifdef __ASSUME_DIRECT_SYSVIPC_SYSCALLS
+-  return INLINE_SYSCALL_CALL (semtimedop, semid, sops, nsops, pts32);
++  return syscall (__NR_semtimedop, semid, sops, nsops, pts32);
+ # else
+   return INLINE_SYSCALL_CALL (ipc, IPCOP_semtimedop, semid,
+ 			      SEMTIMEDOP_IPC_ARGS (nsops, sops, pts32));
 diff --git a/sysdeps/unix/sysv/linux/setegid.c b/sysdeps/unix/sysv/linux/setegid.c
 index 4a608532..e4ff2bc3 100644
 --- a/sysdeps/unix/sysv/linux/setegid.c

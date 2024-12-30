@@ -119,7 +119,7 @@ void ashv_check_pid(void) {
 	if (ashv_pid_setup == 0) {
 		ashv_pid_setup = mypid;
 	} else if (ashv_pid_setup != mypid) {
-		DBG("%s: Cleaning to new pid=%d from oldpid=%d", __PRETTY_FUNCTION__, mypid, ashv_pid_setup);
+		DBG("%s: Cleaning to new pid=%d from oldpid=%d\n", __PRETTY_FUNCTION__, mypid, ashv_pid_setup);
 		// We inherited old state across a fork.
 		ashv_pid_setup = mypid;
 		ashv_local_socket_id = 0;
@@ -156,11 +156,11 @@ void* ashv_thread_function(void* arg) {
 	struct sockaddr_un addr;
 	socklen_t len = sizeof(addr);
 	int sendsock;
-	DBG("%s: thread started", __PRETTY_FUNCTION__);
+	DBG("%s: thread started\n", __PRETTY_FUNCTION__);
 	while ((sendsock = accept(sock, (struct sockaddr *)&addr, &len)) != -1) {
 		int shmid;
 		if (recv(sendsock, &shmid, sizeof(shmid), 0) != sizeof(shmid)) {
-			DBG("%s: ERROR: recv() returned not %zu bytes", __PRETTY_FUNCTION__, sizeof(shmid));
+			DBG("%s: ERROR: recv() returned not %zu bytes\n", __PRETTY_FUNCTION__, sizeof(shmid));
 			close(sendsock);
 			continue;
 		}
@@ -168,19 +168,19 @@ void* ashv_thread_function(void* arg) {
 		int idx = ashv_find_local_index(shmid);
 		if (idx != -1) {
 			if (write(sendsock, &shmem[idx].key, sizeof(key_t)) != sizeof(key_t)) {
-				DBG("%s: ERROR: write failed: %s", __PRETTY_FUNCTION__, strerror(errno));
+				DBG("%s: ERROR: write failed: %s\n", __PRETTY_FUNCTION__, strerror(errno));
 			}
 			if (ancil_send_fd(sendsock, shmem[idx].descriptor) != 0) {
-				DBG("%s: ERROR: ancil_send_fd() failed: %s", __PRETTY_FUNCTION__, strerror(errno));
+				DBG("%s: ERROR: ancil_send_fd() failed: %s\n", __PRETTY_FUNCTION__, strerror(errno));
 			}
 		} else {
-			DBG("%s: ERROR: cannot find shmid 0x%x", __PRETTY_FUNCTION__, shmid);
+			DBG("%s: ERROR: cannot find shmid 0x%x\n", __PRETTY_FUNCTION__, shmid);
 		}
 		pthread_mutex_unlock(&mutex);
 		close(sendsock);
 		len = sizeof(addr);
 	}
-	DBG ("%s: ERROR: listen() failed, thread stopped", __PRETTY_FUNCTION__);
+	DBG ("%s: ERROR: listen() failed, thread stopped\n", __PRETTY_FUNCTION__);
 	return NULL;
 }
 
@@ -199,31 +199,31 @@ int ashv_read_remote_segment(int shmid) {
 
 	int recvsock = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (recvsock == -1) {
-		DBG ("%s: cannot create UNIX socket: %s", __PRETTY_FUNCTION__, strerror(errno));
+		DBG ("%s: cannot create UNIX socket: %s\n", __PRETTY_FUNCTION__, strerror(errno));
 		return -1;
 	}
 	if (connect(recvsock, (struct sockaddr*) &addr, addrlen) != 0) {
-		DBG("%s: Cannot connect to UNIX socket %s: %s, len %d", __PRETTY_FUNCTION__, addr.sun_path + 1, strerror(errno), addrlen);
+		DBG("%s: Cannot connect to UNIX socket %s: %s, len %d\n", __PRETTY_FUNCTION__, addr.sun_path + 1, strerror(errno), addrlen);
 		close(recvsock);
 		return -1;
 	}
 
 	if (send(recvsock, &shmid, sizeof(shmid), 0) != sizeof(shmid)) {
-		DBG ("%s: send() failed on socket %s: %s", __PRETTY_FUNCTION__, addr.sun_path + 1, strerror(errno));
+		DBG ("%s: send() failed on socket %s: %s\n", __PRETTY_FUNCTION__, addr.sun_path + 1, strerror(errno));
 		close(recvsock);
 		return -1;
 	}
 
 	key_t key;
 	if (read(recvsock, &key, sizeof(key_t)) != sizeof(key_t)) {
-		DBG("%s: ERROR: failed read", __PRETTY_FUNCTION__);
+		DBG("%s: ERROR: failed read\n", __PRETTY_FUNCTION__);
 		close(recvsock);
 		return -1;
 	}
 
 	int descriptor = ancil_recv_fd(recvsock);
 	if (descriptor < 0) {
-		DBG("%s: ERROR: ancil_recv_fd() failed on socket %s: %s", __PRETTY_FUNCTION__, addr.sun_path + 1, strerror(errno));
+		DBG("%s: ERROR: ancil_recv_fd() failed on socket %s: %s\n", __PRETTY_FUNCTION__, addr.sun_path + 1, strerror(errno));
 		close(recvsock);
 		return -1;
 	}
@@ -231,7 +231,7 @@ int ashv_read_remote_segment(int shmid) {
 
 	int size = ashmem_get_size_region(descriptor);
 	if (size == 0 || size == -1) {
-		DBG ("%s: ERROR: ashmem_get_size_region() returned %d on socket %s: %s", __PRETTY_FUNCTION__, size, addr.sun_path + 1, strerror(errno));
+		DBG ("%s: ERROR: ashmem_get_size_region() returned %d on socket %s: %s\n", __PRETTY_FUNCTION__, size, addr.sun_path + 1, strerror(errno));
 		return -1;
 	}
 

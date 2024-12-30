@@ -1,10 +1,8 @@
 #ifndef _FAKE_SYSCALL_BASE
 #define _FAKE_SYSCALL_BASE
 
-#include <sysdep.h>
 #include <arch-syscall.h>
 #include <disabled-syscall.h>
-#include <fcntl.h>
 
 // close_range
 // fchownat
