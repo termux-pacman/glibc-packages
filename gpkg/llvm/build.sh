@@ -8,7 +8,7 @@ _SOURCE=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_P
 TERMUX_PKG_SRCURL=($_SOURCE/llvm-$TERMUX_PKG_VERSION.src.tar.xz
 		$_SOURCE/cmake-$TERMUX_PKG_VERSION.src.tar.xz
 		$_SOURCE/third-party-$TERMUX_PKG_VERSION.src.tar.xz)
-TERMUX_PKG_SHA256=(e3f79317adaa9196d2cfffe1c869d7c100b7540832bc44fe0d3f44a12861fa34
+TERMUX_PKG_SHA256=(96f833c6ad99a3e8e1d9aca5f439b8fd2c7efdcf83b664e0af1c0712c5315910
 		11c5a28f90053b0c43d0dec3d0ad579347fc277199c005206b963c19aae514e3
 		b96deca1d3097c7ffd4ff2bb904a50bdd56bec7ed1413ffb0d1d01af87b72c12)
 TERMUX_PKG_DEPENDS="libllvm-glibc, perl-glibc"
