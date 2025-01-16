@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="Compiler infrastructure"
 TERMUX_PKG_LICENSE="Apache-2.0, NCSA"
 TERMUX_PKG_LICENSE_FILE="LICENSE.TXT"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=19.1.3
+TERMUX_PKG_VERSION=19.1.7
 _SOURCE=https://github.com/llvm/llvm-project/releases/download/llvmorg-$TERMUX_PKG_VERSION
 TERMUX_PKG_SRCURL=($_SOURCE/clang-$TERMUX_PKG_VERSION.src.tar.xz
 		$_SOURCE/clang-tools-extra-$TERMUX_PKG_VERSION.src.tar.xz
