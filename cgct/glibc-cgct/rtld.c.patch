@@ -1,5 +1,5 @@
---- src/glibc-2.40/elf/rtld.c	2024-07-21 19:33:37.000000000 +0300
-+++ src/glibc-2.40/elf/rtld.c.patch	2024-09-23 19:07:59.974864614 +0300
+--- src/glibc-2.41/elf/rtld.c	2024-07-21 19:33:37.000000000 +0300
++++ src/glibc-2.41/elf/rtld.c.patch	2024-09-23 19:07:59.974864614 +0300
 @@ -1862,7 +1862,7 @@
       open().  So we do this first.  If it succeeds we do almost twice
       the work but this does not matter, since it is not for production
