@@ -1,5 +1,5 @@
 pkgname=cbt
-pkgver=2.43.1
+pkgver=2.44
 pkgrel=0
 pkgdesc='Cross Binutils for Termux (only for Linux)'
 arch=(x86_64)
@@ -9,10 +9,10 @@ source=(https://ftp.gnu.org/gnu/binutils/binutils-$pkgver.tar.xz
 	config.sub.patch
 	ldmain.c.patch
 	ldmain.h.patch)
-sha256sums=('13f74202a3c4c51118b797a39ea4200d3f6cfbe224da6d1d95bb938480132dfd'
-            '8105b0e8bab1759db2aa27a7c21376e2f634d3ecea9e078100dbf8c2543626bd'
-            '475368e73aeabed942b8b526e74df98d1e499087e736db6a38b401cf272c571e'
-            '388a25ea90edef3e02e4aa9015cb2846557954ef2e5ae3b34ead06e8bc770753')
+sha256sums=('ce2017e059d63e67ddb9240e9d4ec49c2893605035cd60e92ad53177f4377237'
+            'a5c80b256ed836a77c2003b30320eea74fce8ae37ce3e0aa0feaf19a70edb641'
+            '62d657eb1e7c2d60ca732073c7f92ed90b4d2430374f3cca380a92c1c7fb7ed3'
+            '5e215879084adbe5bf49bb9846b036a98e4b9c40c73e20d55598892c6fe53fd3')
 optdepends=('glibc-cgct')
 groups=('cgct')
 

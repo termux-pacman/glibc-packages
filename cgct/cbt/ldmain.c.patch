@@ -1,5 +1,5 @@
---- src/binutils-2.43.1/ld/ldmain.c	2024-01-29 03:00:00.000000000 +0300
-+++ src/binutils-2.43.1/ld/ldmain.c.patch	2024-07-12 14:06:39.982582997 +0300
+--- src/binutils-2.44/ld/ldmain.c	2024-01-29 03:00:00.000000000 +0300
++++ src/binutils-2.44/ld/ldmain.c.patch	2024-07-12 14:06:39.982582997 +0300
 @@ -55,6 +55,9 @@
  #define TARGET_SYSTEM_ROOT ""
  #endif
@@ -35,9 +35,9 @@
    textdomain (PACKAGE);
  
 +#ifdef TARGET_32BIT
-+  ldfile_add_library_path(cgct_app_prefix("/lib32"), search_dir_linker_script);
++  ldfile_add_library_path(cgct_app_prefix("/lib32"), true);
 +#endif
-+  ldfile_add_library_path(cgct_app_prefix("/lib"), search_dir_linker_script);
++  ldfile_add_library_path(cgct_app_prefix("/lib"), true);
 +
    program_name = argv[0];
    xmalloc_set_program_name (program_name);

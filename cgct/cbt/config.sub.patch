@@ -1,6 +1,6 @@
---- src/binutils-2.43.1/config.sub	2024-08-04 02:00:00.000000000 +0300
-+++ src/binutils-2.43.1/config.sub.patch	2024-09-02 18:42:53.474422328 +0300
-@@ -648,6 +648,10 @@
+--- src/binutils-2.44/config.sub	2025-02-02 03:00:00.000000000 +0300
++++ src/binutils-2.44/config.sub.patch	2025-02-28 17:32:26.583779076 +0300
+@@ -701,6 +701,10 @@
  				basic_machine=ymp-cray
  				basic_os=unicos
  				;;
@@ -11,7 +11,7 @@
  			*)
  				basic_machine=$1
  				basic_os=
-@@ -1323,6 +1327,10 @@
+@@ -1526,6 +1530,10 @@
  		kernel=linux
  		os=`echo "$basic_os" | sed -e 's|linux|gnu|'`
  		;;
@@ -22,21 +22,22 @@
  	managarm*)
  		kernel=managarm
  		os=`echo "$basic_os" | sed -e 's|managarm|mlibc|'`
-@@ -1768,7 +1776,7 @@
- 	     | onefs* | tirtos* | phoenix* | fuchsia* | redox* | bme* \
- 	     | midnightbsd* | amdhsa* | unleashed* | emscripten* | wasi* \
- 	     | nsk* | powerunix* | genode* | zvmoe* | qnx* | emx* | zephyr* \
--	     | fiwix* | mlibc* | cos* | mbr* | ironclad* )
-+	     | fiwix* | mlibc* | cos* | mbr* | ironclad* | cgct )
+@@ -2149,7 +2157,8 @@
+ 	| xenix* \
+ 	| xray* \
+ 	| zephyr* \
+-	| zvmoe* )
++	| zvmoe* \
++	| cgct )
  		;;
  	# This one is extra strict with allowed versions
  	sco3.2v2 | sco3.2v[4-9]* | sco5v6*)
-@@ -1829,7 +1837,7 @@
+@@ -2210,7 +2219,7 @@
  case $kernel-$os-$obj in
  	linux-gnu*- | linux-android*- | linux-dietlibc*- | linux-llvm*- \
  		    | linux-mlibc*- | linux-musl*- | linux-newlib*- \
--		    | linux-relibc*- | linux-uclibc*- )
-+		    | linux-relibc*- | linux-uclibc*- | linux-cgct- )
+-		    | linux-relibc*- | linux-uclibc*- | linux-ohos*- )
++		    | linux-relibc*- | linux-uclibc*- | linux-ohos*- | linux-cgct- )
  		;;
- 	uclinux-uclibc*- )
+ 	uclinux-uclibc*- | uclinux-gnu*- )
  		;;
