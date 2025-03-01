@@ -1,0 +1,10 @@
+--- glibc-2.39/sysvipc/Makefile	2024-01-31 03:34:58.000000000 +0300
++++ glibc-2.39/sysvipc/Makefile.patch	2025-01-28 00:38:53.948321946 +0300
+@@ -28,6 +28,7 @@
+ routines := ftok \
+ 	    msgsnd msgrcv msgget msgctl \
+ 	    semop semget semctl semtimedop \
++	    shmem-android \
+ 	    shmat shmdt shmget shmctl
+ 
+ tests    := test-sysvmsg test-sysvsem test-sysvshm
