@@ -1,16 +1,11 @@
+#include <shmem-android.h>
 #include <sys/msg.h>
 #include <stddef.h>
-#include <ipc_priv.h>
-#include <sysdep.h>
-#include <shmem-android.h>
 
 /* Return an identifier for an shared memory segment of at least size SIZE
    which is associated with KEY.  */
 
-int shmget(key_t key, size_t size, int flags)
-{
-	(void) flags;
-
+int shmget(key_t key, size_t size, int flags) {
 	ashv_check_pid();
 
 	// Counter wrapping around at 15 bits.
@@ -71,13 +66,29 @@ int shmget(key_t key, size_t size, int flags)
 				path_buffer[path_length] = '\0';
 				int shmid = atoi(path_buffer);
 				if (shmid != 0) {
+					int socket_id = ashv_socket_id_from_shmid(shmid);
 					int idx = ashv_find_local_index(shmid);
-
-					if (idx == -1) {
+					if (idx == -1 && socket_id != ashv_local_socket_id)
 						idx = ashv_read_remote_segment(shmid);
+
+					if (idx != -1) {
+						if (socket_id != ashv_local_socket_id)
+							ashv_get_update_remote_segment(idx);
+						else
+							android_shmem_check_pids(idx);
+						if (shmem[idx].markedForDeletion && shmem[idx].countAttach == 0) {
+							android_shmem_delete(idx);
+							idx = -1;
+						}
 					}
 
 					if (idx != -1) {
+						if (flags & IPC_CREAT && flags & IPC_EXCL) {
+							DBG("%s: shm with key %d should be created but it already exists (IPC_CREAT+IPC_EXCL)\n", __PRETTY_FUNCTION__, key);
+							errno = EEXIST;
+							pthread_mutex_unlock(&mutex);
+							return -1;
+						}
 						pthread_mutex_unlock(&mutex);
 						return shmem[idx].id;
 					}
@@ -95,6 +106,13 @@ int shmget(key_t key, size_t size, int flags)
 				sprintf(num_buffer, "%d", shmid);
 			}
 			if (symlink(num_buffer, symlink_path) == 0) break;
+		}
+
+		if (!(flags & IPC_CREAT)) {
+			DBG("%s: shm with key %d was not found and no command was given to create it (no IPC_CREAT)\n", __PRETTY_FUNCTION__, key);
+			errno = ENOENT;
+			pthread_mutex_unlock(&mutex);
+			return -1;
 		}
 	}
 
@@ -117,6 +135,8 @@ int shmget(key_t key, size_t size, int flags)
 	shmem[idx].id = shmid;
 	shmem[idx].markedForDeletion = false;
 	shmem[idx].key = key;
+	shmem[idx].countAttach = 0;
+	shmem[idx].attachedPids = NULL;
 
 	if (shmem[idx].descriptor < 0) {
 		DBG("%s: ashmem_create_region() failed for size %zu: %s\n", __PRETTY_FUNCTION__, size, strerror(errno));
