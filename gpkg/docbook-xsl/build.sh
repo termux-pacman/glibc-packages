@@ -3,7 +3,7 @@ TERMUX_PKG_DESCRIPTION="XML stylesheets for Docbook-xml transformations"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_VERSION=1.79.2
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=2
 TERMUX_PKG_LICENSE_FILE="docbook-xsl-${TERMUX_PKG_VERSION}/COPYING, docbook-xsl-nons-${TERMUX_PKG_VERSION}/COPYING"
 TERMUX_PKG_DEPENDS="docbook-xml-glibc, libxml2-utils-glibc, xsltproc-glibc"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
@@ -54,6 +54,8 @@ termux_step_make_install() {
 				install -Dt "${pkgroot}/${fn}" -m600 ${dir}/${fn}/*.{xml,xsl,dtd,ent}
 			done
 		)
+
+		ln -sfr $pkgroot "$TERMUX_PREFIX/share/xml/docbook/xsl-stylesheets${ns}"
 	done
 }
 
