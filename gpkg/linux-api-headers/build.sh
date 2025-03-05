@@ -2,9 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/libc/
 TERMUX_PKG_DESCRIPTION="Kernel headers sanitized for use in userspace"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=6.10
+TERMUX_PKG_VERSION=6.13
 TERMUX_PKG_SRCURL=https://www.kernel.org/pub/linux/kernel/v${TERMUX_PKG_VERSION:0:1}.x/linux-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=774698422ee54c5f1e704456f37c65c06b51b4e9a8b0866f34580d86fef8e226
+TERMUX_PKG_SHA256=e79dcc6eb86695c6babfb07c2861912b635d5075c6cd1cd0567d1ea155f80d6e
 
 _target_arch="x86"
 case "${TERMUX_ARCH}" in

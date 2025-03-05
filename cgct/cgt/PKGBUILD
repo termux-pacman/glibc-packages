@@ -1,11 +1,11 @@
 pkgname=cgt
 pkgver=14.2.1
-pkgrel=0
+pkgrel=1
 pkgdesc='Cross GCCs for Termux (only for Linux)'
 arch=(x86_64)
 url='https://gcc.gnu.org/'
 license=(GPL LGPL FDL)
-_commit=694613a7f9adfa9c87e733adc63839c8801f2b5c
+_commit=a8ee522c5923ba17851e4b71316a2dff19d6368f
 source=(git+https://sourceware.org/git/gcc.git#commit=${_commit}
 	gcc-configure.patch
 	config.sub.patch
@@ -13,7 +13,7 @@ source=(git+https://sourceware.org/git/gcc.git#commit=${_commit}
 	set_dynamic_path.patch
 	cgct-app-prefix.cc
 	cgct-app-prefix.h)
-sha256sums=('085eba5de615f6f74729f96e8c301808159b72382ad331ebec9c79c2bd08e20d'
+sha256sums=('6b2ffebdadb38a772c6454a1b18b15e68c4dadfbee797e696a6f79ecfa95ac7c'
             'b0d2153d28248189ad1f000194c9b12aa7cea04c09c9f36a2e78b2c25b771392'
             'a688899b982608089ee76a97e18c019f596ccb5cad055916a6ad6d387568b3dc'
             '8ad880e14a32a3b5f3ab8039df89b22479c4a92bfbe6b3f758409264ddef5479'
