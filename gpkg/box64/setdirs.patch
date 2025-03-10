@@ -1,8 +1,8 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 95e7b0c..ce59937 100644
+index a5fd235..e94d8fb 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -1159,11 +1159,11 @@ if(NOT _x86 AND NOT _x86_64)
+@@ -1205,11 +1205,11 @@ if(NOT _x86 AND NOT _x86_64)
    if(NOT NO_CONF_INSTALL)
      configure_file(system/box64.conf.cmake system/box64.conf)
  	  if(NOT TERMUX)
@@ -17,7 +17,7 @@ index 95e7b0c..ce59937 100644
          endif()
        else()
          install(FILES ${CMAKE_BINARY_DIR}/system/box64.conf DESTINATION ${TERMUX_PATH}/usr/etc/binfmt.d/)
-@@ -1175,7 +1175,7 @@ if(NOT _x86 AND NOT _x86_64)
+@@ -1221,7 +1221,7 @@ if(NOT _x86 AND NOT _x86_64)
  	  endif()
  
    endif()
@@ -26,7 +26,7 @@ index 95e7b0c..ce59937 100644
    if(NOT NO_LIB_INSTALL)
  	if(NOT TERMUX AND NOT ANDROID)
          install(FILES ${CMAKE_SOURCE_DIR}/x64lib/libstdc++.so.5 DESTINATION ${INSTALL_PATH})
-@@ -1214,7 +1214,7 @@ if(NOT _x86 AND NOT _x86_64)
+@@ -1260,7 +1260,7 @@ if(NOT _x86 AND NOT _x86_64)
  	endif()
     endif()
     if(BOX32)
@@ -36,20 +36,20 @@ index 95e7b0c..ce59937 100644
      	if(NOT TERMUX AND NOT ANDROID)
      		install(FILES ${CMAKE_SOURCE_DIR}/x86lib/libstdc++.so.5 DESTINATION ${INSTALL_PATH})
 diff --git a/src/core.c b/src/core.c
-index c43fd05..ab850b0 100644
+index 5c4dcac..36f840b 100644
 --- a/src/core.c
 +++ b/src/core.c
-@@ -1904,7 +1904,7 @@ int initialize(int argc, const char **argv, char** env, x64emu_t** emulator, elf
+@@ -903,7 +903,7 @@ int initialize(int argc, const char **argv, char** env, x64emu_t** emulator, elf
          printf("See 'box64 --help' for more information.\n");
          exit(0);
      }
--    if(argc>1 && !strcmp(argv[1], "/usr/bin/gdb") && getenv("BOX64_TRACE_FILE"))
-+    if(argc>1 && !strcmp(argv[1], "@TERMUX_PREFIX@/bin/gdb") && getenv("BOX64_TRACE_FILE"))
+-    if(argc>1 && !strcmp(argv[1], "/usr/bin/gdb") && BOX64ENV(trace_file))
++    if(argc>1 && !strcmp(argv[1], "@TERMUX_PREFIX@/bin/gdb") && BOX64ENV(trace_file))
          exit(0);
      // uname -m is redirected to box64 -m
      if(argc==2 && (!strcmp(argv[1], "-m") || !strcmp(argv[1], "-p") || !strcmp(argv[1], "-i")))
 diff --git a/src/steam.c b/src/steam.c
-index 710fb84..24e1f53 100644
+index 5ed2c39..fa00c83 100644
 --- a/src/steam.c
 +++ b/src/steam.c
 @@ -39,13 +39,13 @@ void pressure_vessel(int argc, const char** argv, int nextarg, const char* prog)
@@ -114,7 +114,7 @@ index de962ee..67a786f 100644
  typedef void* (*pFp_t)(void*);
  
 diff --git a/src/wrapped/wrappedlibdl.c b/src/wrapped/wrappedlibdl.c
-index d8b73b3..d886411 100644
+index dd40a1a..db7435a 100644
 --- a/src/wrapped/wrappedlibdl.c
 +++ b/src/wrapped/wrappedlibdl.c
 @@ -141,7 +141,7 @@ void* my_dlopen(x64emu_t* emu, void *filename, int flag)
