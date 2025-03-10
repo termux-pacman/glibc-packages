@@ -1,0 +1,11 @@
+--- src/docs/man/meson.build	2025-01-16 01:54:16.000000000 +0300
++++ src/docs/man/meson.build.patch	2025-03-08 23:25:40.456217778 +0300
+@@ -9,7 +9,7 @@
+     '--stringparam', 'man.th.extra1.suppress', '1',
+     '--stringparam', 'man.authors.section.enabled', '0',
+     '--stringparam', 'man.copyright.section.enabled', '0',
+-    'http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl',
++    '@TERMUX_PREFIX@/share/xml/docbook/xsl-stylesheets-nons/manpages/docbook.xsl',
+     '@INPUT@',
+   ],
+   build_by_default: true,

@@ -1,0 +1,24 @@
+--- src/libpam/pam_modutil_priv.c	2024-10-24 11:00:00.000000000 +0300
++++ src/libpam/pam_modutil_priv.c.patch	2025-03-04 17:41:58.516895636 +0300
+@@ -22,17 +22,17 @@
+  */
+ static int change_uid(uid_t uid, uid_t *save)
+ {
+-	uid_t tmp = setfsuid(uid);
++	uid_t tmp = getuid();
+ 	if (save)
+ 		*save = tmp;
+-	return (uid_t) setfsuid(uid) == uid ? 0 : -1;
++	return (uid_t) getuid() == uid ? 0 : -1;
+ }
+ static int change_gid(gid_t gid, gid_t *save)
+ {
+-	gid_t tmp = setfsgid(gid);
++	gid_t tmp = getgid();
+ 	if (save)
+ 		*save = tmp;
+-	return (gid_t) setfsgid(gid) == gid ? 0 : -1;
++	return (gid_t) getgid() == gid ? 0 : -1;
+ }
+ 
+ static int cleanup(struct pam_modutil_privs *p)

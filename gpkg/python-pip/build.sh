@@ -2,18 +2,23 @@ TERMUX_PKG_HOMEPAGE=https://pip.pypa.io/
 TERMUX_PKG_DESCRIPTION="The PyPA recommended tool for installing Python packages"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION="24.3.1"
+TERMUX_PKG_VERSION="25.0.1"
 TERMUX_PKG_SRCURL=https://github.com/pypa/pip/archive/$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=1349240eff5fd44f4b9d834d503d87505a6cd0a8ab022f3f1665181d6a719a73
+TERMUX_PKG_SHA256=334371888f0c679c04e819ddc234562feaea81331658a76842b62dc9dc83a832
 TERMUX_PKG_DEPENDS="gcc-glibc, make-glibc, pkgconf-glibc, python-glibc (>= 3.11.1-1)"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="gcc-glibc"
 TERMUX_PKG_BREAKS="python-glibc (<< 3.11.1-1)"
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 TERMUX_PKG_BUILD_IN_SRC=true
-TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, setuptools==67.8, docutils, myst_parser, sphinx_copybutton, sphinx_inline_tabs, sphinxcontrib.towncrier, completion"
+TERMUX_PKG_PYTHON_COMMON_DEPS="wheel, setuptools, docutils, myst_parser, sphinx_copybutton, sphinx_inline_tabs, sphinxcontrib.towncrier, completion, sphinx.issues"
+
+termux_step_pre_configure() {
+	sed '/towncrier/d' -i docs/html/conf.py
+}
 
 termux_step_post_make_install() {
 	( # creating pip documentation
+		export LANG="C"
 		cd docs/
 		python pip_sphinxext.py
 		sphinx-build -b man -d build/doctrees/man man build/man -c html

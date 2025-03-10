@@ -1,48 +1,30 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index f093c18..eac861f 100755
+index 4d0c8a9..cd0cb20 100755
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -75,7 +75,6 @@ else()
-     set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE} CACHE INTERNAL "The Python3 executable" FORCE)
- endif()
- 
--cmake_host_system_information(RESULT CMAKE_HOST_SYSTEM_PROCESSOR QUERY OS_PLATFORM)
- string(COMPARE EQUAL "${CMAKE_HOST_SYSTEM_PROCESSOR}" "i686"  _x86)
- string(COMPARE EQUAL "${CMAKE_HOST_SYSTEM_PROCESSOR}" "x86_64"  _x86_64)
- string(COMPARE EQUAL "${CMAKE_HOST_SYSTEM_PROCESSOR}" "aarch64"  _aarch64)
-@@ -781,8 +780,8 @@ if(NOT _x86 AND NOT _x86_64)
+@@ -801,14 +801,14 @@ if(NOT _x86 AND NOT _x86_64)
    if(NOT NO_CONF_INSTALL)
      configure_file(system/box86.conf.cmake system/box86.conf)
      	if(NOT TERMUX)
 -    		install(FILES ${CMAKE_BINARY_DIR}/system/box86.conf DESTINATION /etc/binfmt.d/)
 -		install(FILES ${CMAKE_SOURCE_DIR}/system/box86.box86rc DESTINATION /etc/)
-+    		install(FILES ${CMAKE_BINARY_DIR}/system/box86.conf DESTINATION @TERMUX_PREFIX@/etc/binfmt.d/)
++		install(FILES ${CMAKE_BINARY_DIR}/system/box86.conf DESTINATION @TERMUX_PREFIX@/etc/binfmt.d/)
 +		install(FILES ${CMAKE_SOURCE_DIR}/system/box86.box86rc DESTINATION @TERMUX_PREFIX@/etc/)
  	else()
  		#install(FILES ${CMAKE_BINARY_DIR}/system/box86.conf DESTINATION ${TERMUX_PATH}/usr/etc/binfmt.d/)
  		install(FILES ${CMAKE_SOURCE_DIR}/system/box86.box86rc DESTINATION ${TERMUX_PATH}/usr/etc/)
-@@ -790,11 +789,11 @@ if(NOT _x86 AND NOT _x86_64)
+ 	endif()
    endif()
+-  set(INSTALL_PATH "/usr/lib/box86-i386-linux-gnu/")
++  set(INSTALL_PATH "@TERMUX_PREFIX@/lib/box86-i386-linux-gnu/")
    if(NOT NO_LIB_INSTALL)
      if(NOT TERMUX)
--    	install(FILES ${CMAKE_SOURCE_DIR}/x86lib/libstdc++.so.6 DESTINATION /usr/lib/i386-linux-gnu/)
--    	install(FILES ${CMAKE_SOURCE_DIR}/x86lib/libstdc++.so.5 DESTINATION /usr/lib/i386-linux-gnu/)
--    	install(FILES ${CMAKE_SOURCE_DIR}/x86lib/libgcc_s.so.1 DESTINATION /usr/lib/i386-linux-gnu/)
--    	install(FILES ${CMAKE_SOURCE_DIR}/x86lib/libpng12.so.0 DESTINATION /usr/lib/i386-linux-gnu/)
--    	install(FILES ${CMAKE_SOURCE_DIR}/x86lib/libunwind.so.8 DESTINATION /usr/lib/i386-linux-gnu/)
-+    	install(FILES ${CMAKE_SOURCE_DIR}/x86lib/libstdc++.so.6 DESTINATION @TERMUX_PREFIX@/lib/i386-linux-gnu/)
-+    	install(FILES ${CMAKE_SOURCE_DIR}/x86lib/libstdc++.so.5 DESTINATION @TERMUX_PREFIX@/lib/i386-linux-gnu/)
-+    	install(FILES ${CMAKE_SOURCE_DIR}/x86lib/libgcc_s.so.1 DESTINATION @TERMUX_PREFIX@/lib/i386-linux-gnu/)
-+    	install(FILES ${CMAKE_SOURCE_DIR}/x86lib/libpng12.so.0 DESTINATION @TERMUX_PREFIX@/lib/i386-linux-gnu/)
-+    	install(FILES ${CMAKE_SOURCE_DIR}/x86lib/libunwind.so.8 DESTINATION @TERMUX_PREFIX@/lib/i386-linux-gnu/)
-     else()
- 
- 	    install(FILES ${CMAKE_SOURCE_DIR}/x86lib/libstdc++.so.6 DESTINATION ${TERMUX_PATH}/usr/lib/i386-linux-gnu/)
+     	install(FILES ${CMAKE_SOURCE_DIR}/x86lib/libstdc++.so.6 DESTINATION ${INSTALL_PATH})
 diff --git a/src/main.c b/src/main.c
-index 8009c47..66d9953 100644
+index f7da5c6..a242d1f 100644
 --- a/src/main.c
 +++ b/src/main.c
-@@ -952,20 +952,14 @@ void LoadEnvVars(box86context_t *context)
+@@ -981,24 +981,16 @@ void LoadEnvVars(box86context_t *context)
      //TODO: add relative path to box86 location
  #endif
  #ifndef TERMUX
@@ -60,6 +42,10 @@ index 8009c47..66d9953 100644
 -        AddPath("/usr/lib/i686-pc-linux-gnu", &context->box86_ld_lib, 1);
 -    if(FileExist("/usr/lib32", 0))
 -        AddPath("/usr/lib32", &context->box86_ld_lib, 1);
+-    if(FileExist("/lib/box86-i386-linux-gnu", 0))
+-        AddPath("/lib/box86-i386-linux-gnu", &context->box86_ld_lib, 1);
+-    if(FileExist("/usr/lib/box86-i386-linux-gnu", 0))
+-        AddPath("/usr/lib/box86-i386-linux-gnu", &context->box86_ld_lib, 1);
 +    if(FileExist("@TERMUX_PREFIX@/lib/box86", 0))
 +        AddPath("@TERMUX_PREFIX@/lib/box86", &context->box86_ld_lib, 1);
 +    if(FileExist("@TERMUX_PREFIX@/lib/i386-linux-gnu", 0))
@@ -68,10 +54,12 @@ index 8009c47..66d9953 100644
 +        AddPath("@TERMUX_PREFIX@/lib/i686-pc-linux-gnu", &context->box86_ld_lib, 1);
 +    if(FileExist("@TERMUX_PREFIX@/lib32", 0))
 +        AddPath("@TERMUX_PREFIX@/lib32", &context->box86_ld_lib, 1);
++    if(FileExist("@TERMUX_PREFIX@/lib/box86-i386-linux-gnu", 0))
++        AddPath("@TERMUX_PREFIX@/lib/box86-i386-linux-gnu", &context->box86_ld_lib, 1);
  #else
      if(FileExist("/data/data/com.termux/files/usr/lib/i386-linux-gnu", 0))
          AddPath("/data/data/com.termux/files/usr/lib/i386-linux-gnu", &context->box86_ld_lib, 1);
-@@ -1208,8 +1202,8 @@ static void load_rcfiles()
+@@ -1243,8 +1235,8 @@ static void load_rcfiles()
  	LoadRCFile(rcpath);
          
      #ifndef TERMUX
@@ -82,7 +70,7 @@ index 8009c47..66d9953 100644
      #else
      else if(FileExist("/data/data/com.termux/files/usr/etc/box86.box86rc", IS_FILE))
          LoadRCFile("/data/data/com.termux/files/usr/etc/box86.box86rc");
-@@ -1290,7 +1284,7 @@ int main(int argc, const char **argv, char **env)
+@@ -1325,7 +1317,7 @@ int main(int argc, const char **argv, char **env)
          printf("See 'box86 --help' for more information.\n");
          exit(0);
      }
@@ -135,10 +123,10 @@ index 7b13da1..0ed698f 100644
  typedef void* (*pFp_t)(void*);
  
 diff --git a/src/wrapped/wrappedlibc.c b/src/wrapped/wrappedlibc.c
-index 4abb88f..f2b49c0 100755
+index f27d3ba..7fd250d 100755
 --- a/src/wrapped/wrappedlibc.c
 +++ b/src/wrapped/wrappedlibc.c
-@@ -2634,7 +2634,7 @@ EXPORT void* my_getpwuid(x86emu_t* emu, uint32_t uid)
+@@ -2707,7 +2707,7 @@ EXPORT void* my_getpwuid(x86emu_t* emu, uint32_t uid)
          fakepwd.pw_gid = 0;
          fakepwd.pw_gecos = strdup("root");
          fakepwd.pw_dir = getenv("HOME");
@@ -148,15 +136,15 @@ index 4abb88f..f2b49c0 100755
  
      return ret ? ret : (void*)&fakepwd;
 diff --git a/src/wrapped/wrappedlibdl.c b/src/wrapped/wrappedlibdl.c
-index 3e519bb..6c85caf 100755
+index 87c0b76..b012212 100755
 --- a/src/wrapped/wrappedlibdl.c
 +++ b/src/wrapped/wrappedlibdl.c
 @@ -100,7 +100,7 @@ void* my_dlopen(x86emu_t* emu, void *filename, int flag)
              if(sys)
                  return sys;
          }
--        if(!strcmp(rfilename, "/usr/lib/x86_64-linux-gnu/d3d")) {
-+        if(!strcmp(rfilename, "@TERMUX_PREFIX@/lib/x86_64-linux-gnu/d3d")) {
+-        if(!strcmp(rfilename, "/usr/lib/i386-linux-gnu/d3d")) {
++        if(!strcmp(rfilename, "@TERMUX_PREFIX@/lib/i386-linux-gnu/d3d")) {
              void* sys = my_dlopen(emu, "d3dadapter9.so.1", flag);
              if(sys)
                  return sys;
