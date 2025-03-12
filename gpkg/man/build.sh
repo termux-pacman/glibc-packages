@@ -7,13 +7,12 @@ TERMUX_PKG_VERSION=1.14.6
 TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=http://mdocml.bsd.lv/snapshots/mandoc-${TERMUX_PKG_VERSION}.tar.gz
 TERMUX_PKG_SHA256=8bf0d570f01e70a6e124884088870cbed7537f36328d512909eb10cd53179d9c
-TERMUX_PKG_DEPENDS="less,libandroid-glob,zlib"
+TERMUX_PKG_DEPENDS="less,zlib"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_RM_AFTER_INSTALL="share/examples"
 
 termux_step_pre_configure() {
 	CPPFLAGS+=" -DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD"
-	LDFLAGS+=" -landroid-glob"
 	echo "PREFIX=\"$TERMUX_PREFIX\"" > configure.local
 	echo "CC=\"$CC\"" >> configure.local
 	echo "MANDIR=\"$TERMUX_PREFIX/share/man\"" >> configure.local
