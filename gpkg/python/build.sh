@@ -4,6 +4,7 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_VERSION=3.12.9
+TERMUX_PKG_REVISION=1
 _MAJOR_VERSION="${TERMUX_PKG_VERSION%.*}"
 _SETUPTOOLS_VERSION=69.5.1
 TERMUX_PKG_SRCURL=(https://www.python.org/ftp/python/${TERMUX_PKG_VERSION%rc*}/Python-${TERMUX_PKG_VERSION}.tar.xz
@@ -24,6 +25,7 @@ termux_step_pre_configure() {
 	sed -e '/tag_build = .post/d' -e '/tag_date = 1/d' -i setuptools-${_SETUPTOOLS_VERSION}/setup.cfg
 
 	export CFLAGS="${CFLAGS/-O2/-O3} -ffat-lto-objects"
+	unset PYTHONPYCACHEPREFIX
 }
 
 termux_step_configure() {
