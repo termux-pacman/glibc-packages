@@ -1,19 +1,18 @@
 pkgname=cgt
-pkgver=14.2.1
-pkgrel=1
+pkgver=15.1.0
+pkgrel=0
 pkgdesc='Cross GCCs for Termux (only for Linux)'
 arch=(x86_64)
 url='https://gcc.gnu.org/'
 license=(GPL LGPL FDL)
-_commit=a8ee522c5923ba17851e4b71316a2dff19d6368f
-source=(git+https://sourceware.org/git/gcc.git#commit=${_commit}
+source=(https://ftp.gnu.org/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.xz
 	gcc-configure.patch
 	config.sub.patch
 	configure.patch
 	set_dynamic_path.patch
 	cgct-app-prefix.cc
 	cgct-app-prefix.h)
-sha256sums=('6b2ffebdadb38a772c6454a1b18b15e68c4dadfbee797e696a6f79ecfa95ac7c'
+sha256sums=('e2b09ec21660f01fecffb715e0120265216943f038d0e48a9868713e54f06cea'
             'b0d2153d28248189ad1f000194c9b12aa7cea04c09c9f36a2e78b2c25b771392'
             'a688899b982608089ee76a97e18c019f596ccb5cad055916a6ad6d387568b3dc'
             '8ad880e14a32a3b5f3ab8039df89b22479c4a92bfbe6b3f758409264ddef5479'
@@ -44,8 +43,6 @@ prepare() {
 		'${prefix}/${target_alias}'; do
 		sed -i "s|${i}|${i%%/*}|" $(grep -s -r -l "${i}")
 	done
-	echo "${pkgver}" > gcc/BASE-VER
-	echo "${_commit}" > gcc/DEV-PHASE
 }
 
 build() {
@@ -110,6 +107,8 @@ build() {
 			--disable-libunwind-exceptions \
 			CFLAGS_FOR_TARGET="$FLAGS_FOR_TARGET $CFLAGS" \
 			CXXFLAGS_FOR_TARGET="$FLAGS_FOR_TARGET $CXXFLAGS" \
+			CC_FOR_TARGET="${srcdir}/gcc-${arch_build}/gcc/xgcc -B${srcdir}/gcc-${arch_build}/gcc" \
+			CXX_FOR_TARGET="${srcdir}/gcc-${arch_build}/gcc/xg++ -B${srcdir}/gcc-${arch_build}/gcc" \
 			LD_FOR_TARGET=${CGCT_PREFIX}/bin/ld \
 			AS_FOR_TARGET=${CGCT_PREFIX}/bin/as \
 			AR_FOR_TARGET=${CGCT_PREFIX}/bin/ar \
