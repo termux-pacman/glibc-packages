@@ -1,11 +1,11 @@
 pkgname=cgct-headers
-pkgver=6.13
+pkgver=6.14.3
 pkgrel=0
 pkgdesc="Kernel headers for CGCT (only for Linux)"
 arch=(x86_64)
 url='https://www.gnu.org/software/libc/'
 source=(https://www.kernel.org/pub/linux/kernel/v${pkgver:0:1}.x/linux-${pkgver}.tar.xz)
-sha256sums=('e79dcc6eb86695c6babfb07c2861912b635d5075c6cd1cd0567d1ea155f80d6e')
+sha256sums=('91c6c322c32568f09922a02ed35f46372ca8526714c6555b3115b9e9c156652a')
 groups=('cgct')
 
 build() {
