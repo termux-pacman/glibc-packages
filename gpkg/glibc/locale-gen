@@ -13,7 +13,7 @@ fi
 
 # Remove all old locale dir and locale-archive before generating new
 # locale data.
-rm -rf @TERMUX_PREFIX@/lib/locale/* || true
+rm -rf @TERMUX_PREFIX@/lib/locale/locale-archive || true
 
 umask 022
 
