@@ -4,13 +4,18 @@ TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="LICENSE"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_VERSION=3.12.9
+TERMUX_PKG_REVISION=1
 _MAJOR_VERSION="${TERMUX_PKG_VERSION%.*}"
 _SETUPTOOLS_VERSION=69.5.1
+_DEBPYTHON_COMMIT=5348f704668c0b6c360b6c6fb10153b9c2898af5
 TERMUX_PKG_SRCURL=(https://www.python.org/ftp/python/${TERMUX_PKG_VERSION%rc*}/Python-${TERMUX_PKG_VERSION}.tar.xz
-		https://github.com/pypa/setuptools/archive/refs/tags/v${_SETUPTOOLS_VERSION}.tar.gz)
+		https://github.com/pypa/setuptools/archive/refs/tags/v${_SETUPTOOLS_VERSION}.tar.gz
+		https://salsa.debian.org/cpython-team/python3-defaults/-/archive/${_DEBPYTHON_COMMIT}/python3-defaults-${_DEBPYTHON_COMMIT}.tar.gz
+)
 TERMUX_PKG_SHA256=(
 	7220835d9f90b37c006e9842a8dff4580aaca4318674f947302b8d28f3f81112
 	2cf4ea407b1325c2c85862d13eb31f9b57098b0ae7f94e2258aea4e634f6534f
+	d54ee8a27d53750a2fc13aa3c4ddc105138bcbd9b2fe77c5858a3c49e3843b66
 )
 TERMUX_PKG_DEPENDS="libbz2-glibc, libexpat-glibc, gdbm-glibc, libffi-glibc, libnsl-glibc, libxcrypt-glibc, openssl-glibc, zlib-glibc"
 TERMUX_PKG_BUILD_DEPENDS="sqlite-glibc, mpdecimal-glibc, llvm-glibc"
@@ -18,12 +23,20 @@ TERMUX_PKG_PROVIDES="python3-glibc"
 TERMUX_PKG_RM_AFTER_INSTALL="glibc/lib/python${_MAJOR_VERSION}/site-packages/*/"
 TERMUX_PKG_BUILD_IN_SRC=true
 
+termux_step_post_get_source() {
+	mv "$TERMUX_PKG_SRCDIR/python3-defaults-$_DEBPYTHON_COMMIT" "$TERMUX_PKG_SRCDIR/debpython"
+}
+
 termux_step_pre_configure() {
 	rm -rf Modules/expat
 	rm -rf Modules/_decimal/libmpdec
 	sed -e '/tag_build = .post/d' -e '/tag_date = 1/d' -i setuptools-${_SETUPTOOLS_VERSION}/setup.cfg
 
 	export CFLAGS="${CFLAGS/-O2/-O3} -ffat-lto-objects"
+
+	sed -i -e "s|@TERMUX_PYTHON_VERSION@|${_MAJOR_VERSION}|g" \
+		-e "s|@TERMUX_PKG_FULLVERSION@|$(test ${TERMUX_PACKAGE_FORMAT} = pacman && echo ${TERMUX_PKG_FULLVERSION_FOR_PACMAN} || echo ${TERMUX_PKG_FULLVERSION})|g" \
+		$(find "$TERMUX_PKG_SRCDIR/debpython" -type f)
 }
 
 termux_step_configure() {
@@ -69,4 +82,12 @@ termux_step_post_make_install() {
 		pip install --no-deps . --target ${TERMUX_PKG_SRCDIR}/setuptools
 		cp -r ${TERMUX_PKG_SRCDIR}/setuptools/setuptools/_distutils ${TERMUX_PYTHON_HOME}/distutils
 	)
+
+	install -m 755 -d "$TERMUX_PREFIX/lib/python$_MAJOR_VERSION/debpython"
+	install -m 644 "$TERMUX_PKG_SRCDIR/debpython/debpython/"* \
+		"$TERMUX_PREFIX/lib/python$_MAJOR_VERSION/debpython/"
+
+	for prog in py3compile py3clean; do
+		install -m 755 "$TERMUX_PKG_SRCDIR/debpython/$prog" "$TERMUX_PREFIX/bin/"
+	done
 }

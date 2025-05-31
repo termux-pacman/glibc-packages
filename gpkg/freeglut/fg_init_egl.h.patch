@@ -1,0 +1,10 @@
+--- src/src/egl/fg_init_egl.h	2024-06-09 20:44:13.000000000 +0300
++++ src/src/egl/fg_init_egl.h.patch	2025-03-10 19:41:49.802555281 +0300
+@@ -28,6 +28,6 @@
+ 
+ extern void fghPlatformInitializeEGL();
+ extern void fghPlatformCloseDisplayEGL();
+-extern void fgPlatformDestroyContext();
++extern void fgPlatformDestroyContext(SFG_PlatformDisplay pDisplay, SFG_WindowContextType MContext);
+ 
+ #endif
