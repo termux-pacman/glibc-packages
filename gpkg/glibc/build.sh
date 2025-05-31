@@ -3,6 +3,7 @@ TERMUX_PKG_DESCRIPTION="GNU C Library"
 TERMUX_PKG_LICENSE="GPL-3.0, LGPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
 TERMUX_PKG_VERSION=2.41
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/libc/glibc-$TERMUX_PKG_VERSION.tar.xz
 TERMUX_PKG_SHA256=a5a26b22f545d6b7d7b3dd828e11e428f24f4fac43c934fb071b6a7d0828e901
 TERMUX_PKG_DEPENDS="linux-api-headers-glibc"
@@ -100,7 +101,7 @@ termux_step_pre_configure() {
 	sed -i "s/${TERMUX_PKG_VERSION}/${TERMUX_PKG_FULLVERSION_FOR_PACMAN}/" ${TERMUX_PKG_SRCDIR}/version.h
 
 	# specifying the current release (use only when developing glibc)
-	sed -i "s/stable/dev.$(git -C ${TERMUX_PKG_BUILDER_DIR} rev-parse --short HEAD).$(date +%Y%m%d%H%M%S)/" ${TERMUX_PKG_SRCDIR}/version.h
+	#sed -i "s/stable/dev.$(git -C ${TERMUX_PKG_BUILDER_DIR} rev-parse --short HEAD).$(date +%Y%m%d%H%M%S)/" ${TERMUX_PKG_SRCDIR}/version.h
 }
 
 termux_step_configure() {
