@@ -1,5 +1,5 @@
 pkgname=glibc-cgct
-pkgver=2.41
+pkgver=2.42
 pkgrel=0
 pkgdesc="GNU C Library for CGCT (only for Linux)"
 arch=(x86_64)
@@ -8,23 +8,24 @@ license=('GPL' 'LGPL')
 source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz
 	rtld.c.patch
 	setup-cgct)
-sha256sums=('a5a26b22f545d6b7d7b3dd828e11e428f24f4fac43c934fb071b6a7d0828e901'
-            'cb81c92ade4b0a2daa1301340bd79dce55bc4b156cf9dcd9dc08ae05d17d6a23'
+sha256sums=('d1775e32e4628e64ef930f435b67bb63af7599acb6be2b335b9f19f16509f17f'
+            '7113a921551e55e266da36fc54c66fe5b3545f1c4662fd76bb4e16cfd1f573f3'
             '15dcc4a741f0a347252aa26963bb0f1a7bdd5dbfc2690827600d6acb5dbd2aa9')
 groups=('cgct')
 
 prepare() {
+	ln -s glibc-${pkgver} glibc
 	for i in *.patch; do
 		patch -Np1 -i ${srcdir}/$i
 	done
 
 	for var in LD_WARN LD_LIBRARY_PATH LD_BIND_NOW LD_BIND_NOT LD_DYNAMIC_WEAK LD_PRELOAD; do
-		for file in $(grep -s -r -l "${var}" ./glibc-${pkgver}); do
+		for file in $(grep -s -r -l "${var}" ./glibc); do
 			sed -i "s/${var}/${var}_CGCT/g" ${file}
 		done
 	done
 
-	rm ./glibc-${pkgver}/sysdeps/unix/sysv/linux/x86_64/configure*
+	rm ./glibc/sysdeps/unix/sysv/linux/x86_64/configure*
 
 	mkdir -p glibc-build || true
 }
@@ -39,7 +40,7 @@ build() {
 	echo "sbindir=${CGCT_PATH}/bin" >> configparms
 	echo "rootsbindir=${CGCT_PATH}/bin" >> configparms
 
-	../glibc-$pkgver/configure \
+	../glibc/configure \
 		--prefix=$CGCT_PATH \
 		--libdir=${CGCT_PATH}/lib \
 		--libexecdir=${CGCT_PATH}/lib \
@@ -65,7 +66,7 @@ package() {
 	rm -f "$pkgdir"/${CGCT_PATH}/etc/ld.so.{cache,conf}
 	rm -f "$pkgdir"/${CGCT_PATH}/bin/{tzselect,zdump,zic}
 
-	cd glibc-$pkgver
+	cd glibc
 
 	install -m644 nscd/nscd.conf "$pkgdir/${CGCT_PATH}/etc/nscd.conf"
 	install -m644 posix/gai.conf "$pkgdir"/${CGCT_PATH}/etc/gai.conf
