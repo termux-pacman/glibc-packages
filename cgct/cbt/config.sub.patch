@@ -1,5 +1,5 @@
---- src/binutils-2.44/config.sub	2025-02-02 03:00:00.000000000 +0300
-+++ src/binutils-2.44/config.sub.patch	2025-02-28 17:32:26.583779076 +0300
+--- src/binutils/config.sub	2025-02-02 03:00:00.000000000 +0300
++++ src/binutils/config.sub.patch	2025-02-28 17:32:26.583779076 +0300
 @@ -701,6 +701,10 @@
  				basic_machine=ymp-cray
  				basic_os=unicos
