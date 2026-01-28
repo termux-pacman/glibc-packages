@@ -1,6 +1,6 @@
 pkgname=cbt
-pkgver=2.44
-pkgrel=1
+pkgver=2.45.1
+pkgrel=0
 pkgdesc='Cross Binutils for Termux (only for Linux)'
 arch=(x86_64)
 url='https://www.gnu.org/software/binutils/'
@@ -9,14 +9,15 @@ source=(https://ftp.gnu.org/gnu/binutils/binutils-$pkgver.tar.xz
 	config.sub.patch
 	ldmain.c.patch
 	ldmain.h.patch)
-sha256sums=('ce2017e059d63e67ddb9240e9d4ec49c2893605035cd60e92ad53177f4377237'
-            'a5c80b256ed836a77c2003b30320eea74fce8ae37ce3e0aa0feaf19a70edb641'
-            'd5102f07e44d5a857628cc58a8aeffceed1dacd0db1c9e485fd523f92d726511'
-            '5e215879084adbe5bf49bb9846b036a98e4b9c40c73e20d55598892c6fe53fd3')
+sha256sums=('5fe101e6fe9d18fdec95962d81ed670fdee5f37e3f48f0bef87bddf862513aa5'
+            '96098ecd39d5ffb95364f405f4182cc2524ceb57f68884c3bc6cddb080190d2e'
+            'd6f9b3e9495c8b6030f7b96469f86f15c06ebcd3a83c40fd6c1232dbdf5517b3'
+            '9c58abb0507f85fdc7603980a5e1021bc55bd44444f74937c1e2ab72f8f97f49')
 optdepends=('glibc-cgct')
 groups=('cgct')
 
 prepare() {
+	ln -s binutils-${pkgver} binutils
 	for i in *.patch; do
 		patch -Np1 -i ${srcdir}/$i
 	done
@@ -38,7 +39,7 @@ build() {
 			flags_32bit=" -DTARGET_32BIT -Wp,-DTARGET_32BIT"
 		fi
 
-		"$srcdir"/binutils-${pkgver}/configure \
+		"$srcdir"/binutils/configure \
 			--host=cgct \
 			--build=${CHOST} \
 			--target=$target \

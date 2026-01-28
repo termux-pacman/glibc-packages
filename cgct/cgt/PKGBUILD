@@ -1,5 +1,5 @@
 pkgname=cgt
-pkgver=15.1.0
+pkgver=15.2.0
 pkgrel=0
 pkgdesc='Cross GCCs for Termux (only for Linux)'
 arch=(x86_64)
@@ -12,7 +12,7 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.xz
 	set_dynamic_path.patch
 	cgct-app-prefix.cc
 	cgct-app-prefix.h)
-sha256sums=('e2b09ec21660f01fecffb715e0120265216943f038d0e48a9868713e54f06cea'
+sha256sums=('438fd996826b0c82485a29da03a72d71d6e3541a83ec702df4271f6fe025d24e'
             'b0d2153d28248189ad1f000194c9b12aa7cea04c09c9f36a2e78b2c25b771392'
             'a688899b982608089ee76a97e18c019f596ccb5cad055916a6ad6d387568b3dc'
             '8ad880e14a32a3b5f3ab8039df89b22479c4a92bfbe6b3f758409264ddef5479'
@@ -26,7 +26,7 @@ targets=(aarch64-linux-gnu arm-linux-gnueabihf x86_64-linux-gnu i686-linux-gnu)
 options=(libtool staticlibs !emptydirs)
 
 prepare() {
-	[ ! -d gcc ] && ln -s gcc-${pkgver} gcc
+	ln -s gcc-${pkgver} gcc
 	for i in *.patch; do
 		patch -Np1 -i ${srcdir}/$i
 	done
