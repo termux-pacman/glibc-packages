@@ -1,5 +1,5 @@
 diff --git a/nptl/pthread_create.c b/nptl/pthread_create.c
-index 9ae5423d..89b4da90 100644
+index e1033d4e..8b8b959f 100644
 --- a/nptl/pthread_create.c
 +++ b/nptl/pthread_create.c
 @@ -380,16 +380,6 @@ start_thread (void *arg)
@@ -33,10 +33,10 @@ index 891ed8fb..dfe77d81 100644
      }
  
 diff --git a/sysdeps/nptl/dl-tls_init_tp.c b/sysdeps/nptl/dl-tls_init_tp.c
-index f487bfb6..8c190182 100644
+index 47566dce..4f642210 100644
 --- a/sysdeps/nptl/dl-tls_init_tp.c
 +++ b/sysdeps/nptl/dl-tls_init_tp.c
-@@ -90,14 +90,9 @@ __tls_init_tp (void)
+@@ -91,14 +91,9 @@ __tls_init_tp (void)
      pd->robust_head.futex_offset = (offsetof (pthread_mutex_t, __data.__lock)
                                      - offsetof (pthread_mutex_t,
                                                  __data.__list.__next));
@@ -53,10 +53,10 @@ index f487bfb6..8c190182 100644
  
    {
 diff --git a/sysdeps/unix/sysv/linux/rseq-internal.h b/sysdeps/unix/sysv/linux/rseq-internal.h
-index f89e7842..707460d5 100644
+index d2ab4cb8..707460d5 100644
 --- a/sysdeps/unix/sysv/linux/rseq-internal.h
 +++ b/sysdeps/unix/sysv/linux/rseq-internal.h
-@@ -93,45 +93,11 @@ RSEQ_SELF (void)
+@@ -93,44 +93,11 @@ RSEQ_SELF (void)
    return (struct rseq_area *) ((char *) __thread_pointer () + __rseq_offset);
  }
  
@@ -75,13 +75,12 @@ index f89e7842..707460d5 100644
 -      if (size < RSEQ_AREA_SIZE_INITIAL)
 -        size = RSEQ_AREA_SIZE_INITIAL;
 -
--      /* Initialize the rseq fields that are read by the kernel on
--         registration, there is no guarantee that struct pthread is
--         cleared on all architectures.  */
+-      /* Initialize the whole rseq area to zero prior to registration.  */
+-      memset (RSEQ_SELF (), 0, size);
+-
+-      /* Set the cpu_id field to RSEQ_CPU_ID_UNINITIALIZED, this is checked by
+-         the kernel at registration when CONFIG_DEBUG_RSEQ is enabled.  */
 -      RSEQ_SETMEM (cpu_id, RSEQ_CPU_ID_UNINITIALIZED);
--      RSEQ_SETMEM (cpu_id_start, 0);
--      RSEQ_SETMEM (rseq_cs, 0);
--      RSEQ_SETMEM (flags, 0);
 -
 -      int ret = INTERNAL_SYSCALL_CALL (rseq, RSEQ_SELF (), size, 0, RSEQ_SIG);
 -      if (!INTERNAL_SYSCALL_ERROR_P (ret))
