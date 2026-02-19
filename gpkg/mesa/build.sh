@@ -43,7 +43,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_pre_configure() {
 	case $TERMUX_ARCH in
-		arm|aarch64) TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dvulkan-drivers=swrast,panfrost,freedreno -Dfreedreno-kmds=msm,kgsl";;
+		arm|aarch64) TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dvulkan-drivers=swrast,panfrost,virtio,freedreno -Dfreedreno-kmds=msm,kgsl";;
 		*) TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dvulkan-drivers=swrast";;
 	esac
 	export MESON_PACKAGE_CACHE_DIR="${TERMUX_PKG_SRCDIR}"
