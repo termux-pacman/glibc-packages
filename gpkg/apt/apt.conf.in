@@ -1,0 +1,5 @@
+// vim:ft=aptconf
+Acquire::https::CaInfo "@TERMUX_PREFIX@/etc/ssl/certs/ca-certificates.crt";.
+APT::Architecture "aarch64";
+APT::Clean-Installed "0";
+APT::Install-Recommends "0";

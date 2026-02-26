@@ -1,0 +1,16 @@
+// vim:ft=aptconf
+/* vi:set ft=aptconf */
+/* RootDir "@TERMUX_PREFIX@"; */
+/* Dir "@TERMUX_PREFIX@"; */
+/* Dir::Bin::dpkg "bin/dpkg"; */
+/* don't mix cache with bionic */ 
+/* Dir::Cache "@TERMUX_CACHE_DIR@/apt"; */
+/* Dir::Etc "etc/apt"; */
+/* Dir::Etc::sourcelist "/data/data/com.termux/debian/d.sources"; */
+/* Dir::Etc::sourceparts ""; */
+/* Dir::Log "var/log/apt"; */
+/* Dir::State "var/lib/apt"; */
+/* Dir::State::status "../dpkg/status"; */
+/* Dir::State::status "lists/../../dpkg/status"; */
+/* Dir::State::status "@TERMUX_PREFIX@/var/lib/dpkg/status"; */
+/* dpkg::options { "--instdir=@TERMUX_PREFIX@"; }; */
