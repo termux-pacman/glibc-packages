@@ -4,24 +4,24 @@
     "name": "gpkg",
     "distribution": "gpkg",
     "component": "gpkg",
-    "url": "https://service.termux-pacman.dev/gpkg"
+    "url": "https://sync.termux-pacman.dev/gpkg"
   },
   "packages": {
     "name": "main",
     "distribution": "main",
     "component": "main",
-    "url": "https://service.termux-pacman.dev/main"
+    "url": "https://sync.termux-pacman.dev/main"
   },
   "x11-packages": {
     "name": "x11",
     "distribution": "x11",
     "component": "x11",
-    "url": "https://service.termux-pacman.dev/x11"
+    "url": "https://sync.termux-pacman.dev/x11"
   },
   "root-packages": {
     "name": "root",
     "distribution": "root",
     "component": "root",
-    "url": "https://service.termux-pacman.dev/root"
+    "url": "https://sync.termux-pacman.dev/root"
   }
 }

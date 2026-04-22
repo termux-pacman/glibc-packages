@@ -245,10 +245,12 @@ jobs:
       uses: actions/download-artifact@v4.1.7
       with:
         path: ./
-    - name: Install aws-cli
-      run: |
-        git clone https://github.com/termux-pacman/aws-cli-action.git
-        ./aws-cli-action/setup.sh '${{ secrets.AWS_ACCESS_KEY_ID }}' '${{ secrets.AWS_ACCESS_KEY }}' '${{ secrets.AWS_REGION }}'
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v6.1.0
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
     - name: Import GPG key
       run: |
         echo '${{ secrets.SF_GPG_BOT }}' > key.gpg
@@ -258,8 +260,18 @@ jobs:
       run: ./get-build-package.sh
     - name: Uploading packages to aws
       run: |
-        source ./aws-cli-action/func.sh
         source ./scripts/utils/termux/package/termux_package.sh
+        get_name() {
+          local name="" file_sp=(${1//-/ })
+          for _index_f_get_name in $(seq 0 $((${#file_sp[*]}-4))); do
+            if [ -z $name ]; then
+              name="${file_sp[_index_f_get_name]}"
+            else
+              name+="-${file_sp[_index_f_get_name]}"
+            fi
+          done
+          echo "${name//+/0}"
+        }
         sfuf() {
           gpg --batch --pinentry-mode=loopback --passphrase '${{ secrets.PW_GPG_BOT }}' --detach-sign --use-agent -u '${{ secrets.KEY_GPG_BOT }}' --no-armor "$1"
           for format_file in "" ".sig"; do

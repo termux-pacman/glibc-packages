@@ -82,10 +82,12 @@ jobs:
       uses: actions/download-artifact@v4.1.7
       with:
         path: ./
-    - name: Install aws-cli
-      run: |
-        git clone https://github.com/termux-pacman/aws-cli-action.git
-        ./aws-cli-action/setup.sh '${{ secrets.AWS_ACCESS_KEY_ID }}' '${{ secrets.AWS_ACCESS_KEY }}' '${{ secrets.AWS_REGION }}'
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v6.1.0
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
     - name: Import GPG key
       run: |
         echo '${{ secrets.SF_GPG_BOT }}' > key.gpg
