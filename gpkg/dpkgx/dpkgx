@@ -1,0 +1,81 @@
+#!/bin/env bash
+test $# -eq 0 && echo install  debian-repo and call dapt or dpkgx with the same arguments as apt and dpkg && exit
+test -n "$DATA" || DATA=/data/data/com.termux
+test -n "$DPKGX_ROOT" || echo error DPKGX_ROOT unset source $DATA/debian/bashrc first && exit
+root=$DPKGX_ROOT
+dpkg_root=$root/dpkg
+status=$dpkg_root/status
+# export D=$root
+log=$dpkg_root/log
+echo $(date +"%H:%M:%S") $@ >> $log
+
+function dpkgx {
+dpkg --admindir=$dpkg_root --instdir=$root $@
+}
+
+case "$1" in
+"setup")
+	set -x
+	dpkgx --add-architecture arm64
+	cp -v  ld.so.conf $PREFIX/glibc/etc/
+	ldconfig
+	exit 0;;
+"clean")
+	set -x
+	rm -v ld.so.conf $PREFIX/glibc/etc/
+	ldconfig
+	exit 0;;
+"test")
+	shift
+	dpkgx $@
+	exit 0;;
+esac
+
+fd=1
+for a in $@; do
+case "$a" in
+	"--configure") action+=$a;;
+"--pending") action+=$a;;
+"--recursive") action+=$a;;
+"--status-fd") fd=$2;;
+"--unpack") action+=$a;;
+esac
+done
+
+function install {
+	for p in $@; do
+		if [[ "$p" != *.deb ]]; then continue; fi
+		name=$(dpkg -I $p|grep Package|cut -f3 -d" ")
+		echo unpacking $fd $name $p | tee -a $log
+		dpkg -x $p $root
+		echo >> $status
+		dpkg -I $p |sed -n '/Package:/,$p'|cut -c2- >> $status
+		echo "Status: install ok installed" >> $status
+		echo "status $name:arm64: unpacked" >&$fd
+done
+}
+
+case "$action" in
+	"--configure--pending")
+		echo skipping --configure | tee -a $log
+		# echo "status $name:arm64: installed" >&$fd
+		# sed -i s,"Status: install".*,"Status: install ok installed", $U/dpkg/status
+	exit 0
+	;;
+
+	"--unpack--recursive")
+		folder=$(echo $@|awk '{print $NF}')
+		for f in $(ls $folder); do
+		echo $f
+		install $folder/$f
+	done
+		exit 0
+		;;
+	"--unpack")
+		install $@
+	exit 0
+		;;
+esac
+
+dpkgx $@
+exit 0

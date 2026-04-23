@@ -1,0 +1,6 @@
+## See the sources.list(5) manual page for further settings.
+Types: deb
+URIs: http://ports.ubuntu.com/ubuntu-ports
+Suites: noble noble-updates noble-backports noble-security
+Components: main universe restricted multiverse
+Signed-By: /data/data/com.termux/ubuntu/gpg 
