@@ -1,6 +1,6 @@
 --- src/gcc/gcc/Makefile.in
 +++ src/gcc/gcc/Makefile.in
-@@ -559,13 +559,9 @@ FNMATCH_H   = $(srcdir)/../include/fnmatch.h
+@@ -563,13 +563,9 @@ FNMATCH_H   = $(srcdir)/../include/fnmatch.h
  LINKER_PLUGIN_API_H = $(srcdir)/../include/plugin-api.h
  
  # Default native SYSTEM_HEADER_DIR, to be overridden by targets.
@@ -16,7 +16,7 @@
  
  # autoconf sets SYSTEM_HEADER_DIR to one of the above.
  # Purge it of unnecessary internal relative paths
-@@ -1164,7 +1160,7 @@ BUILD_LIBS = $(BUILD_LIBIBERTY)
+@@ -1184,7 +1180,7 @@ BUILD_LIBS = $(BUILD_LIBIBERTY)
  
  BUILD_RTL = build/rtl.o build/read-rtl.o build/ggc-none.o \
  	    build/vec.o build/min-insn-modes.o build/gensupport.o \
@@ -25,16 +25,16 @@
  BUILD_MD = build/read-md.o
  BUILD_ERRORS = build/errors.o
  
-@@ -1291,7 +1287,7 @@ FORTRAN_TARGET_OBJS=@fortran_target_objs@
+@@ -1315,7 +1311,7 @@ FORTRAN_TARGET_OBJS=@fortran_target_objs@
  RUST_TARGET_OBJS=@rust_target_objs@
  
  # Object files for gcc many-languages driver.
 -GCC_OBJS = gcc.o gcc-main.o ggc-none.o gcc-urlifier.o options-urls.o
 +GCC_OBJS = gcc.o gcc-main.o ggc-none.o gcc-urlifier.o options-urls.o cgct-app-prefix.o
  
- c-family-warn = $(STRICT_WARN)
+ SARIF_REPLAY_OBJS = sarif-replay.o libsarifreplay.o
  
-@@ -1421,6 +1417,7 @@ OBJS = \
+@@ -1454,6 +1450,7 @@ OBJS = \
  	coverage.o \
  	cppbuiltin.o \
  	cppdefault.o \
@@ -42,7 +42,7 @@
  	cprop.o \
  	cse.o \
  	cselib.o \
-@@ -2369,7 +2366,7 @@ gcc-nm.cc: gcc-ar.cc
+@@ -2602,7 +2599,7 @@ gcc-nm.cc: gcc-ar.cc
  	cp $^ $@
  
  COLLECT2_OBJS = collect2.o collect2-aix.o vec.o ggc-none.o \
@@ -51,7 +51,7 @@
  COLLECT2_LIBS = @COLLECT2_LIBS@
  collect2$(exeext): $(COLLECT2_OBJS) $(LIBDEPS)
  # Don't try modifying collect2 (aka ld) in place--it might be linking this.
-@@ -2985,6 +2982,7 @@ build/vec.o : vec.cc $(BCONFIG_H) $(SYSTEM_H) $(CORETYPES_H) $(VEC_H)	\
+@@ -3253,6 +3250,7 @@ build/vec.o : vec.cc $(BCONFIG_H) $(SYSTEM_H) $(CORETYPES_H) $(VEC_H)	\
  build/hash-table.o : hash-table.cc $(BCONFIG_H) $(SYSTEM_H)		\
    $(CORETYPES_H) $(HASH_TABLE_H) $(GGC_H) toplev.h $(DIAGNOSTIC_CORE_H)
  build/sort.o : sort.cc $(BCONFIG_H) $(SYSTEM_H)
@@ -59,7 +59,7 @@
  build/inchash.o : inchash.cc $(BCONFIG_H) $(SYSTEM_H) $(CORETYPES_H)	\
    $(HASHTAB_H) inchash.h
  build/gencondmd.o : build/gencondmd.cc $(BCONFIG_H) $(SYSTEM_H)		\
-@@ -3327,11 +3325,7 @@ stmp-int-hdrs: $(STMP_FIXINC) $(T_GLIMITS_H) $(T_STDINT_GCC_H) $(USER_H) fixinc_
+@@ -3610,11 +3608,7 @@ stmp-int-hdrs: $(STMP_FIXINC) $(T_GLIMITS_H) $(T_STDINT_GCC_H) $(USER_H) fixinc_
  	  sysroot_headers_suffix=`echo $${ml} | sed -e 's/;.*$$//'`; \
  	  multi_dir=`echo $${ml} | sed -e 's/^[^;]*;//'`; \
  	  include_dir=include$${multi_dir}; \
@@ -82,7 +82,7 @@
  
  /* TARGET_64BIT may be defined to use driver specific functionality. */
  #undef TARGET_64BIT
-@@ -1191,8 +1192,10 @@ main (int argc, char **argv)
+@@ -1197,8 +1198,10 @@ main (int argc, char **argv)
    prefix_from_env ("LIBPATH", &libpath_lib_dirs);
    /* Add to this list also two standard directories where
       AIX loader always searches for libraries.  */
@@ -95,7 +95,7 @@
  #endif
  
    /* Get any options that the upper GCC wants to pass to the sub-GCC.
-@@ -2682,20 +2685,20 @@ scan_libraries (const char *prog_name)
+@@ -2687,20 +2690,20 @@ scan_libraries (const char *prog_name)
  /* Array of standard AIX libraries which should not
     be scanned for ctors/dtors.  */
  static const char *const aix_std_libs[] = {
@@ -143,7 +143,7 @@
  
  #undef MUSL_DYNAMIC_LINKER
  #define MUSL_DYNAMIC_LINKER "/lib/ld-musl-aarch64%{mbig-endian:_be}%{mabi=ilp32:_ilp32}.so.1"
-@@ -34,20 +36,20 @@
+@@ -38,22 +40,22 @@
  
  #define CPP_SPEC "%{pthread:-D_REENTRANT}"
  
@@ -159,8 +159,10 @@
     %{static-pie:-Bstatic -pie --no-dynamic-linker -z text} \
     -X						\
     %{mbig-endian:-EB} %{mlittle-endian:-EL}     \
--   -maarch64linux%{mabi=ilp32:32}%{mbig-endian:b}"
-+   -maarch64linux%{mabi=ilp32:32}%{mbig-endian:b}", NULL)
+    -maarch64linux%{mabi=ilp32:32}%{mbig-endian:b} \
+    %{%:sanitize(memtag-stack):%{!fsanitize-memtag-mode:-z memtag-stack -z memtag-mode=sync}} \
+-   %{%:sanitize(memtag-stack):%{fsanitize-memtag-mode=*:-z memtag-stack -z memtag-mode=%}}"
++   %{%:sanitize(memtag-stack):%{fsanitize-memtag-mode=*:-z memtag-stack -z memtag-mode=%}}", NULL)
  
  
 -#define LINK_SPEC LINUX_TARGET_LINK_SPEC AARCH64_ERRATA_LINK_SPEC
@@ -179,7 +181,7 @@
  /* On EABI GNU/Linux, we want both the BPABI builtins and the
     GNU/Linux builtins.  */
  #undef  TARGET_OS_CPP_BUILTINS
-@@ -62,14 +64,14 @@
+@@ -65,14 +67,14 @@
     GLIBC_DYNAMIC_LINKER_DEFAULT and TARGET_DEFAULT_FLOAT_ABI.  */
  
  #undef  GLIBC_DYNAMIC_LINKER
@@ -199,7 +201,7 @@
  
  /* For ARM musl currently supports four dynamic linkers:
     - ld-musl-arm.so.1 - for the EABI-derived soft-float ABI
-@@ -91,9 +93,9 @@
+@@ -94,9 +96,9 @@
  /* At this point, bpabi.h will have clobbered LINK_SPEC.  We want to
     use the GNU/Linux version, not the generic BPABI version.  */
  #undef  LINK_SPEC
@@ -212,7 +214,7 @@
  
  #undef  ASAN_CC1_SPEC
  #define ASAN_CC1_SPEC "%{%:sanitize(address):-funwind-tables}"
-@@ -121,8 +123,8 @@
+@@ -124,8 +126,8 @@
  
  #undef	ENDFILE_SPEC
  #define ENDFILE_SPEC \
@@ -425,17 +427,26 @@
  #endif
      { 0, 0, 0, 0, 0, 0 }
    };
---- src/gcc/gcc/gcc.cc	2024-11-22 23:52:07.605751246 +0300
-+++ src/gcc/gcc/gcc.cc.patch	2024-11-23 00:09:51.505136358 +0300
-@@ -51,6 +51,7 @@ compilation is specified by a string cal
- #include "common/common-target.h"
+--- src/gcc/gcc/gcc.cc
++++ src/gcc/gcc/gcc.cc
+@@ -55,6 +55,7 @@ compilation is specified by a string called a "spec".  */
  #include "gcc-urlifier.h"
  #include "opts-diagnostic.h"
+ #include "auto-profile.h" /* for AUTO_PROFILE_VERSION.  */
 +#include "cgct-app-prefix.h"
  
  #ifndef MATH_LIBRARY
  #define MATH_LIBRARY "m"
-@@ -1607,11 +1608,10 @@ static const char *gcc_libexec_prefix;
+@@ -1237,7 +1238,7 @@ static const char *link_gcc_c_sequence_spec = LINK_GCC_C_SEQUENCE_SPEC;
+ static const char *link_ssp_spec = LINK_SSP_SPEC;
+ static const char *asm_spec = ASM_SPEC;
+ static const char *asm_final_spec = ASM_FINAL_SPEC;
+-static const char *link_spec = LINK_SPEC LIBC_LINK_SPEC;
++static const char *link_spec = concat(LINK_SPEC, LIBC_LINK_SPEC, NULL);
+ static const char *lib_spec = LIB_SPEC;
+ static const char *link_gomp_spec = "";
+ static const char *libgcc_spec = LIBGCC_SPEC;
+@@ -1641,11 +1642,10 @@ static const char *gcc_libexec_prefix;
  
  /* Default prefixes to attach to command names.  */
  
@@ -451,7 +462,7 @@
  #endif
  
  #ifdef CROSS_DIRECTORY_STRUCTURE  /* Don't use these prefixes for a cross compiler.  */
-@@ -1648,10 +1648,10 @@ static const char *const standard_startf
+@@ -1682,10 +1682,10 @@ static const char *const standard_startfile_prefix = STANDARD_STARTFILE_PREFIX;
  static const char *md_exec_prefix = MD_EXEC_PREFIX;
  static const char *md_startfile_prefix = MD_STARTFILE_PREFIX;
  static const char *md_startfile_prefix_1 = MD_STARTFILE_PREFIX_1;
@@ -466,7 +477,7 @@
  
  /* A relative path to be used in finding the location of tools
     relative to the driver.  */
-@@ -4876,6 +4876,8 @@ process_command (unsigned int decoded_op
+@@ -4913,6 +4913,8 @@ process_command (unsigned int decoded_options_count,
       that are lists of directory names with colons.  */
  
    temp = env.get ("COMPILER_PATH");
@@ -475,7 +486,7 @@
    if (temp)
      {
        const char *startp, *endp;
-@@ -8569,7 +8571,7 @@ driver::set_up_specs () const
+@@ -8615,7 +8617,7 @@ driver::set_up_specs () const
      }
    /* We should eventually get rid of all these and stick to
       startfile_prefix_spec exclusively.  */
@@ -484,7 +495,7 @@
      {
        if (*md_startfile_prefix)
  	add_sysrooted_prefix (&startfile_prefixes, md_startfile_prefix,
-@@ -8590,7 +8592,7 @@ driver::set_up_specs () const
+@@ -8636,7 +8638,7 @@ driver::set_up_specs () const
  	add_sysrooted_prefix (&startfile_prefixes,
  			      standard_startfile_prefix, "BINUTILS",
  			      PREFIX_PRIORITY_LAST, 0, 1);
@@ -493,7 +504,7 @@
  	{
  	  add_prefix (&startfile_prefixes,
  		      concat (gcc_exec_prefix
-@@ -8602,13 +8604,15 @@ driver::set_up_specs () const
+@@ -8648,13 +8650,15 @@ driver::set_up_specs () const
  
        /* Sysrooted prefixes are relocated because target_system_root is
  	 also relocated by gcc_exec_prefix.  */

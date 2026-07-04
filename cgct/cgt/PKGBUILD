@@ -1,5 +1,5 @@
 pkgname=cgt
-pkgver=15.2.0
+pkgver=16.1.0
 pkgrel=0
 pkgdesc='Cross GCCs for Termux (only for Linux)'
 arch=(x86_64)
@@ -12,11 +12,11 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.xz
 	set_dynamic_path.patch
 	cgct-app-prefix.cc
 	cgct-app-prefix.h)
-sha256sums=('438fd996826b0c82485a29da03a72d71d6e3541a83ec702df4271f6fe025d24e'
+sha256sums=('50efb4d94c3397aff3b0d61a5abd748b4dd31d9d3f2ab7be05b171d36a510f79'
             'b0d2153d28248189ad1f000194c9b12aa7cea04c09c9f36a2e78b2c25b771392'
             'a688899b982608089ee76a97e18c019f596ccb5cad055916a6ad6d387568b3dc'
             '8ad880e14a32a3b5f3ab8039df89b22479c4a92bfbe6b3f758409264ddef5479'
-            'aa87377b2a73e303c45d9a86496b94193799083324a442572768bd1b704a71e8'
+            '170b41572555e0ed66e627d7ca0b6600767d1873c6e7e97ffb5cb9adf4855042'
             '732e15a76056348911f60825c377c0378f6dad57b29eb86fcc7447cf8172f171'
             '9fb91df134d096bf493844812617b5aed9ce5d6ccd564f8a3a11c8d9812be744')
 depends=('cbt')
@@ -41,14 +41,15 @@ prepare() {
 		'${exec_prefix}/'{'${host_alias}','${target_noncanonical}'} \
 		'$(exec_prefix)/'{'$(host_noncanonical)','$(target_noncanonical)','$(target_alias)'} \
 		'${prefix}/${target_alias}'; do
+		echo "sed -i \"s|${i}|${i%%/*}|\""
 		sed -i "s|${i}|${i%%/*}|" $(grep -s -r -l "${i}")
 	done
 }
 
 build() {
 	unset CFLAGS CXXFLAGS AR LD CC CXX
-	CFLAGS="-O2 -pipe -fno-plt -fexceptions -Wp,-D_FORTIFY_SOURCE=2 -Wformat -fstack-clash-protection"
-	CXXFLAGS="${CFLAGS} -Wp,-D_GLIBCXX_ASSERTIONS"
+	export CFLAGS="-O2 -pipe -fno-plt -fexceptions -Wp,-D_FORTIFY_SOURCE=2 -Wformat -fstack-clash-protection"
+	export CXXFLAGS="${CFLAGS} -Wp,-D_GLIBCXX_ASSERTIONS"
 
 	clean_prefix || true
 
