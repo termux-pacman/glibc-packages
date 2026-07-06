@@ -1,5 +1,5 @@
 pkgname=cbt
-pkgver=2.45.1
+pkgver=2.46.1
 pkgrel=0
 pkgdesc='Cross Binutils for Termux (only for Linux)'
 arch=(x86_64)
@@ -9,9 +9,9 @@ source=(https://ftp.gnu.org/gnu/binutils/binutils-$pkgver.tar.xz
 	config.sub.patch
 	ldmain.c.patch
 	ldmain.h.patch)
-sha256sums=('5fe101e6fe9d18fdec95962d81ed670fdee5f37e3f48f0bef87bddf862513aa5'
+sha256sums=('e127a709cba24c76de8936cb7083dd768f28cd37eb010492e2f19b71eb1294e4'
             '96098ecd39d5ffb95364f405f4182cc2524ceb57f68884c3bc6cddb080190d2e'
-            'd6f9b3e9495c8b6030f7b96469f86f15c06ebcd3a83c40fd6c1232dbdf5517b3'
+            '6a4f76ba473485ec4821d6f16cc5d615bd6b5b0300c8ee82048ec7cd41b5e016'
             '9c58abb0507f85fdc7603980a5e1021bc55bd44444f74937c1e2ab72f8f97f49')
 optdepends=('glibc-cgct')
 groups=('cgct')
@@ -25,8 +25,8 @@ prepare() {
 
 build() {
 	unset CFLAGS CXXFLAGS AR LD CC CXX
-	CFLAGS="-O2 -pipe -fno-plt -fexceptions -Wp,-D_FORTIFY_SOURCE=2 -Wformat -fstack-clash-protection"
-	CXXFLAGS="${CFLAGS} -Wp,-D_GLIBCXX_ASSERTIONS"
+	export CFLAGS="-O2 -pipe -fno-plt -fexceptions -Wp,-D_FORTIFY_SOURCE=2 -Wformat -fstack-clash-protection"
+	export CXXFLAGS="${CFLAGS} -Wp,-D_GLIBCXX_ASSERTIONS"
 
 	for target in aarch64-linux-gnu arm-linux-gnueabihf x86_64-linux-gnu i686-linux-gnu; do
 		arch_build=${target/-*}

@@ -1,6 +1,6 @@
---- src/binutils/ld/ldmain.c	2024-01-29 03:00:00.000000000 +0300
-+++ src/binutils/ld/ldmain.c.patch	2024-07-12 14:06:39.982582997 +0300
-@@ -55,6 +55,9 @@
+--- src/binutils/ld/ldmain.c	2026-07-04 22:10:33.301262190 +0300
++++ src/binutils/ld/ldmain.c.patch	2026-07-04 22:11:05.421262178 +0300
+@@ -61,6 +61,9 @@
  #define TARGET_SYSTEM_ROOT ""
  #endif
  
@@ -10,8 +10,8 @@
  /* EXPORTS */
  
  FILE *saved_script_handle = NULL;
-@@ -246,6 +249,19 @@
-   (*default_bfd_error_handler) (fmt, ap);
+@@ -650,6 +653,19 @@
+ #endif
  }
  
 +/* Dynamic prefix */
@@ -30,7 +30,7 @@
  int
  main (int argc, char **argv)
  {
-@@ -259,6 +275,11 @@
+@@ -664,6 +680,11 @@
    bindtextdomain (PACKAGE, LOCALEDIR);
    textdomain (PACKAGE);
  
@@ -39,6 +39,6 @@
 +#endif
 +  ldfile_add_library_path(cgct_app_prefix("/lib"), false);
 +
-   program_name = argv[0];
+   set_program_name (argv[0]);
    xmalloc_set_program_name (program_name);
  
