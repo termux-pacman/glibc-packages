@@ -1,5 +1,5 @@
 diff --git a/sysdeps/unix/sysv/linux/isatty.c b/sysdeps/unix/sysv/linux/isatty.c
-index 3faaec5e..6b24257a 100644
+index 5403956b..0d0864f1 100644
 --- a/sysdeps/unix/sysv/linux/isatty.c
 +++ b/sysdeps/unix/sysv/linux/isatty.c
 @@ -18,12 +18,10 @@
@@ -18,7 +18,7 @@ index 3faaec5e..6b24257a 100644
  }
  weak_alias (__isatty, isatty)
 diff --git a/sysdeps/unix/sysv/linux/isatty_nostatus.c b/sysdeps/unix/sysv/linux/isatty_nostatus.c
-index 406decba..4bfe540d 100644
+index 987b7527..b7fb3c11 100644
 --- a/sysdeps/unix/sysv/linux/isatty_nostatus.c
 +++ b/sysdeps/unix/sysv/linux/isatty_nostatus.c
 @@ -21,6 +21,6 @@
@@ -31,7 +31,7 @@ index 406decba..4bfe540d 100644
 +  return INTERNAL_SYSCALL_CALL (ioctl, fd, TCGETS, &k_termios) == 0;
  }
 diff --git a/sysdeps/unix/sysv/linux/kernel-features.h b/sysdeps/unix/sysv/linux/kernel-features.h
-index a49a9159..fe8f7ef9 100644
+index 01c865e2..6d5bd285 100644
 --- a/sysdeps/unix/sysv/linux/kernel-features.h
 +++ b/sysdeps/unix/sysv/linux/kernel-features.h
 @@ -56,7 +56,7 @@
@@ -44,10 +44,10 @@ index a49a9159..fe8f7ef9 100644
  /* Support for various CLOEXEC and NONBLOCK flags was added in
     2.6.27.  */
 diff --git a/sysdeps/unix/sysv/linux/speed.c b/sysdeps/unix/sysv/linux/speed.c
-index 4efb0ded..7aec7c28 100644
+index 390207f8..844dec14 100644
 --- a/sysdeps/unix/sysv/linux/speed.c
 +++ b/sysdeps/unix/sysv/linux/speed.c
-@@ -230,7 +230,7 @@ ___speed_to_cbaud (speed_t speed)
+@@ -236,7 +236,7 @@ ___speed_to_cbaud (speed_t speed)
  
  
  /* Canonicalize the representation of speed fields in a kernel
@@ -56,7 +56,7 @@ index 4efb0ded..7aec7c28 100644
     representation (not __BOTHER), use it and propagate the
     corresponding speed value to ispeed/ospeed, otherwise the other way
     around if possible.  Finally, if the input speed is zero, copy the
-@@ -241,7 +241,7 @@ ___speed_to_cbaud (speed_t speed)
+@@ -247,7 +247,7 @@ ___speed_to_cbaud (speed_t speed)
  
     This is used by tcgetattr() and tcsetattr(). */
  void
@@ -66,7 +66,7 @@ index 4efb0ded..7aec7c28 100644
    k_termios_p->c_ospeed =
        ___cbaud_to_speed (cbaud (k_termios_p->c_cflag),  k_termios_p->c_ospeed);
 diff --git a/sysdeps/unix/sysv/linux/tcgetattr.c b/sysdeps/unix/sysv/linux/tcgetattr.c
-index ca175697..2c688b04 100644
+index 339cf79e..7d06a12b 100644
 --- a/sysdeps/unix/sysv/linux/tcgetattr.c
 +++ b/sysdeps/unix/sysv/linux/tcgetattr.c
 @@ -21,12 +21,12 @@
@@ -86,7 +86,7 @@ index ca175697..2c688b04 100644
        memset (termios_p, 0, sizeof (*termios_p));
        termios_p->c_iflag  = k_termios.c_iflag;
 diff --git a/sysdeps/unix/sysv/linux/tcsetattr.c b/sysdeps/unix/sysv/linux/tcsetattr.c
-index 4f07a03e..7b54446a 100644
+index c925353b..b7471447 100644
 --- a/sysdeps/unix/sysv/linux/tcsetattr.c
 +++ b/sysdeps/unix/sysv/linux/tcsetattr.c
 @@ -23,7 +23,7 @@
@@ -98,7 +98,7 @@ index 4f07a03e..7b54446a 100644
    unsigned long cmd;
  
    memset (&k_termios, 0, sizeof k_termios);
-@@ -37,7 +37,7 @@ __tcsetattr (int fd, int optional_actions, const struct termios *termios_p)
+@@ -37,14 +37,12 @@ __tcsetattr (int fd, int optional_actions, const struct termios *termios_p)
    k_termios.c_ospeed = termios_p->c_ospeed;
    k_termios.c_ispeed = termios_p->c_ispeed;
  
@@ -107,8 +107,6 @@ index 4f07a03e..7b54446a 100644
  
    copy_c_cc (k_termios.c_cc, _TERMIOS2_NCCS, termios_p->c_cc, NCCS);
  
-@@ -53,8 +53,6 @@ __tcsetattr (int fd, int optional_actions, const struct termios *termios_p)
-    */
    static_assert_equal(TCSADRAIN, TCSANOW + 1);
    static_assert_equal(TCSAFLUSH, TCSANOW + 2);
 -  static_assert_equal(TCSETSW2,  TCSETS2 + 1);
@@ -116,39 +114,44 @@ index 4f07a03e..7b54446a 100644
    static_assert_equal(TCSETSW,   TCSETS  + 1);
    static_assert_equal(TCSETSF,   TCSETS  + 2);
  
-@@ -62,16 +60,19 @@ __tcsetattr (int fd, int optional_actions, const struct termios *termios_p)
-   if (cmd > 2)
-     return INLINE_SYSCALL_ERROR_RETURN_VALUE (EINVAL);
+@@ -60,20 +58,18 @@ __tcsetattr (int fd, int optional_actions, const struct termios *termios_p)
+   if (k_termios.c_ospeed == k_termios.c_ispeed)
+     k_termios.c_cflag &= ~CIBAUD;
  
+-  /* Choose the proper ioctl number to invoke.
+-
+-     Alpha got TCSETS2 late (Linux 4.20), but has the same structure
+-     format, and it only needs TCSETS2 if either it needs to use
+-     __BOTHER or split speed.  All other architectures have TCSETS2 as
+-     far back as the current glibc supports.  Calling TCSETS with
+-     __BOTHER causes unpredictable results on old Alpha kernels and
+-     could even crash them. */
 -  if (__ASSUME_TERMIOS2 ||
 -      k_termios.c_ospeed != k_termios.c_ispeed ||
 -      cbaud (k_termios.c_cflag) == __BOTHER)
--    {
--      cmd += TCSETS2;
--    }
+-    cmd += TCSETS2;
 -  else
-+  k_termios.c_cflag &= ~CIBAUD;
-+
+-    cmd += TCSETS;
 +  switch (optional_actions)
-     {
++    {
 +    case TCSANOW:
 +    case TCSADRAIN:
-       cmd += TCSETS;
--      k_termios.c_cflag &= ~CIBAUD;
++      cmd += TCSETS;
 +      break;
 +    case TCSAFLUSH:
 +      cmd = TCSETS;
 +      break;
 +    default:
 +      break;
-     }
++    }
  
    return INLINE_SYSCALL_CALL (ioctl, fd, cmd, &k_termios);
+ }
 diff --git a/sysdeps/unix/sysv/linux/termios_internals.h b/sysdeps/unix/sysv/linux/termios_internals.h
-index e8dbfe74..8550173a 100644
+index a80f55cc..fb8e73a9 100644
 --- a/sysdeps/unix/sysv/linux/termios_internals.h
 +++ b/sysdeps/unix/sysv/linux/termios_internals.h
-@@ -137,7 +137,7 @@ ___speed_to_cbaud (speed_t speed)
+@@ -94,7 +94,7 @@ ___speed_to_cbaud (speed_t speed)
      __attribute_const__ attribute_hidden;
  
  extern void

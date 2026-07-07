@@ -28,7 +28,7 @@ jobs:
       fail-fast: false
     steps:
     - name: Clone repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
       with:
         fetch-depth: 1000
 
@@ -223,7 +223,7 @@ jobs:
         find pkgs -type f -name "*.pkg.*" -exec sha256sum "{}" \; | sort -k2
     - name: Store *.pkg.* files
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7.0.1
       with:
         name: pkgs-${{ matrix.target_arch }}-${{ github.sha }}
         path: ./artifacts
@@ -240,13 +240,13 @@ jobs:
       fail-fast: false
     steps:
     - name: Clone repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
     - name: Get *.pkg.* files
-      uses: actions/download-artifact@v4.1.7
+      uses: actions/download-artifact@v8.0.1
       with:
         path: ./
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v6.1.0
+      uses: aws-actions/configure-aws-credentials@v6.2.1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY }}
@@ -279,8 +279,7 @@ jobs:
           done
           rm "$1.sig"
         }
-        archive="pkgs-${{ matrix.arch }}-${{ github.sha }}/pkgs-${{ matrix.arch }}-${{ github.sha }}.tar"
-        tar xf "$archive"
+        tar xf "pkgs-${{ matrix.arch }}-${{ github.sha }}.tar"
         for repo in $(jq --raw-output 'del(.pkg_format) | .[].name' repo.json); do
           dp_file="deleted_${repo}_packages.txt"
           if [[ -f pkgs/$dp_file ]]; then

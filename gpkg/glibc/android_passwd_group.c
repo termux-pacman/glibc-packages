@@ -203,7 +203,7 @@ struct group * get_group_android(const char* name, gid_t gid) {
 	res.gr_name = (char *)name;
 	res.gr_passwd = NULL;
 	res.gr_gid = gid;
-	res.gr_mem = *(char **[2]){(char **)name, NULL};
+	res.gr_mem = *(char **[2]){&res.gr_name, NULL};
 
 	return &res;
 }

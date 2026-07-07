@@ -1,5 +1,5 @@
 diff --git a/elf/dl-environ.c b/elf/dl-environ.c
-index cb759a44..998c5a57 100644
+index 51fb3677..a7c7151e 100644
 --- a/elf/dl-environ.c
 +++ b/elf/dl-environ.c
 @@ -21,6 +21,22 @@
@@ -52,10 +52,10 @@ index cb759a44..998c5a57 100644
        ++current;
      }
 diff --git a/elf/dl-support.c b/elf/dl-support.c
-index 2f502c8b..e1614c76 100644
+index 7505e149..1c22a59c 100644
 --- a/elf/dl-support.c
 +++ b/elf/dl-support.c
-@@ -293,11 +293,11 @@ _dl_non_dynamic_init (void)
+@@ -291,11 +291,11 @@ _dl_non_dynamic_init (void)
  	}
      }
  
@@ -69,7 +69,7 @@ index 2f502c8b..e1614c76 100644
  		  /* No glibc-hwcaps selection support in statically
  		     linked binaries.  */
  		  NULL, NULL);
-@@ -305,11 +305,11 @@ _dl_non_dynamic_init (void)
+@@ -303,11 +303,11 @@ _dl_non_dynamic_init (void)
    /* Remember the last search directory added at startup.  */
    _dl_init_all_dirs = GL(dl_all_dirs);
  
@@ -85,10 +85,10 @@ index 2f502c8b..e1614c76 100644
  #ifdef DL_PLATFORM_INIT
    DL_PLATFORM_INIT;
 diff --git a/elf/dl-usage.c b/elf/dl-usage.c
-index 5baac4ba..77ac93d4 100644
+index a5bc1cb4..e740b150 100644
 --- a/elf/dl-usage.c
 +++ b/elf/dl-usage.c
-@@ -187,7 +187,7 @@ setting environment variables (which would be inherited by subprocesses).\n\
+@@ -186,7 +186,7 @@ setting environment variables (which would be inherited by subprocesses).\n\
                          object we can handle\n\
    --inhibit-cache       Do not use " LD_SO_CACHE "\n\
    --library-path PATH   use given PATH instead of content of the environment\n\
@@ -98,7 +98,7 @@ index 5baac4ba..77ac93d4 100644
                          search glibc-hwcaps subdirectories in LIST\n\
    --glibc-hwcaps-mask LIST\n\
 diff --git a/sysdeps/generic/unsecvars.h b/sysdeps/generic/unsecvars.h
-index f1724efe..8f0fa1a9 100644
+index 33755179..c45373ea 100644
 --- a/sysdeps/generic/unsecvars.h
 +++ b/sysdeps/generic/unsecvars.h
 @@ -20,6 +20,20 @@
@@ -111,11 +111,11 @@ index f1724efe..8f0fa1a9 100644
 +  "GLIBC_LD_DEBUG\0"							      \
 +  "GLIBC_LD_DEBUG_OUTPUT\0"						      \
 +  "GLIBC_LD_DYNAMIC_WEAK\0"						      \
-+  "GLIBC_LD_HWCAP_MASK\0"						      \
 +  "GLIBC_LD_LIBRARY_PATH\0"						      \
 +  "GLIBC_LD_ORIGIN_PATH\0"						      \
 +  "GLIBC_LD_PRELOAD\0"							      \
 +  "GLIBC_LD_PROFILE\0"							      \
++  "GLIBC_LD_PROFILE_OUTPUT\0"						      \
 +  "GLIBC_LD_SHOW_AUXV\0"						      \
 +  "GLIBC_LD_VERBOSE\0"							      \
 +  "GLIBC_LD_WARN\0"							      \
