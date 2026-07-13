@@ -14,14 +14,14 @@ on:
       packages:
         description: "A space-separated names of packages selected for rebuilding"
         required: true
-        
+
 permissions: {} # none
 
 jobs:
   build:
     permissions:
       contents: read # actions/upload-artifact doesn't need contents: write
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     strategy:
       matrix:
         target_arch: [aarch64, arm, i686, x86_64]
@@ -32,18 +32,8 @@ jobs:
       with:
         fetch-depth: 1000
 
-    - name: Set up QEMU
-      run: |
-        while true; do
-          {
-            sudo apt update
-            yes | sudo apt install qemu-user qemu-user-static binfmt-support
-          } || continue
-          break
-        done
-        sudo update-binfmts --enable qemu-aarch64
-        sudo update-binfmts --enable qemu-arm
-        docker run --rm --privileged tonistiigi/binfmt --install all
+    - name: Set up binfmt
+      run: docker run --rm --privileged tonistiigi/binfmt:qemu-v10.2.3 --install all
 
     - name: Get files from termux-packages repository
       run: ./get-build-package.sh
@@ -186,7 +176,7 @@ jobs:
         done
 
         if [ ! -z "$packages" ]; then
-          if grep -qP "(^|\s)${packages// /($|\s)|(^|\s)}($|\s)" ./big-pkgs.list; then
+          if grep -Eq "^($(paste -sd '|' <<< "${packages}"))$" ./big-pkgs.list; then
             ./scripts/setup-ubuntu.sh
             ./scripts/setup-cgct.sh
             sudo apt install ninja-build
