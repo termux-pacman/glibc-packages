@@ -1,28 +1,30 @@
-diff -uNr ncurses-6.1-20181117/progs/tic.c ncurses-6.1-20181117.mod/progs/tic.c
---- ncurses-6.1-20181117/progs/tic.c	2018-03-18 02:05:10.000000000 +0200
-+++ ncurses-6.1-20181117.mod/progs/tic.c	2019-03-01 20:40:56.193173489 +0200
-@@ -386,7 +386,7 @@
+diff --git a/progs/tic.c b/progs/tic.c
+index 1c0ff0b..47f7eed 100644
+--- a/progs/tic.c
++++ b/progs/tic.c
+@@ -389,7 +389,7 @@ open_tempfile(char *filename)
  {
-     FILE *result = 0;
+     FILE *result = NULL;
  
 -    _nc_STRCPY(filename, "/tmp/XXXXXX", PATH_MAX);
 +    _nc_STRCPY(filename, "@TERMUX_PREFIX_CLASSICAL@/tmp/XXXXXX", PATH_MAX);
  #if HAVE_MKSTEMP
      {
  	int oldmask = (int) umask(077);
-@@ -900,7 +900,7 @@
+@@ -922,7 +922,7 @@ main(int argc, char *argv[])
      } else {
  	if (infodump == TRUE) {
  	    /* captoinfo's no-argument case */
 -	    source_file = "/etc/termcap";
 +	    source_file = "@TERMUX_PREFIX@/etc/termcap";
- 	    if ((termcap = getenv("TERMCAP")) != 0
- 		&& (namelst = make_namelist(getenv("TERM"))) != 0) {
+ 	    if ((termcap = getenv("TERMCAP")) != NULL
+ 		&& (namelst = make_namelist(getenv("TERM"))) != NULL) {
  		if (access(termcap, F_OK) == 0) {
-diff -uNr ncurses-6.1-20181117/progs/tset.c ncurses-6.1-20181117.mod/progs/tset.c
---- ncurses-6.1-20181117/progs/tset.c	2017-10-08 03:01:29.000000000 +0300
-+++ ncurses-6.1-20181117.mod/progs/tset.c	2019-03-01 20:40:15.049476720 +0200
-@@ -566,8 +566,8 @@
+diff --git a/progs/tset.c b/progs/tset.c
+index ed9ee28..38561d1 100644
+--- a/progs/tset.c
++++ b/progs/tset.c
+@@ -579,8 +579,8 @@ get_termcap_entry(int fd, const char *userarg)
  	    goto map;
  	}
  #else

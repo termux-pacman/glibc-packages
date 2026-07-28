@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://www.sqlite.org
 TERMUX_PKG_DESCRIPTION="A C library that implements an SQL database engine"
 TERMUX_PKG_LICENSE="Public Domain"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-_SQLITE_SRCVER=3490100
-_SQLITE_YEAR=2025
-TERMUX_PKG_VERSION=3.49.1
+_SQLITE_SRCVER=3530400
+_SQLITE_YEAR=2026
+TERMUX_PKG_VERSION=3.53.4
 TERMUX_PKG_SRCURL=https://www.sqlite.org/${_SQLITE_YEAR}/sqlite-src-${_SQLITE_SRCVER}.zip
-TERMUX_PKG_SHA256=4404d93cbce818b1b98ca7259d0ba9b45db76f2fdd9373e56f2d29b519f4d43b
+TERMUX_PKG_SHA256=d18fa15aec74d8c17e1463f861095adc01b5ad190256acb4f91d22f0368d232b
 TERMUX_PKG_DEPENDS="zlib-glibc"
 TERMUX_PKG_BUILD_IN_SRC=true
 
@@ -46,9 +46,6 @@ termux_step_post_make_install() {
 
 	install -m755 -d $TERMUX_PREFIX/share/man/man1
 	install -m644 $TERMUX_PKG_SRCDIR/sqlite3.1 $TERMUX_PREFIX/share/man/man1/
-
-	install -m755 -d $TERMUX_PREFIX/share/man/mann
-	install -m644 $TERMUX_PKG_SRCDIR/autoconf/tea/doc/sqlite3.n $TERMUX_PREFIX/share/man/mann/
 
 	install -Dm644 lempar.c $TERMUX_PREFIX/share/lemon/lempar.c
 }

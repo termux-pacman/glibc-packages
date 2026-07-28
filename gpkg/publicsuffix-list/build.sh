@@ -2,11 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://github.com/publicsuffix/list
 TERMUX_PKG_DESCRIPTION="Cross-vendor public domain suffix database"
 TERMUX_PKG_LICENSE="MPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-_COMMIT=9094af5c6cb260e69137c043c01be18fee01a540
-TERMUX_PKG_VERSION="2024.03.06"
+_COMMIT=ee780bcf233174cb23ba8575d54c4154d47508e1
+TERMUX_PKG_VERSION="2026.05.07"
 TERMUX_PKG_SRCURL=git+https://github.com/publicsuffix/list
-TERMUX_PKG_SHA256=6d9f7108184522fbf7b8aef9569354068ad7693991e4520d6506407c681887ce
-TERMUX_PKG_GIT_BRANCH=master
+TERMUX_PKG_SHA256=91d74d6010b43210957d7d7196b1defc635c8888f3d6f899acafe40575761878
+TERMUX_PKG_GIT_BRANCH=main
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_PLATFORM_INDEPENDENT=true
 
@@ -33,5 +33,5 @@ termux_step_make() {
 
 termux_step_make_install() {
 	install -Dm 644 public_suffix_list.dat tests/test_psl.txt -t "$TERMUX_PREFIX/share/publicsuffix"
-	ln -s public_suffix_list.dat "$TERMUX_PREFIX/share/publicsuffix/effective_tld_names.dat"
+	ln -sf public_suffix_list.dat "$TERMUX_PREFIX/share/publicsuffix/effective_tld_names.dat"
 }
