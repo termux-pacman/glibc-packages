@@ -3,9 +3,9 @@ TERMUX_PKG_DESCRIPTION="The Kerberos network authentication system"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_LICENSE_FILE="../NOTICE"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=1.21.3
+TERMUX_PKG_VERSION=1.22.2
 TERMUX_PKG_SRCURL=https://fossies.org/linux/misc/krb5-$TERMUX_PKG_VERSION.tar.gz
-TERMUX_PKG_SHA256=b7a4cd5ead67fb08b980b21abd150ff7217e85ea320c9ed0c6dadd304840ad35
+TERMUX_PKG_SHA256=3243ffbc8ea4d4ac22ddc7dd2a1dc54c57874c40648b60ff97009763554eaf13
 TERMUX_PKG_DEPENDS="e2fsprogs-glibc, libverto-glibc"
 TERMUX_PKG_CONFFILES="glibc/etc/krb5.conf glibc/var/krb5kdc/kdc.conf"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
@@ -25,7 +25,18 @@ DEFCKTNAME=$TERMUX_PREFIX/var/krb5/user/%{euid}/client.keytab
 #--with-ldap
 
 termux_step_post_get_source() {
+	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
+		# Due to incorrect library routing in CGCT, need to make sure
+		# that the old krb5 libraries are not in `${TERMUX_PREFIX}/lib`.
+		# TODO: fix library routing in CGCT
+		rm -f $TERMUX_PREFIX/lib/lib{gss{api_krb5,rpc},k5crypto,kadm5clnt{,_mit},kadm5srv{,_mit},kdb5,krad,krb5{,support}}*
+	fi
+
 	TERMUX_PKG_SRCDIR+="/src"
+}
+
+termux_step_pre_configure() {
+	export WARN_CFLAGS=""
 }
 
 termux_step_post_make_install() {

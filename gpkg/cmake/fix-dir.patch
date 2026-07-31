@@ -1,0 +1,26 @@
+diff --git a/Source/cmExecProgramCommand.cxx b/Source/cmExecProgramCommand.cxx
+index 5f09bb63..1c7d70ab 100644
+--- a/Source/cmExecProgramCommand.cxx
++++ b/Source/cmExecProgramCommand.cxx
+@@ -206,7 +206,7 @@ bool RunCommand(std::string command, std::string& output, int& retVal,
+   }
+   fflush(stdout);
+   fflush(stderr);
+-  char const* cmd[] = { "/bin/sh", "-c", command.c_str(), nullptr };
++  char const* cmd[] = { "@TERMUX_PREFIX@/bin/sh", "-c", command.c_str(), nullptr };
+   cmsysProcess_SetCommand(cp, cmd);
+ #endif
+ 
+diff --git a/Source/cmLocalUnixMakefileGenerator3.cxx b/Source/cmLocalUnixMakefileGenerator3.cxx
+index ab6d3456..02f5bdd8 100644
+--- a/Source/cmLocalUnixMakefileGenerator3.cxx
++++ b/Source/cmLocalUnixMakefileGenerator3.cxx
+@@ -680,7 +680,7 @@ void cmLocalUnixMakefileGenerator3::WriteMakeVariables(
+   } else {
+ #if !defined(__VMS)
+     makefileStream << "# The shell in which to execute make rules.\n"
+-                      "SHELL = /bin/sh\n"
++                      "SHELL = @TERMUX_PREFIX@/bin/sh\n"
+                       "\n";
+ #endif
+   }
