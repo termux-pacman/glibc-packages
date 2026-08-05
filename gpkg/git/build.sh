@@ -2,10 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://git-scm.com/
 TERMUX_PKG_DESCRIPTION="Fast, scalable, distributed revision control system"
 TERMUX_PKG_LICENSE="GPL-2.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION="2.47.0"
+TERMUX_PKG_VERSION="2.55.0"
 TERMUX_PKG_SRCURL=https://mirrors.kernel.org/pub/software/scm/git/git-${TERMUX_PKG_VERSION}.tar.xz
-TERMUX_PKG_SHA256=1ce114da88704271b43e027c51e04d9399f8c88e9ef7542dae7aebae7d87bc4e
+TERMUX_PKG_SHA256=457fdb04dc8728e007d4688695e6912e6f680727920f2a40bf11eacc17505357
 TERMUX_PKG_DEPENDS="libcurl-glibc, libexpat-glibc, libiconv-glibc, openssl-glibc, pcre2-glibc, zlib-glibc, less-glibc"
+TERMUX_PKG_PYTHON_COMMON_BUILD_DEPS="asciidoc"
 TERMUX_PKG_SUGGESTS="perl-glibc"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_MAKE_ARGS="
@@ -19,6 +20,7 @@ NO_INSTALL_HARDLINKS=1
 MAN_BOLD_LITERAL=1
 NO_PERL_CPAN_FALLBACKS=1
 USE_LIBPCRE2=1
+NO_RUST=1
 "
 _make() {
 	make -j $TERMUX_PKG_MAKE_PROCESSES $@ ${TERMUX_PKG_EXTRA_MAKE_ARGS}
@@ -32,7 +34,6 @@ termux_step_make() {
 	_make all man
 	_make -C contrib/credential/libsecret
 	_make -C contrib/subtree all man
-	_make -C contrib/mw-to-git all
 	_make -C contrib/diff-highlight
 }
 
@@ -51,8 +52,6 @@ termux_step_make_install() {
 	_make -C contrib/credential/libsecret clean
 	# subtree installation
 	_make -C contrib/subtree install install-man
-	# mediawiki installation
-	_make -C contrib/mw-to-git install
 	# the rest of the contrib stuff
 	find contrib/ -name '.gitignore' -delete
 	cp -a ./contrib/* $TERMUX_PREFIX/share/git/
