@@ -1,5 +1,5 @@
---- src/binutils/ld/ldmain.c	2026-07-04 22:10:33.301262190 +0300
-+++ src/binutils/ld/ldmain.c.patch	2026-07-04 22:11:05.421262178 +0300
+--- src/binutils/ld/ldmain.c	2026-08-05 23:50:28.515974831 +0300
++++ src/binutils/ld/ldmain.c.patch	2026-08-05 23:51:46.518293888 +0300
 @@ -61,6 +61,9 @@
  #define TARGET_SYSTEM_ROOT ""
  #endif
@@ -30,15 +30,15 @@
  int
  main (int argc, char **argv)
  {
-@@ -664,6 +680,11 @@
-   bindtextdomain (PACKAGE, LOCALEDIR);
-   textdomain (PACKAGE);
+@@ -798,6 +814,11 @@
+   lang_has_input_file = false;
+   parse_args (argc, argv);
  
 +#ifdef TARGET_32BIT
 +  ldfile_add_library_path(cgct_app_prefix("/lib32"), false);
 +#endif
 +  ldfile_add_library_path(cgct_app_prefix("/lib"), false);
 +
-   set_program_name (argv[0]);
-   xmalloc_set_program_name (program_name);
+   if (config.hash_table_size != 0)
+     bfd_hash_set_default_size (config.hash_table_size);
  
