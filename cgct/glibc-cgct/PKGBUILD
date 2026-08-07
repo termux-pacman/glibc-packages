@@ -1,5 +1,5 @@
 pkgname=glibc-cgct
-pkgver=2.43
+pkgver=2.44
 pkgrel=0
 pkgdesc="GNU C Library for CGCT (only for Linux)"
 arch=(x86_64)
@@ -8,7 +8,7 @@ license=('GPL' 'LGPL')
 source=(https://ftp.gnu.org/gnu/libc/glibc-$pkgver.tar.xz
 	rtld.c.patch
 	setup-cgct)
-sha256sums=('d9c86c6b5dbddb43a3e08270c5844fc5177d19442cf5b8df4be7c07cd5fa3831'
+sha256sums=('37f600f2bef3c5e8300147059568b2a2e40a7ad6ccc65ce942556d49429cc667'
             '7113a921551e55e266da36fc54c66fe5b3545f1c4662fd76bb4e16cfd1f573f3'
             '15dcc4a741f0a347252aa26963bb0f1a7bdd5dbfc2690827600d6acb5dbd2aa9')
 groups=('cgct')
