@@ -1,0 +1,10 @@
+--- src/meson.build	2026-08-06 09:05:15.000000000 +0300
++++ src/meson.build.patch	2026-08-09 15:14:00.073981929 +0300
+@@ -127,7 +127,6 @@
+ ]
+ 
+ check_funcs = [
+-  ['link'],
+   ['symlink'],
+   ['mkstemp'],
+   ['_mktemp_s'],

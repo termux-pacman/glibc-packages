@@ -1,0 +1,36 @@
+--- util-linux-2.42.1/include/pidfd-utils.h	2026-05-18 13:20:50.000000000 +0300
++++ util-linux-2.42.1/include/pidfd-utils.h.patch	2026-08-08 03:19:24.209320770 +0300
+@@ -37,15 +37,6 @@
+ # include <sys/syscall.h>
+ # include <unistd.h>
+ 
+-# if !defined(HAVE_PIDFD_SEND_SIGNAL) && defined(SYS_pidfd_send_signal)
+-static inline int pidfd_send_signal(int pidfd, int sig, siginfo_t *info,
+-				    unsigned int flags)
+-{
+-	return syscall(SYS_pidfd_send_signal, pidfd, sig, info, flags);
+-}
+-#  define HAVE_PIDFD_SEND_SIGNAL 1
+-# endif
+-
+ # if !defined(HAVE_PIDFD_OPEN) && defined(SYS_pidfd_open)
+ static inline int pidfd_open(pid_t pid, unsigned int flags)
+ {
+@@ -71,17 +62,6 @@
+  * Dummy fallbacks for cases when #ifdef HAVE_PIDFD_* makes the code too complex.
+  */
+ 
+-#if !defined(HAVE_PIDFD_SEND_SIGNAL) && !defined(SYS_pidfd_send_signal)
+-static inline int pidfd_send_signal(int pidfd __attribute__((unused)),
+-				    int sig __attribute__((unused)),
+-				    siginfo_t *info __attribute__((unused)),
+-				    unsigned int flags __attribute__((unused)))
+-{
+-	errno = ENOSYS;
+-	return -1;
+-}
+-#endif
+-
+ #if !defined(HAVE_PIDFD_OPEN) && !defined(SYS_pidfd_open)
+ static inline int pidfd_open(pid_t pid __attribute__((unused)),
+ 			     unsigned int flags __attribute__((unused)))

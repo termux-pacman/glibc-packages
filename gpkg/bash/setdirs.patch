@@ -1,0 +1,175 @@
+diff --git a/config-top.h b/config-top.h
+index c47ab01..5d12fd4 100644
+--- a/config-top.h
++++ b/config-top.h
+@@ -58,7 +58,7 @@
+ /* The default value of the PATH variable. */
+ #ifndef DEFAULT_PATH_VALUE
+ #define DEFAULT_PATH_VALUE \
+-  "/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:."
++  "@TERMUX_PREFIX@/bin:."
+ #endif
+ 
+ /* If you want to unconditionally set a value for PATH in every restricted
+@@ -69,13 +69,13 @@
+    the Posix.2 confstr () function, or CS_PATH define are not present. */
+ #ifndef STANDARD_UTILS_PATH
+ #define STANDARD_UTILS_PATH \
+-  "/bin:/usr/bin:/sbin:/usr/sbin"
++  "@TERMUX_PREFIX@/bin"
+ #endif
+ 
+ /* The default path for enable -f */
+ #ifndef DEFAULT_LOADABLE_BUILTINS_PATH
+ #define DEFAULT_LOADABLE_BUILTINS_PATH \
+-  "/usr/local/lib/bash:/usr/lib/bash:/opt/local/lib/bash:/usr/pkg/lib/bash:/opt/pkg/lib/bash:."
++  "@TERMUX_PREFIX@/lib/bash:."
+ #endif
+ 
+ /* Default primary and secondary prompt strings. */
+@@ -92,7 +92,7 @@
+ #define DEFAULT_BASHRC "~/.bashrc"
+ 
+ /* System-wide .bashrc file for interactive shells. */
+-/* #define SYS_BASHRC "/etc/bash.bashrc" */
++#define SYS_BASHRC "@TERMUX_PREFIX@/etc/bash.bashrc"
+ 
+ /* System-wide .bash_logout for login shells. */
+ /* #define SYS_BASH_LOGOUT "/etc/bash.bash_logout" */
+diff --git a/error.c b/error.c
+index 10af070..bac2144 100644
+--- a/error.c
++++ b/error.c
+@@ -381,7 +381,7 @@ trace (const char *format, ...)
+   static FILE *tracefp = (FILE *)NULL;
+ 
+   if (tracefp == NULL)
+-    tracefp = fopen("/tmp/bash-trace.log", "a+");
++    tracefp = fopen("@TERMUX_PREFIX_CLASSICAL@/tmp/bash-trace.log", "a+");
+ 
+   if (tracefp == NULL)
+     tracefp = stderr;
+diff --git a/lib/malloc/stats.c b/lib/malloc/stats.c
+index a26d44a..d49bdfa 100644
+--- a/lib/malloc/stats.c
++++ b/lib/malloc/stats.c
+@@ -136,7 +136,7 @@ fprint_malloc_stats (char *s, FILE *fp)
+   _print_malloc_stats (s, fp);
+ }
+ 
+-#define TRACEROOT "/var/tmp/maltrace/stats."
++#define TRACEROOT "@TERMUX_PREFIX@/var/tmp/maltrace/stats."
+ 
+ void
+ trace_malloc_stats (char *s, char *fn)
+diff --git a/lib/malloc/table.c b/lib/malloc/table.c
+index be6a88d..07c151a 100644
+--- a/lib/malloc/table.c
++++ b/lib/malloc/table.c
+@@ -367,7 +367,7 @@ mlocation_dump_table (void)
+   _location_dump_table (stderr);
+ }
+ 
+-#define LOCROOT "/var/tmp/maltrace/locations."
++#define LOCROOT "@TERMUX_PREFIX@/var/tmp/maltrace/locations."
+ 
+ void
+ mlocation_write_table (void)
+diff --git a/lib/malloc/trace.c b/lib/malloc/trace.c
+index e968e62..8d6f16e 100644
+--- a/lib/malloc/trace.c
++++ b/lib/malloc/trace.c
+@@ -96,7 +96,7 @@ malloc_trace_bin (int n)
+ #endif
+ }
+ 
+-#define TRACEROOT "/var/tmp/maltrace/trace."
++#define TRACEROOT "@TERMUX_PREFIX@/var/tmp/maltrace/trace."
+ 
+ void
+ malloc_set_tracefn (char *s, char *fn)
+diff --git a/lib/readline/rlconf.h b/lib/readline/rlconf.h
+index e0fd735..1e4c6b9 100644
+--- a/lib/readline/rlconf.h
++++ b/lib/readline/rlconf.h
+@@ -43,7 +43,7 @@
+ #define DEFAULT_INPUTRC "~/.inputrc"
+ 
+ /* The ultimate last-ditch filename for an init file -- system-wide. */
+-#define SYS_INPUTRC "/etc/inputrc"
++#define SYS_INPUTRC "@TERMUX_PREFIX@/etc/inputrc"
+ 
+ /* If defined, expand tabs to spaces. */
+ #define DISPLAY_TABS
+diff --git a/lib/readline/util.c b/lib/readline/util.c
+index c8c23de..bf1ea12 100644
+--- a/lib/readline/util.c
++++ b/lib/readline/util.c
+@@ -490,7 +490,7 @@ _rl_tropen (void)
+   if (x == 0)
+     x = ".";
+ #else
+-  x = "/var/tmp";
++  x = "@TERMUX_PREFIX_CLASSICAL@/var/tmp";
+ #endif
+   snprintf (fnbuf, sizeof (fnbuf), "%s/rltrace.%ld", x, (long)getpid());
+   unlink(fnbuf);
+diff --git a/lib/sh/tmpfile.c b/lib/sh/tmpfile.c
+index 6105ebd..7a370e7 100644
+--- a/lib/sh/tmpfile.c
++++ b/lib/sh/tmpfile.c
+@@ -80,15 +80,11 @@ get_sys_tmpdir (void)
+     return sys_tmpdir;
+ #endif
+ 
+-  sys_tmpdir = "/tmp";
++  sys_tmpdir = "@TERMUX_PREFIX_CLASSICAL@/tmp";
+   if (file_iswdir (sys_tmpdir))
+     return sys_tmpdir;
+ 
+-  sys_tmpdir = "/var/tmp";
+-  if (file_iswdir (sys_tmpdir))
+-    return sys_tmpdir;
+-
+-  sys_tmpdir = "/usr/tmp";
++  sys_tmpdir = "@TERMUX_PREFIX_CLASSICAL@/var/tmp";
+   if (file_iswdir (sys_tmpdir))
+     return sys_tmpdir;
+ 
+diff --git a/pathnames.h.in b/pathnames.h.in
+index f5ec455..d329c22 100644
+--- a/pathnames.h.in
++++ b/pathnames.h.in
+@@ -22,10 +22,10 @@
+ #define _PATHNAMES_H_
+ 
+ /* The default file for hostname completion. */
+-#define DEFAULT_HOSTS_FILE "/etc/hosts"
++#define DEFAULT_HOSTS_FILE "@TERMUX_PREFIX@/etc/hosts"
+ 
+ /* The default login shell startup file. */
+-#define SYS_PROFILE "/etc/profile"
++#define SYS_PROFILE "@TERMUX_PREFIX@/etc/profile"
+ 
+ /* The default location of the bash debugger initialization/startup file. */
+ #define DEBUGGER_START_FILE	"@DEBUGGER_START_FILE@"
+diff --git a/shell.c b/shell.c
+index e59029c..3813c56 100644
+--- a/shell.c
++++ b/shell.c
+@@ -355,12 +355,12 @@ _cygwin32_check_tmp (void)
+ {
+   struct stat sb;
+ 
+-  if (stat ("/tmp", &sb) < 0)
+-    internal_warning (_("could not find /tmp, please create!"));
++  if (stat ("@TERMUX_PREFIX_CLASSICAL@/tmp", &sb) < 0)
++    internal_warning (_("could not find @TERMUX_PREFIX_CLASSICAL@/tmp, please create!"));
+   else
+     {
+       if (S_ISDIR (sb.st_mode) == 0)
+-	internal_warning (_("/tmp must be a valid directory name"));
++	internal_warning (_("@TERMUX_PREFIX_CLASSICAL@/tmp must be a valid directory name"));
+     }
+ }
+ #endif /* __CYGWIN__ */
