@@ -24,10 +24,10 @@ index 4c3521db..06b6faa7 100644
      {
        if (errno == ENOENT)
 diff --git a/elf/ldconfig.c b/elf/ldconfig.c
-index aca96740..09f4ab8e 100644
+index a39f3ecf..1b6533f1 100644
 --- a/elf/ldconfig.c
 +++ b/elf/ldconfig.c
-@@ -47,7 +47,7 @@
+@@ -48,7 +48,7 @@
  
  
  #ifndef LD_SO_CONF
@@ -35,12 +35,12 @@ index aca96740..09f4ab8e 100644
 +# define LD_SO_CONF SYSCONFDIR "/" LD_SO ".conf"
  #endif
  
- /* Get libc version number.  */
+ #ifndef TUNABLES_CONF
 diff --git a/elf/rtld.c b/elf/rtld.c
-index 29e7a4dd..56f465d5 100644
+index fc053df8..9e448536 100644
 --- a/elf/rtld.c
 +++ b/elf/rtld.c
-@@ -1841,7 +1841,7 @@ dl_main (const ElfW(Phdr) *phdr,
+@@ -1834,7 +1834,7 @@ dl_main (const ElfW(Phdr) *phdr,
       open().  So we do this first.  If it succeeds we do almost twice
       the work but this does not matter, since it is not for production
       use.  */
@@ -216,6 +216,60 @@ index 090ae697..89457cc3 100644
  
    for (i = 0; i < ITERATIONS; i++)
      {
+diff --git a/misc/fstab.h b/misc/fstab.h
+index 9f17e1b9..40f904b2 100644
+--- a/misc/fstab.h
++++ b/misc/fstab.h
+@@ -45,8 +45,8 @@
+  * if type is "rq", then use concatenation of fs_file and "quotas" to locate
+  * quota file.
+  */
+-#define	_PATH_FSTAB	"/etc/fstab"
+-#define	FSTAB		"/etc/fstab"	/* deprecated */
++#define	_PATH_FSTAB	"@TERMUX_PREFIX@/etc/fstab"
++#define	FSTAB		"@TERMUX_PREFIX@/etc/fstab"	/* deprecated */
+ 
+ #define	FSTAB_RW	"rw"		/* read/write device */
+ #define	FSTAB_RQ	"rq"		/* read/write with quotas */
+diff --git a/misc/ttyent.h b/misc/ttyent.h
+index fe418a53..2aa09882 100644
+--- a/misc/ttyent.h
++++ b/misc/ttyent.h
+@@ -34,7 +34,7 @@
+ 
+ #include <features.h>
+ 
+-#define	_PATH_TTYS	"/etc/ttys"
++#define	_PATH_TTYS	"@TERMUX_PREFIX@/etc/ttys"
+ 
+ #define	_TTYS_OFF	"off"
+ #define	_TTYS_ON	"on"
+diff --git a/nis/nis_call.c b/nis/nis_call.c
+index 00a66b1e..bf3e8d57 100644
+--- a/nis/nis_call.c
++++ b/nis/nis_call.c
+@@ -592,7 +592,7 @@ nis_server_cache_search (const_nis_name name, int search_parent,
+   struct stat64 st;
+ 
+   int saved_errno = errno;
+-  if (stat64 ("/var/nis/NIS_COLD_START", &st) < 0)
++  if (stat64 ("@TERMUX_PREFIX@/var/nis/NIS_COLD_START", &st) < 0)
+     st.st_mtime = nis_cold_start_mtime + 1;
+   __set_errno (saved_errno);
+ 
+diff --git a/nis/nis_file.c b/nis/nis_file.c
+index b2819364..5fc8dcc7 100644
+--- a/nis/nis_file.c
++++ b/nis/nis_file.c
+@@ -72,7 +72,7 @@ write_nis_obj (const char *name, const void *obj, iofct_t writefct)
+ }
+ 
+ 
+-static const char cold_start_file[] = "/var/nis/NIS_COLD_START";
++static const char cold_start_file[] = "@TERMUX_PREFIX@/var/nis/NIS_COLD_START";
+ 
+ directory_obj *
+ readColdStartFile (void)
 diff --git a/nis/ypclnt.c b/nis/ypclnt.c
 index 455d80df..29862d37 100644
 --- a/nis/ypclnt.c
@@ -250,6 +304,31 @@ index 0906de29..3fc62956 100644
  
  /* Maximum allowed length for the key.  */
  #define MAXKEYLEN 1024
+diff --git a/nscd/nscd.h b/nscd/nscd.h
+index 7d1bac2d..4873f5db 100644
+--- a/nscd/nscd.h
++++ b/nscd/nscd.h
+@@ -160,14 +160,14 @@ struct database_dyn
+ 
+ 
+ /* Paths of the file for the persistent storage.  */
+-#define _PATH_NSCD_PASSWD_DB	"/var/db/nscd/passwd"
+-#define _PATH_NSCD_GROUP_DB	"/var/db/nscd/group"
+-#define _PATH_NSCD_HOSTS_DB	"/var/db/nscd/hosts"
+-#define _PATH_NSCD_SERVICES_DB	"/var/db/nscd/services"
+-#define _PATH_NSCD_NETGROUP_DB	"/var/db/nscd/netgroup"
++#define _PATH_NSCD_PASSWD_DB	"@TERMUX_PREFIX@/var/db/nscd/passwd"
++#define _PATH_NSCD_GROUP_DB	"@TERMUX_PREFIX@/var/db/nscd/group"
++#define _PATH_NSCD_HOSTS_DB	"@TERMUX_PREFIX@/var/db/nscd/hosts"
++#define _PATH_NSCD_SERVICES_DB	"@TERMUX_PREFIX@/var/db/nscd/services"
++#define _PATH_NSCD_NETGROUP_DB	"@TERMUX_PREFIX@/var/db/nscd/netgroup"
+ 
+ /* Path used when not using persistent storage.  */
+-#define _PATH_NSCD_XYZ_DB_TMP	"/var/run/nscd/dbXXXXXX"
++#define _PATH_NSCD_XYZ_DB_TMP	"@TERMUX_PREFIX@/var/run/nscd/dbXXXXXX"
+ 
+ /* Maximum alignment requirement we will encounter.  */
+ #define BLOCK_ALIGN_LOG 3
 diff --git a/nss/bug-erange.c b/nss/bug-erange.c
 index b709418b..0aff48d1 100644
 --- a/nss/bug-erange.c
@@ -365,10 +444,10 @@ index d5aa4b43..1cabc20e 100644
  	@$(AWK) 'BEGIN { ini=1 } \
  		 /^[ \t]*$$/ { next } \
 diff --git a/nss/getaddrinfo.c b/nss/getaddrinfo.c
-index c0f496f9..5d89c5be 100644
+index 4f6ac335..c90b42ea 100644
 --- a/nss/getaddrinfo.c
 +++ b/nss/getaddrinfo.c
-@@ -1718,7 +1718,7 @@ in6aicmp (const void *p1, const void *p2)
+@@ -1723,7 +1723,7 @@ in6aicmp (const void *p1, const void *p2)
  
  
  /* Name of the config file for RFC 3484 sorting (for now).  */
@@ -849,6 +928,41 @@ index 5ed5d0e5..f6a01d30 100644
  
  /* ISO C header names including Amendment 1 (without ".h" suffix).  */
  static char *header[] =
+diff --git a/sunrpc/key_call.c b/sunrpc/key_call.c
+index 98abeaf4..4f9a3a70 100644
+--- a/sunrpc/key_call.c
++++ b/sunrpc/key_call.c
+@@ -318,7 +318,7 @@ key_call_keyenvoy (u_long proc, xdrproc_t xdr_arg, char *arg,
+   int success;
+   uid_t ruid;
+   uid_t euid;
+-  static const char MESSENGER[] = "/usr/etc/keyenvoy";
++  static const char MESSENGER[] = "@TERMUX_PREFIX@/etc/keyenvoy";
+ 
+   success = 1;
+   sigemptyset (&mask);
+@@ -458,7 +458,7 @@ getkeyserv_handle (int vers)
+ 
+   if (kcp->client == (CLIENT *) NULL)
+     /* Use the AF_UNIX transport */
+-    kcp->client = clnt_create ("/var/run/keyservsock", KEY_PROG, vers, "unix");
++    kcp->client = clnt_create ("@TERMUX_PREFIX@/var/run/keyservsock", KEY_PROG, vers, "unix");
+ 
+   if (kcp->client == (CLIENT *) NULL)
+     return (CLIENT *) NULL;
+diff --git a/support/support_capture_subprocess.c b/support/support_capture_subprocess.c
+index d45ad35c..18ba831c 100644
+--- a/support/support_capture_subprocess.c
++++ b/support/support_capture_subprocess.c
+@@ -182,7 +182,7 @@ find_sgid_group (gid_t *target, const char *name)
+ {
+   /* Do not use getgrname_r because it does not work in statically
+      linked binaries if the system libc is different.  */
+-  FILE *fp = fopen ("/etc/group", "rce");
++  FILE *fp = fopen ("@TERMUX_PREFIX@/etc/group", "rce");
+   if (fp == NULL)
+     return false;
+   __fsetlocking (fp, FSETLOCKING_BYCALLER);
 diff --git a/support/support_fuse.c b/support/support_fuse.c
 index 081e196c..0aa3e6fc 100644
 --- a/support/support_fuse.c
@@ -862,6 +976,19 @@ index 081e196c..0aa3e6fc 100644
  
    char *prefix = xasprintf ("%s/glibc-tst-fuse.", tmpdir);
    support_fuse_mountpoints = support_fuse_mkdir (prefix);
+diff --git a/support/support_nscd.c b/support/support_nscd.c
+index 2d7d503a..bb175185 100644
+--- a/support/support_nscd.c
++++ b/support/support_nscd.c
+@@ -64,7 +64,7 @@ support_nscd_start (void)
+ 
+   /* Create the directory for the persistent database files.  Without
+      this, nscd cannot create the shared memory mappings.  */
+-  xmkdirp ("/var/db/nscd", 0755);
++  xmkdirp ("@TERMUX_PREFIX@/var/db/nscd", 0755);
+ 
+   char *nscd_path = xasprintf ("%s/nscd/nscd", support_objdir_root);
+   char *args[] = { nscd_path, (char *) "--foreground",
 diff --git a/support/support_test_main.c b/support/support_test_main.c
 index 19fe119d..5e6f52e4 100644
 --- a/support/support_test_main.c
@@ -876,7 +1003,7 @@ index 19fe119d..5e6f52e4 100644
    if (support_set_test_dir != NULL)
      support_set_test_dir (test_dir);
 diff --git a/sysdeps/generic/dl-cache.h b/sysdeps/generic/dl-cache.h
-index 26f0c1e0..ad282e3b 100644
+index 972ab32b..99a25122 100644
 --- a/sysdeps/generic/dl-cache.h
 +++ b/sysdeps/generic/dl-cache.h
 @@ -34,8 +34,14 @@
@@ -896,7 +1023,7 @@ index 26f0c1e0..ad282e3b 100644
  
  #ifndef add_system_dir
 diff --git a/sysdeps/generic/ldconfig.h b/sysdeps/generic/ldconfig.h
-index 5913bf40..3d74d35b 100644
+index 80071465..de6022bd 100644
 --- a/sysdeps/generic/ldconfig.h
 +++ b/sysdeps/generic/ldconfig.h
 @@ -48,7 +48,12 @@
@@ -914,7 +1041,7 @@ index 5913bf40..3d74d35b 100644
  /* Declared in cache.c.  */
  extern void print_cache (const char *cache_name);
 diff --git a/sysdeps/generic/paths.h b/sysdeps/generic/paths.h
-index 893b4c22..6c38ca05 100644
+index 6b8f4404..b4e6d44d 100644
 --- a/sysdeps/generic/paths.h
 +++ b/sysdeps/generic/paths.h
 @@ -33,43 +33,43 @@
@@ -948,7 +1075,7 @@ index 893b4c22..6c38ca05 100644
 +#define	_PATH_MAN	"@TERMUX_PREFIX@/share/man"
  #define	_PATH_MEM	"/dev/mem"
 -#define	_PATH_MNTTAB	"/etc/fstab"
--#define	_PATH_MOUNTED	"/var/run/mtab"
+-#define	_PATH_MOUNTED	"/etc/mtab"
 -#define	_PATH_NOLOGIN	"/etc/nologin"
 -#define	_PATH_PRESERVE	"/var/lib"
 -#define	_PATH_RWHODIR	"/var/spool/rwho"
@@ -956,7 +1083,7 @@ index 893b4c22..6c38ca05 100644
 -#define	_PATH_SHADOW	"/etc/shadow"
 -#define	_PATH_SHELLS	"/etc/shells"
 +#define	_PATH_MNTTAB	"@TERMUX_PREFIX@/etc/fstab"
-+#define	_PATH_MOUNTED	"@TERMUX_PREFIX@/var/run/mtab"
++#define	_PATH_MOUNTED	"@TERMUX_PREFIX@/etc/mtab"
 +#define	_PATH_NOLOGIN	"@TERMUX_PREFIX@/etc/nologin"
 +#define	_PATH_PRESERVE	"@TERMUX_PREFIX@/var/lib"
 +#define	_PATH_RWHODIR	"@TERMUX_PREFIX@/var/spool/rwho"
@@ -1021,6 +1148,19 @@ index b31ec84f..a759edc3 100644
  		 S_IRUSR | S_IWUSR);
  
    return fd;
+diff --git a/sysdeps/unix/sysv/linux/gethostid.c b/sysdeps/unix/sysv/linux/gethostid.c
+index 0f05450e..b6b85e8c 100644
+--- a/sysdeps/unix/sysv/linux/gethostid.c
++++ b/sysdeps/unix/sysv/linux/gethostid.c
+@@ -22,7 +22,7 @@
+ #include <not-cancel.h>
+ #include <stdbool.h>
+ 
+-#define HOSTIDFILE "/etc/hostid"
++#define HOSTIDFILE "@TERMUX_PREFIX@/etc/hostid"
+ 
+ #ifdef SET_PROCEDURE
+ int
 diff --git a/sysdeps/unix/sysv/linux/paths.h b/sysdeps/unix/sysv/linux/paths.h
 index 1342ab3a..357120b4 100644
 --- a/sysdeps/unix/sysv/linux/paths.h
