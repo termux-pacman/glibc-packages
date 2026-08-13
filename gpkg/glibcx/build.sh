@@ -11,7 +11,7 @@ TERMUX_PKG_EXCLUDED_ARCHES="arm, i686, x86_64"
 TERMUX_PKG_BUILD_IN_SRC=true
 
 termux_step_make() {
-	./build.sh
+	bash ./build.sh
 }
 
 termux_step_make_install() {
