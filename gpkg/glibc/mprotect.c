@@ -14,9 +14,9 @@
 #include <string.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include <not-cancel.h>
 
 #ifdef SHARED
+# include <not-cancel.h>
 # define GLOBAL_READ_SIZE 1024
 
 /* - String To Unsigned Long Int
@@ -76,7 +76,7 @@ static int __is_mmaped(void *addr) {
 	free(cont);
 	return res;
 }
-#endif
+#endif // SHARED
 
 int __mprotect(void *addr, size_t len, int prot) {
 	int res = INLINE_SYSCALL_CALL(mprotect, addr, len, prot);
@@ -98,7 +98,7 @@ int __mprotect(void *addr, size_t len, int prot) {
 		}
 		return INLINE_SYSCALL_CALL(mprotect, addr, len, prot);
 	}
-#endif
+#endif // SHARED
 	return res;
 }
 

@@ -43,6 +43,7 @@
 		"futex_waitv",
 		"landlock_create_ruleset",
 		"pidfd_send_signal",
+		"pidfd_getfd",
 		"rseq",
 		"set_robust_list",
 		"get_robust_list",
