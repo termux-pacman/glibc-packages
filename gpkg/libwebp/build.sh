@@ -1,0 +1,19 @@
+TERMUX_PKG_HOMEPAGE=https://developers.google.com/speed/webp/
+TERMUX_PKG_DESCRIPTION="Library to encode and decode images in WebP format"
+TERMUX_PKG_LICENSE="BSD 3-Clause"
+TERMUX_PKG_LICENSE_FILE="COPYING"
+TERMUX_PKG_MAINTAINER="@termux-pacman"
+TERMUX_PKG_VERSION=1.4.0
+TERMUX_PKG_SRCURL=https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-${TERMUX_PKG_VERSION}.tar.gz
+TERMUX_PKG_SHA256=51c422d0f9763e9d66467197f8f3fdc6f6a3925f4ed707009e2ce273caf5df3f
+TERMUX_PKG_DEPENDS="glibc, libjpeg-turbo-glibc, libpng-glibc, libtiff-glibc, zlib-glibc, gcc-libs-glibc"
+TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
+-DBUILD_SHARED_LIBS=ON
+-DWEBP_BUILD_ANIM_UTILS=ON
+-DWEBP_BUILD_CWEBP=ON
+-DWEBP_BUILD_DWEBP=ON
+-DWEBP_BUILD_GIF2WEBP=OFF
+-DWEBP_BUILD_IMG2WEBP=ON
+-DWEBP_BUILD_VWEBP=OFF
+-DWEBP_BUILD_EXTRAS=OFF
+"
