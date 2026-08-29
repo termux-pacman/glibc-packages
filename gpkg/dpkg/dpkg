@@ -1,0 +1,3 @@
+#!/bin/sh
+set -x
+$PREFIX/glibc/libexec/dpkg --instdir=$PREFIX/glibc --admindir=$PREFIX/glibc/var/lib/dpkg $@
