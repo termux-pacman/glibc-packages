@@ -1,0 +1,23 @@
+test -n "$DATA" || DATA=/data/data/com.termux
+root=$DATA/debian
+export D=$root
+export DPKGX_ROOT=$root
+export PATH+=:$root/usr/bin:$root/usr/games
+conf=$root/apt.conf
+alias dapt="apt -c $conf"
+alias dapt-cache="apt-cache -c $conf"
+alias dapt-config="apt-config -c $conf"
+alias dapt-file="apt-file -c $conf"
+alias dapt-mark="apt-mark -c $conf"
+
+unset LD_PRELOAD
+
+export R_HOME=$root/usr/lib/R
+export EDITOR=vim
+alias R="$root/usr/lib/R/bin/exec/R --save"
+sed -i s,usr/bin,bin, $root/usr/lib/R/bin/pager
+
+# export DOTNET_ROOT=$root/usr/lib/dotnet
+# export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
+# touch ~/.local/share/NuGet/Migrations/1
+# touch ~/.dotnet/8.0.111.dotnetFirstUseSentinel
