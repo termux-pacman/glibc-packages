@@ -1,0 +1,5 @@
+{
+	"name": "Development Environment",
+	"image": "mcr.microsoft.com/devcontainers/base:ubuntu24.04",
+	"remoteUser": "vscode"
+}
