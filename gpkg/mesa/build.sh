@@ -38,12 +38,14 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -D platforms=x11,wayland
 -D shared-glapi=enabled
 -D valgrind=disabled
+# should this be prefixed TERMUX_PKG_MASSAGEDIR
+-D vulkan-icd-dir=$TERMUX_PREFIX/share/vulkan/icd.d
 -D vulkan-layers=device-select,overlay
 "
 
 termux_step_pre_configure() {
 	case $TERMUX_ARCH in
-		arm|aarch64) TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dvulkan-drivers=swrast,panfrost,freedreno -Dfreedreno-kmds=msm,kgsl";;
+		arm|aarch64) TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dvulkan-drivers=swrast,panfrost,freedreno,virtio -Dfreedreno-kmds=msm,kgsl";;
 		*) TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" -Dvulkan-drivers=swrast";;
 	esac
 	export MESON_PACKAGE_CACHE_DIR="${TERMUX_PKG_SRCDIR}"
