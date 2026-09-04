@@ -1,0 +1,9 @@
+TERMUX_PKG_HOMEPAGE=https://www.gnu.org/software/gawk/
+TERMUX_PKG_DESCRIPTION="GNU Awk programming language implementation for text processing"
+TERMUX_PKG_LICENSE="GPL-3.0"
+TERMUX_PKG_MAINTAINER="@termux-pacman"
+TERMUX_PKG_VERSION=5.3.0
+TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/gawk/gawk-${TERMUX_PKG_VERSION}.tar.xz
+TERMUX_PKG_SHA256=ca9c16d3d11d0ff8c69d79dc0b47267e1329a69b39b799895604ed447d3ca90b
+TERMUX_PKG_DEPENDS="glibc, readline-glibc, libunistring-glibc"
+TERMUX_PKG_ESSENTIAL=true
