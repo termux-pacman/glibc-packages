@@ -2,14 +2,9 @@ TERMUX_PKG_HOMEPAGE=https://gcc.gnu.org/
 TERMUX_PKG_DESCRIPTION="Runtime libraries shipped by GCC"
 TERMUX_PKG_LICENSE="GPL-3.0"
 TERMUX_PKG_MAINTAINER="@termux-pacman"
-TERMUX_PKG_VERSION=14.2.1
-TERMUX_PKG_REVISION=1
-_COMMIT=a8ee522c5923ba17851e4b71316a2dff19d6368f
-TERMUX_PKG_SRCURL=git+https://sourceware.org/git/gcc
-TERMUX_PKG_SHA256=ee47c48b656c2fe6e937f99954303f07ef6eab26d40cf70401880cdc2c290b1c
-TERMUX_PKG_GIT_BRANCH="master"
-#TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/gcc/gcc-$TERMUX_PKG_VERSION/gcc-$TERMUX_PKG_VERSION.tar.xz
-#TERMUX_PKG_SHA256=a7b39bc69cbf9e25826c5a60ab26477001f7c08d85cec04bc0e29cabed6f3cc9
+TERMUX_PKG_VERSION=16.2.0
+TERMUX_PKG_SRCURL=https://ftp.gnu.org/gnu/gcc/gcc-$TERMUX_PKG_VERSION/gcc-$TERMUX_PKG_VERSION.tar.xz
+TERMUX_PKG_SHA256=e6738e29597f733270731aa90600f37ffdc045079dfc27ec7e8192cc81085c3e
 TERMUX_PKG_DEPENDS="glibc"
 TERMUX_PKG_BUILD_DEPENDS="doxygen-glibc"
 TERMUX_PKG_BREAKS="gcc-glibc-libs-dev"
@@ -18,22 +13,10 @@ TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_SEPARATE_SUB_DEPENDS=true
 TERMUX_PKG_ONLY_INSTALLING=true
 
-termux_step_post_get_source() {
-	git fetch --unshallow
-	git checkout $_COMMIT
-
-	local s=$(find . -type f ! -path '*/.git/*' -print0 | xargs -0 sha256sum | LC_ALL=C sort | sha256sum)
-	if [[ "${s}" != "${TERMUX_PKG_SHA256}  "* ]]; then
-		termux_error_exit "Checksum mismatch for source files."
-	fi
-}
-
 termux_step_pre_configure() {
 	sed -i 's@\./fixinc\.sh@-c true@' ${TERMUX_PKG_SRCDIR}/gcc/Makefile.in
 	sed -i '/m64=/s/lib64/lib/' ${TERMUX_PKG_SRCDIR}/gcc/config/i386/t-linux64
 	sed -i '/lp64=/s/lib64/lib/' ${TERMUX_PKG_SRCDIR}/gcc/config/aarch64/t-aarch64-linux
-	echo "${TERMUX_PKG_VERSION}" > ${TERMUX_PKG_SRCDIR}/gcc/BASE-VER
-	echo "${_COMMIT}" > ${TERMUX_PKG_SRCDIR}/gcc/DEV-PHASE
 	CFLAGS=${CFLAGS/-Werror=format-security/}
 	CXXFLAGS=${CXXFLAGS/-Werror=format-security/}
 	CFLAGS+=" -I${TERMUX_PREFIX}/include -L${TERMUX_PREFIX}/lib"
@@ -82,11 +65,11 @@ termux_step_configure() {
 		--enable-host-shared \
 		--disable-libssp \
 		--disable-libstdcxx-pch \
-		LD_FOR_TARGET=$TERMUX_PREFIX/bin/ld || (cat config.log && exit 1)
+		LD_FOR_TARGET=$TERMUX_PREFIX/bin/ld
 }
 
 termux_step_make() {
-	make
+	make || (cat ${TERMUX_HOST_PLATFORM}/libatomic/config.log; exit 1)
 }
 
 termux_step_make_install() {
@@ -118,6 +101,9 @@ termux_step_make_install() {
 		make -C $TERMUX_HOST_PLATFORM/$lib install-info
 	done
 
+	install -m644 gcc/libatomic_asneeded.so $TERMUX_PREFIX/lib/
+	ln -sf libatomic.a $TERMUX_PREFIX/lib/libatomic_asneeded.a
+
 	# --- gcc ---
 	make -C gcc install-driver install-cpp install-gcc-ar \
 		c++.install-common install-headers install-plugin install-lto-wrapper
@@ -144,7 +130,7 @@ termux_step_make_install() {
 
 	make -C lto-plugin install
 	install -dm755 $TERMUX_PREFIX/lib/bfd-plugins/
-	ln -s /${_libdir}/liblto_plugin.so \
+	ln -sf /${_libdir}/liblto_plugin.so \
 		$TERMUX_PREFIX/lib/bfd-plugins/
 
 	make -C $TERMUX_HOST_PLATFORM/libgomp install-nodist_{libsubinclude,toolexeclib}HEADERS
@@ -162,7 +148,7 @@ termux_step_make_install() {
 	make -C libcpp install
 	make -C gcc install-po
 
-	ln -s gcc $TERMUX_PREFIX/bin/cc
+	ln -sf gcc $TERMUX_PREFIX/bin/cc
 
 	install -Dm755 $TERMUX_PKG_BUILDER_DIR/c89 $TERMUX_PREFIX/bin/c89
 	install -Dm755 $TERMUX_PKG_BUILDER_DIR/c99 $TERMUX_PREFIX/bin/c99
@@ -171,14 +157,13 @@ termux_step_make_install() {
 	python -O -m compileall $TERMUX_PREFIX/share/gcc-${TERMUX_PKG_VERSION%%+*}/
 
 	# --- gcc-fortran ---
-
 	make -C $TERMUX_HOST_PLATFORM/libgfortran install-cafexeclibLTLIBRARIES \
 		install-{toolexeclibDATA,nodist_fincludeHEADERS,gfor_cHEADERS}
 	make -C $TERMUX_HOST_PLATFORM/libgomp install-nodist_fincludeHEADERS
 	make -C gcc fortran.install-{common,man,info}
 	install -Dm755 gcc/f951 ${_libdir}/f951
 
-	ln -s gfortran $TERMUX_PREFIX/bin/f95
+	ln -sf gfortran $TERMUX_PREFIX/bin/f95
 
 	if [ -d $TERMUX_PREFIX/lib64 ]; then
 		mv $TERMUX_PREFIX/lib64/* $TERMUX_PREFIX/lib
