@@ -1,8 +1,8 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 7499480..0e3bc3e 100644
+index 9eb7f3c..95ed2a6 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -1379,11 +1379,11 @@ if(NOT _x86 AND NOT _x86_64)
+@@ -1515,11 +1515,11 @@ if(NOT _x86 AND NOT _x86_64)
    if(NOT NO_CONF_INSTALL)
      configure_file(system/box64.conf.cmake system/box64.conf)
  	  if(NOT TERMUX)
@@ -17,16 +17,16 @@ index 7499480..0e3bc3e 100644
          endif()
        else()
          install(FILES ${CMAKE_BINARY_DIR}/system/box64.conf DESTINATION ${TERMUX_PATH}/usr/etc/binfmt.d/)
-@@ -1395,7 +1395,7 @@ if(NOT _x86 AND NOT _x86_64)
+@@ -1531,7 +1531,7 @@ if(NOT _x86 AND NOT _x86_64)
  	  endif()
  
    endif()
--  set(INSTALL_PATH "/usr/lib/box64-x86_64-linux-gnu/")
-+  set(INSTALL_PATH "@TERMUX_PREFIX@/lib/box64-x86_64-linux-gnu/")
+-  set(INSTALL_PATH "/usr/lib/box64-x86_64-linux-gnu")
++  set(INSTALL_PATH "@TERMUX_PREFIX@/lib/box64-x86_64-linux-gnu")
    if(NOT NO_LIB_INSTALL)
  	if(NOT TERMUX AND NOT ANDROID)
          install(FILES ${CMAKE_SOURCE_DIR}/x64lib/libstdc++.so.5 DESTINATION ${INSTALL_PATH})
-@@ -1434,7 +1434,7 @@ if(NOT _x86 AND NOT _x86_64)
+@@ -1570,7 +1570,7 @@ if(NOT _x86 AND NOT _x86_64)
  	endif()
     endif()
     if(BOX32)
@@ -36,10 +36,10 @@ index 7499480..0e3bc3e 100644
      	if(NOT TERMUX AND NOT ANDROID)
      		install(FILES ${CMAKE_SOURCE_DIR}/x86lib/libstdc++.so.5 DESTINATION ${INSTALL_PATH})
 diff --git a/src/core.c b/src/core.c
-index 528e6d3..14ccdd8 100644
+index c33c384..969744b 100644
 --- a/src/core.c
 +++ b/src/core.c
-@@ -790,7 +790,7 @@ int initialize(int argc, const char **argv, char** env, x64emu_t** emulator, elf
+@@ -830,7 +830,7 @@ int initialize(int argc, const char **argv, char** env, x64emu_t** emulator, elf
          printf("See 'box64 --help' for more information.\n");
          exit(0);
      }
@@ -49,7 +49,7 @@ index 528e6d3..14ccdd8 100644
      // uname -m is redirected to box64 -m
      if (argc == 2 && (!strcmp(argv[1], "-m") || !strcmp(argv[1], "-p") || !strcmp(argv[1], "-i"))) {
 diff --git a/src/steam.c b/src/steam.c
-index 4a2b24f..56b0d5d 100644
+index 4a0323a..128c1d7 100644
 --- a/src/steam.c
 +++ b/src/steam.c
 @@ -88,13 +88,13 @@ void pressure_vessel(int argc, const char** argv, int nextarg, const char* prog)
@@ -68,7 +68,7 @@ index 4a2b24f..56b0d5d 100644
                      strcat(tmp, argv[nextarg]+strlen("--env-if-host=STEAM_RUNTIME_LIBRARY_PATH="));
                      p = strchr(tmp, '=');
                      *p ='\0'; ++p;
-@@ -214,8 +214,8 @@ void pressure_vessel(int argc, const char** argv, int nextarg, const char* prog)
+@@ -174,8 +174,8 @@ void pressure_vessel(int argc, const char** argv, int nextarg, const char* prog)
                  strncat(tmp, tmp2, sizeof(tmp)-1);  \
                  strncat(tmp, ":", sizeof(tmp)-1);   \
              }
@@ -112,7 +112,7 @@ index de962ee..67a786f 100644
  typedef void* (*pFp_t)(void*);
  
 diff --git a/src/wrapped/wrappedlibdl.c b/src/wrapped/wrappedlibdl.c
-index 8ad2e38..1861931 100644
+index c9c521e..79c2b49 100644
 --- a/src/wrapped/wrappedlibdl.c
 +++ b/src/wrapped/wrappedlibdl.c
 @@ -140,7 +140,7 @@ void* my_dlopen(x64emu_t* emu, void *filename, int flag)
