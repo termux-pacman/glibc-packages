@@ -1,0 +1,13 @@
+--- mariadb-12.3.3/cmake/libfmt.cmake	2026-08-20 09:33:29.000000000 +0300
++++ mariadb-12.3.3/cmake/libfmt.cmake.patch	2026-09-12 18:26:06.047709739 +0300
+@@ -18,8 +18,8 @@
+     SET(source URL "https://github.com/fmtlib/fmt/releases/download/11.0.2/fmt-11.0.2.zip"
+                URL_MD5 c622dca45ec3fc95254c48370a9f7a1d)
+   ELSE()
+-    SET(source URL "https://github.com/fmtlib/fmt/releases/download/12.2.0/fmt-12.2.0.zip"
+-               URL_MD5 6083253772ad29e73a4d5920be08918e)
++    SET(source URL "https://github.com/fmtlib/fmt/archive/0ce7d8708583bb745481e33841d5f56ee70c0e00.zip"
++               URL_MD5 10ec4ee8b9bc705c4356b35e040e4c41)
+   ENDIF()
+ 
+   ExternalProject_Add(
