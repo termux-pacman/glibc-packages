@@ -271,9 +271,9 @@ if [ "${GLIBC_RUNNER_RUN_SHELL}" = "true" ]; then
 else
 	if [ -n "$1" ]; then
 		if [ "${DISABLE_DYNAMIC_LINKER}" = "true" ]; then
-			exec $(_glibc-runner_debug) $@
+			exec $(_glibc-runner_debug) "$@"
 		elif [ "${GLIBC_RUNNER_RUN_CONFIGURE}" = "false" ]; then
-			exec $(_glibc-runner_debug) ld.so $@
+			exec $(_glibc-runner_debug) ld.so "$@"
 		fi
 	fi
 fi
