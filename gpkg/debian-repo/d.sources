@@ -1,0 +1,10 @@
+## See the sources.list(5) manual page for further settings.
+# http://http.us.debian.org/debian unstable main contrib non-free
+Types: deb
+URIs: https://deb.debian.org/debian
+Suites: unstable
+# Suites: sid
+Components: main
+# Components: main contrib non-free 
+# Signed-By: /home/a/etc/debian/asc
+Signed-By: /data/data/com.termux/debian/asc
