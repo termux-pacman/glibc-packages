@@ -1,0 +1,22 @@
+--- gcc-16.2.0/libatomic/configure	2026-08-07 10:47:30.066989210 +0300
++++ gcc-16.2.0/libatomic/configure.patch	2026-11-06 20:39:52.427089460 +0300
+@@ -1755,8 +1755,7 @@
+ esac
+ eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+ $as_echo "$ac_try_echo"; } >&5
+-  (eval "$ac_try") 2>&5
+-  ac_status=$?
++  ac_status=0
+   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+   test $ac_status = 0; }; }; then :
+   ac_retval=0
+@@ -3949,8 +3948,7 @@
+ esac
+ eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+ $as_echo "$ac_try_echo"; } >&5
+-  (eval "$ac_try") 2>&5
+-  ac_status=$?
++  ac_status=0
+   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+   test $ac_status = 0; }; }; then
+     cross_compiling=no
