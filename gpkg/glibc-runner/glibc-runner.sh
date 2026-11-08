@@ -48,7 +48,7 @@ _glibc-runner_set_up_teg() {
 
 _glibc-runner_set_up_binary() {
 	_glibc-runner_check_program "patchelf"
-	local LD_FILE=$(ls $GLIBC_PREFIX/lib/ld-* 2> /dev/null)
+	local LD_FILE=$(ls "$GLIBC_PREFIX"/lib/ld-* 2> /dev/null | head -n 1)
 	local LD_RPATH="${GLIBC_PREFIX}/lib"
 	if [ "$GLIBC_RUNNER_RUN_FINDLIB" = "true" ] && [ -n "$LD_LIBRARY_PATH" ]; then
 		LD_RPATH="$LD_LIBRARY_PATH"
@@ -56,9 +56,16 @@ _glibc-runner_set_up_binary() {
 	if [ -z "$LD_FILE" ]; then
 		_glibc-runner_error "interpreter not found in '$GLIBC_PREFIX/lib' directory"
 	fi
-	patchelf --set-rpath $LD_RPATH \
-		--set-interpreter $LD_FILE \
-		"$1"
+	if [ "$GLIBC_RUNNER_RUN_RPATH" = "true" ]; then
+		_glibc-runner_message "setting interpreter to '${LD_FILE}' and rpath to '${LD_RPATH}'"
+		patchelf --set-rpath "$LD_RPATH" \
+			--set-interpreter "$LD_FILE" \
+			"$1" || _glibc-runner_error "failed to configure '$1'"
+	else
+		_glibc-runner_message "setting interpreter to '${LD_FILE}'"
+		patchelf --set-interpreter "$LD_FILE" \
+			"$1" || _glibc-runner_error "failed to configure '$1'"
+	fi
 }
 
 _glibc-runner_findlib() {
@@ -155,6 +162,7 @@ _glibc-runner_help_message() {
 	echo " --shell     -s  run the glibc-runner shell or a command from that shell"
 	echo " --teg       -t  enable the use of termux-exec-glibc in the glibc-runner shell"
 	echo " --configure -c  configure the binary to run on the device"
+	echo " --rpath     -r  also set an rpath when configuring the binary"
 	echo " --findlib   -f  find libraries for the binary"
 	echo " --no-linker -n  don't use dynamic linker to launch binary"
 	echo " --debug     -d  [1|2|3|4]  launch binary or shell under strace"
@@ -203,6 +211,7 @@ DISABLE_DYNAMIC_LINKER=false
 GLIBC_RUNNER_RUN_SHELL=false
 GLIBC_RUNNER_RUN_FINDLIB=false
 GLIBC_RUNNER_RUN_CONFIGURE=false
+GLIBC_RUNNER_RUN_RPATH=false
 GLIBC_RUNNER_RUN_DEBUG=false
 
 while (($# >= 1)); do
@@ -212,6 +221,7 @@ while (($# >= 1)); do
 		-s|--shell) GLIBC_RUNNER_RUN_SHELL=true;;
 		-t|--teg) ENABLE_LIBTERMUX_EXEC_GLIBC=true;;
 		-c|--configure) GLIBC_RUNNER_RUN_CONFIGURE=true;;
+		-r|--rpath) GLIBC_RUNNER_RUN_RPATH=true;;
 		-f|--findlib) GLIBC_RUNNER_RUN_FINDLIB=true;;
 		-n|--no-linker) DISABLE_DYNAMIC_LINKER=true;;
 		-d|--debug)
